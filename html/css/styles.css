@@ -9,7 +9,18 @@ html, body {
     margin:      0;
 }
 
-#error {
+.error {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    height:          100%;
+    width:           100%;
+    overflow:        hidden;
+    word-break:      break-word;
+    color:           red;
+}
+
+.loading {
     display:         flex;
     align-items:     center;
     justify-content: center;

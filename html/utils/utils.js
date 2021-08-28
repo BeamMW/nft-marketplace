@@ -8,21 +8,11 @@ export default class Utils {
     static BEAM = null
     static APP = null
 
-    static onLoad(cback) {
+    static onLoad(creator) {
         window.addEventListener('load', () => new QWebChannel(qt.webChannelTransport, (channel) => {
             Utils.BEAM = channel.objects.BEAM
-            
-            document.body.style.color = Utils.BEAM.style.content_main
-            let topColor =  [Utils.BEAM.style.appsGradientOffset, "px,"].join('')
-            let mainColor = [Utils.BEAM.style.appsGradientTop, "px,"].join('')
-            
-            document.body.style.backgroundImage = `linear-gradient(to bottom, 
-                ${Utils.hex2rgba(Utils.BEAM.style.background_main_top)} ${topColor}
-                ${Utils.hex2rgba(Utils.BEAM.style.background_main)} ${mainColor}
-                ${Utils.hex2rgba(Utils.BEAM.style.background_main)}`
-
             Utils.onApiResult((...args) => Utils.handleApiResult(...args))
-            Utils.APP = cback(Utils.BEAM)
+            Utils.APP = creator(Utils.BEAM)
             Utils.APP.start()
         }))
     }
