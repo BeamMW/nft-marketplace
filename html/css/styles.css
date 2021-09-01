@@ -30,6 +30,15 @@ html, body {
     word-break:      break-word;
 }
 
+pre {
+    font-family: 'SFProDisplay', sans-serif;
+    font-weight: normal;
+}
+
+.restart {
+    font-size: 0.9em;
+}
+
 
 /*
 

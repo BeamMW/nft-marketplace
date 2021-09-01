@@ -1,7 +1,19 @@
-import App from './components/app.js'
-import utils from './utils/utils.js'
+import App    from './components/app.js'
+import Assets from './components/assets.js'
+import utils  from './utils/utils.js'
 
 utils.onLoad(beam => {
-    const vueApp = Vue.createApp(App, {beam})
+    const routes = [
+        {path: '/assets', component: Assets}
+    ]
+
+    const router = new VueRouter({
+        routes
+    })
+
+    const vueApp = Vue.createApp(App, {
+        beam
+    })
+    
     return vueApp.mount('body')
 })
