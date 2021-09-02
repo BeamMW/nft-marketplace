@@ -5,8 +5,10 @@ export default class Utils {
     //
     // API Exposed by the wallet itself
     //
-    static BEAM = null
-    static APP = null
+    static BEAM   = null
+    static APP    = null
+    static CallID = 0
+    static Calls  = {}
 
     static onLoad(creator) {
         window.addEventListener('load', () => new QWebChannel(qt.webChannelTransport, (channel) => {
@@ -70,17 +72,21 @@ export default class Utils {
         xhr.send(null)
     }
 
-    static callApi(callid, method, params) {
+    static callApi(method, params, cback) {
+        let callid = ['call', Utils.CallID++].join('-')
+        Utils.Calls[callid] = cback
+
         let request = {
             "jsonrpc": "2.0",
             "id":      callid,
             "method":  method,
             "params":  params
         }
+
         Utils.BEAM.api.callWalletApi(JSON.stringify(request))
     }
 
-    static invokeContract(callid, args, bytes) {
+    static invokeContract(args, cback, bytes) {
         let params = {
             "create_tx": false
         }
@@ -97,7 +103,7 @@ export default class Utils {
             }, params)
         }
 
-        return Utils.callApi(callid, 'invoke_contract', params)
+        return Utils.callApi('invoke_contract', params, cback)
     }
 
     static onApiResult(cback) {
@@ -111,7 +117,9 @@ export default class Utils {
             answer = JSON.parse(json)
             const id = answer.id
             const hid = Utils.id2HandlerId(id)
-            const cback = (Utils.APP[hid] || Utils.APP.onApiResult).bind(Utils.APP)
+            
+            const cback = Utils.Calls[id] || (Utils.APP[hid] || Utils.APP.onApiResult).bind(Utils.APP)
+            delete Utils.Calls[id]
             
             if (answer.error) {
                 return cback(answer)
@@ -129,15 +137,14 @@ export default class Utils {
                 let shaderAnswer = JSON.parse(answer.result.output)
                 if (shaderAnswer.error) {
                     return cback({
-                        error: sanswer.error,
+                        error: shaderAnswer.error,
                         answer
                     })
                 }
-                return cback(null, shaderAnswer)
+                return cback(null, shaderAnswer, answer)
             }
             else
             {
-                // usual api call result
                 return cback(null, answer.result, answer)
             }
         }
@@ -176,5 +183,13 @@ export default class Utils {
             }
             return
         }
+    }
+
+    static hexEncodeU8A (arr) {
+        return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
+    }
+
+    static hexDecodeU8A (str) {
+        return new Uint8Array(str.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
     }
 }

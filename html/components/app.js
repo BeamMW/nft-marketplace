@@ -10,15 +10,13 @@ export default {
     },
 
     created () {
-        // we do not need reactivity on data below
-        this.shader  = undefined
-        this.cid     = "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609"
+        this.shader = undefined
+        this.cid = "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609"
     },
 
     data () {
         return {
-            error: "",
-            errleft: 0
+            name: "value"
         }
     },
 
@@ -31,45 +29,20 @@ export default {
         }
     },
 
+    template: `
+        <router-view></router-view>
+    `,
+
     methods: {
-        renderApp () {
-            return html`
-                <div class="loading">
-                    Loading...
-                </div>
-            `
-        },
-
-        renderError () {
-            return html`
-                <div class="error">
-                    <div>
-                        <pre>${this.error}</pre>
-                        <span class="restart">Restarting in ${this.errleft}</span>
-                    </div>
-                </div>
-            `
-        },
-
-        setError (err, context) {
-            this.error = [context || "Error occured",  utils.formatJSON(err)].join(':\n')             
-            this.restart()
-        },
-
-        restart (now) {
-            if (this.timeout) {
-                clearInterval(this.timeout)
-            }
-            
-            this.errleft = now ? 0 : 3
-            this.timeout = setInterval(() => {
-                this.errleft -= 1
-                if (this.errleft == 0) {
-                    clearInterval(this.timeout)
-                    this.start()
+        setError (error, context) {
+            this.$router.push({
+                name: "error", 
+                params: {
+                    error: utils.formatJSON(error),
+                    context
                 }
-            }, now ? 0 : 1000)
-        },
+            })
+        },      
 
         start () {
             // adjust styles
@@ -82,7 +55,8 @@ export default {
             utils.download("./galleryManager.wasm", (err, bytes) => {
                 if (err) return this.setError(err, "Shader download")
                 this.shader = bytes
-                utils.invokeContract("checkCID", "role=manager,action=view", this.shader)
+                //utils.invokeContract("", (...args) => this.onShowMethods(...args))
+                utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.shader)
             })
         }, 
 
@@ -102,7 +76,9 @@ export default {
                 throw `Failed to verify cid '${this.cid}'`
             }
 
-            utils.invokeContract("showMethods")
+            this.$router.push({
+                name: "assets", 
+            })
         },
 
         onShowMethods (err, res) {
@@ -111,10 +87,5 @@ export default {
             }
             alert(utils.formatJSON(res))
         }
-    },
-
-    render (...args) {
-        if (this.error) return this.renderError(...args)
-        return this.renderApp(...args)
-    },
+    }
 }
