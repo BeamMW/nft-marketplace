@@ -5,6 +5,13 @@ import asset   from './asset.js'
 import loading from './loading.js'
 
 export default {
+    props: {
+        changed_txs: {
+            type: Array,
+            default: []
+        }
+    },
+
     components: {
         asset, upload
     },
@@ -17,7 +24,12 @@ export default {
                     v-bind:id="item.id"
                     v-bind:title="item.title"
                     v-bind:bytes="item.bytes"
-                    v-bind:artist="artists[item.pk].label"
+                    v-bind:artist="(artists[item.pk] || {}).label"
+                    v-bind:owned="item.owned"
+                    v-bind:approved="item.approved"
+                    v-bind:price="item.price"
+                    v-bind:in_tx="item.in_tx"
+                    v-on:tx-started="onTxStarted"
                 />
             </div>
         </div>    
@@ -27,6 +39,14 @@ export default {
         return {
             artists: {},
             items: []
+        }
+    },
+
+    watch: {
+        changed_txs: {
+            handler (old, val) {
+                this.loadItems()
+            }
         }
     },
 
@@ -47,24 +67,54 @@ export default {
                 this.artists[artist.key] = artist
             }
 
-            utils.invokeContract(`role=user,action=view_all,cid=${this.$root.cid},id=1`, (...args) => this.onLoadItems(...args))
+            this.loadItems()
         },
 
-        onLoadItems(err, res) {
+        loadItems () {
+            utils.invokeContract(`role=user,action=view_all,cid=${this.$root.cid},id=1`, 
+                (...args) => {
+                    this.onLoadItems(...args)
+                }
+            )
+        },
+
+        onLoadItems (err, res) {
             if (err) {
                 return this.$root.setError(err)
             }
 
             utils.ensureField(res, "items", "array")
-            this.rawItems = res.items
 
+            let items = []
             for (const item of res.items) {
-                if (item.id < 7) continue
-                //if (!item.approved) continue
-                
-                this.items.push(item)
-                this.loadItem(this.items.length - 1, item.id)
+                if (item.id < 12) continue
+            
+                if (item["price.aid"] != undefined) {
+                    item.price = {
+                        aid: item["price.aid"],
+                        amount: item["price.amount"]
+                    }
+                }
+
+                // TODO: optimize
+                let found = false
+                for (let idx = 0; idx < this.items.length; ++idx) {
+                    let old = this.items[idx]
+                    if (old.id == item.id) {
+                        item.title = old.title
+                        item.bytes = old.bytes
+                        found = true
+                    }
+                }
+
+                item.in_tx = false
+                items.push(item)
+                if (!found) {
+                    this.loadItem(items.length - 1, item.id)
+                }   
             }
+            
+            this.items = items
         },
 
         loadItem(idx, id) {
@@ -85,7 +135,6 @@ export default {
                     // parse name
                     let nend = data.findIndex(val => val == 0)
                     if (nend == -1 || nend + 1 == data.length) {
-                        alert("unable")
                         throw `Unable to parse image name`
                     }
 
@@ -101,6 +150,14 @@ export default {
                     item.bytes = bytes
                 }
             )
+        },
+
+        onTxStarted(id) {
+            for (let item of this.items) {
+                if (item.id == id) {
+                    item.in_tx = true
+                }
+            }
         }
     }
 }

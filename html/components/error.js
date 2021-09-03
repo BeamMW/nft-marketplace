@@ -19,7 +19,7 @@ export default {
         }
     },
 
-    created () {
+    mounted () {
         this.errleft = 5
         this.timeout = setInterval(() => {
             this.errleft -= 1
@@ -35,7 +35,8 @@ export default {
 
     computed: {
         errorText () {
-            return [this.context, this.error].join(':\n')
+            alert(this.context)
+            return [this.context, this.error].join('\n')
         }
     },
 

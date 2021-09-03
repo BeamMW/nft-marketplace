@@ -44,8 +44,9 @@ export default class Utils {
         this.getById(id).classList.add("hidden");
     }
 
-    static formatJSON(json) {
-        return JSON.stringify(json, null, 2)
+    static formatJSON(obj) {
+        let res = JSON.stringify(obj, null, 2)
+        return res == "{}" ? obj.toString() : res
     }
 
     static download(url, cback) {
@@ -151,7 +152,7 @@ export default class Utils {
         catch (err)
         {
             Utils.APP.onApiResult({
-                error: Utils.formatJSON(err) == "{}" ? err.toString() : err,
+                error: err.toString(),
                 answer: answer || json
             })
         }

@@ -31,7 +31,6 @@ export default {
                              utils.hexEncodeU8A(asep), 
                              utils.hexEncodeU8A(aimg)
                             ].join('')
-                alert(`Uploading image\nName: ${name}\nData size: ${hex.length}`)
                 utils.invokeContract(`role=artist,action=upload,cid=${this.$root.cid},data=${hex}`, (...args) => this.onUpload(...args))
             }
         },
@@ -47,10 +46,8 @@ export default {
 
         onSendToChain (err, resp) {
             if (err) {
-                alert("error")
                 return this.$root.setError(err, "Failed to upload image")
             }
-            //alert(utils.formatJSON(resp))
         }
     }
 }

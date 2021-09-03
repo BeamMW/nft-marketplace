@@ -8,7 +8,7 @@ utils.onLoad(beam => {
     const routes = [
         {path: '/',       name: "root",   component: Loading},
         {path: '/error',  name: "error",  component: Error, props: true},
-        {path: '/assets', name: "assets", component: Assets}
+        {path: '/assets', name: "assets", component: Assets, props: true}
     ]
 
     const router = VueRouter.createRouter({

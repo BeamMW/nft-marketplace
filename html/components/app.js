@@ -6,17 +6,22 @@ export default {
         beam: {
             type: Object,
             required: true
+        },
+        changed_tx: {
+            type: String,
+            required: false,
+            default: "defval"
         }
     },
 
     created () {
         this.shader = undefined
         this.cid = "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609"
+        this.check_txs = false
     },
 
     data () {
         return {
-            name: "value"
         }
     },
 
@@ -56,6 +61,7 @@ export default {
                 if (err) return this.setError(err, "Shader download")
                 this.shader = bytes
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args))
+                utils.callApi("ev_subunsub", {ev_txs_changed: true}, (...args) => this.checkError(...args))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.shader)
             })
         }, 
@@ -64,6 +70,33 @@ export default {
             if (err) {
                 return this.setError(err,  "API handling error")
             }
+
+            if (full.id == 'ev_txs_changed') {
+                if (!this.check_txs) {
+                    return
+                }
+                
+                let txs = full.result.txs
+                let changed = []
+
+                for (let tx of txs) {
+                    if (tx.status == 2 || tx.status == 3 || tx.status == 4) {
+                        changed.push(tx.txId)
+                    }
+                }
+
+                if (changed.length) {
+                    this.$router.push({
+                        name: "assets", 
+                        params: {
+                            changed_txs: changed
+                        }
+                    })
+                }
+
+                return
+            }
+
             this.setError(full, "Unexpected API result")
         },
         
@@ -77,8 +110,9 @@ export default {
             }
 
             this.$router.push({
-                name: "assets", 
+                name: "assets"
             })
+            this.check_txs = true
         },
 
         onShowMethods (err, res) {
@@ -86,6 +120,10 @@ export default {
                 return this.setError(err)
             }
             alert(utils.formatJSON(res))
+        },
+
+        checkError(err) {
+            if (err) return this.setError(err)
         }
     }
 }

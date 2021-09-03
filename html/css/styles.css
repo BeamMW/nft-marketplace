@@ -91,38 +91,17 @@ pre {
     border-radius: 5px;
 }
 
-.item > .first-row,
-.item > .second-row {
+.item > .info-row
+{
     box-sizing: border-box;
     padding-left: 18px;
     padding-right: 18px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 3px;
 }
 
-.item > .second-row {
-    margin-top: 3px;
-}
-
-.item .artist, 
-.item .cprice 
-{
-    font-size: 0.8em;
-    opacity: 0.5;
-}
-
-.item .title,
-.item .price 
-{
-    opacity: 0.9;
-}
-
-.item .price {
-    font-weight: bolder;
-}
-
-<!--
 ::-webkit-scrollbar {
     width: 11px;
     height: 10px;
@@ -141,4 +120,63 @@ pre {
 
 ::-webkit-scrollbar-button {
     display: none;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.green {
+    background-color: limegreen;
+}
+
+.red {
+    background-color: crimson;
+}
+
+.darker {
+    opacity: 0.5
+}
+
+.small {
+    font-size: 0.85em;
+}
+
+.normal {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.bolder {
+    font-weight: 500;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.hidden {
+    display: none;
+}
+
+a {
+    color: limegreen;
+    text-decoration: none;
+}
+
+.buy {
+    color: limegreen;
+    border: 1px solid limegreen;
+    border-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 0.78em;
+}
+
+.ml-hem {
+    margin-left: 0.5em;
 }
