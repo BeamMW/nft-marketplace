@@ -1,27 +1,28 @@
 import html from '../utils/html.js'
 import utils from '../utils/utils.js'
+import assets from './assets.js'
+import loading from './loading.js'
+import error from './error.js'
 
 export default {
     props: {
         beam: {
             type: Object,
             required: true
-        },
-        changed_tx: {
-            type: String,
-            required: false,
-            default: "defval"
         }
     },
 
     created () {
         this.shader = undefined
-        this.cid = "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609"
-        this.check_txs = false
+        this.cid    = "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609"
     },
 
     data () {
         return {
+            loading: true,
+            artist_key: "",
+            changed_txs: [],
+            error: undefined
         }
     },
 
@@ -34,20 +35,42 @@ export default {
         }
     },
 
-    template: `
-        <router-view></router-view>
-    `,
+    render () {
+        if (this.error) {
+            return html`
+                <${error} 
+                    error=${this.error.error} 
+                    context=${this.error.context}
+                    onClearError=${this.clearError}
+                />`
+        }
+
+        if (this.loading) {
+            return html`<${loading}/>`
+        }
+
+        return html`
+            <${assets} cid=${this.cid} artist_key=${this.artist_key} changed_txs=${this.changed_txs}/>
+        `
+    },
 
     methods: {
         setError (error, context) {
-            this.$router.push({
-                name: "error", 
-                params: {
+            if (error) {
+                this.error = {
                     error: utils.formatJSON(error),
                     context
                 }
-            })
-        },      
+            }
+            else {
+                this.error = undefined
+            }
+        },     
+        
+        clearError() {
+            this.error = undefined
+            this.start()
+        },
 
         start () {
             // adjust styles
@@ -71,11 +94,7 @@ export default {
                 return this.setError(err,  "API handling error")
             }
 
-            if (full.id == 'ev_txs_changed') {
-                if (!this.check_txs) {
-                    return
-                }
-                
+            if (full.id == 'ev_txs_changed') {                
                 let txs = full.result.txs
                 let changed = []
 
@@ -86,14 +105,9 @@ export default {
                 }
 
                 if (changed.length) {
-                    this.$router.push({
-                        name: "assets", 
-                        params: {
-                            changed_txs: changed
-                        }
-                    })
+                    this.changed_txs = changed
                 }
-
+                
                 return
             }
 
@@ -109,16 +123,22 @@ export default {
                 throw `Failed to verify cid '${this.cid}'`
             }
 
-            this.$router.push({
-                name: "assets"
-            })
-            this.check_txs = true
+            utils.invokeContract(
+                `role=artist,action=get_key,cid=${this.cid}`, 
+                (...args) => this.onGetArtistKey(...args), this.shader
+            )
+        },
+
+        onGetArtistKey(err, res) {
+            if (err) return this.setError(err)     
+            
+            utils.ensureField(res, "key", "string")
+            this.artist_key = res.key
+            this.loading = false
         },
 
         onShowMethods (err, res) {
-            if (err) {
-                return this.setError(err)
-            }
+            if (err) return this.setError(err)
             alert(utils.formatJSON(res))
         },
 

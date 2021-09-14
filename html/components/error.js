@@ -1,5 +1,4 @@
 import html from '../utils/html.js'
-import utils from '../utils/utils.js'
 
 export default {
     props: {
@@ -25,22 +24,19 @@ export default {
             this.errleft -= 1
             if (this.errleft == 0) {
                 clearInterval(this.timeout)
-                this.$router.push({
-                    name: "root", 
-                })
-                this.$root.start()
+                this.$emit('clear-error')
             }
         }, 1000)
     },
 
     computed: {
         errorText () {
-            alert(this.context)
+            // TODO: handle long errors
             return [this.context, this.error].join('\n')
         }
     },
 
-    render (...args) {
+    render () {
         return html`
             <div class="error">
                 <div>

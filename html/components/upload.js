@@ -2,10 +2,25 @@ import html from '../utils/html.js'
 import utils from '../utils/utils.js'
 
 export default {
-    render (...args) {
+    props: {
+        is_artist: {
+            type: Boolean,
+            default: false
+        }
+    },
+
+    render () {
+        if (this.is_artist) {
+            return html`
+                <div class="upload">
+                    <input type="file" accept="image/png, image/jpeg" onChange=${this.previewFile}></input>
+                </div>
+            `
+        }
+        
         return html`
-            <div class="upload">
-                <input type="file" accept="image/png, image/jpeg" onChange=${this.previewFile}></input>
+            <div class="upload darker">
+                <i>You should become an artist to upload images</i>
             </div>
         `
     },
@@ -36,9 +51,7 @@ export default {
         },
 
         onUpload(err, sres, full) {
-            if (err) {
-                return this.$root.setError(err, "Failed to generate upload request")
-            }
+            if (err) return this.$root.setError(err, "Failed to generate upload request")
 
             utils.ensureField(full.result, "raw_data", "array")
             utils.callApi('process_invoke_data', {data: full.result.raw_data}, (...args) => this.onSendToChain(...args))
@@ -46,6 +59,7 @@ export default {
 
         onSendToChain (err, resp) {
             if (err) {
+                if (utils.isUserCancelled(err)) return
                 return this.$root.setError(err, "Failed to upload image")
             }
         }

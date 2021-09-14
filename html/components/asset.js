@@ -1,7 +1,6 @@
 import html    from '../utils/html.js'
 import loading from './loading.js'
 import dot     from './dot.js'
-import utils   from '../utils/utils.js'
 
 export default {
     props: {
@@ -24,11 +23,11 @@ export default {
         },
         owned: {
             type: Number,
-            default: 0
+            default: 1//0 !!test
         },
         approved: {
             type: Number,
-            default: 0
+            default: 1//0 !!test
         },
         price: {
             type: Object,
@@ -40,17 +39,17 @@ export default {
         }
     },
 
-    emits: ['tx-started'],
+    emits: ['buy', 'sell'],
 
     computed: {
         ownerText () {
             if (this.artist) return this.artist
             if (this.owned) return "You own this item"
-            return "Somebody";
+            return "Somebody"
         },
     },
 
-    render (...args) {
+    render () {
         return html`
             <div class="item">
                 ${this.renderPreview()}
@@ -136,47 +135,12 @@ export default {
 
         onBuy (ev) {
             ev.preventDefault()
-            utils.invokeContract(
-                `role=user,action=buy,id=${this.id},cid=${this.$root.cid}`, 
-                (...args) => this.onMakeTx(...args)
-            )
+            this.$emit('buy', this.id)
         },
 
         onSell (ev) {
-            // TODO: only render here, move all actions up
             ev.preventDefault()
-            try
-            {
-                // TODO: show custom dialog
-                // TODO: support float values
-                let price = prompt("Enter the price in BEAM")
-                if (price == null) return
-                price = parseInt(price) * 100000000
-
-                utils.invokeContract(
-                    `role=user,action=set_price,id=${this.id},amount=${price},aid=0,cid=${this.$root.cid}`, 
-                    (...args) => this.onMakeTx(...args)
-                )
-            } 
-            catch (err) 
-            {
-                this.$root.setError(err, "Failed to sell an item")
-            }
-        },
-
-        onMakeTx(err, sres, full) {
-            if (err) {
-                return this.$root.setError(err, "Failed to generate transaction request")
-            }
-            utils.ensureField(full.result, "raw_data", "array")
-            utils.callApi('process_invoke_data', {data: full.result.raw_data}, (...args) => this.onSendToChain(...args))
-        },
-
-        onSendToChain (err, resp) {
-            if (err) {
-                return this.$root.setError(err, "Failed to create transaction")
-            }
-            this.$emit('tx-started', this.id)
+            this.$emit('sell', this.id)
         }
     }
 }

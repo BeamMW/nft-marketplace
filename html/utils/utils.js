@@ -193,4 +193,8 @@ export default class Utils {
     static hexDecodeU8A (str) {
         return new Uint8Array(str.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
     }
+
+    static isUserCancelled (err) {
+        return err.error && err.error.code == -32021
+    }
 }
