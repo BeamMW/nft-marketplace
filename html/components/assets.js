@@ -78,7 +78,7 @@ export default {
 
     methods: {
         onLoadArtists(err, res) {
-            if (err) return this.$root.setError(err)
+            if (err) return this.$root.setError(err, "Failed to load artists")
         
             utils.ensureField(res, "artists", "array")
             for (const artist of res.artists) {
@@ -96,7 +96,7 @@ export default {
         },
 
         onLoadItems (err, res) {
-            if (err) return this.$root.setError(err)
+            if (err) return this.$root.setError(err, "Failed to load artwork list")
         
             // TODO: load transactions and check if any item is in_tx
             utils.ensureField(res, "items", "array")
@@ -136,7 +136,7 @@ export default {
             utils.invokeContract(`role=user,action=download,cid=${this.cid},id=${id}`,
                 (err, res) => {
                     if (err) {
-                        return this.$root.setError(err)
+                        return this.$root.setError(err, "Failed to download an artwork")
                     }
 
                     utils.ensureField(res, "data", "string")
@@ -170,7 +170,7 @@ export default {
         onBuyAsset(id) {
             utils.invokeContract(
                 `role=user,action=buy,id=${id},cid=${this.cid}`, 
-                (...args) => this.makeTx(...args)
+                (...args) => this.onMakeTx(...args)
             )
         },
 

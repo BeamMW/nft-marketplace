@@ -23,11 +23,11 @@ export default {
         },
         owned: {
             type: Number,
-            default: 1//0 !!test
+            default: 0
         },
         approved: {
             type: Number,
-            default: 1//0 !!test
+            default: 0
         },
         price: {
             type: Object,

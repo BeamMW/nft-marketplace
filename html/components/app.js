@@ -1,8 +1,8 @@
-import html from '../utils/html.js'
-import utils from '../utils/utils.js'
-import assets from './assets.js'
+import html    from '../utils/html.js'
+import utils   from '../utils/utils.js'
+import assets  from './assets.js'
 import loading from './loading.js'
-import error from './error.js'
+import error   from './error.js'
 
 export default {
     props: {
@@ -56,20 +56,12 @@ export default {
 
     methods: {
         setError (error, context) {
-            if (error) {
-                this.error = {
-                    error: utils.formatJSON(error),
-                    context
-                }
-            }
-            else {
-                this.error = undefined
-            }
+            this.error = {error, context}
+            if (!!this.error) this.start()
         },     
         
         clearError() {
-            this.error = undefined
-            this.start()
+            this.setError(undefined, undefined)
         },
 
         start () {
@@ -116,11 +108,11 @@ export default {
         
         onCheckCID (err, res) {
             if (err) {
-                return this.setError(err)     
+                return this.setError(err, "Failed to verify cid")     
             }
  
             if (!res.contracts.some(el => el.cid == this.cid)) {
-                throw `Failed to verify cid '${this.cid}'`
+                throw `CID not found '${this.cid}'`
             }
 
             utils.invokeContract(
@@ -130,7 +122,7 @@ export default {
         },
 
         onGetArtistKey(err, res) {
-            if (err) return this.setError(err)     
+            if (err) return this.setError(err, "Failed to get artist key")     
             
             utils.ensureField(res, "key", "string")
             this.artist_key = res.key

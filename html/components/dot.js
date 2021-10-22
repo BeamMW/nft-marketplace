@@ -9,7 +9,7 @@ export default {
         }
     },
 
-    render (...args) {
+    render () {
         return html`<span class="dot ${this.state}"/>`
     }
 }

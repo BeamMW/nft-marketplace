@@ -1,10 +1,10 @@
-import html from '../utils/html.js'
+import html  from '../utils/html.js'
+import utils from '../utils/utils.js'
 
 export default {
     props: {
         error: {
-            type: String,
-            default: ""
+            default: undefined
         },
         context: {
             type: String,
@@ -31,8 +31,16 @@ export default {
 
     computed: {
         errorText () {
-            // TODO: handle long errors
-            return [this.context, this.error].join('\n')
+            // strip off some long unncessary binary stuff that might occur here
+            if (this.error.answer && 
+                this.error.answer.result 
+                && this.error.answer.result.raw_data) 
+            {
+                this.error.answer.result.raw_data = "--excluded--"
+            }
+            
+            let serr = utils.formatJSON(this.error)
+            return [this.context, serr].join('\n')
         }
     },
 
