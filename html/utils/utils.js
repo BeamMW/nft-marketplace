@@ -119,7 +119,7 @@ export default class Utils {
             const id = answer.id
             const hid = Utils.id2HandlerId(id)
             
-            const cback = Utils.Calls[id] || (Utils.APP[hid] || Utils.APP.onApiResult).bind(Utils.APP)
+            const cback = Utils.Calls[id] || Utils.APP.onApiResult.bind(Utils.APP)
             delete Utils.Calls[id]
             
             if (answer.error) {

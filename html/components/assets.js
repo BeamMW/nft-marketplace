@@ -3,18 +3,24 @@ import upload  from './upload.js'
 import asset   from './asset.js'
 
 export default {
-    props: {
-        changed_txs: {
-            type: Array,
-            default: []
+    computed: {
+        changed_txs () {
+            return this.$state.changed_txs
         },
-        artist_key: {
-            type: String,
-            required: true
+        artist_key () {
+            return this.$state.artist_key
         },
-        cid: {
-            type: String,
-            required: true
+        cid () {
+            return this.$state.cid
+        },
+        is_artist () {
+            for (let aid in this.artists) {
+                let artist = this.artists[aid]
+                if (artist.key == this.artist_key) {
+                    return true
+                }
+            }
+            return false
         }
     },
 
@@ -46,18 +52,6 @@ export default {
         return {
             artists: {},
             items: []
-        }
-    },
-
-    computed: {
-        is_artist () {
-            for (let aid in this.artists) {
-                let artist = this.artists[aid]
-                if (artist.key == this.artist_key) {
-                    return true
-                }
-            }
-            return false
         }
     },
 
@@ -170,7 +164,7 @@ export default {
         onBuyAsset(id) {
             utils.invokeContract(
                 `role=user,action=buy,id=${id},cid=${this.cid}`, 
-                (...args) => this.onMakeTx(...args)
+                (...args) => this.MakeTx(...args)
             )
         },
 
@@ -184,7 +178,7 @@ export default {
 
                 utils.invokeContract(
                     `role=user,action=set_price,id=${id},amount=${price},aid=0,cid=${this.cid}`, 
-                    (err, sres, fres) => this.onMakeTx(err, sres, fres, id)
+                    (err, sres, fres) => this.MakeTx(err, sres, fres, id)
                 )
             } 
             catch (err) 

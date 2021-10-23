@@ -24,7 +24,7 @@ export default {
             this.errleft -= 1
             if (this.errleft == 0) {
                 clearInterval(this.timeout)
-                this.$emit('clear-error')
+                this.$store.clearError()
             }
         }, 1000)
     },
