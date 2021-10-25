@@ -15,11 +15,11 @@ export default {
         title: {
             type: String,
             required: true,
-            default: "Loading..."
+            default: ""
         },
         bytes: {
             type: Object,
-            default: undefined
+            default: []
         },
         owned: {
             type: Number,
@@ -44,21 +44,21 @@ export default {
     computed: {
         ownerText () {
             if (this.artist) return this.artist
-            if (this.owned) return "You own this item"
+            if (this.owned) return "You own this artwork"
             return "Somebody"
         },
     },
 
     render () {
         return html`
-            <div class="item">
+            <div class="artwork">
                 ${this.renderPreview()}
                 <div class="info-row">
                     <span class="small darker">${this.ownerText}</span>
                     <span class="small darker ${this.price && !this.in_tx ? '' : 'hidden'}">Price</span>
                 </div>
                 <div class="info-row">
-                    <span>${this.renderDot()}<span class="normal bolder">${this.title}</span></span>
+                    <span>${this.renderDot()}<span class="normal bolder">${this.title || "Loading..."}</span></span>
                     ${this.renderPrice()}
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default {
 
     methods: {
         renderPreview() {
-            if (this.bytes) {
+            if (this.bytes.length) {
                 let image = URL.createObjectURL(new Blob([this.bytes], {type: 'image/jpeg'}))
                 return html`
                     <div class="preview-container">

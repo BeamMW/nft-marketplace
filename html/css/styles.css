@@ -51,7 +51,7 @@ pre {
     height: 100%
 }
 
-.items {
+.artworks {
     display:   flex;
     flex-wrap: wrap;
     overflow:  auto;
@@ -60,7 +60,7 @@ pre {
     margin-bottom: -16px;
 }
 
-.items > .item {
+.artworks > .artwork {
     margin-left: 16px;
     margin-bottom:  16px;
 
@@ -74,7 +74,7 @@ pre {
 
 }
 
-.item .preview-container {
+.artwork .preview-container {
     height: 350px;
     margin-bottom: 18px;
     margin-top: 20px;
@@ -85,14 +85,14 @@ pre {
     justify-content: center;
 }
 
-.item  img {
+.artwork  img {
     max-width:100%;
     max-height:100%;
     object-fit: contain;
     border-radius: 5px;
 }
 
-.item > .info-row
+.artwork > .info-row
 {
     box-sizing: border-box;
     padding-left: 18px;

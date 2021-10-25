@@ -4,7 +4,7 @@ import {router} from './router.js'
 import utils    from './utils/utils.js'
 
 utils.onLoad(beam => {
-    const vueApp = Vue.createApp(App, {beam})
+    const vueApp = Vue.createApp(App)
     
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
