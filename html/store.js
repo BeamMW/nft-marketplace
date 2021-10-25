@@ -126,6 +126,9 @@ export const store = {
     },
 
     loadParams () {
+        // TODO: move loading sequence to promises, now loadBalance initiates update chain
+        //       do not chain functions, but execue promises arrayy
+        //       cancel all pending promises in new ev_system_state
         utils.invokeContract(
             `role=manager,action=view_params,cid=${this.state.cid}`, 
             (...args) => this.onLoadParams(...args)
@@ -145,8 +148,6 @@ export const store = {
     },
     
     loadBalance() {
-        // TODO: move loading sequence to promises, now loadBalance initiates update chain
-        //       do not chain functions, but execue promises arrayy
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
             (...args) => this.onLoadBalance(...args)
