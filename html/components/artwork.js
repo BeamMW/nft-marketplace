@@ -55,7 +55,7 @@ export default {
                 ${this.renderPreview()}
                 <div class="info-row">
                     <span class="small darker">${this.ownerText}</span>
-                    <span class="small darker ${this.price && !this.in_tx ? '' : 'hidden'}">Price</span>
+                    <span class="small darker ${this.price ? '' : 'hidden'}">Price</span>
                 </div>
                 <div class="info-row">
                     <span>${this.renderDot()}<span class="normal bolder">${this.title || "Loading..."}</span></span>
@@ -95,15 +95,12 @@ export default {
         },
         
         renderPrice() {
-            if (this.in_tx) {
-                return html`<span class='small darker'>Transaction in progress</span>`
-            }
-
             // if has price - just display it and return
             if (this.price) {
                 let amount = this.price.amount / 100000000
                 
-                // if owned can cancel & change
+                // TODO: if owned && has price should be able to cancel or change price
+                //       probably not for the first version
                 if (this.owned) {
                     return html`<span class="normal bold">${amount} BEAM</span>`
                 }
@@ -111,7 +108,7 @@ export default {
                 // if not owned can only buy
                 return html`
                     <span>
-                        <a href="#" onclick=${this.onBuy} class="buy">BUY</a>
+                        <a href="#" onclick=${this.onBuy} class="buy ${this.in_tx ? 'darker' : ''}">BUY</a>
                         <span class="normal bold ml-hem">${amount} BEAM</span>
                     </span>
                 `
@@ -135,12 +132,16 @@ export default {
 
         onBuy (ev) {
             ev.preventDefault()
-            this.$emit('buy', this.id)
+            if (!this.in_tx) {
+                this.$emit('buy', this.id)
+            }
         },
 
         onSell (ev) {
             ev.preventDefault()
-            this.$emit('sell', this.id)
+            if (!this.in_tx) {
+                this.$emit('sell', this.id)
+            }
         }
     }
 }

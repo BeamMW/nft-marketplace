@@ -7,11 +7,14 @@ const defaultState = () => {
         error: undefined,
         shader: undefined,
         cid: "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609",
-        changed_txs: undefined,
         artist_key: "",
         is_artist: false,
-        artworks: [], // TODO: Refresh artworks & artists by timer, 1min should be OK
-        artists: {} 
+        is_admin: false,
+        artworks: [], 
+        artists: {},
+        artists_count: 0,
+        balance_beam: 0,
+        in_tx: false,
     }
 }
 
@@ -46,11 +49,15 @@ export const store = {
                 if (err) return this.setError(err, "Failed to download shader")
                 this.state.shader = bytes
 
-                //utils.invokeContract("", (...args) => this.onShowMethods(...args))
-                utils.callApi("ev_subunsub", {ev_txs_changed: true}, (err) => this.checkError(err))
+                //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
+                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
+    },
+
+    refreshAllData () {
+        this.loadParams()
     },
 
     onCheckCID (err, res) {
@@ -81,20 +88,24 @@ export const store = {
             return this.setError(err,  "API handling error")
         }
 
-        if (full.id == 'ev_txs_changed') {                
+        if (full.id == 'ev_txs_changed') {   
+            let inTx = false            
             let txs = full.result.txs
-            let changed = []
-
+            
             for (let tx of txs) {
-                if (tx.status == 2 || tx.status == 3 || tx.status == 4) {
-                    changed.push(tx.txId)
+                if (tx.status == 0 || tx.status == 1 || tx.status == 5) {
+                    inTx = true
+                    break
                 }
             }
 
-            if (changed.length) {
-                this.state.changed_txs = changed
-            }
-            
+            this.state.in_tx = inTx
+            return
+        }
+
+        if (full.id == 'ev_system_state') {
+            // we update our data on each block
+            this.refreshAllData()
             return
         }
 
@@ -102,16 +113,78 @@ export const store = {
     },
 
     //
-    // Artists
+    // Self info, balance & stuff
     //
     onGetArtistKey(err, res) {
-        if (err) return this.setError(err, "Failed to get artist key")     
+        if (err) {
+            return this.setError(err, "Failed to get artist key")     
+        }
         
         utils.ensureField(res, "key", "string")
         this.state.artist_key = res.key
+        this.refreshAllData()
+    },
+
+    loadParams () {
+        utils.invokeContract(
+            `role=manager,action=view_params,cid=${this.state.cid}`, 
+            (...args) => this.onLoadParams(...args)
+        )
+    },
+
+    onLoadParams (err, res) {
+        if (err) {
+            return this.setError(err, "Failed to load contract params")
+        }
+
+        // TODO: res.Exibits == count of artworks
+        //       check it and if not changed do not reload
+        utils.ensureField(res, "Admin", "number")
+        this.state.is_admin = !!res.Admin
+        this.loadBalance()
+    },
+    
+    loadBalance() {
+        // TODO: move loading sequence to promises, now loadBalance initiates update chain
+        //       do not chain functions, but execue promises arrayy
+        utils.invokeContract(
+            `role=user,action=view_balance,cid=${this.state.cid}`, 
+            (...args) => this.onLoadBalance(...args)
+        )
+    },
+
+    onLoadBalance(err, res) {
+        if (err) {
+            return this.setError(err, "Failed to load balance")
+        }
+
+        // totals can be missing if user has nothing at all
+        // also there can be not only beam. We just interested
+        // only in beam for now
+        if (res.totals) {
+            utils.ensureField(res, "totals", "array")
+            for (let item of res.totals) {
+                if (item.aid == 0) {
+                    this.state.balance_beam = item.amount
+                }
+            }
+        }
+
         this.loadArtists()
     },
 
+    withdrawBEAM () {
+        //utils.invokeContract(
+        //    `role=user,action=view_balance,cid=${this.state.cid}`, 
+        //    (...args) => this.onLoadBalance(...args)
+        //)
+        // TODO: ask valdo how to withdraw correctly
+        alert("to be done, need to ask Vlad how to do that")
+    },
+
+    //
+    // Artists
+    //
     loadArtists () {
         utils.invokeContract(
             `role=manager,action=view_artists,cid=${this.state.cid}`, 
@@ -120,30 +193,45 @@ export const store = {
     },
 
     onLoadArtists(err, res) {
-        if (err) return this.setError(err, "Failed to load artists list")
-
-        utils.ensureField(res, "artists", "array")
-
-        let artists = {}
-        for (let artist of res.artists) {
-            if (artist.key == this.state.artist_key) {
-                this.state.is_artist = true
-            }
-            artists[artist.key] = artist
+        if (err) {
+            return this.setError(err, "Failed to load artists list")
         }
 
-        this.state.artists = artists
+        utils.ensureField(res, "artists", "array")
+        //
+        // OPTIMIZE: 
+        //       code below is not optimized, need to ask Vlad  if it is possible for contract/app to
+        //       return artists old artists before new. In this case we can skip artists_count in res.artists
+        //
+        //       for (let idx = this.state.artists_count; idx < res.artists.length; ++idx) {
+        //          let artist = res.artists[idx]
+        //          if (artist.key == this.state.artist_key) {
+        //            this.state.is_artist = true
+        //          }
+        //          this.state.artists[artist.key] = artist
+        //       }
+        //
+        if (this.state.artists_count != res.artists.length) {
+            let artists = []
+            for (let artist of res.artists) {
+                if (artist.key == this.state.artist_key) {
+                    this.state.is_artist = true
+                }
+                artists.push(artist)
+            }
+            this.state.artists = artists
+        } 
+        // END OF NOT OPTIMIZED
+        this.state.artists_count = res.artists.length
         this.loadArtworks()
     },
 
-    
     //
     // Artworks
     //
     loadArtworks () {
         utils.invokeContract(
-            // TODO: do we need id=1 here?
-            `role=user,action=view_all,cid=${this.state.cid},id=1`, 
+            `role=user,action=view_all,cid=${this.state.cid}`, 
             (...args) => this.onLoadArtworks(...args)
         )    
     },
@@ -153,12 +241,10 @@ export const store = {
             return this.setError(err, "Failed to load artwork list")
         }
     
-        // TODO: load transactions and check if any item is in_tx
         utils.ensureField(res, "items", "array")
-    
         let artworks = []
         for (const artwork of res.items) {
-            // TODO: remove if, this is for test only
+            // TODO: remove if < 12, this is for test only
             if (artwork.id < 12) continue
         
             if (artwork["price.aid"] != undefined) {
@@ -176,13 +262,11 @@ export const store = {
                     artwork.title = old.title
                     artwork.bytes = old.bytes
                     found = true
+                    break
                 }
             }
 
-            // TODO: load transactions and check if any item is in_tx
-            artwork.in_tx = false
             artworks.push(artwork)
-
             if (!found) {
                 this.loadArtwork(artworks.length - 1, artwork.id)
             }   
@@ -200,8 +284,8 @@ export const store = {
         )  
     },
 
-    // TODO: check if we need to pass id
-    onLoadArtwork(err, res, idx, id) {
+    // TODO: check if we need to pass idx
+    onLoadArtwork(err, res, idx) {
         if (err) {
             return this.setError(err, "Failed to download an artwork")
         }
@@ -239,6 +323,7 @@ export const store = {
     // Buy & Sell
     //
     buyArtwork (id) {
+        // TODO: what will happen if two different users would hit buy during the same block?
         utils.invokeContract(
             `role=user,action=buy,id=${id},cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
@@ -258,10 +343,10 @@ export const store = {
         }
 
         utils.ensureField(full.result, "raw_data", "array")
-        //utils.callApi(
-        //    'process_invoke_data', {data: full.result.raw_data}, 
-        //     (...args) => this.onSendToChain(...args)
-        //)
+        utils.callApi(
+            'process_invoke_data', {data: full.result.raw_data}, 
+            (...args) => this.onSendToChain(...args)
+        )
     },
 
     onSendToChain(err, res) {
@@ -269,12 +354,6 @@ export const store = {
             if (utils.isUserCancelled(err)) return
             return this.$root.setError(err, "Failed to create transaction")
         }
-
-        // TODO: check that artwork becomes in_tx
-        //for (let item of this.items) {
-        //    if (item.id == id) {
-        //        item.in_tx = true
-        //    }
-        //}
+        utils.ensureField(res, "txid", "string")
     }
 }

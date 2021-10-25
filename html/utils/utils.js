@@ -1,6 +1,8 @@
 const MIN_AMOUNT = 0.00000001;
 const MAX_AMOUNT = 254000000;
 
+// TODO: move to new utils, ensure we create 6.1 API
+// TODO: move to new contract
 export default class Utils {
     //
     // API Exposed by the wallet itself
