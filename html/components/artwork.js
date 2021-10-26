@@ -118,7 +118,7 @@ export default {
             if (this.owned) {
                 // if already approved then can sell
                 if (this.approved) {
-                    return html`<a href="#" class="buy" onclick=${this.onSell}>SELL</a>`
+                    return html`<a href="#" class="buy ${this.in_tx ? 'darker' : ''}" onclick=${this.onSell}>SELL</a>`
                 } 
                 // otherwise wait for approval
                 return html`<span class='small darker'>Waiting for approval</span>`
