@@ -217,7 +217,14 @@ export const store = {
         //       }
         //
         if (this.state.artists_count != res.artists.length) {
-            let artists = []
+            if (!this.state.selected_artist) {
+                // choose first artist for admin if nobody is selected
+                this.state.selected_artist = {
+                    key: res.artists[0].key,
+                    label: res.artists[0].label
+                }
+            }
+
             for (let artist of res.artists) {
                 if (artist.key == this.state.artist_key) {
                     this.state.is_artist = true

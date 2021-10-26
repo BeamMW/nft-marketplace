@@ -3,13 +3,16 @@ export default {
     computed: {
         artists() {
             return this.$state.artists
+        },
+        artists_count() {
+            return this.$state.artists_count
         }
     },
 
     template: `
         <div class="upload">
             <input type="button" value="Add new artist" v-on:click.native="onAddArtist"/>
-            <span v-if="!artists || !artists.length">Add artists to upload artworks</span>
+            <span v-if="!artists_count">Add artists to upload artworks</span>
             <span v-else>
                 <span>Upload for artist:&nbsp;&nbsp;</span>
                 <select name="upload_artist" v-model="$state.selected_artist">
