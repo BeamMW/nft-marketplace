@@ -40,8 +40,8 @@ pre {
 .balance-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 }
 
 .balance {
@@ -51,11 +51,16 @@ pre {
     background-color: rgba(255,255,255,0.1);
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
+    padding: 0 20px;
     padding-left: 20px;
-    padding-right: 20px;
-    margin-bottom: 20px;
+}
+
+.balance-value {
+    margin-left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
 }
 
 .show-key {
@@ -89,13 +94,46 @@ pre {
     height: 100%
 }
 
+.artworks-controls {
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+}
+
+.artworks-controls__tabs {
+    display: flex;
+    flex-direction: row;
+}
+
+.tab-item {
+    color: rgba(255, 255, 255, .3);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.tab-item__title {
+    padding: 4px 16px;
+}
+
+.tab-item__bottom-line {
+    height: 2px;
+    width: 100%;
+    box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7);
+    background-color: #00f6d2;
+}
+
+.tab-active {
+    color: #fff;
+}
+
 .artworks {
     display:   flex;
     flex-wrap: wrap;
-    overflow:  auto;
+    overflow: auto;
     flex-grow: 1;
     margin-left: -16px;
     margin-bottom: -16px;
+    margin-top: 20px;
 }
 
 .artworks > .artwork {
@@ -104,37 +142,44 @@ pre {
 
     display: flex;
     flex-direction: column;
-    width:   350px;
-    height:  445px;
-    border:  1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    width:   284px;
+    border:  none;
+    background-color: rgba(240, 205, 205, 0.05);
+    border-radius: 10px;
 
+}
+
+.artwork-title {
+    font-size: 16px;
+    color: #fff;
+    margin-top: 20px;
+}
+
+.artwork-owner {
+    font-size: 12px;
+    color: rgba(255, 255, 255, .5);
+    margin-top: 6px;
 }
 
 .artwork .preview-container {
-    height: 350px;
-    margin-bottom: 18px;
-    margin-top: 20px;
-    margin-left: 18px;
-    margin-right: 18px;
+    height: 360px;
+    background-color: #f8f8f8;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
-.artwork  img {
-    max-width:100%;
-    max-height:100%;
+.artwork img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    border-radius: 5px;
 }
 
-.artwork > .info-row
-{
+.artwork > .info-row {
     box-sizing: border-box;
-    padding-left: 18px;
-    padding-right: 18px;
+    padding: 0 14px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

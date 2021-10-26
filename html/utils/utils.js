@@ -117,7 +117,11 @@ export default class Utils {
         let answer = undefined
         try
         {
-            answer = JSON.parse(json)
+            answer = JSON.parse(json);
+            console.log('Api result: ', answer);
+            if (answer.result.output !== undefined) {
+                console.log('Output: ', JSON.parse(answer.result.output));
+            }
             const id = answer.id
             const hid = Utils.id2HandlerId(id)
             

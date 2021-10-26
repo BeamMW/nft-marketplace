@@ -1,9 +1,10 @@
-import html from '../utils/html.js'
+import html from '../utils/html.js';
+import { common } from '../utils/consts.js';
 
 export default {
     computed: {
         balance_beam () {
-            return this.$state.balance_beam
+            return this.$state.balance_beam / common.GROTHS_IN_BEAM;
         },
         artist_key () {
             return this.$state.artist_key
@@ -17,8 +18,9 @@ export default {
         return html`
             <div class="balance-container">
                 <div class="balance">
+                    <img src="./assets/icon-beam.svg"/>
                     <div class="balance-value">
-                        ${this.balance_beam} GROTH
+                        ${this.balance_beam} BEAM
                     </div>
                     ${this.renderWithdraw()}
                 </div>    
@@ -43,7 +45,7 @@ export default {
         },
 
         onShowKey () {
-            alert(this.artist_key)
+            //alert(this.artist_key)
         },
 
         onWithdraw () {

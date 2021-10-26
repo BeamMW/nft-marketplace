@@ -1,6 +1,7 @@
-import html    from '../utils/html.js'
-import loading from './loading.js'
-import dot     from './dot.js'
+import html    from '../utils/html.js';
+import loading from './loading.js';
+import dot     from './dot.js';
+import { common } from '../utils/consts.js';
 
 export default {
     props: {
@@ -39,14 +40,14 @@ export default {
 
     computed: {
         ownerText () {
-            let res = ""
+            let res = "";
             if (this.author) {
-                res = ["Artist", this.author].join(': ')
+                res = ["by", this.author].join(' ');
             }
             if (this.owned) {
-                return res += (res ? " | " : "") + "You own this artwork"
+                return res += (res ? " | " : "") + "You own this artwork";
             }
-            return res ? res : "Loading..."
+            return res ? res : "Loading...";
         },
     },
 
@@ -55,11 +56,12 @@ export default {
             <div class="artwork">
                 ${this.renderPreview()}
                 <div class="info-row">
-                    <span class="small darker">${this.ownerText}</span>
-                    <span class="small darker ${this.price ? '' : 'hidden'}">Price</span>
+                    <span class="artwork-title">${this.renderDot()}<span>${this.title || "Loading..."}</span></span>
                 </div>
                 <div class="info-row">
-                    <span>${this.renderDot()}<span class="normal bolder">${this.title || "Loading..."}</span></span>
+                    <span class="artwork-owner">${this.ownerText}</span>
+                </div>
+                <div class="info-row ${this.price ? '' : 'hidden'}">
                     ${this.renderPrice()}
                 </div>
             </div>
@@ -96,7 +98,7 @@ export default {
         renderPrice() {
             // if has price - just display it and return
             if (this.price) {
-                let amount = this.price.amount / 100000000
+                let amount = this.price.amount / common.GROTHS_IN_BEAM;
                 
                 // TODO: if owned && has price should be able to cancel or change price
                 //       probably not for the first version

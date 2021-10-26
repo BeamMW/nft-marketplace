@@ -78,7 +78,7 @@ export const store = {
 
     onShowMethods (err, res) {
         if (err) return this.setError(err)
-        alert(utils.formatJSON(res))
+        //alert(utils.formatJSON(res))
     },
 
     //
@@ -272,28 +272,26 @@ export const store = {
                 }
             }
 
-            // TODO: optimize
-            let found = false
-            for (let idx = 0; idx < this.state.artworks.length; ++idx) {
-                let old = this.state.artworks[idx]
-                if (old.id == artwork.id) {
-                    artwork.title     = old.title
-                    artwork.bytes     = old.bytes
-                    artwork.pk_author = old.pk_author
-                    found = true
-                    break
-                }
+            let oldArtwork = this.state.artworks.find((item) => {
+                return item.id == artwork.id;
+            });
+
+            if (oldArtwork) {
+                artwork.title = oldArtwork.title;
+                artwork.bytes = oldArtwork.bytes;
+                artwork.pk_author = oldArtwork.pk_author;
             }
 
-            artworks.push(artwork)
-            if (!found) {
-                this.loadArtwork(artworks.length - 1, artwork.id)
-            }   
+            artworks.push(artwork);
+            
+            if (!oldArtwork){
+                this.loadArtwork(artworks.length - 1, artwork.id);
+            }
         }
         
         // TODO: update existing artworks, not replace
-        this.state.artworks = artworks
-        this.state.loading = false 
+        this.state.artworks = artworks;
+        this.state.loading = false;
     },
 
     loadArtwork(idx, id) {
