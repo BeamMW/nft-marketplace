@@ -6,7 +6,7 @@ const defaultState = () => {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "0e982209bf4202075fa4c4acd5b43e7b559112e5b7ffe5b78f8ebd88e3c07609",
+        cid: "ea3a002da2b8f8d24c5f5e7056e4c06aad6309097588c6946d10ac00349a9f52",
         artist_key: "",
         is_artist: false,
         is_admin: false,
@@ -15,6 +15,7 @@ const defaultState = () => {
         artists_count: 0,
         balance_beam: 0,
         in_tx: false,
+        selected_artist: undefined,
     }
 }
 
@@ -221,9 +222,8 @@ export const store = {
                 if (artist.key == this.state.artist_key) {
                     this.state.is_artist = true
                 }
-                artists.push(artist)
+                this.state.artists[artist.key] = artist
             }
-            this.state.artists = artists
         } 
         // END OF NOT OPTIMIZED
         this.state.artists_count = res.artists.length
@@ -248,8 +248,12 @@ export const store = {
         utils.ensureField(res, "items", "array")
         let artworks = []
         for (const artwork of res.items) {
-            // TODO: remove if < 12, this is for test only
-            if (artwork.id < 12) continue
+            // TODO: remove if < 2, this is for test only
+            if (artwork.id < 3) continue
+
+            // just for convenience, to make more clear what pk is
+            artwork.pk_owner = artwork.pk
+            delete artwork.pk
         
             if (artwork["price.aid"] != undefined) {
                 artwork.price = {
@@ -263,8 +267,9 @@ export const store = {
             for (let idx = 0; idx < this.state.artworks.length; ++idx) {
                 let old = this.state.artworks[idx]
                 if (old.id == artwork.id) {
-                    artwork.title = old.title
-                    artwork.bytes = old.bytes
+                    artwork.title     = old.title
+                    artwork.bytes     = old.bytes
+                    artwork.pk_author = old.pk_author
                     found = true
                     break
                 }
@@ -294,6 +299,9 @@ export const store = {
             return this.setError(err, "Failed to download an artwork")
         }
 
+        utils.ensureField(res, "artist", "string")
+        let pk_author = res.artist
+
         utils.ensureField(res, "data", "string")
         var data = utils.hexDecodeU8A(res.data)
 
@@ -320,6 +328,7 @@ export const store = {
         if (artwork && artwork.id) {
             artwork.title = name
             artwork.bytes = bytes
+            artwork.pk_author = pk_author
         }
     },
 
@@ -343,7 +352,7 @@ export const store = {
 
     onMakeTx (err, sres, full) {
         if (err) {
-            return this.$root.setError(err, "Failed to generate transaction request")
+            return this.setError(err, "Failed to generate transaction request")
         }
 
         utils.ensureField(full.result, "raw_data", "array")
@@ -356,8 +365,47 @@ export const store = {
     onSendToChain(err, res) {
         if (err) {
             if (utils.isUserCancelled(err)) return
-            return this.$root.setError(err, "Failed to create transaction")
+            return this.setError(err, "Failed to create transaction")
         }
         utils.ensureField(res, "txid", "string")
+    },
+
+    //
+    // Admin stuff
+    //
+    addArtist (key, name) {
+        utils.invokeContract(
+            `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    uploadArtwork (file, artist_key, artist_name) {
+        let name = file.name.split('.')[0]
+        name = [name[0].toUpperCase(), name.substring(1)].join('')
+            
+        try {
+            let reader = new FileReader()
+            reader.readAsArrayBuffer(file)
+
+            reader.onload = ()=> {
+                let aver  = Uint8Array.from([1])
+                let aname = (new TextEncoder()).encode(name)
+                let asep  = Uint8Array.from([0, 0])
+                let aimg  = new Uint8Array(reader.result)
+                let hex   = [utils.hexEncodeU8A(aver), 
+                            utils.hexEncodeU8A(aname), 
+                            utils.hexEncodeU8A(asep), 
+                            utils.hexEncodeU8A(aimg)
+                            ].join('')
+                        
+                utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
+                    (...args) => this.onMakeTx(...args)
+                )
+            }
+        }
+        catch(err) {
+            this.setError(err, "Failed to upload artwork")
+        }
     }
 }

@@ -1,55 +1,51 @@
-import html from '../utils/html.js'
-import utils from '../utils/utils.js'
-
-// TODO: implement upload for artist (show name + artist key in dropdown)
 export default {
-    render () {
-        return html`
-            <div class="upload">
-                <input type="file" accept="image/png, image/jpeg" onChange=${this.previewFile}></input>
-            </div>
-        `
+
+    computed: {
+        artists() {
+            return this.$state.artists
+        }
     },
 
+    template: `
+        <div class="upload">
+            <input type="button" value="Add new artist" v-on:click.native="onAddArtist"/>
+            <span v-if="!artists || !artists.length">Add artists to upload artworks</span>
+            <span v-else>
+                <span>Upload for artist:&nbsp;&nbsp;</span>
+                <select name="upload_artist" v-model="$state.selected_artist">
+                    <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}}</option>
+                </select>
+                &nbsp;&nbsp;
+                <input type="file" accept="image/png, image/jpeg" 
+                    v-on:change.native="onUploadArtwork"
+                    :disabled="!$state.selected_artist"
+                />
+            </span>
+        </div>
+        `,
+
     methods: {
-        previewFile (ev) {
+        onAddArtist () {
+            try {
+                // TODO: show normal dialog, no " and , in name parsed[1] (name), max 100 bytes; parsed[0] (key) is alphanumeric 
+                let data = prompt("Enter: artistid,name")
+                if (data != null) {
+                    let parsed = data.split(",")
+                    if (parsed.length != 2) throw "No comma found"
+                    this.$store.addArtist(parsed[0],parsed[1])
+                }
+            }
+            catch(err) {
+                this.$store.setError(err, "Failed to parse artist data")
+            }
+        },
+
+        onUploadArtwork (ev) {
             let file = ev.target.files[0]
-            if (!file) return
-
-            let name = file.name.split('.')[0]
-            name = [name[0].toUpperCase(), name.substring(1)].join('')
-            
-            let reader = new FileReader()
-            reader.readAsArrayBuffer(file)
-
-            reader.onload = ()=> {
-                let aver  = Uint8Array.from([1])
-                let aname = (new TextEncoder()).encode(name)
-                let asep  = Uint8Array.from([0, 0])
-                let aimg  = new Uint8Array(reader.result)
-                let hex   = [utils.hexEncodeU8A(aver), 
-                             utils.hexEncodeU8A(aname), 
-                             utils.hexEncodeU8A(asep), 
-                             utils.hexEncodeU8A(aimg)
-                            ].join('')
-                utils.invokeContract(`role=artist,action=upload,cid=${this.$root.cid},data=${hex}`, (...args) => this.onUpload(...args))
+            if (!file) { 
+                return
             }
-        },
-
-        onUpload(err, sres, full) {
-            // TODO: move to store
-            if (err) return this.$root.setError(err, "Failed to generate upload request")
-
-            utils.ensureField(full.result, "raw_data", "array")
-            utils.callApi('process_invoke_data', {data: full.result.raw_data}, (...args) => this.onSendToChain(...args))
-        },
-
-        onSendToChain (err) {
-            // TODO: move to store
-            if (err) {
-                if (utils.isUserCancelled(err)) return
-                return this.$root.setError(err, "Failed to upload image")
-            }
+            this.$store.uploadArtwork(file, this.$state.selected_artist.key, this.$state.selected_artist.label)
         }
     }
 }

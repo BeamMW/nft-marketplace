@@ -78,6 +78,10 @@ pre {
     margin-bottom: 20px;
 }
 
+.upload > input {
+    margin-right: 20px;
+}
+
 .vertical-container {
     display: flex; 
     flex-direction: column;

@@ -8,7 +8,7 @@ export default {
             type: Number,
             required: true
         },
-        artist: {
+        author: {
             type: String,
             required: false
         },
@@ -22,10 +22,6 @@ export default {
             default: []
         },
         owned: {
-            type: Number,
-            default: 0
-        },
-        approved: {
             type: Number,
             default: 0
         },
@@ -43,9 +39,14 @@ export default {
 
     computed: {
         ownerText () {
-            if (this.artist) return this.artist
-            if (this.owned) return "You own this artwork"
-            return "Somebody"
+            let res = ""
+            if (this.author) {
+                res = ["Artist", this.author].join(': ')
+            }
+            if (this.owned) {
+                return res += (res ? " | " : "") + "You own this artwork"
+            }
+            return res ? res : "Loading..."
         },
     },
 
@@ -89,8 +90,6 @@ export default {
             }
 
             let state = 'green'
-            if (!this.approved) state = "red"
-
             return html`<${dot} state=${state}/>`
         },
         
@@ -116,12 +115,7 @@ export default {
 
             // doesn't have price and is own image
             if (this.owned) {
-                // if already approved then can sell
-                if (this.approved) {
-                    return html`<a href="#" class="buy ${this.in_tx ? 'darker' : ''}" onclick=${this.onSell}>SELL</a>`
-                } 
-                // otherwise wait for approval
-                return html`<span class='small darker'>Waiting for approval</span>`
+                return html`<a href="#" class="buy ${this.in_tx ? 'darker' : ''}" onclick=${this.onSell}>SELL</a>`
             }
 
             // doesn't have price and is not own image
