@@ -170,6 +170,8 @@ export const store = {
                     this.state.balance_beam = item.amount
                 }
             }
+        } else {
+            this.state.balance_beam = 0
         }
 
         this.loadArtists()
