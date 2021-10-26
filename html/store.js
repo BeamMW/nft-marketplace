@@ -49,7 +49,7 @@ export const store = {
                 if (err) return this.setError(err, "Failed to download shader")
                 this.state.shader = bytes
 
-                //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
+                utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
                 utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
@@ -175,12 +175,15 @@ export const store = {
     },
 
     withdrawBEAM () {
-        //utils.invokeContract(
-        //    `role=user,action=view_balance,cid=${this.state.cid}`, 
-        //    (...args) => this.onLoadBalance(...args)
-        //)
-        // TODO: ask valdo how to withdraw correctly
-        alert("to be done, need to ask Vlad how to do that")
+        // TODO: this will not happen in demo but all the amounts might not fit into one block
+        //       need to set nMaxCount to 100 max and reflet that in UI
+        //       AND
+        //       withdrawal in bulk negates privacy. Need to ask user what to do - in bulk
+        //       or for each piece separately
+        utils.invokeContract(
+            `role=user,action=withdraw,nMaxCount=0,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
     },
 
     //
