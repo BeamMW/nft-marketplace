@@ -79,7 +79,7 @@ export const store = {
 
     onShowMethods (err, res) {
         if (err) return this.setError(err)
-        //alert(utils.formatJSON(res))
+        alert(utils.formatJSON(res))
     },
 
     //
@@ -350,7 +350,7 @@ export const store = {
     },
 
     //
-    // Buy & Sell
+    // Artwork actions, Buy, Sell, Like &c.
     //
     buyArtwork (id) {
         // TODO: what will happen if two different users would hit buy during the same block?
@@ -363,6 +363,20 @@ export const store = {
     sellArtwork (id, price) {
         utils.invokeContract(
             `role=user,action=set_price,id=${id},amount=${price},aid=0,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    likeArtwork (id) {
+        utils.invokeContract(
+            `role=user,action=vote,id=${id},val=1,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    unlikeArtwork (id) {
+        utils.invokeContract(
+            `role=user,action=vote,id=${id},val=0,cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
         )
     },

@@ -40,9 +40,13 @@ export default {
                     v-bind:bytes="artwork.bytes"
                     v-bind:owned="artwork.owned"
                     v-bind:price="artwork.price"
+                    v-bind:likes_cnt="artwork.impressions"
+                    v-bind:liked="artwork.my_impression == 1"
                     v-bind:in_tx="in_tx"
                     v-on:sell="onSellArtwork"
                     v-on:buy="onBuyArtwork"
+                    v-on:like="onLikeArtwork"
+                    v-on:unlike="onUnlikeArtwork"
                 />
             </div>
         </div>    
@@ -65,6 +69,14 @@ export default {
             catch (err) {
                 this.$store.setError(err, "Failed to sell an item");
             }
+        },
+
+        onLikeArtwork(id) {
+            this.$store.likeArtwork(id)
+        },
+
+        onUnlikeArtwork(id) {
+            this.$store.unlikeArtwork(id)
         }
     }
 }

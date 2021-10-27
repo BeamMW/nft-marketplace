@@ -33,6 +33,14 @@ export default {
         in_tx: {
             type: Boolean,
             default: false
+        },
+        likes_cnt: {
+            type: Number,
+            deafault: 0,
+        },
+        liked: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -61,6 +69,9 @@ export default {
                 <div class="info-row">
                     <span class="artwork-owner">${this.ownerText}</span>
                 </div>
+                <div class="info-row">  
+                    ${this.renderLikes()}
+                </div>
                 <div class="info-row ${this.price ? '' : 'hidden'}">
                     ${this.renderPrice()}
                 </div>
@@ -69,6 +80,17 @@ export default {
     },
 
     methods: {
+        renderLikes () {
+            return html`
+                <span class="small">
+                    Likes: ${this.likes_cnt}
+                    <a href="#" onclick=${this.liked ? this.onUnlike : this.onLike} class="like ${this.in_tx ? 'darker' : ''}">
+                        ${this.liked ? "Unlike" : "Like"}
+                    </a>
+                </span>
+            `
+        },
+
         renderPreview() {
             if (this.bytes.length) {
                 let image = URL.createObjectURL(new Blob([this.bytes], {type: 'image/jpeg'}))
@@ -137,6 +159,20 @@ export default {
             ev.preventDefault()
             if (!this.in_tx) {
                 this.$emit('sell', this.id)
+            }
+        },
+
+        onLike (ev) {
+            ev.preventDefault()
+            if (!this.in_tx) {
+                this.$emit('like', this.id)
+            }
+        },
+
+        onUnlike (ev) {
+            ev.preventDefault()
+            if (!this.in_tx) {
+                this.$emit('unlike', this.id)
             }
         }
     }

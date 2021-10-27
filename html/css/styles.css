@@ -206,6 +206,11 @@ pre {
     margin-bottom: 3px;
 }
 
+.artwork .like {
+    color: #00f6d2;
+    margin-left: 10px;
+}
+
 ::-webkit-scrollbar {
     width: 11px;
     height: 10px;
