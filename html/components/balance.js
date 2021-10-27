@@ -6,8 +6,11 @@ export default {
         balance_beam () {
             return this.$state.balance_beam / common.GROTHS_IN_BEAM;
         },
-        artist_key () {
-            return this.$state.artist_key
+        my_artist_key () {
+            return this.$state.my_artist_key
+        },
+        my_artist_name () {
+            return (this.$state.artists[this.$state.my_artist_key] || {}).label
         },
         in_tx () {
             return this.$state.in_tx
@@ -45,7 +48,7 @@ export default {
         },
 
         onShowKey () {
-            //alert(this.artist_key)
+            alert(this.my_artist_name + ": " + this.my_artist_key)
         },
 
         onWithdraw () {

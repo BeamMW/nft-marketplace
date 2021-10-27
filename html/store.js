@@ -7,7 +7,7 @@ const defaultState = () => {
         error: undefined,
         shader: undefined,
         cid: "ea3a002da2b8f8d24c5f5e7056e4c06aad6309097588c6946d10ac00349a9f52",
-        artist_key: "",
+        my_artist_key: "",
         is_artist: false,
         is_admin: false,
         artworks: [], 
@@ -122,7 +122,7 @@ export const store = {
         }
         
         utils.ensureField(res, "key", "string")
-        this.state.artist_key = res.key
+        this.state.my_artist_key = res.key
         this.refreshAllData()
     },
 
@@ -213,7 +213,7 @@ export const store = {
         //
         //       for (let idx = this.state.artists_count; idx < res.artists.length; ++idx) {
         //          let artist = res.artists[idx]
-        //          if (artist.key == this.state.artist_key) {
+        //          if (artist.key == this.state.my_artist_key) {
         //            this.state.is_artist = true
         //          }
         //          this.state.artists[artist.key] = artist
@@ -229,7 +229,7 @@ export const store = {
             }
 
             for (let artist of res.artists) {
-                if (artist.key == this.state.artist_key) {
+                if (artist.key == this.state.my_artist_key) {
                     this.state.is_artist = true
                 }
                 this.state.artists[artist.key] = artist
@@ -388,7 +388,7 @@ export const store = {
         )
     },
 
-    uploadArtwork (file, artist_key, artist_name) {
+    uploadArtwork (file, artist_key) {
         let name = file.name.split('.')[0]
         name = [name[0].toUpperCase(), name.substring(1)].join('')
             
