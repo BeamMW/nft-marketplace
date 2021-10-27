@@ -3,25 +3,28 @@ import {store}  from './store.js'
 import {router} from './router.js'
 import utils    from './utils/utils.js'
 
-utils.onLoad(beam => {
-    const vueApp = Vue.createApp(App)
-    
-    vueApp.config.globalProperties.$store = store
-    vueApp.config.globalProperties.$state = store.state
-    vueApp.use(router)
-    vueApp.mount('body')
-    
-    return {
-        start () {
-            const style = document.createElement('style');
-            style.innerHTML = `.error {color: ${beam.style.validator_error};}`
-            document.head.appendChild(style)
-            document.body.style.color = beam.style.content_main
-            store.start()
-        },
+// TODO: ensure we create 6.1 API
+utils.initialize(
+    {
+        "appname": "BEAM Gallery",
+        "apiResultHandler": (...args) => store.onApiResult(...args)
+    }, 
+    (err) => {
+        const vueApp = Vue.createApp(App)
+        vueApp.config.globalProperties.$store = store
+        vueApp.config.globalProperties.$state = store.state
+        vueApp.use(router)
+        vueApp.mount('body')
 
-        onApiResult(...args) {
-            store.onApiResult(...args)
+        const style = document.createElement('style');
+        style.innerHTML = `.error {color: ${utils.getStyles().validator_error};}`
+        document.head.appendChild(style)
+        document.body.style.color = utils.getStyles().content_main
+
+        if (err) {
+            return store.setError(err)
         }
+
+        store.start()
     }
-})
+)

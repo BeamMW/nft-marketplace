@@ -7,7 +7,7 @@ const defaultState = () => {
         error: undefined,
         shader: undefined,
         cid: "ea3a002da2b8f8d24c5f5e7056e4c06aad6309097588c6946d10ac00349a9f52",
-        artist_key: "",
+        my_artist_key: "",
         is_artist: false,
         is_admin: false,
         artworks: [], 
@@ -27,6 +27,7 @@ export const store = {
     //
     setError(error, context) {
         this.state.error = {error, context}
+        router.push({name: 'gallery'})
     },
 
     checkError (err) {
@@ -122,7 +123,7 @@ export const store = {
         }
         
         utils.ensureField(res, "key", "string")
-        this.state.artist_key = res.key
+        this.state.my_artist_key = res.key
         this.refreshAllData()
     },
 
@@ -213,7 +214,7 @@ export const store = {
         //
         //       for (let idx = this.state.artists_count; idx < res.artists.length; ++idx) {
         //          let artist = res.artists[idx]
-        //          if (artist.key == this.state.artist_key) {
+        //          if (artist.key == this.state.my_artist_key) {
         //            this.state.is_artist = true
         //          }
         //          this.state.artists[artist.key] = artist
@@ -229,7 +230,7 @@ export const store = {
             }
 
             for (let artist of res.artists) {
-                if (artist.key == this.state.artist_key) {
+                if (artist.key == this.state.my_artist_key) {
                     this.state.is_artist = true
                 }
                 this.state.artists[artist.key] = artist
@@ -243,6 +244,14 @@ export const store = {
     //
     // Artworks
     //
+    hexEncodeU8A (arr) {
+        return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
+    },
+
+    hexDecodeU8A (str) {
+        return new Uint8Array(str.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    },
+
     loadArtworks () {
         utils.invokeContract(
             `role=user,action=view_all,cid=${this.state.cid}`, 
@@ -311,7 +320,7 @@ export const store = {
         let pk_author = res.artist
 
         utils.ensureField(res, "data", "string")
-        var data = utils.hexDecodeU8A(res.data)
+        var data = this.hexDecodeU8A(res.data)
 
         // check version
         if (data[0] != 1) {
@@ -388,7 +397,7 @@ export const store = {
         )
     },
 
-    uploadArtwork (file, artist_key, artist_name) {
+    uploadArtwork (file, artist_key) {
         let name = file.name.split('.')[0]
         name = [name[0].toUpperCase(), name.substring(1)].join('')
             
@@ -401,10 +410,10 @@ export const store = {
                 let aname = (new TextEncoder()).encode(name)
                 let asep  = Uint8Array.from([0, 0])
                 let aimg  = new Uint8Array(reader.result)
-                let hex   = [utils.hexEncodeU8A(aver), 
-                            utils.hexEncodeU8A(aname), 
-                            utils.hexEncodeU8A(asep), 
-                            utils.hexEncodeU8A(aimg)
+                let hex   = [this.hexEncodeU8A(aver), 
+                             this.hexEncodeU8A(aname), 
+                             this.hexEncodeU8A(asep), 
+                             this.hexEncodeU8A(aimg)
                             ].join('')
                         
                 utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
