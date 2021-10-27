@@ -243,6 +243,14 @@ export const store = {
     //
     // Artworks
     //
+    hexEncodeU8A (arr) {
+        return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
+    },
+
+    hexDecodeU8A (str) {
+        return new Uint8Array(str.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    },
+
     loadArtworks () {
         utils.invokeContract(
             `role=user,action=view_all,cid=${this.state.cid}`, 
@@ -311,7 +319,7 @@ export const store = {
         let pk_author = res.artist
 
         utils.ensureField(res, "data", "string")
-        var data = utils.hexDecodeU8A(res.data)
+        var data = this.hexDecodeU8A(res.data)
 
         // check version
         if (data[0] != 1) {
@@ -401,10 +409,10 @@ export const store = {
                 let aname = (new TextEncoder()).encode(name)
                 let asep  = Uint8Array.from([0, 0])
                 let aimg  = new Uint8Array(reader.result)
-                let hex   = [utils.hexEncodeU8A(aver), 
-                            utils.hexEncodeU8A(aname), 
-                            utils.hexEncodeU8A(asep), 
-                            utils.hexEncodeU8A(aimg)
+                let hex   = [this.hexEncodeU8A(aver), 
+                             this.hexEncodeU8A(aname), 
+                             this.hexEncodeU8A(asep), 
+                             this.hexEncodeU8A(aimg)
                             ].join('')
                         
                 utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
