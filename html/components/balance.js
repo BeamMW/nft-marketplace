@@ -41,9 +41,10 @@ export default {
             }
     
             return html`
-                <a href="#" onclick=${this.onWithdraw} class="show-key">
-                    withdraw
-                </a>
+                <div onclick=${this.onWithdraw} class="balance-withdraw">
+                    <img class="balance-withdraw__icon" src="./assets/icon-receive.svg"/>
+                    <span class="balance-withdraw__text">withdraw</span>
+                </div>
             `
         },
 
