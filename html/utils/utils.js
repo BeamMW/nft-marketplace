@@ -1,12 +1,12 @@
 const MIN_AMOUNT = 0.00000001;
 const MAX_AMOUNT = 254000000;
-let BEAM = null;
+
+let BEAM     = null
+let CallID   = 0
+let Calls    = {}
+let APIResCB = undefined
 
 export default class Utils {
-    static CallID   = 0
-    static Calls    = {}
-    static APIResCB = undefined
-
     static isMobile () {
         const ua = navigator.userAgent;
         return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
@@ -63,8 +63,8 @@ export default class Utils {
     }
 
     static async callApi(method, params, cback) {
-        let callid = ['call', Utils.CallID++].join('-')
-        Utils.Calls[callid] = cback
+        let callid = ['call', CallID++].join('-')
+        Calls[callid] = cback
 
         let request = {
             "jsonrpc": "2.0",
@@ -120,8 +120,8 @@ export default class Utils {
             }
             
             const id = answer.id
-            const cback = Utils.Calls[id] || Utils.APIResCB
-            delete Utils.Calls[id]
+            const cback = Calls[id] || APIResCB
+            delete Calls[id]
             
             if (answer.error) {
                 return cback(answer)
@@ -152,7 +152,7 @@ export default class Utils {
         }
         catch (err)
         {
-            Utils.APIResCB({
+            APIResCB({
                 error: err.toString(),
                 answer: answer || json
             })
@@ -160,7 +160,7 @@ export default class Utils {
     }
 
     static async initialize(params, initcback) {
-        Utils.APIResCB = params["apiResultHandler"]
+        APIResCB = params["apiResultHandler"]
         
         try
         {
