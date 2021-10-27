@@ -30,7 +30,8 @@ export default {
     methods: {
         onAddArtist () {
             try {
-                // TODO: show normal dialog, no " and , in name parsed[1] (name), max 100 bytes; parsed[0] (key) is alphanumeric 
+                // TODO: show normal dialog, no " and , in name parsed[1] (name), max 100 bytes; 
+                //       parsed[0] (key) is alphanumeric 
                 let data = prompt("Enter: artistid,name")
                 if (data != null) {
                     let parsed = data.split(",")

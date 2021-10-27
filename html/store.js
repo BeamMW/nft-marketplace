@@ -27,6 +27,7 @@ export const store = {
     //
     setError(error, context) {
         this.state.error = {error, context}
+        router.push({name: 'gallery'})
     },
 
     checkError (err) {
