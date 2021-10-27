@@ -1,69 +1,43 @@
 import html from '../utils/html.js';
-import upload  from './upload.js';
-import artwork from './artwork.js';
-import balance from './balance.js';
-import warning from './tx-warning.js';
-import artworksControls from './artworks-controls.js';
 import { common } from '../utils/consts.js';
 
 export default {
     computed: {
-        in_tx () {
-            return this.$state.in_tx;
-        },
-        is_admin () {
-            return this.$state.is_admin;
-        },
-        artists () {
-            return this.$state.artists;
-        },
-        artworks () {
-            return this.$state.artworks;
+        my_key () {
+            return this.$state.my_artist_key;
         }
     },
 
     components: {
-        artwork, upload, balance, warning, artworksControls
     },
 
-    template: `
-        <div class="vertical-container">
-            <balance></balance>
-            <warning v-if="in_tx"></warning>
-            <upload v-if="!in_tx && is_admin"/>
-            <artworksControls></artworksControls>
-            <div class="artworks">
-                <artwork v-for="artwork in artworks"
-                    v-bind:id="artwork.id"
-                    v-bind:title="artwork.title"
-                    v-bind:author="(artists[artwork.pk_author] || {}).label"
-                    v-bind:bytes="artwork.bytes"
-                    v-bind:owned="artwork.owned"
-                    v-bind:price="artwork.price"
-                    v-bind:in_tx="in_tx"
-                    v-on:sell="onSellArtwork"
-                    v-on:buy="onBuyArtwork"
-                />
+    render() { 
+        return html`<div class="coming-soon">
+            <div class="coming-soon__title">
+                NFT Gallery is coming soon…
             </div>
-        </div>    
-    `,
+            <img class="coming-soon__icon" src="./assets/coming-soon.svg"/>
+            <div class="coming-soon__text"> 
+                <div>Your public key:</div>
+                <div class="cp-div">${this.my_key} <img onclick=${this.onCopy} class="cp" src="./assets/icon-copy.svg"/></div> 
+            </div>
+        </div>`;
+    },
 
     methods: {
-        onBuyArtwork (id) {
-            this.$store.buyArtwork(id);
-        },
-
-        onSellArtwork (id) {
+        onCopy() {
+            var textArea = document.createElement("textarea");
+            textArea.style.position = "fixed";
+            textArea.value = this.my_key;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
             try {
-                let price = prompt("Enter the price in BEAM (need to implement regrular dialog with float values)");
-                if (price == null) {
-                    return;
-                }
-                price = parseInt(price) * common.GROTHS_IN_BEAM;
-                this.$store.sellArtwork(id, price);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
+                return document.execCommand("copy");
+            } catch (ex) {
+                return false;
+            } finally {
+                document.body.removeChild(textArea);
             }
         }
     }
