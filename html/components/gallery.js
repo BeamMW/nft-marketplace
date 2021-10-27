@@ -32,8 +32,9 @@ export default {
             <warning v-if="in_tx"></warning>
             <upload v-if="!in_tx && is_admin"/>
             <artworksControls></artworksControls>
-            <div class="artworks">
-                <artwork v-for="artwork in artworks"
+            <template v-if="artworks.length > 0">
+                <div class="artworks">
+                    <artwork v-for="artwork in artworks"
                     v-bind:id="artwork.id"
                     v-bind:title="artwork.title"
                     v-bind:author="(artists[artwork.pk_author] || {}).label"
@@ -47,8 +48,15 @@ export default {
                     v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
-                />
-            </div>
+                    />
+                </div>
+            </template>
+            <template v-else>
+                <div class="empty-gallery">
+                    <img class="empty-gallery__icon" src="./assets/icon-empty-gallery.svg"/>
+                    <div class="empty-gallery__text">There are no artworks at the moment.</div>
+                </div>
+            </template>
         </div>    
     `,
 

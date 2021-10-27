@@ -151,13 +151,11 @@ pre {
     flex-wrap: wrap;
     overflow: auto;
     flex-grow: 1;
-    margin-left: -16px;
-    margin-bottom: -16px;
     margin-top: 20px;
 }
 
 .artworks > .artwork {
-    margin-left: 16px;
+    margin-right: 16px;
     margin-bottom:  16px;
 
     display: flex;
@@ -173,6 +171,16 @@ pre {
     font-size: 16px;
     color: #fff;
     margin-top: 20px;
+}
+
+.artwork-likes {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.artwork-likes__text {
+    margin-left: 5px;
 }
 
 .artwork-owner {
@@ -209,6 +217,53 @@ pre {
 .artwork .like {
     color: #00f6d2;
     margin-left: 10px;
+}
+
+.artwork-can-buy {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-top: 7px;
+    margin-bottom: 17px;
+}
+
+.artwork-can-buy__amount,
+.artwork-can-buy__curr {
+    margin-left: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.artwork-can-buy__button {
+    margin-left: auto;
+}
+
+.empty-gallery {
+    margin: 100px auto 0 auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.empty-gallery__text {
+    margin-top: 30px;
+    opacity: 0.5;
+    font-size: 14px;
+    line-height: 1.43;
+    text-align: center;
+    color: #fff;
+}
+
+.not-on-sale {
+    margin-left: auto;
+    opacity: 0.5;
+    font-size: 14px;
+    font-style: italic;
+    color: #fff;
+    margin-top: 17px;
+    margin-bottom: 27px;
 }
 
 ::-webkit-scrollbar {

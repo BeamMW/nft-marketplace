@@ -64,13 +64,16 @@ export default {
             <div class="artwork">
                 ${this.renderPreview()}
                 <div class="info-row">
-                    <span class="artwork-title">${this.renderDot()}<span>${this.title || "Loading..."}</span></span>
+                    <span class="artwork-title">
+                        ${this.renderDot()}
+                        <span>
+                            ${this.title || "Loading..."}
+                        </span>
+                    </span>
+                    ${this.renderLikes()}
                 </div>
                 <div class="info-row">
                     <span class="artwork-owner">${this.ownerText}</span>
-                </div>
-                <div class="info-row">  
-                    ${this.renderLikes()}
                 </div>
                 <div class="info-row ${this.price ? '' : 'hidden'}">
                     ${this.renderPrice()}
@@ -82,11 +85,12 @@ export default {
     methods: {
         renderLikes () {
             return html`
-                <span class="small">
-                    Likes: ${this.likes_cnt}
-                    <a href="#" onclick=${this.liked ? this.onUnlike : this.onLike} class="like ${this.in_tx ? 'darker' : ''}">
-                        ${this.liked ? "Unlike" : "Like"}
-                    </a>
+                <span class="artwork-likes">
+                    <img onclick=${this.liked ? this.onUnlike : this.onLike} 
+                        src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
+                    <span class="artwork-likes__text">
+                        ${this.likes_cnt}
+                    </span>
                 </span>
             `
         },
@@ -130,9 +134,11 @@ export default {
                 
                 // if not owned can only buy
                 return html`
-                    <span>
-                        <a href="#" onclick=${this.onBuy} class="buy ${this.in_tx ? 'darker' : ''}">BUY</a>
-                        <span class="normal bold ml-hem">${amount} BEAM</span>
+                    <span class="artwork-can-buy">
+                        <img src="./assets/icon-beam.svg"/>
+                        <span class="artwork-can-buy__amount">${amount}</span>
+                        <span class="artwork-can-buy__curr">BEAM</span>
+                        <a href="#" onclick=${this.onBuy} class="artwork-can-buy__button buy ${this.in_tx ? 'darker' : ''}">BUY</a>
                     </span>
                 `
             }
@@ -145,7 +151,7 @@ export default {
             // doesn't have price and is not own image
             // means can be anything - not approved yet, not sold by
             // owner &c. Just dispaly that it is not on sale
-            return html`<span class='small darker'>Not on sale</span>`
+            return html`<span class='not-on-sale'>Not on sale</span>`
         },
 
         onBuy (ev) {
