@@ -11,7 +11,9 @@ const defaultState = () => {
         my_artist_key: "",
         is_artist: false,
         is_admin: false,
-        artworks: [], 
+        artworks: {
+            [tabs.ALL]: []
+        },
         artists: {},
         artists_count: 0,
         balance_beam: 0,
@@ -267,7 +269,8 @@ export const store = {
         }
     
         utils.ensureField(res, "items", "array")
-        let artworks = []
+        let all = [], sale = [], liked = [], mine = [], sold = []
+
         for (const artwork of res.items) {
             // TODO: remove if < 2, this is for test only
             if (artwork.id < 3) continue
@@ -283,7 +286,7 @@ export const store = {
                 }
             }
 
-            let oldArtwork = this.state.artworks.find((item) => {
+            let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
                 return item.id == artwork.id;
             });
 
@@ -293,26 +296,45 @@ export const store = {
                 artwork.pk_author = oldArtwork.pk_author;
             }
 
-            if (this.state.active_tab === tabs.ALL ||
-                this.state.active_tab === tabs.SALE && artwork.price ||
-                this.state.active_tab === tabs.LIKED && artwork.impressions > 0 ||
-                this.state.active_tab === tabs.MINE && artwork.pk === this.state.my_artist_key) {
-                artworks.push(artwork);
+            all.push(artwork)
+            let mykey = this.state.my_artist_key
+
+            // MINE is what I own
+            if (artwork.owned) {
+                mine.push(artwork)
+            }
+
+            // SALE is what OWN && what has price set
+            if (artwork.owned && artwork.price) {
+                sale.push(artwork)
             }
             
-            if (!oldArtwork){
-                this.loadArtwork(artworks.length - 1, artwork.id);
+            // LIKED is waht I've liked
+            if (artwork.my_impression) {
+                liked.push(artwork)
+            }
+            
+            // SOLD - I'm an author but I do not own
+            if (artwork.pk_author == mykey && !artwork.owned) {
+                sold.push(artwork)
+            }
+
+            if (!oldArtwork) {
+                this.loadArtwork(all.length - 1, artwork.id);
             }
         }
         
         // TODO: update existing artworks, not replace
-        this.state.artworks = artworks;
+        this.state.artworks[tabs.ALL]   = all
+        this.state.artworks[tabs.SALE]  = sale
+        this.state.artworks[tabs.LIKED] = liked
+        this.state.artworks[tabs.MINE]  = mine
+        this.state.artworks[tabs.SOLD]  = sold
         this.state.loading = false;
     },
 
     setActiveTab(id) {
         this.state.active_tab = id;
-        this.loadArtworks();
     },
 
     loadArtwork(idx, id) {
@@ -353,11 +375,17 @@ export const store = {
 
         // save parsed data
         // list may have been changed, so we check if artwork with this id is still present
-        let artwork = this.state.artworks[idx]
+        let artwork = this.state.artworks[tabs.ALL][idx]
         if (artwork && artwork.id) {
             artwork.title = name
             artwork.bytes = bytes
             artwork.pk_author = pk_author
+
+            // We receive author only now, so add what's missing to SOLD
+            let mykey = this.state.my_artist_key
+            if (artwork.pk_author === mykey && !artwork.owned) {
+                this.state.artworks[tabs.SOLD].push(artwork)
+            }
         }
     },
 
