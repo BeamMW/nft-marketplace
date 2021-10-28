@@ -327,20 +327,33 @@ pre {
     display: none;
 }
 
-a {
-    color: limegreen;
-    text-decoration: none;
-}
-
-.buy {
-    color: limegreen;
-    border: 1px solid limegreen;
-    border-radius: 3px;
-    padding-left: 4px;
-    padding-right: 4px;
-    font-size: 0.78em;
-}
-
 .ml-hem {
     margin-left: 0.5em;
+}
+
+.button {
+    padding: 11px 25px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    color: #032e49;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button.buy {
+    background-color: #da68f5;
+}
+
+.button.sell {
+    background-color: #0bccf7;
+}
+
+.button__text {
+    margin-left: 5px;
+}
+
+.button:hover {
+    box-shadow: 0 0 8px white;
 }

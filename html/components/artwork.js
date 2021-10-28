@@ -1,6 +1,7 @@
 import html    from '../utils/html.js';
 import loading from './loading.js';
 import dot     from './dot.js';
+import artButton from './art-button.js';
 import { common } from '../utils/consts.js';
 
 export default {
@@ -45,6 +46,10 @@ export default {
     },
 
     emits: ['buy', 'sell'],
+
+    components: {
+        artButton
+    },
 
     computed: {
         ownerText () {
@@ -138,14 +143,14 @@ export default {
                         <img src="./assets/icon-beam.svg"/>
                         <span class="artwork-can-buy__amount">${amount}</span>
                         <span class="artwork-can-buy__curr">BEAM</span>
-                        <a href="#" onclick=${this.onBuy} class="artwork-can-buy__button buy ${this.in_tx ? 'darker' : ''}">BUY</a>
+                        <${artButton} class="artwork-can-buy__button" onclick=${this.onBuy} type="buy"/>
                     </span>
                 `
             }
 
             // doesn't have price and is own image
             if (this.owned) {
-                return html`<a href="#" class="buy ${this.in_tx ? 'darker' : ''}" onclick=${this.onSell}>SELL</a>`
+                return html`<${artButton} class="artwork-can-buy__button" onclick=${this.onSell} type="sell"/>`
             }
 
             // doesn't have price and is not own image

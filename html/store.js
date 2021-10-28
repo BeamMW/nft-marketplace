@@ -1,5 +1,6 @@
-import {router} from './router.js'
-import utils from './utils/utils.js'
+import {router} from './router.js';
+import utils from './utils/utils.js';
+import { tabs } from './utils/consts.js';
 
 const defaultState = () => {
     return {
@@ -16,6 +17,7 @@ const defaultState = () => {
         balance_beam: 0,
         in_tx: false,
         selected_artist: undefined,
+        active_tab: tabs.ALL,
     }
 }
 
@@ -291,7 +293,12 @@ export const store = {
                 artwork.pk_author = oldArtwork.pk_author;
             }
 
-            artworks.push(artwork);
+            if (this.state.active_tab === tabs.ALL ||
+                this.state.active_tab === tabs.SALE && artwork.price ||
+                this.state.active_tab === tabs.LIKED && artwork.impressions > 0 ||
+                this.state.active_tab === tabs.MINE && artwork.pk === this.state.my_artist_key) {
+                artworks.push(artwork);
+            }
             
             if (!oldArtwork){
                 this.loadArtwork(artworks.length - 1, artwork.id);
@@ -301,6 +308,11 @@ export const store = {
         // TODO: update existing artworks, not replace
         this.state.artworks = artworks;
         this.state.loading = false;
+    },
+
+    setActiveTab(id) {
+        this.state.active_tab = id;
+        this.loadArtworks();
     },
 
     loadArtwork(idx, id) {
@@ -438,5 +450,5 @@ export const store = {
         catch(err) {
             this.setError(err, "Failed to upload artwork")
         }
-    }
+    },
 }
