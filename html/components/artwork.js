@@ -57,9 +57,9 @@ export default {
             if (this.author) {
                 res = ["by", this.author].join(' ');
             }
-            if (this.owned) {
-                return res += (res ? " | " : "") + "You own this artwork";
-            }
+            // if (this.owned) {
+            //     return res += (res ? " | " : "") + "You own this artwork";
+            // }
             return res ? res : "Loading...";
         },
     },
@@ -78,6 +78,7 @@ export default {
                 </div>
                 <div class="info-row">
                     <span class="artwork-owner">${this.ownerText}</span>
+                    ${this.renderMine()}
                 </div>
                 <div class="artwork-bottom-row">
                     ${this.renderPrice()}
@@ -113,6 +114,14 @@ export default {
                         <${loading}/>
                     </div>
                 `
+            }
+        },
+
+        renderMine() {
+            if (this.owned) {
+                return html`<div class="mine">
+                    mine
+                </div>`;
             }
         },
 
