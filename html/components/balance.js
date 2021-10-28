@@ -26,10 +26,14 @@ export default {
                         ${this.balance_beam} BEAM
                     </div>
                     ${this.renderWithdraw()}
-                </div>    
-                <a href="#" onclick=${this.onShowKey} class="show-key">
-                    Show my public key
-                </a>
+                </div>
+                <div class="user-opt">
+                    ${this.renderUserName()}
+                    <div class="user-opt__key" onclick=${this.onShowKey}>
+                        <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
+                        <span class="user-opt__key__text">Show my public key</span>
+                    </div>
+                </div>
             </div>
         `
     },
@@ -46,6 +50,17 @@ export default {
                     <span class="balance-withdraw__text">withdraw</span>
                 </div>
             `
+        },
+
+        renderUserName () {
+            if (this.my_artist_name) {
+                return html`
+                <div class="user-opt__user" onclick=${this.onShowKey}>
+                    <img class="user-opt__user__icon" src="./assets/icon-user.svg"/>
+                    <span class="user-opt__user__text">${this.my_artist_name}</span>
+                </div>
+                `;
+            }
         },
 
         onShowKey () {
