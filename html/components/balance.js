@@ -1,5 +1,5 @@
 import html from '../utils/html.js';
-import { common } from '../utils/consts.js';
+import { common, tabs } from '../utils/consts.js';
 
 export default {
     computed: {
@@ -14,6 +14,9 @@ export default {
         },
         in_tx () {
             return this.$state.in_tx
+        },
+        show_balance () {
+            return this.$state.is_artist || this.$state.balance_beam
         }
     },
 
