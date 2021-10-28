@@ -213,6 +213,15 @@ pre {
     margin-bottom: 3px;
 }
 
+.artwork-bottom-row {
+    height: 41px;
+    margin: 10px 0 20px 0;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
 .artwork .like {
     color: #00f6d2;
     margin-left: 10px;
@@ -223,8 +232,6 @@ pre {
     flex-direction: row;
     align-items: center;
     width: 100%;
-    margin-top: 7px;
-    margin-bottom: 17px;
 }
 
 .artwork-can-buy__amount,
@@ -261,8 +268,6 @@ pre {
     font-size: 14px;
     font-style: italic;
     color: #fff;
-    margin-top: 17px;
-    margin-bottom: 27px;
 }
 
 ::-webkit-scrollbar {

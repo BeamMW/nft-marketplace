@@ -70,7 +70,6 @@ export default {
                 ${this.renderPreview()}
                 <div class="info-row">
                     <span class="artwork-title">
-                        ${this.renderDot()}
                         <span>
                             ${this.title || "Loading..."}
                         </span>
@@ -80,7 +79,7 @@ export default {
                 <div class="info-row">
                     <span class="artwork-owner">${this.ownerText}</span>
                 </div>
-                <div class="info-row ${this.price ? '' : 'hidden'}">
+                <div class="artwork-bottom-row">
                     ${this.renderPrice()}
                 </div>
             </div>
@@ -134,7 +133,11 @@ export default {
                 // TODO: if owned && has price should be able to cancel or change price
                 //       probably not for the first version
                 if (this.owned) {
-                    return html`<span class="normal bold">${amount} BEAM</span>`
+                    return html`<span class="artwork-can-buy">
+                        <img src="./assets/icon-beam.svg"/>
+                        <span class="artwork-can-buy__amount">${amount}</span>
+                        <span class="artwork-can-buy__curr">BEAM</span>
+                    </span>`
                 }
                 
                 // if not owned can only buy
@@ -156,7 +159,7 @@ export default {
             // doesn't have price and is not own image
             // means can be anything - not approved yet, not sold by
             // owner &c. Just dispaly that it is not on sale
-            return html`<span class='not-on-sale'>Not on sale</span>`
+            return html`<span class='not-on-sale'>Not for sale</span>`
         },
 
         onBuy (ev) {
