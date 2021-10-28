@@ -146,8 +146,6 @@ export const store = {
             return this.setError(err, "Failed to load contract params")
         }
 
-        // TODO: res.Exibits == count of artworks
-        //       check it and if not changed do not reload
         utils.ensureField(res, "Admin", "number")
         this.state.is_admin = !!res.Admin
         this.loadBalance()
@@ -324,7 +322,7 @@ export const store = {
             }
         }
         
-        // TODO: update existing artworks, not replace
+        // TODO: need to find a way to optimize this
         this.state.artworks[tabs.ALL]   = all
         this.state.artworks[tabs.SALE]  = sale
         this.state.artworks[tabs.LIKED] = liked
@@ -340,11 +338,10 @@ export const store = {
     loadArtwork(idx, id) {
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
-            (err, res) => this.onLoadArtwork(err, res, idx, id)
+            (err, res) => this.onLoadArtwork(err, res, idx)
         )  
     },
 
-    // TODO: check if we need to pass idx
     onLoadArtwork(err, res, idx) {
         if (err) {
             return this.setError(err, "Failed to download an artwork")
@@ -393,7 +390,6 @@ export const store = {
     // Artwork actions, Buy, Sell, Like &c.
     //
     buyArtwork (id) {
-        // TODO: what will happen if two different users would hit buy during the same block?
         utils.invokeContract(
             `role=user,action=buy,id=${id},cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
