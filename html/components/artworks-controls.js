@@ -27,6 +27,11 @@ export default {
                         <div class="tab-item__title">ON SALE</div>
                         ${this.renderActiveLine(tabs.SALE)}
                     </span>
+                    <span class="tab-item ${this.active_tab === tabs.SOLD ? 'tab-active' : ''}" 
+                    onclick=${()=>{this.onTabClicked(tabs.SOLD)}}>
+                        <div class="tab-item__title">SOLD</div>
+                        ${this.renderActiveLine(tabs.SOLD)}
+                    </span>
                     <span class="tab-item ${this.active_tab === tabs.LIKED ? 'tab-active' : ''}" 
                     onclick=${()=>{this.onTabClicked(tabs.LIKED)}}>
                         <div class="tab-item__title">LIKED</div>

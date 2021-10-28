@@ -17,8 +17,12 @@ export default {
         artists () {
             return this.$state.artists;
         },
+        active_tab () {
+            return this.$state.active_tab
+        },
         artworks () {
-            return this.$state.artworks;
+            let tab = this.$state.active_tab;
+            return this.$state.artworks[tab];
         }
     },
 

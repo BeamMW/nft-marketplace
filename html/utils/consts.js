@@ -6,5 +6,6 @@ export const tabs = {
     ALL: 0,
     MINE: 1,
     SALE: 2,
-    LIKED: 3
+    LIKED: 3,
+    SOLD: 4,
 }
