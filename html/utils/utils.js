@@ -115,7 +115,7 @@ export default class Utils {
             answer = JSON.parse(json);
             console.log('Api result: ', answer);
             
-            if (answer.result.output !== undefined) {
+            if (answer.result && answer.result.output) {
                 console.log('Output: ', JSON.parse(answer.result.output));
             }
             
