@@ -156,6 +156,19 @@ export const store = {
             `role=user,action=view_balance,cid=${this.state.cid}`, 
             (...args) => this.onLoadBalance(...args)
         )
+
+        //if (this.state.is_admin) {
+        //    utils.invokeContract(
+        //        `role=manager,action=view_balance,cid=${this.state.cid}`, 
+        //        (...args) => this.onLoadVotingBalance(...args)
+        //    )
+        //}
+    },
+
+    onLoadRewardsBalance (err, res) {
+        if (err) {
+            return this.setError(err, "Failed to load voting balance")
+        }
     },
 
     onLoadBalance(err, res) {
@@ -440,6 +453,13 @@ export const store = {
     //
     // Admin stuff
     //
+    addRewards (amount) {
+        utils.invokeContract(
+            `role=manager,action=add_rewards,num=${amount},cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
     addArtist (key, name) {
         utils.invokeContract(
             `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
