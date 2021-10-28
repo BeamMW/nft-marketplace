@@ -398,6 +398,7 @@ pre {
 
 .mine {
     padding: 3px 8px;
+    line-height: 1;
     border-radius: 3px;
     background-color: rgba(0, 246, 210, .3);
     color: #fff;

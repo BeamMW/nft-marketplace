@@ -120,7 +120,7 @@ export default {
         renderMine() {
             if (this.owned) {
                 return html`<div class="mine">
-                    mine
+                    <span>mine</span>
                 </div>`;
             }
         },
