@@ -149,7 +149,6 @@ pre {
     display:   flex;
     flex-wrap: wrap;
     overflow: auto;
-    flex-grow: 1;
     margin-top: 20px;
 }
 
