@@ -12,31 +12,11 @@ export default {
         return html`
             <div class="artworks-controls">
                 <div class="artworks-controls__tabs">
-                    <span class="tab-item ${this.active_tab === tabs.ALL ? 'tab-active' : ''}" 
-                    onclick=${()=>{this.onTabClicked(tabs.ALL)}}>
-                        <div class="tab-item__title">ALL</div>
-                        ${this.renderActiveLine(tabs.ALL)}
-                    </span>
-                    <span class="tab-item ${this.active_tab === tabs.MINE ? 'tab-active' : ''}" 
-                    onclick=${()=>{this.onTabClicked(tabs.MINE)}}>
-                        <div class="tab-item__title">MINE</div>
-                        ${this.renderActiveLine(tabs.MINE)}
-                    </span>
-                    <span class="tab-item ${this.active_tab === tabs.SALE ? 'tab-active' : ''}" 
-                    onclick=${()=>{this.onTabClicked(tabs.SALE)}}>
-                        <div class="tab-item__title">ON SALE</div>
-                        ${this.renderActiveLine(tabs.SALE)}
-                    </span>
-                    <span class="tab-item ${this.active_tab === tabs.SOLD ? 'tab-active' : ''}" 
-                    onclick=${()=>{this.onTabClicked(tabs.SOLD)}}>
-                        <div class="tab-item__title">SOLD</div>
-                        ${this.renderActiveLine(tabs.SOLD)}
-                    </span>
-                    <span class="tab-item ${this.active_tab === tabs.LIKED ? 'tab-active' : ''}" 
-                    onclick=${()=>{this.onTabClicked(tabs.LIKED)}}>
-                        <div class="tab-item__title">LIKED</div>
-                        ${this.renderActiveLine(tabs.LIKED)}
-                    </span>
+                    ${this.renderTab(tabs.ALL, 'ALL')}
+                    ${this.renderTab(tabs.MINE, 'MINE')}
+                    ${this.renderTab(tabs.SALE, 'SALE')}
+                    ${this.renderTab(tabs.SOLD, 'SOLD')}
+                    ${this.renderTab(tabs.LIKED, 'LIKED')}
                 </div>
             </div>
         `;
@@ -53,6 +33,19 @@ export default {
             if (id === this.active_tab) {
                 return html`
                     <div class="tab-item__bottom-line"></div>
+                `;
+            }
+        },
+
+        renderTab(type, title) {
+            if (type === tabs.ALL || 
+            (this.$state.artworks[type] !== undefined && this.$state.artworks[type].length > 0)) {
+                return html`
+                    <span class="tab-item ${this.active_tab === type ? 'tab-active' : ''}" 
+                    onclick=${()=>{this.onTabClicked(type)}}>
+                        <div class="tab-item__title">${title}</div>
+                        ${this.renderActiveLine(type)}
+                    </span>
                 `;
             }
         }

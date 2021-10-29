@@ -90,7 +90,7 @@ export default {
     methods: {
         renderLikes () {
             return html`
-                <span class="artwork-likes">
+                <span class="artwork-likes ${this.in_tx ? 'disabled' : ''}">
                     <img onclick=${this.liked ? this.onUnlike : this.onLike} 
                         src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
                     <span class="artwork-likes__text">

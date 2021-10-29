@@ -132,6 +132,7 @@ pre {
 
 .tab-item__title {
     padding: 4px 16px;
+    text-transform: uppercase;
 }
 
 .tab-item__bottom-line {
@@ -176,6 +177,7 @@ pre {
     align-items: center;
     margin-left: auto;
     margin-top: 20px;
+    cursor: pointer;
 }
 
 .artwork-likes__text {
@@ -334,6 +336,10 @@ pre {
     margin-left: 0.5em;
 }
 
+.disabled {
+    opacity: 0.2;
+}
+
 .button {
     padding: 11px 25px;
     border-radius: 50px;
@@ -357,7 +363,7 @@ pre {
     margin-left: 5px;
 }
 
-.button:hover {
+.button:not(.disabled):hover {
     box-shadow: 0 0 8px white;
 }
 
