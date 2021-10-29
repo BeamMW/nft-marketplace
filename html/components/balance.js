@@ -23,7 +23,7 @@ export default {
     render () {
         return html`
             <div class="balance-container">
-                <div class="balance">
+                <div class="balance ${this.show_balance ? '' : 'hidden'}">
                     <img src="./assets/icon-beam.svg"/>
                     <div class="balance-value">
                         ${this.balance_beam} BEAM

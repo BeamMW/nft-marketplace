@@ -370,6 +370,7 @@ pre {
 .user-opt {
     display: flex;
     flex-direction: column;
+    margin-left: auto;
 }
 
 .user-opt__key {
