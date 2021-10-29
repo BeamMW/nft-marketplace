@@ -33,11 +33,25 @@ export default {
                     <span class="button__text">close</span>
                 </div>
             `;
+        } else if (this.type === 'cancel') {
+            return html`
+                <div class="button ${this.type}">
+                    <img src="./assets/icon-cancel.svg"/>
+                    <span class="button__text">cancel</span>
+                </div>
+            `;
         } else if (this.type === 'copy') {
             return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-copy-blue.svg"/>
                     <span class="button__text">copy and close</span>
+                </div>
+            `;
+        } else if (this.type === 'proceed') {
+            return html`
+                <div class="button ${this.type}">
+                    <img src="./assets/icon-receive-proceed.svg"/>
+                    <span class="button__text">proceed</span>
                 </div>
             `;
         }

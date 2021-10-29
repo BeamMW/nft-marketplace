@@ -21,7 +21,8 @@ const defaultState = () => {
         selected_artist: undefined,
         active_tab: tabs.ALL,
         is_popup_visible: false,
-        popup_type: null
+        popup_type: null,
+        id_to_sell: ''
     }
 }
 
@@ -51,6 +52,10 @@ export const store = {
 
     setPopupType(value) {
         this.state.popup_type = value;
+    },
+
+    setIdToSell(id) {
+        this.state.id_to_sell = id;
     },
 
     //

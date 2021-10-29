@@ -4,7 +4,7 @@ import artwork from './artwork.js';
 import balance from './balance.js';
 import warning from './tx-warning.js';
 import artworksControls from './artworks-controls.js';
-import { common } from '../utils/consts.js';
+import { popups } from '../utils/consts.js';
 import publicKeyPopup from './public-key-popup.js';
 
 export default {
@@ -76,12 +76,9 @@ export default {
 
         onSellArtwork (id) {
             try {
-                let price = prompt("Enter the price in BEAM (need to implement regrular dialog with float values)");
-                if (price == null) {
-                    return;
-                }
-                price = parseInt(price) * common.GROTHS_IN_BEAM;
-                this.$store.sellArtwork(id, price);
+                this.$store.setPopupType(popups.SELL);
+                this.$store.setIdToSell(id);
+                this.$store.changePopupState(true);
             } 
             catch (err) {
                 this.$store.setError(err, "Failed to sell an item");

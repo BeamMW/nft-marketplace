@@ -366,9 +366,15 @@ pre {
     background-color: #0bccf7;
 }
 
+.button.cancel,
 .button.close {
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
+}
+
+.button.proceed {
+    margin-left: 30px;
+    background-color: #0bccf7;
 }
 
 .button.copy {
@@ -378,6 +384,7 @@ pre {
 
 .button__text {
     margin-left: 5px;
+    line-height: 1;
 }
 
 .button:not(.disabled):hover {
@@ -450,6 +457,7 @@ pre {
     width: 760px;
 }
 
+.popup__content-sell__title,
 .popup__content-key__title {
     font-size: 18px;
     font-weight: bold;
@@ -472,4 +480,87 @@ pre {
     margin-top: 30px;
     display: flex;
     flex-direction: row;
+}
+
+.popup .popup__content-sell {
+    padding: 40px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 390px;
+}
+
+.popup__content-sell__input {
+    margin-top: 20px;
+    height: 45px;
+    width: 100%;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, .05);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.popup__content-sell__input__elem {
+    background: rgba(255, 255, 255, 0);
+    border: none;
+    font-size: 24px;
+    resize: none;
+    color: #0bccf7;
+    height: 100%;
+    padding: 0;
+    border-radius: 10px;
+    padding: 8px;
+    max-width: 292px;
+}
+
+.popup__content-sell__input__elem:focus {
+    outline-width: 0;
+    color: #0bccf7;
+}
+
+.popup__content-sell__input__elem::placeholder {
+    color: #0bccf7;
+}
+
+.popup__content-sell__input__text {
+    margin-right: 8px;
+    font-size: 16px;
+    margin-left: auto;
+    color: #ffffff;
+}
+
+.popup__content-sell__controls {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+}
+
+.popup__content-sell__info {
+    margin-top: 30px;
+    opacity: 0.7;
+    font-size: 14px;
+    font-style: italic;
+    color: #fff;
+}
+
+.popup__content-sell__fee {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    align-self: flex-start;
+}
+
+.popup__content-sell__fee__title {
+    opacity: 0.5;
+    font-size: 12px;
+    color: #fff;
+}
+
+.popup__content-sell__fee__value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0bccf7;
+    margin-left: 10px;
 }

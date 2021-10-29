@@ -69,7 +69,6 @@ export default {
         onShowKey () {
             this.$store.setPopupType(popups.KEY);
             this.$store.changePopupState(true);
-            //alert(this.my_artist_name + ": " + this.my_artist_key)
         },
 
         onWithdraw () {
