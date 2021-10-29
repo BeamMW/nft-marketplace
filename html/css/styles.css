@@ -94,14 +94,14 @@ pre {
     text-align: center;
 }
 
-.upload {
+.admin-ui {
     display:         flex;
     align-items:     center;
     justify-content: center;
     margin-top: 30px;
 }
 
-.upload > input {
+.admin-ui > input {
     margin-right: 20px;
 }
 

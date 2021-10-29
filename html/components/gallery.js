@@ -1,5 +1,5 @@
 import html from '../utils/html.js';
-import upload  from './upload.js';
+import adminui from './admin-ui.js';
 import artwork from './artwork.js';
 import balance from './balance.js';
 import warning from './tx-warning.js';
@@ -27,14 +27,14 @@ export default {
     },
 
     components: {
-        artwork, upload, balance, warning, artworksControls
+        artwork, adminui, balance, warning, artworksControls
     },
 
     template: `
         <div class="vertical-container">
             <balance></balance>
             <warning v-if="in_tx"></warning>
-            <upload v-if="!in_tx && is_admin"/>
+            <adminui v-if="!in_tx && is_admin"/>
             <artworksControls></artworksControls>
             <template v-if="artworks.length > 0">
                 <div class="artworks">
