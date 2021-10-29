@@ -37,7 +37,7 @@ export default {
         },
         likes_cnt: {
             type: Number,
-            deafault: 0,
+            default: 0,
         },
         liked: {
             type: Boolean,

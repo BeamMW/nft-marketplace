@@ -5,7 +5,7 @@ import balance from './balance.js';
 import warning from './tx-warning.js';
 import artworksControls from './artworks-controls.js';
 import { common } from '../utils/consts.js';
-import utils from '../utils/utils.js';
+import publicKeyPopup from './public-key-popup.js';
 
 export default {
     computed: {
@@ -24,11 +24,14 @@ export default {
         artworks () {
             let tab = this.$state.active_tab;
             return this.$state.artworks[tab];
+        },
+        is_popup_visible() {
+            return this.$state.is_popup_visible;
         }
     },
 
     components: {
-        artwork, adminui, balance, warning, artworksControls
+        artwork, adminui, balance, warning, artworksControls, publicKeyPopup
     },
 
     template: `
@@ -37,6 +40,7 @@ export default {
             <warning v-if="in_tx"></warning>
             <adminui v-if="!in_tx && is_admin"/>
             <artworksControls></artworksControls>
+            <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
             <template v-if="artworks.length > 0">
                 <div class="artworks">
                     <artwork v-for="artwork in artworks"
@@ -62,7 +66,7 @@ export default {
                     <div class="empty-gallery__text">There are no artworks at the moment.</div>
                 </div>
             </template>
-        </div>    
+        </div>
     `,
 
     methods: {
@@ -90,6 +94,6 @@ export default {
 
         onUnlikeArtwork(id) {
             this.$store.unlikeArtwork(id)
-        }
+        },
     }
 }

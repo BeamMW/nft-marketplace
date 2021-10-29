@@ -20,6 +20,8 @@ const defaultState = () => {
         in_tx: false,
         selected_artist: undefined,
         active_tab: tabs.ALL,
+        is_popup_visible: false,
+        popup_type: null
     }
 }
 
@@ -41,6 +43,14 @@ export const store = {
     clearError() {
         this.state.error = undefined
         this.start()
+    },
+
+    changePopupState(value) {
+        this.state.is_popup_visible = value;
+    },
+
+    setPopupType(value) {
+        this.state.popup_type = value;
     },
 
     //

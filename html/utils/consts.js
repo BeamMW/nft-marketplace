@@ -9,3 +9,8 @@ export const tabs = {
     LIKED: 3,
     SOLD: 4,
 }
+
+export const popups = {
+    KEY: 0,
+    SELL: 1,
+}

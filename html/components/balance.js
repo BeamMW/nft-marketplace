@@ -1,5 +1,5 @@
 import html from '../utils/html.js';
-import { common, tabs } from '../utils/consts.js';
+import { common, popups } from '../utils/consts.js';
 
 export default {
     computed: {
@@ -65,9 +65,11 @@ export default {
                 `;
             }
         },
-
+        
         onShowKey () {
-            alert(this.my_artist_name + ": " + this.my_artist_key)
+            this.$store.setPopupType(popups.KEY);
+            this.$store.changePopupState(true);
+            //alert(this.my_artist_name + ": " + this.my_artist_key)
         },
 
         onWithdraw () {

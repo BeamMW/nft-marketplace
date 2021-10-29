@@ -336,7 +336,7 @@ export default class Utils {
         let titleElem = document.createElement("h3");
         titleElem.innerText = "Connecting to BEAM Web Wallet."; 
         let subtitle = document.createElement("p");
-        subtitle.innerText = "To use BEAM Faucet you should have BEAM Web Wallet installed and allow connection.";
+        subtitle.innerText = "To use BEAM Gallery you should have BEAM Web Wallet installed and allow connection.";
 
         let reconnectButton = document.createElement("button");
         reconnectButton.innerText = "Try to connect again";
