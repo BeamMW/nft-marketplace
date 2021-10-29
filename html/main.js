@@ -23,6 +23,10 @@ utils.initialize(
                 background_main_top,
                 background_main
         } = utils.getStyles();
+
+        if (utils.isWeb()) {
+            document.body.style.padding = '5%';
+        }
         
         const topColor =  [appsGradientOffset, "px,"].join('');
         const mainColor = [appsGradientTop, "px,"].join('');
@@ -30,12 +34,15 @@ utils.initialize(
         style.innerHTML = `.error {color: ${validator_error};}`;
         document.head.appendChild(style);
         document.body.style.color = content_main;
-        document.body.style.backgroundImage = [
-            "linear-gradient(to bottom,",
-            background_main_top, topColor,
-            background_main, mainColor,
-            background_main
-        ].join(' ');
+
+        if (!utils.isDesktop()) {
+            document.body.style.backgroundImage = [
+                "linear-gradient(to bottom,",
+                background_main_top, topColor,
+                background_main, mainColor,
+                background_main
+            ].join(' ');
+        }
         
 
         if (err) {

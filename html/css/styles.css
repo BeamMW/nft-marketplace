@@ -4,10 +4,13 @@ html, body {
     font-family: 'SFProDisplay', sans-serif;
     font-weight: normal;
     height:      100%;
-    width:       100%;
     overflow:    hidden;
     margin:      0;
     color:       white;
+}
+
+html {
+    width:       100%;
 }
 
 .error {

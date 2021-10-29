@@ -5,6 +5,7 @@ import balance from './balance.js';
 import warning from './tx-warning.js';
 import artworksControls from './artworks-controls.js';
 import { common } from '../utils/consts.js';
+import utils from '../utils/utils.js';
 
 export default {
     computed: {
@@ -31,7 +32,7 @@ export default {
     },
 
     template: `
-        <div class="vertical-container">
+        <div class="vertical-container" id="container">
             <balance></balance>
             <warning v-if="in_tx"></warning>
             <adminui v-if="!in_tx && is_admin"/>
