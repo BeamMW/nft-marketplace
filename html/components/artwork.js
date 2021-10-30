@@ -137,7 +137,7 @@ export default {
         renderPrice() {
             // if has price - just display it and return
             if (this.price) {
-                let amount = this.price.amount / common.GROTHS_IN_BEAM;
+                let amount = (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
                 
                 // TODO: if owned && has price should be able to cancel or change price
                 //       probably not for the first version
