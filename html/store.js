@@ -1,6 +1,6 @@
 import {router} from './router.js';
 import utils from './utils/utils.js';
-import { tabs } from './utils/consts.js';
+import { tabs, sort } from './utils/consts.js';
 
 const defaultState = () => {
     return {
@@ -22,7 +22,8 @@ const defaultState = () => {
         active_tab: tabs.ALL,
         is_popup_visible: false,
         popup_type: null,
-        id_to_sell: ''
+        id_to_sell: '',
+        sort_by: null
     }
 }
 
@@ -56,6 +57,11 @@ export const store = {
 
     setIdToSell(id) {
         this.state.id_to_sell = id;
+    },
+
+    setSortBy(val) {
+        this.state.sort_by = val;
+        this.sortArtWorks();
     },
 
     //
@@ -322,6 +328,8 @@ export const store = {
                 artwork.pk_author = oldArtwork.pk_author;
             }
 
+            artwork['author']=(this.state.artists[artwork.pk_author] || {}).label;
+
             all.push(artwork)
             let mykey = this.state.my_artist_key
 
@@ -357,10 +365,47 @@ export const store = {
         this.state.artworks[tabs.MINE]  = mine
         this.state.artworks[tabs.SOLD]  = sold
         this.state.loading = false;
+        this.sortArtWorks();
+    },
+
+    sortArtWorks() {
+        let activeArts = this.state.artworks[this.state.active_tab];
+
+        switch(this.state.sort_by) {
+            case sort.CREATOR_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author > b.author? 1 : -1);
+                break;
+            case sort.CREATOR_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author < b.author? 1 : -1);
+                break;
+            case sort.PRICE_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                    if (a.price !== undefined && b.price !== undefined) {
+                        return a.price.amount > b.price.amount? 1 : -1;
+                    } 
+                });
+                break;
+            case sort.PRICE_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                    if (a.price !== undefined && b.price !== undefined) {
+                        return a.price.amount < b.price.amount? 1 : -1;
+                    } 
+                });
+                break;
+            case sort.LIKES_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions > b.impressions? 1 : -1);
+                break;
+            case sort.LIKES_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions < b.impressions? 1 : -1);
+                break;
+            default:
+              break;
+        }
     },
 
     setActiveTab(id) {
         this.state.active_tab = id;
+        this.sortArtWorks();
     },
 
     loadArtwork(idx, id) {

@@ -14,3 +14,12 @@ export const popups = {
     KEY: 0,
     SELL: 1,
 }
+
+export const sort = {
+    CREATOR_ASC: 0,
+    CREATOR_DESC: 1,
+    PRICE_ASC: 2,
+    PRICE_DESC: 3,
+    LIKES_ASC: 4,
+    LIKES_DESC: 5
+}

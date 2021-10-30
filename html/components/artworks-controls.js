@@ -1,5 +1,6 @@
 import html from '../utils/html.js';
 import { tabs } from '../utils/consts.js';
+import CustomSelect from './selector.js';
 
 export default {
     computed: {
@@ -8,7 +9,21 @@ export default {
         }
     },
 
+    components: {
+        CustomSelect
+    },
+
     render () {
+        const selectorOptions = [
+            'Creator: A to Z',
+            'Creator: Z to A',
+            'Price: Low to High',
+            'Price: High to Low',
+            'Likes: Low to High',
+            'Likes: High to Low'
+        ];
+
+        //TODO: catch event from custom-select
         return html`
             <div class="actions-container">
                 <div class="artworks-controls">
@@ -20,11 +35,15 @@ export default {
                         ${this.renderTab(tabs.LIKED, 'LIKED')}
                     </div>
                 </div>
-                <span class="sort empty">
-                    Sort by
-                </span>
             </div>
         `;
+
+        //enable after author load fix
+        // <${CustomSelect}
+        // options=${selectorOptions}
+        // default="Sort by"
+        // class="select"
+        // />
     },
 
     methods: {
