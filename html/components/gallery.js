@@ -70,13 +70,11 @@ export default {
     `,
 
     methods: {
-        onCopy() {
-            var textArea = document.createElement("textarea");
-            textArea.style.position = "fixed";
-            textArea.value = this.my_key;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
+        onBuyArtwork (id) {
+            this.$store.buyArtwork(id);
+        },
+
+        onSellArtwork (id) {
             try {
                 this.$store.setPopupType(popups.SELL);
                 this.$store.setIdToSell(id);

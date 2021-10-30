@@ -74,15 +74,11 @@ export const store = {
         Vue.nextTick(() => {
             utils.download("./galleryManager.wasm", (err, bytes) => {
                 if (err) return this.setError(err, "Failed to download shader")
-                this.state.shader = bytes;
-                
-                utils.invokeContract(
-                    `role=artist,action=get_key`, 
-                    (...args) => this.onGetArtistKey(...args), this.state.shader
-                )
+                this.state.shader = bytes
+
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
-                //utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
-                //utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
+                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
+                utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
     },
@@ -96,12 +92,12 @@ export const store = {
             return this.setError(err, "Failed to verify cid")     
         }
 
-        // if (!res.contracts.some(el => el.cid == this.state.cid)) {
-        //     throw `CID not found '${this.state.cid}'`
-        // }
+        if (!res.contracts.some(el => el.cid == this.state.cid)) {
+            throw `CID not found '${this.state.cid}'`
+        }
 
         utils.invokeContract(
-            `role=artist,action=get_key`, 
+            `role=artist,action=get_key,cid=${this.state.cid}`, 
             (...args) => this.onGetArtistKey(...args), this.shader
         )
     },
@@ -152,9 +148,8 @@ export const store = {
         }
         
         utils.ensureField(res, "key", "string")
-        this.state.my_artist_key = res.key;
-        this.state.loading = false;
-        //this.refreshAllData()
+        this.state.my_artist_key = res.key
+        this.refreshAllData()
     },
 
     loadParams () {
