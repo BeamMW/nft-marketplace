@@ -61,7 +61,7 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val;
-        this.sortArtWorks();
+        //this.sortArtWorks();
     },
 
     //
@@ -365,7 +365,7 @@ export const store = {
         this.state.artworks[tabs.MINE]  = mine
         this.state.artworks[tabs.SOLD]  = sold
         this.state.loading = false;
-        this.sortArtWorks();
+        //this.sortArtWorks();
     },
 
     sortArtWorks() {
@@ -405,7 +405,7 @@ export const store = {
 
     setActiveTab(id) {
         this.state.active_tab = id;
-        this.sortArtWorks();
+        //this.sortArtWorks();
     },
 
     loadArtwork(idx, id) {
