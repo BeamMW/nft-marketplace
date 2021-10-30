@@ -1,28 +1,73 @@
 import html from '../utils/html.js';
-import { common } from '../utils/consts.js';
+import adminui from './admin-ui.js';
+import artwork from './artwork.js';
+import balance from './balance.js';
+import warning from './tx-warning.js';
+import artworksControls from './artworks-controls.js';
+import { popups } from '../utils/consts.js';
+import publicKeyPopup from './public-key-popup.js';
 
 export default {
     computed: {
-        my_key () {
-            return this.$state.my_artist_key;
+        in_tx () {
+            return this.$state.in_tx;
+        },
+        is_admin () {
+            return this.$state.is_admin;
+        },
+        artists () {
+            return this.$state.artists;
+        },
+        active_tab () {
+            return this.$state.active_tab
+        },
+        artworks () {
+            let tab = this.$state.active_tab;
+            return this.$state.artworks[tab];
+        },
+        is_popup_visible() {
+            return this.$state.is_popup_visible;
         }
     },
 
     components: {
+        artwork, adminui, balance, warning, artworksControls, publicKeyPopup
     },
 
-    render() { 
-        return html`<div class="coming-soon">
-            <div class="coming-soon__title">
-                NFT Gallery is coming soon…
-            </div>
-            <img class="coming-soon__icon" src="./assets/coming-soon.svg"/>
-            <div class="coming-soon__text"> 
-                <div>Your public key:</div>
-                <div class="cp-div">${this.my_key} <img onclick=${this.onCopy} class="cp" src="./assets/icon-copy.svg"/></div> 
-            </div>
-        </div>`;
-    },
+    template: `
+        <div class="vertical-container" id="container">
+            <balance></balance>
+            <warning v-if="in_tx"></warning>
+            <adminui v-if="!in_tx && is_admin"/>
+            <artworksControls></artworksControls>
+            <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
+            <template v-if="artworks.length > 0">
+                <div class="artworks">
+                    <artwork v-for="artwork in artworks"
+                    v-bind:id="artwork.id"
+                    v-bind:title="artwork.title"
+                    v-bind:author="(artists[artwork.pk_author] || {}).label"
+                    v-bind:bytes="artwork.bytes"
+                    v-bind:owned="artwork.owned"
+                    v-bind:price="artwork.price"
+                    v-bind:likes_cnt="artwork.impressions"
+                    v-bind:liked="artwork.my_impression == 1"
+                    v-bind:in_tx="in_tx"
+                    v-on:sell="onSellArtwork"
+                    v-on:buy="onBuyArtwork"
+                    v-on:like="onLikeArtwork"
+                    v-on:unlike="onUnlikeArtwork"
+                    />
+                </div>
+            </template>
+            <template v-else>
+                <div class="empty-gallery">
+                    <img class="empty-gallery__icon" src="./assets/icon-empty-gallery.svg"/>
+                    <div class="empty-gallery__text">There are no artworks at the moment.</div>
+                </div>
+            </template>
+        </div>
+    `,
 
     methods: {
         onCopy() {
@@ -33,12 +78,21 @@ export default {
             textArea.focus();
             textArea.select();
             try {
-                return document.execCommand("copy");
-            } catch (ex) {
-                return false;
-            } finally {
-                document.body.removeChild(textArea);
+                this.$store.setPopupType(popups.SELL);
+                this.$store.setIdToSell(id);
+                this.$store.changePopupState(true);
+            } 
+            catch (err) {
+                this.$store.setError(err, "Failed to sell an item");
             }
-        }
+        },
+
+        onLikeArtwork(id) {
+            this.$store.likeArtwork(id)
+        },
+
+        onUnlikeArtwork(id) {
+            this.$store.unlikeArtwork(id)
+        },
     }
 }

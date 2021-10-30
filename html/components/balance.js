@@ -1,5 +1,5 @@
 import html from '../utils/html.js';
-import { common } from '../utils/consts.js';
+import { common, popups } from '../utils/consts.js';
 
 export default {
     computed: {
@@ -14,22 +14,29 @@ export default {
         },
         in_tx () {
             return this.$state.in_tx
+        },
+        show_balance () {
+            return this.$state.is_artist || this.$state.balance_beam
         }
     },
 
     render () {
         return html`
             <div class="balance-container">
-                <div class="balance">
+                <div class="balance ${this.show_balance ? '' : 'hidden'}">
                     <img src="./assets/icon-beam.svg"/>
                     <div class="balance-value">
                         ${this.balance_beam} BEAM
                     </div>
                     ${this.renderWithdraw()}
-                </div>    
-                <a href="#" onclick=${this.onShowKey} class="show-key">
-                    Show my public key
-                </a>
+                </div>
+                <div class="user-opt">
+                    ${this.renderUserName()}
+                    <div class="user-opt__key" onclick=${this.onShowKey}>
+                        <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
+                        <span class="user-opt__key__text">Show my public key</span>
+                    </div>
+                </div>
             </div>
         `
     },
@@ -48,8 +55,20 @@ export default {
             `
         },
 
+        renderUserName () {
+            if (this.my_artist_name) {
+                return html`
+                <div class="user-opt__user" onclick=${this.onShowKey}>
+                    <img class="user-opt__user__icon" src="./assets/icon-user.svg"/>
+                    <span class="user-opt__user__text">${this.my_artist_name}</span>
+                </div>
+                `;
+            }
+        },
+        
         onShowKey () {
-            alert(this.my_artist_name + ": " + this.my_artist_key)
+            this.$store.setPopupType(popups.KEY);
+            this.$store.changePopupState(true);
         },
 
         onWithdraw () {

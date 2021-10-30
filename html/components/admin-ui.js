@@ -6,11 +6,12 @@ export default {
         },
         artists_count() {
             return this.$state.artists_count
-        }
+        },
     },
 
     template: `
-        <div class="upload">
+        <div class="admin-ui">
+            <input type="button" value="Add Rewards" v-on:click.native="onAddRewards"/>
             <input type="button" value="Add new artist" v-on:click.native="onAddArtist"/>
             <span v-if="!artists_count">Add artists to upload artworks</span>
             <span v-else>
@@ -28,6 +29,20 @@ export default {
         `,
 
     methods: {
+        onAddRewards() {
+            try {
+                let amount = prompt("Enter amount int REWARD TOKEN");
+                if (amount == null) {
+                    return;
+                }
+                amount = parseInt(amount); // THIS IS NOT IN GROTHs
+                this.$store.addRewards(amount)
+            } 
+            catch (err) {
+                this.$store.setError(err, "Failed to add rewards");
+            }
+        },
+
         onAddArtist () {
             try {
                 // TODO: show normal dialog, no " and , in name parsed[1] (name), max 100 bytes; 

@@ -3,10 +3,10 @@ import {store}  from './store.js'
 import {router} from './router.js'
 import utils    from './utils/utils.js'
 
-// TODO: ensure we create 6.1 API
 utils.initialize(
     {
         "appname": "BEAM Gallery",
+        "min_api_version": "6.1",
         "apiResultHandler": (...args) => store.onApiResult(...args)
     }, 
     (err) => {
@@ -23,6 +23,10 @@ utils.initialize(
                 background_main_top,
                 background_main
         } = utils.getStyles();
+
+        if (utils.isWeb()) {
+            document.body.style.padding = '5%';
+        }
         
         const topColor =  [appsGradientOffset, "px,"].join('');
         const mainColor = [appsGradientTop, "px,"].join('');

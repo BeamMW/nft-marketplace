@@ -1,5 +1,6 @@
-import {router} from './router.js'
-import utils from './utils/utils.js'
+import {router} from './router.js';
+import utils from './utils/utils.js';
+import { tabs, sort } from './utils/consts.js';
 
 const defaultState = () => {
     return {
@@ -10,12 +11,19 @@ const defaultState = () => {
         my_artist_key: "",
         is_artist: false,
         is_admin: false,
-        artworks: [], 
+        artworks: {
+            [tabs.ALL]: []
+        },
         artists: {},
         artists_count: 0,
         balance_beam: 0,
         in_tx: false,
         selected_artist: undefined,
+        active_tab: tabs.ALL,
+        is_popup_visible: false,
+        popup_type: null,
+        id_to_sell: '',
+        sort_by: null
     }
 }
 
@@ -37,6 +45,23 @@ export const store = {
     clearError() {
         this.state.error = undefined
         this.start()
+    },
+
+    changePopupState(value) {
+        this.state.is_popup_visible = value;
+    },
+
+    setPopupType(value) {
+        this.state.popup_type = value;
+    },
+
+    setIdToSell(id) {
+        this.state.id_to_sell = id;
+    },
+
+    setSortBy(val) {
+        this.state.sort_by = val;
+        //this.sortArtWorks();
     },
 
     //
@@ -83,7 +108,7 @@ export const store = {
 
     onShowMethods (err, res) {
         if (err) return this.setError(err)
-        //alert(utils.formatJSON(res))
+        alert(utils.formatJSON(res))
     },
 
     //
@@ -147,8 +172,6 @@ export const store = {
             return this.setError(err, "Failed to load contract params")
         }
 
-        // TODO: res.Exibits == count of artworks
-        //       check it and if not changed do not reload
         utils.ensureField(res, "Admin", "number")
         this.state.is_admin = !!res.Admin
         this.loadBalance()
@@ -159,6 +182,19 @@ export const store = {
             `role=user,action=view_balance,cid=${this.state.cid}`, 
             (...args) => this.onLoadBalance(...args)
         )
+
+        //if (this.state.is_admin) {
+        //    utils.invokeContract(
+        //        `role=manager,action=view_balance,cid=${this.state.cid}`, 
+        //        (...args) => this.onLoadVotingBalance(...args)
+        //    )
+        //}
+    },
+
+    onLoadRewardsBalance (err, res) {
+        if (err) {
+            return this.setError(err, "Failed to load voting balance")
+        }
     },
 
     onLoadBalance(err, res) {
@@ -270,7 +306,8 @@ export const store = {
         }
     
         utils.ensureField(res, "items", "array")
-        let artworks = []
+        let all = [], sale = [], liked = [], mine = [], sold = []
+
         for (const artwork of res.items) {
             // TODO: remove if < 2, this is for test only
             if (artwork.id < 3) continue
@@ -286,7 +323,7 @@ export const store = {
                 }
             }
 
-            let oldArtwork = this.state.artworks.find((item) => {
+            let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
                 return item.id == artwork.id;
             });
 
@@ -296,26 +333,93 @@ export const store = {
                 artwork.pk_author = oldArtwork.pk_author;
             }
 
-            artworks.push(artwork);
+            artwork['author']=(this.state.artists[artwork.pk_author] || {}).label;
+
+            all.push(artwork)
+            let mykey = this.state.my_artist_key
+
+            // MINE is what I own
+            if (artwork.owned) {
+                mine.push(artwork)
+            }
+
+            // SALE is what OWN && what has price set
+            if (artwork.owned && artwork.price) {
+                sale.push(artwork)
+            }
             
-            if (!oldArtwork){
-                this.loadArtwork(artworks.length - 1, artwork.id);
+            // LIKED is waht I've liked
+            if (artwork.my_impression) {
+                liked.push(artwork)
+            }
+            
+            // SOLD - I'm an author but I do not own
+            if (artwork.pk_author == mykey && !artwork.owned) {
+                sold.push(artwork)
+            }
+
+            if (!oldArtwork) {
+                this.loadArtwork(all.length - 1, artwork.id);
             }
         }
         
-        // TODO: update existing artworks, not replace
-        this.state.artworks = artworks;
+        // TODO: need to find a way to optimize this
+        this.state.artworks[tabs.ALL]   = all
+        this.state.artworks[tabs.SALE]  = sale
+        this.state.artworks[tabs.LIKED] = liked
+        this.state.artworks[tabs.MINE]  = mine
+        this.state.artworks[tabs.SOLD]  = sold
         this.state.loading = false;
+        //this.sortArtWorks();
+    },
+
+    sortArtWorks() {
+        let activeArts = this.state.artworks[this.state.active_tab];
+
+        switch(this.state.sort_by) {
+            case sort.CREATOR_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author > b.author? 1 : -1);
+                break;
+            case sort.CREATOR_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author < b.author? 1 : -1);
+                break;
+            case sort.PRICE_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                    if (a.price !== undefined && b.price !== undefined) {
+                        return a.price.amount > b.price.amount? 1 : -1;
+                    } 
+                });
+                break;
+            case sort.PRICE_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                    if (a.price !== undefined && b.price !== undefined) {
+                        return a.price.amount < b.price.amount? 1 : -1;
+                    } 
+                });
+                break;
+            case sort.LIKES_ASC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions > b.impressions? 1 : -1);
+                break;
+            case sort.LIKES_DESC:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions < b.impressions? 1 : -1);
+                break;
+            default:
+              break;
+        }
+    },
+
+    setActiveTab(id) {
+        this.state.active_tab = id;
+        //this.sortArtWorks();
     },
 
     loadArtwork(idx, id) {
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
-            (err, res) => this.onLoadArtwork(err, res, idx, id)
+            (err, res) => this.onLoadArtwork(err, res, idx)
         )  
     },
 
-    // TODO: check if we need to pass idx
     onLoadArtwork(err, res, idx) {
         if (err) {
             return this.setError(err, "Failed to download an artwork")
@@ -346,19 +450,24 @@ export const store = {
 
         // save parsed data
         // list may have been changed, so we check if artwork with this id is still present
-        let artwork = this.state.artworks[idx]
+        let artwork = this.state.artworks[tabs.ALL][idx]
         if (artwork && artwork.id) {
             artwork.title = name
             artwork.bytes = bytes
             artwork.pk_author = pk_author
+
+            // We receive author only now, so add what's missing to SOLD
+            let mykey = this.state.my_artist_key
+            if (artwork.pk_author === mykey && !artwork.owned) {
+                this.state.artworks[tabs.SOLD].push(artwork)
+            }
         }
     },
 
     //
-    // Buy & Sell
+    // Artwork actions, Buy, Sell, Like &c.
     //
     buyArtwork (id) {
-        // TODO: what will happen if two different users would hit buy during the same block?
         utils.invokeContract(
             `role=user,action=buy,id=${id},cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
@@ -368,6 +477,20 @@ export const store = {
     sellArtwork (id, price) {
         utils.invokeContract(
             `role=user,action=set_price,id=${id},amount=${price},aid=0,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    likeArtwork (id) {
+        utils.invokeContract(
+            `role=user,action=vote,id=${id},val=1,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    unlikeArtwork (id) {
+        utils.invokeContract(
+            `role=user,action=vote,id=${id},val=0,cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
         )
     },
@@ -395,6 +518,13 @@ export const store = {
     //
     // Admin stuff
     //
+    addRewards (amount) {
+        utils.invokeContract(
+            `role=manager,action=add_rewards,num=${amount},cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
     addArtist (key, name) {
         utils.invokeContract(
             `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
@@ -429,5 +559,5 @@ export const store = {
         catch(err) {
             this.setError(err, "Failed to upload artwork")
         }
-    }
+    },
 }

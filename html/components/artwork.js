@@ -1,6 +1,7 @@
 import html    from '../utils/html.js';
 import loading from './loading.js';
 import dot     from './dot.js';
+import artButton from './art-button.js';
 import { common } from '../utils/consts.js';
 
 export default {
@@ -33,10 +34,22 @@ export default {
         in_tx: {
             type: Boolean,
             default: false
+        },
+        likes_cnt: {
+            type: Number,
+            default: 0,
+        },
+        liked: {
+            type: Boolean,
+            default: false
         }
     },
 
     emits: ['buy', 'sell'],
+
+    components: {
+        artButton
+    },
 
     computed: {
         ownerText () {
@@ -44,9 +57,9 @@ export default {
             if (this.author) {
                 res = ["by", this.author].join(' ');
             }
-            if (this.owned) {
-                return res += (res ? " | " : "") + "You own this artwork";
-            }
+            // if (this.owned) {
+            //     return res += (res ? " | " : "") + "You own this artwork";
+            // }
             return res ? res : "Loading...";
         },
     },
@@ -56,12 +69,18 @@ export default {
             <div class="artwork">
                 ${this.renderPreview()}
                 <div class="info-row">
-                    <span class="artwork-title">${this.renderDot()}<span>${this.title || "Loading..."}</span></span>
+                    <span class="artwork-title">
+                        <span>
+                            ${this.title || "Loading..."}
+                        </span>
+                    </span>
+                    ${this.renderLikes()}
                 </div>
                 <div class="info-row">
                     <span class="artwork-owner">${this.ownerText}</span>
+                    ${this.renderMine()}
                 </div>
-                <div class="info-row ${this.price ? '' : 'hidden'}">
+                <div class="artwork-bottom-row">
                     ${this.renderPrice()}
                 </div>
             </div>
@@ -69,6 +88,18 @@ export default {
     },
 
     methods: {
+        renderLikes () {
+            return html`
+                <span class="artwork-likes ${this.in_tx ? 'disabled' : ''}">
+                    <img onclick=${this.liked ? this.onUnlike : this.onLike} 
+                        src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
+                    <span class="artwork-likes__text">
+                        ${this.likes_cnt}
+                    </span>
+                </span>
+            `
+        },
+
         renderPreview() {
             if (this.bytes.length) {
                 let image = URL.createObjectURL(new Blob([this.bytes], {type: 'image/jpeg'}))
@@ -86,6 +117,14 @@ export default {
             }
         },
 
+        renderMine() {
+            if (this.owned) {
+                return html`<div class="mine">
+                    <span>mine</span>
+                </div>`;
+            }
+        },
+
         renderDot() {
             if (!this.owned) {
                 return ""
@@ -98,32 +137,38 @@ export default {
         renderPrice() {
             // if has price - just display it and return
             if (this.price) {
-                let amount = this.price.amount / common.GROTHS_IN_BEAM;
+                let amount = (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
                 
                 // TODO: if owned && has price should be able to cancel or change price
                 //       probably not for the first version
                 if (this.owned) {
-                    return html`<span class="normal bold">${amount} BEAM</span>`
+                    return html`<span class="artwork-can-buy">
+                        <img src="./assets/icon-beam.svg"/>
+                        <span class="artwork-can-buy__amount">${amount}</span>
+                        <span class="artwork-can-buy__curr">BEAM</span>
+                    </span>`
                 }
                 
                 // if not owned can only buy
                 return html`
-                    <span>
-                        <a href="#" onclick=${this.onBuy} class="buy ${this.in_tx ? 'darker' : ''}">BUY</a>
-                        <span class="normal bold ml-hem">${amount} BEAM</span>
+                    <span class="artwork-can-buy">
+                        <img src="./assets/icon-beam.svg"/>
+                        <span class="artwork-can-buy__amount">${amount}</span>
+                        <span class="artwork-can-buy__curr">BEAM</span>
+                        <${artButton} class="artwork-can-buy__button" onclick=${this.onBuy} type="buy"/>
                     </span>
                 `
             }
 
             // doesn't have price and is own image
             if (this.owned) {
-                return html`<a href="#" class="buy ${this.in_tx ? 'darker' : ''}" onclick=${this.onSell}>SELL</a>`
+                return html`<${artButton} class="artwork-can-buy__button" onclick=${this.onSell} type="sell"/>`
             }
 
             // doesn't have price and is not own image
             // means can be anything - not approved yet, not sold by
             // owner &c. Just dispaly that it is not on sale
-            return html`<span class='small darker'>Not on sale</span>`
+            return html`<span class='not-on-sale'>Not for sale</span>`
         },
 
         onBuy (ev) {
@@ -137,6 +182,20 @@ export default {
             ev.preventDefault()
             if (!this.in_tx) {
                 this.$emit('sell', this.id)
+            }
+        },
+
+        onLike (ev) {
+            ev.preventDefault()
+            if (!this.in_tx) {
+                this.$emit('like', this.id)
+            }
+        },
+
+        onUnlike (ev) {
+            ev.preventDefault()
+            if (!this.in_tx) {
+                this.$emit('unlike', this.id)
             }
         }
     }
