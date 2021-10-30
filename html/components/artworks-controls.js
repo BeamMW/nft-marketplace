@@ -10,14 +10,19 @@ export default {
 
     render () {
         return html`
-            <div class="artworks-controls">
-                <div class="artworks-controls__tabs">
-                    ${this.renderTab(tabs.ALL, 'ALL')}
-                    ${this.renderTab(tabs.MINE, 'MINE')}
-                    ${this.renderTab(tabs.SALE, 'SALE')}
-                    ${this.renderTab(tabs.SOLD, 'SOLD')}
-                    ${this.renderTab(tabs.LIKED, 'LIKED')}
+            <div class="actions-container">
+                <div class="artworks-controls">
+                    <div class="artworks-controls__tabs">
+                        ${this.renderTab(tabs.ALL, 'ALL')}
+                        ${this.renderTab(tabs.MINE, 'MINE')}
+                        ${this.renderTab(tabs.SALE, 'SALE')}
+                        ${this.renderTab(tabs.SOLD, 'SOLD')}
+                        ${this.renderTab(tabs.LIKED, 'LIKED')}
+                    </div>
                 </div>
+                <span class="sort empty">
+                    Sort by
+                </span>
             </div>
         `;
     },

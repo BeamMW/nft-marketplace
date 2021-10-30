@@ -119,11 +119,27 @@ pre {
     height: 85%;
 }
 
-.artworks-controls {
+.actions-container {
     display: flex;
     flex-direction: row;
     margin-top: 30px;
 }
+
+.artworks-controls {
+    display: flex;
+    flex-direction: row;
+}
+
+.sort {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.sort.empty {
+    opacity: 0.5;
+    font-size: 14px;
+    color: #fff;
+} 
 
 .artworks-controls__tabs {
     display: flex;
@@ -222,7 +238,7 @@ pre {
 }
 
 .artwork-bottom-row {
-    height: 41px;
+    min-height: 41px;
     margin: 10px 0 20px 0;
     padding: 0 14px;
     display: flex;
@@ -237,7 +253,8 @@ pre {
 
 .artwork-can-buy {
     display: flex;
-    flex-direction: row;
+    line-height: 2;
+    flex-wrap: wrap;
     align-items: center;
     width: 100%;
 }

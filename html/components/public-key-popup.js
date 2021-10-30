@@ -43,32 +43,35 @@ export default {
     mounted: function () {
         this.applyStyles();
 
-        document.getElementById('sell-input').addEventListener('keydown', (event) => {
-            const specialKeys = [
-                'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
-                'Control', 'Delete', 'F5'
-              ];
+        const sellInput = document.getElementById('sell-input');
+        if (sellInput) {
+            document.getElementById('sell-input').addEventListener('keydown', (event) => {
+                const specialKeys = [
+                    'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
+                    'Control', 'Delete', 'F5'
+                ];
 
-            if (specialKeys.indexOf(event.key) !== -1) {
-                return;
-            }
+                if (specialKeys.indexOf(event.key) !== -1) {
+                    return;
+                }
 
-            const current = document.getElementById('sell-input').value;
-            const next = current.concat(event.key);
-        
-            if (!utils.handleString(next)) {
-                event.preventDefault();
-            }
-        })
-
-        document.getElementById('sell-input').addEventListener('paste', (event) => {
-            if (event.clipboardData !== undefined) {
-                const text = event.clipboardData.getData('text');
-                if (!utils.handleString(text)) {
+                const current = document.getElementById('sell-input').value;
+                const next = current.concat(event.key);
+            
+                if (!utils.handleString(next)) {
                     event.preventDefault();
                 }
-            }
-        })
+            })
+
+            document.getElementById('sell-input').addEventListener('paste', (event) => {
+                if (event.clipboardData !== undefined) {
+                    const text = event.clipboardData.getData('text');
+                    if (!utils.handleString(text)) {
+                        event.preventDefault();
+                    }
+                }
+            });
+        }
     },
 
     methods: {
