@@ -17,7 +17,7 @@ export default {
             <span v-else>
                 <span>Upload for artist:&nbsp;&nbsp;</span>
                 <select name="upload_artist" v-model="$state.selected_artist">
-                    <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}}</option>
+                    <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}} - {{artist.key.substring(0, 4)}}</option>
                 </select>
                 &nbsp;&nbsp;
                 <input type="file" accept="image/png, image/jpeg" 
