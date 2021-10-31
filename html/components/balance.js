@@ -6,11 +6,10 @@ export default {
         balance_beam () {
             return this.$state.balance_beam / common.GROTHS_IN_BEAM;
         },
-        my_artist_key () {
-            return this.$state.my_artist_key
-        },
         my_artist_name () {
-            return (this.$state.artists[this.$state.my_artist_key] || {}).label
+            let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
+                         this.$state.artists[this.$state.my_artist_keys[1]]
+            return (artist || {}).label
         },
         in_tx () {
             return this.$state.in_tx

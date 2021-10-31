@@ -19,8 +19,8 @@ export default {
         popup_type () {
             return this.$state.popup_type;
         },
-        my_artist_key () {
-            return this.$state.my_artist_key;
+        display_artist_key () {
+            return this.$state.my_artist_keys[0];
         },
         id_to_sell () {
             return this.$state.id_to_sell;
@@ -90,7 +90,7 @@ export default {
                 </div>
 
                 <div class="popup__content-key__data">
-                    <span>${this.my_artist_key}</span>
+                    <span>${this.display_artist_key}</span>
                     <img class="copy-icon" onclick=${this.onCopy} src="./assets/icon-copy.svg"/>
                 </div>
 
@@ -100,7 +100,7 @@ export default {
                     type="close"/>
 
                     <${artButton} 
-                    data=${this.my_artist_key}
+                    data=${this.display_artist_key}
                     onclick=${this.onCopy} 
                     type="copy"/>
                 </div>
@@ -154,7 +154,7 @@ export default {
         onCopy() {
             var textArea = document.createElement("textarea");
             textArea.style.position = "fixed";
-            textArea.value = this.my_artist_key;
+            textArea.value = this.display_artist_key;
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
