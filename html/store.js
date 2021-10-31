@@ -7,8 +7,8 @@ const defaultState = () => {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "c02dbd603ec8925177cd3fd5e26848e3b82cd3691b69edd8add4ccfd4081ae9e",
-        my_artist_key: "",
+        cid: "b51efe78d3e7c83c8dbc3d59d5e06b2bd770139e645bc19e50652632cbdd47d1",
+        my_artist_keys: [],
         is_artist: false,
         is_admin: false,
         artworks: {
@@ -104,7 +104,7 @@ export const store = {
 
         utils.invokeContract(
             `role=artist,action=get_key,cid=${this.state.cid}`, 
-            (...args) => this.onGetArtistKey(...args), this.shader
+            (...args) => this.onGetArtistKeyCID(...args), this.shader
         )
     },
 
@@ -148,13 +148,27 @@ export const store = {
     //
     // Self info, balance & stuff
     //
-    onGetArtistKey(err, res) {
+    onGetArtistKeyCID(err, res) {
         if (err) {
             return this.setError(err, "Failed to get artist key")     
         }
         
         utils.ensureField(res, "key", "string")
-        this.state.my_artist_key = res.key
+        this.state.my_artist_keys.push(res.key)
+        
+        utils.invokeContract(
+            `role=artist,action=get_key`, 
+            (...args) => this.onGetArtistKeyNoCID(...args), this.shader
+        )
+    },
+
+    onGetArtistKeyNoCID(err, res) {
+        if (err) {
+            return this.setError(err, "Failed to get artist key")     
+        }
+        
+        utils.ensureField(res, "key", "string")
+        this.state.my_artist_keys.push(res.key)
         this.refreshAllData()
     },
 
@@ -256,7 +270,7 @@ export const store = {
         //
         //       for (let idx = this.state.artists_count; idx < res.artists.length; ++idx) {
         //          let artist = res.artists[idx]
-        //          if (artist.key == this.state.my_artist_key) {
+        //          if (artist.key == ... use indexOf this.state.my_artist_keys) {
         //            this.state.is_artist = true
         //          }
         //          this.state.artists[artist.key] = artist
@@ -271,8 +285,9 @@ export const store = {
                 }
             }
 
+            let mykeys = this.state.my_artist_keys
             for (let artist of res.artists) {
-                if (artist.key == this.state.my_artist_key) {
+                if (mykeys.indexOf(artist.key) != -1) {
                     this.state.is_artist = true
                 }
                 this.state.artists[artist.key] = artist
@@ -337,7 +352,7 @@ export const store = {
             artwork['author']=(this.state.artists[artwork.pk_author] || {}).label;
 
             all.push(artwork)
-            let mykey = this.state.my_artist_key
+            let mykeys = this.state.my_artist_keys
 
             // MINE is what I own
             if (artwork.owned) {
@@ -355,7 +370,7 @@ export const store = {
             }
             
             // SOLD - I'm an author but I do not own
-            if (artwork.pk_author == mykey && !artwork.owned) {
+            if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
                 sold.push(artwork)
             }
 
@@ -458,8 +473,8 @@ export const store = {
             artwork.pk_author = pk_author
 
             // We receive author only now, so add what's missing to SOLD
-            let mykey = this.state.my_artist_key
-            if (artwork.pk_author === mykey && !artwork.owned) {
+            let mykeys = this.state.my_artist_keys
+            if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
                 this.state.artworks[tabs.SOLD].push(artwork)
             }
         }
