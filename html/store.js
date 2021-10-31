@@ -311,7 +311,7 @@ export const store = {
 
         for (const artwork of res.items) {
             // TODO: remove if < 2, this is for test only
-            if (artwork.id < 3) continue
+            // if (artwork.id < 3) continue
 
             // just for convenience, to make more clear what pk is
             artwork.pk_owner = artwork.pk
