@@ -7,7 +7,7 @@ const defaultState = () => {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "ea3a002da2b8f8d24c5f5e7056e4c06aad6309097588c6946d10ac00349a9f52",
+        cid: "c02dbd603ec8925177cd3fd5e26848e3b82cd3691b69edd8add4ccfd4081ae9e",
         my_artist_key: "",
         is_artist: false,
         is_admin: false,
