@@ -7,7 +7,7 @@ const defaultState = () => {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "ea3a002da2b8f8d24c5f5e7056e4c06aad6309097588c6946d10ac00349a9f52",
+        cid: "c02dbd603ec8925177cd3fd5e26848e3b82cd3691b69edd8add4ccfd4081ae9e",
         my_artist_key: "",
         is_artist: false,
         is_admin: false,
@@ -23,7 +23,8 @@ const defaultState = () => {
         is_popup_visible: false,
         popup_type: null,
         id_to_sell: '',
-        sort_by: null
+        sort_by: null,
+        refresh_timer: undefined
     }
 }
 
@@ -68,6 +69,10 @@ export const store = {
     // Shader, CID, debug helpers
     //
     start () {
+        if (this.state.refresh_timer) {
+            clearInterval(this.state.refresh_timer)
+        }
+
         Object.assign(this.state, defaultState())
         router.push({name: 'gallery'})
 
@@ -77,7 +82,8 @@ export const store = {
                 this.state.shader = bytes
 
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
-                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
+                //utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
+                this.state.refresh_timer = setInterval(() => this.refreshAllData(), 5000)
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
@@ -305,7 +311,7 @@ export const store = {
 
         for (const artwork of res.items) {
             // TODO: remove if < 2, this is for test only
-            if (artwork.id < 3) continue
+            // if (artwork.id < 3) continue
 
             // just for convenience, to make more clear what pk is
             artwork.pk_owner = artwork.pk

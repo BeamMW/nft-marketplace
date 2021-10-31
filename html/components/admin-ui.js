@@ -17,10 +17,10 @@ export default {
             <span v-else>
                 <span>Upload for artist:&nbsp;&nbsp;</span>
                 <select name="upload_artist" v-model="$state.selected_artist">
-                    <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}}</option>
+                    <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}} - {{artist.key.substring(0, 4)}}</option>
                 </select>
                 &nbsp;&nbsp;
-                <input type="file" accept="image/png, image/jpeg" 
+                <input type="file" multiple accept="image/png, image/jpeg"   
                     v-on:change.native="onUploadArtwork"
                     :disabled="!$state.selected_artist"
                 />
@@ -60,11 +60,14 @@ export default {
         },
 
         onUploadArtwork (ev) {
-            let file = ev.target.files[0]
-            if (!file) { 
-                return
+            let files = ev.target.files
+            for (let idx = 0; idx < files.length; idx++) {
+                let file = files[idx]
+                if (!file) { 
+                    continue;
+                }
+                this.$store.uploadArtwork(file, this.$state.selected_artist.key, this.$state.selected_artist.label)
             }
-            this.$store.uploadArtwork(file, this.$state.selected_artist.key, this.$state.selected_artist.label)
         }
     }
 }
