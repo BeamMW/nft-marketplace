@@ -126,7 +126,7 @@ export const store = {
                 }
             }
 
-            this.state.in_tx = inTx
+            // this.state.in_tx = inTx
             return
         }
 
