@@ -97,14 +97,24 @@ pre {
     text-align: center;
 }
 
-.admin-ui {
+.admin-column {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    margin-bottom: -30px;
+}
+
+.admin-row {
     display:         flex;
     align-items:     center;
     justify-content: center;
-    margin-top: 30px;
 }
 
-.admin-ui > input {
+.admin-row > *:not(first) {
+    margin-top: 20px;
+}
+
+.admin-row > input {
     margin-right: 20px;
 }
 
@@ -640,3 +650,4 @@ pre {
 .selectHide {
     display: none;
 }
+
