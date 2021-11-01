@@ -73,7 +73,7 @@ export default class Utils {
             "params":  params
         }
 
-        console.log(Utils.formatJSON(request))
+        //console.log(Utils.formatJSON(request))
 
         if (Utils.isWeb()) {
             BEAM.callWalletApi(callid, method, params);
@@ -113,10 +113,11 @@ export default class Utils {
         try
         {
             answer = JSON.parse(json);
-            console.log('Api result: ', answer);
-            
+           
             if (answer.result && answer.result.output) {
-                console.log('Output: ', JSON.parse(answer.result.output));
+                //console.log('Output: ', JSON.parse(answer.result.output));
+            } else {
+                //console.log('Api result: ', answer);
             }
             
             const id = answer.id

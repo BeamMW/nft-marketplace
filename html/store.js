@@ -1,13 +1,13 @@
 import {router} from './router.js';
 import utils from './utils/utils.js';
-import { tabs, sort } from './utils/consts.js';
+import { tabs, sort, common } from './utils/consts.js';
 
 const defaultState = () => {
     return {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "b51efe78d3e7c83c8dbc3d59d5e06b2bd770139e645bc19e50652632cbdd47d1",
+        cid: "c02dbd603ec8925177cd3fd5e26848e3b82cd3691b69edd8add4ccfd4081ae9e",
         my_artist_keys: [],
         is_artist: false,
         is_admin: false,
@@ -17,6 +17,7 @@ const defaultState = () => {
         artists: {},
         artists_count: 0,
         balance_beam: 0,
+        balance_reward: 0,
         in_tx: false,
         selected_artist: undefined,
         active_tab: tabs.ALL,
@@ -24,7 +25,8 @@ const defaultState = () => {
         popup_type: null,
         id_to_sell: '',
         sort_by: null,
-        refresh_timer: undefined
+        refresh_timer: undefined,
+        pending_artworks: 0,
     }
 }
 
@@ -83,7 +85,7 @@ export const store = {
 
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
                 //utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
-                this.state.refresh_timer = setInterval(() => this.refreshAllData(), 5000)
+                this.state.refresh_timer = setInterval(() => this.refreshAllData(), 10000)
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
@@ -188,7 +190,9 @@ export const store = {
         }
 
         utils.ensureField(res, "Admin", "number")
+        utils.ensureField(res, "voteReward_balance", "number")
         this.state.is_admin = !!res.Admin
+        this.state.balance_reward = res.voteReward_balance
         this.loadBalance()
     },
     
@@ -347,6 +351,7 @@ export const store = {
                 artwork.title = oldArtwork.title;
                 artwork.bytes = oldArtwork.bytes;
                 artwork.pk_author = oldArtwork.pk_author;
+                artwork.sales = oldArtwork.sales;
             }
 
             artwork['author']=(this.state.artists[artwork.pk_author] || {}).label;
@@ -430,9 +435,13 @@ export const store = {
     },
 
     loadArtwork(idx, id) {
+        this.state.pending_artworks++
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
-            (err, res) => this.onLoadArtwork(err, res, idx)
+            (err, res) => {
+                this.state.pending_artworks--
+                this.onLoadArtwork(err, res, idx)
+            }
         )  
     },
 
@@ -576,4 +585,109 @@ export const store = {
             this.setError(err, "Failed to upload artwork")
         }
     },
+
+    showStats() {
+
+        let total = this.state.artworks[tabs.ALL].length
+        let left  = total
+
+        for (let idx = 0; idx < total; ++idx) {
+            let curridx = idx
+            let currid  = this.state.artworks[tabs.ALL][curridx].id
+            utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${currid}`, 
+                (err, res) => {
+                    if (err) {
+                        return this.setError(err)
+                    }
+
+                    if (res.sales.length) {
+                        let artwork = this.state.artworks[tabs.ALL][curridx]
+                        artwork.sales = res.sales
+                    } 
+                    
+                    if (--left == 0) {
+                        // this is the last artwork
+                        this.__showStats()
+                    }
+                }
+            )
+        }
+    },
+
+    __showStats() {
+        const cnt_stats = 12
+        let artworks = this.state.artworks[tabs.ALL]
+        let artists = this.state.artists
+
+        let likes = [], likes_total = 0;
+        let sales = [], tvb = 0
+
+        let likes_compare = (l1, l2) => l2.impressions - l1.impressions
+        let sells_compare = (s1, s2) => s2.amount - s1.amount
+
+        for (let idx = 0; idx < artworks.length; idx++) {
+            let artwork = artworks[idx]
+            
+            likes.push({idx, impressions: artwork.impressions})
+            likes_total += artwork.impressions
+
+            likes.sort(likes_compare)
+            if (likes.length > cnt_stats) {
+                likes.pop()
+            }
+
+            if (artwork.sales) {
+                let max_this = 0
+                for (let sale of artwork.sales) {
+                    tvb += sale.amount
+                    if (sale.amount > max_this) max_this = sale.amount
+                }
+
+                sales.push({
+                    idx, 
+                    amount: max_this
+                })
+
+                sales.sort(sells_compare)
+                if (sales.length > cnt_stats) {
+                    sales.pop()
+                }
+            }
+        }
+        
+        let formatter = function (arr, title, extra) {
+            let result = [title, "\n"].join("")
+            let cntr = 1;
+
+            for (let data of arr) {
+                let artwork = artworks[data.idx]
+                let eres = extra ? extra(artwork, data) : []
+                result = [
+                            result, "\n  ", cntr, ". \"", 
+                            artwork.title, "\" by \"", (artists[artwork.pk_author] || {}).label,
+                            "\" id ", data.idx + 1
+                         ].join("")
+
+                if (eres.length) {
+                    result = [result, ", ", ...eres].join("")
+                }         
+
+                cntr++
+            }
+
+            return result
+        }
+
+        let sliked = formatter(likes, "Most liked:", (artwork) => [artwork.impressions, "likes"].join(" "))
+        let slikes = ["Total likes: ", likes_total].join("")
+        let ssold  = formatter(sales, "Top sales (one per artwork):", (artwork, data) => {
+            let price = data.amount
+            return [price / common.GROTHS_IN_BEAM, " BEAM"].join("")
+        })
+        let stvb   = ["Total value of sales: ", tvb / common.GROTHS_IN_BEAM, " BEAM"].join("")
+        let snum   = ["Total artworks: ", artworks.length].join("")
+
+        let message = [sliked, slikes, ssold, stvb, snum].join("\n\n")
+        alert(message)
+    }
 }
