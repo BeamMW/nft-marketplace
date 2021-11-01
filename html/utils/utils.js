@@ -373,6 +373,10 @@ export default class Utils {
         installButton.style.fontWeight = "bold";
         installButton.style.fontSize = "14px";
         installButton.style.backgroundColor = "#00f6d2";
+        installButton.addEventListener('click', () => {
+            window.open('https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk', 
+                '_blank');
+        });
 
         installButton.addEventListener("mouseover", () => {
             installButton.style.boxShadow = "0 0 8px white";
