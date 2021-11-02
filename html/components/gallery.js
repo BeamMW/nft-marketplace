@@ -26,7 +26,7 @@ export default {
             return this.$state.artworks[tab];
         },
         can_vote () {
-            return this.$state.can_vote
+            return this.$state.balance_reward > 0;
         },
         is_popup_visible() {
             return this.$state.is_popup_visible;
@@ -61,6 +61,7 @@ export default {
                     v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
+                    v-on:change_price="onChangePrice"
                     />
                 </div>
             </template>
@@ -81,6 +82,17 @@ export default {
         onSellArtwork (id) {
             try {
                 this.$store.setPopupType(popups.SELL);
+                this.$store.setIdToSell(id);
+                this.$store.changePopupState(true);
+            } 
+            catch (err) {
+                this.$store.setError(err, "Failed to sell an item");
+            }
+        },
+
+        onChangePrice (id) {
+            try {
+                this.$store.setPopupType(popups.CHANGE_PRICE);
                 this.$store.setIdToSell(id);
                 this.$store.changePopupState(true);
             } 

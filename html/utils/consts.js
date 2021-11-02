@@ -13,6 +13,7 @@ export const tabs = {
 export const popups = {
     KEY: 0,
     SELL: 1,
+    CHANGE_PRICE: 2,
 }
 
 export const sort = {

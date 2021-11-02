@@ -49,7 +49,7 @@ export default {
         },        
     },
 
-    emits: ['buy', 'sell'],
+    emits: ['buy', 'sell', 'change_price'],
 
     components: {
         artButton
@@ -95,7 +95,6 @@ export default {
     },
 
     methods: {
-        //${!this.can_vote}
         renderLikes () {
             return html`
                 <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled="${this.can_vote ? 'false' : 'true'}">
@@ -126,12 +125,14 @@ export default {
 
         renderMine() {
             if (this.owned) {
-                return html`<div class="mine">
-                    <span>mine</span>
-                </div>`;
+                return html`
+                    <span class="mine">
+                        <span>mine</span>
+                    </span>
+                `;
             }
         },
-
+        
         renderDot() {
             if (!this.owned) {
                 return ""
@@ -153,6 +154,7 @@ export default {
                         <img src="./assets/icon-beam.svg"/>
                         <span class="artwork-can-buy__amount">${amount}</span>
                         <span class="artwork-can-buy__curr">BEAM</span>
+                        <${artButton} class="artwork-can-buy__button" onclick=${this.onChangePrice} type="change"/>
                     </span>`
                 }
                 
@@ -209,7 +211,7 @@ export default {
         onChangePrice (ev) {
             ev.preventDefault()
             if (this.can_change_price) {
-                alert('change price')
+                this.$emit('change_price', this.id)
             }
         }
     }
