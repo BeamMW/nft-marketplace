@@ -12,7 +12,7 @@ utils.initialize(
     (err) => {
         const vueApp = Vue.createApp(App);
         vueApp.config.globalProperties.$store = store;
-        vueApp.config.globalProperties.$state = store.state;
+        vueApp.config.globalProperties.$state = Vue.readonly(store.state);
         vueApp.use(router);
         vueApp.mount('body');
 

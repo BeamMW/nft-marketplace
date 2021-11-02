@@ -19,7 +19,7 @@ export default {
     },
 
     render () {
-        if (this.type === 'sell' || this.type === 'buy') {
+        if (this.type === 'sell' || this.type === 'change' || this.type === 'buy') {
             return html`
                 <div class="button ${this.type} ${this.in_tx ? 'disabled' : ''}">
                     <img src="./assets/icon-button.svg"/>

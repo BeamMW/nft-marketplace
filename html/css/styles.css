@@ -210,6 +210,10 @@ pre {
 .artwork-owner {
     font-size: 12px;
     color: rgba(255, 255, 255, .5);
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .artwork .preview-container {
@@ -379,7 +383,8 @@ pre {
     background-color: #da68f5;
 }
 
-.button.sell {
+.button.sell, 
+.button.change {
     background-color: #0bccf7;
 }
 
@@ -444,7 +449,7 @@ pre {
 }
 
 .mine {
-    padding: 3px 8px;
+    padding: 0px 8px 4px 8px;
     line-height: 1;
     border-radius: 3px;
     background-color: rgba(0, 246, 210, .3);
@@ -651,3 +656,10 @@ pre {
     display: none;
 }
 
+.pointer-cursor {
+    cursor: pointer;
+}
+
+*[disabled="true"] {
+    cursor: default !important;
+}

@@ -126,7 +126,9 @@ export default {
                     <span class="popup__content-sell__fee__value">0.011 BEAM</span>
                 </div>
 
-                <div class="popup__content-sell__info">Small transaction fee must be paid</div>
+                <div class="popup__content-sell__info">
+                    Small transaction fee must be paid
+                </div>
 
                 <div class="popup__content-sell__controls">
                     <${artButton}

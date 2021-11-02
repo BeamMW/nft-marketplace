@@ -42,10 +42,14 @@ export default {
         liked: {
             type: Boolean,
             default: false
-        }
+        },
+        can_vote: {
+            type: Boolean,
+            default: true
+        },        
     },
 
-    emits: ['buy', 'sell'],
+    emits: ['buy', 'sell', 'change_price'],
 
     components: {
         artButton
@@ -62,6 +66,9 @@ export default {
             // }
             return res ? res : "Loading...";
         },
+        can_change_price () {
+            return this.owned && this.price
+        }
     },
 
     render () {
@@ -90,9 +97,8 @@ export default {
     methods: {
         renderLikes () {
             return html`
-                <span class="artwork-likes ${this.in_tx ? 'disabled' : ''}">
-                    <img onclick=${this.liked ? this.onUnlike : this.onLike} 
-                        src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
+                <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled="${this.can_vote ? 'false' : 'true'}">
+                    <img src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
                     <span class="artwork-likes__text">
                         ${this.likes_cnt}
                     </span>
@@ -119,12 +125,14 @@ export default {
 
         renderMine() {
             if (this.owned) {
-                return html`<div class="mine">
-                    <span>mine</span>
-                </div>`;
+                return html`
+                    <span class="mine">
+                        <span>mine</span>
+                    </span>
+                `;
             }
         },
-
+        
         renderDot() {
             if (!this.owned) {
                 return ""
@@ -146,6 +154,7 @@ export default {
                         <img src="./assets/icon-beam.svg"/>
                         <span class="artwork-can-buy__amount">${amount}</span>
                         <span class="artwork-can-buy__curr">BEAM</span>
+                        <${artButton} class="artwork-can-buy__button" onclick=${this.onChangePrice} type="change"/>
                     </span>`
                 }
                 
@@ -187,15 +196,22 @@ export default {
 
         onLike (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
+            if (this.can_vote) {
                 this.$emit('like', this.id)
             }
         },
 
         onUnlike (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
+            if (this.can_vote) {
                 this.$emit('unlike', this.id)
+            }
+        },
+
+        onChangePrice (ev) {
+            ev.preventDefault()
+            if (this.can_change_price) {
+                this.$emit('change_price', this.id)
             }
         }
     }
