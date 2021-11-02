@@ -25,6 +25,9 @@ export default {
             let tab = this.$state.active_tab;
             return this.$state.artworks[tab];
         },
+        can_vote () {
+            return this.$state.can_vote
+        },
         is_popup_visible() {
             return this.$state.is_popup_visible;
         }
@@ -53,6 +56,7 @@ export default {
                     v-bind:likes_cnt="artwork.impressions"
                     v-bind:liked="artwork.my_impression == 1"
                     v-bind:in_tx="in_tx"
+                    v-bind:can_vote="can_vote"
                     v-on:sell="onSellArtwork"
                     v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"

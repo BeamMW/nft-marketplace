@@ -651,3 +651,10 @@ pre {
     display: none;
 }
 
+.pointer-cursor {
+    cursor: pointer;
+}
+
+*[disabled="true"] {
+    cursor: default !important;
+}

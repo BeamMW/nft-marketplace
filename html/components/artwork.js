@@ -42,7 +42,11 @@ export default {
         liked: {
             type: Boolean,
             default: false
-        }
+        },
+        can_vote: {
+            type: Boolean,
+            default: true
+        },        
     },
 
     emits: ['buy', 'sell'],
@@ -62,6 +66,9 @@ export default {
             // }
             return res ? res : "Loading...";
         },
+        can_change_price () {
+            return this.owned && this.price
+        }
     },
 
     render () {
@@ -88,11 +95,11 @@ export default {
     },
 
     methods: {
+        //${!this.can_vote}
         renderLikes () {
             return html`
-                <span class="artwork-likes ${this.in_tx ? 'disabled' : ''}">
-                    <img onclick=${this.liked ? this.onUnlike : this.onLike} 
-                        src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
+                <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled=${!this.can_like}>
+                    <img src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
                     <span class="artwork-likes__text">
                         ${this.likes_cnt}
                     </span>
@@ -187,15 +194,22 @@ export default {
 
         onLike (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
+            if (this.can_vote) {
                 this.$emit('like', this.id)
             }
         },
 
         onUnlike (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
+            if (this.can_vote) {
                 this.$emit('unlike', this.id)
+            }
+        },
+
+        onChangePrice (ev) {
+            ev.preventDefault()
+            if (this.can_change_price) {
+                alert('change price')
             }
         }
     }

@@ -2,6 +2,9 @@ import {router} from './router.js';
 import utils from './utils/utils.js';
 import { tabs, sort, common } from './utils/consts.js';
 
+const reactive = Vue.reactive
+const computed = Vue.computed
+
 const defaultState = () => {
     return {
         loading: true,
@@ -18,6 +21,9 @@ const defaultState = () => {
         artists_count: 0,
         balance_beam: 0,
         balance_reward: 0,
+        can_vote: computed(() => {
+            return balance_reward > 0
+        }),
         in_tx: false,
         selected_artist: undefined,
         active_tab: tabs.ALL,
@@ -31,7 +37,7 @@ const defaultState = () => {
 }
 
 export const store = {
-    state: Vue.reactive(defaultState()),
+    state: reactive(defaultState()),
 
     //
     // Errors
@@ -191,7 +197,8 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = !!res.Admin
+        //this.state.is_admin = !!res.Admin
+        this.state.is_admin = true
         this.state.balance_reward = res.voteReward_balance
         this.loadBalance()
     },
