@@ -98,7 +98,7 @@ export default {
         //${!this.can_vote}
         renderLikes () {
             return html`
-                <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled=${!this.can_like}>
+                <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled="${this.can_vote ? 'false' : 'true'}">
                     <img src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
                     <span class="artwork-likes__text">
                         ${this.likes_cnt}
