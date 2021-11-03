@@ -1,1 +1,3 @@
-Gallery Plugin POC
+BEAM NFT Marketplace
+
+-- UNDER CONTRUCTION ---
