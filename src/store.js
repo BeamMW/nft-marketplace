@@ -1,9 +1,7 @@
 import {router} from './router.js';
 import utils from './utils/utils.js';
 import { tabs, sort, common } from './utils/consts.js';
-
-const reactive = Vue.reactive
-const computed = Vue.computed
+import { reactive } from 'vue';
 
 const defaultState = () => {
     return {

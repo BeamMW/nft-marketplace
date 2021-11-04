@@ -1,7 +1,8 @@
-import Gallery  from './components/gallery.js'
+import Gallery from './components/gallery.js'
+import {createRouter, createWebHashHistory} from 'vue-router'
 
-export const router = VueRouter.createRouter({
-    history: VueRouter.createWebHashHistory(),
+export const router = createRouter({
+    history: createWebHashHistory(),
     routes:  [
         {path: '/', component: Gallery, name: "gallery"},
     ]

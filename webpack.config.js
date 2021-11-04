@@ -37,6 +37,7 @@ module.exports = {
         new copy({
             patterns: [
                 "./src/galleryManager.wasm",
+                "./src/appicon.svg",
                 {from: "assets/**/*", context: "./src"}
             ]
         })
