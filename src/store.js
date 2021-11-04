@@ -249,7 +249,7 @@ export const store = {
         //       withdrawal in bulk negates privacy. Need to ask user what to do - in bulk
         //       or for each piece separately
         utils.invokeContract(
-            `role=user,action=withdraw,nMaxCount=0,cid=${this.state.cid}`, 
+            `role=user,action=withdraw,nMaxCount=10,cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
         )
     },

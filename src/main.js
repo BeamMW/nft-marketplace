@@ -1,4 +1,22 @@
-import App      from './components/app.js'
+//import Vue   from "vue"
+//import App   from "./App.vue"
+import utils from './utils/utils.js'
+import "./styles/fonts.css"
+import "./styles/global.css"
+
+utils.initialize({
+        appname: "BEAM NFT Gallery",
+        min_api_version: "6.2",
+        "apiResultHandler": () => {}
+    }, 
+    (err) => {
+        //const vueApp = Vue.createApp(App)
+        //vueApp.mount('body')
+        alert("loaded2")
+    }
+)
+
+/*import App      from './components/app.js'
 import {store}  from './store.js'
 import {router} from './router.js'
 import utils    from './utils/utils.js'
@@ -52,3 +70,4 @@ utils.initialize(
         store.start();
     }
 )
+*/

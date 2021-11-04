@@ -1,6 +1,7 @@
 {
-	"name": "Gallery",
-	"description": "Gallery POC",
+	"name": "NFT Marketplace",
+	"description": "Buy and sell NFTs",
 	"url": "localapp/html/index.html",
-	"guid": "plugin-gallery"
+	"guid": "nft-marketplace",
+	"min_api_version": "6.2"
 }
