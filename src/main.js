@@ -10,7 +10,7 @@ import "./styles/global.css"
 utils.initialize(
     {
         "appname": "BEAM Gallery",
-        "min_api_version": "6.1",
+        "min_api_version": "6.2",
         "apiResultHandler": (...args) => store.onApiResult(...args)
     }, 
     (err) => {
