@@ -38,7 +38,16 @@ module.exports = {
             patterns: [
                 "./src/galleryManager.wasm",
                 "./src/appicon.svg",
-                {from: "assets/**/*", context: "./src"}
+                {   
+                    from: "assets/**/*", 
+                    context: "./src"
+                },
+                {
+                    from: path.join(__dirname, './node_modules/beam-wasm-client-masternet/'),
+                    globOptions: {
+                        ignore: ['**/package.json', '**/README.md'],
+                    },
+                }
             ]
         })
     ]
