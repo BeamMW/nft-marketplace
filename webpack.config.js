@@ -3,7 +3,7 @@ const html = require('html-webpack-plugin')
 const copy = require("copy-webpack-plugin")
 const extractCSS = require("mini-css-extract-plugin")
 
-module.exports = {
+const config = (DEV_MODE) => {return {
     entry: {
         main: "./src/main.js",
     },
@@ -19,7 +19,15 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/i,
-                use: [extractCSS.loader, "css-loader"],
+                use: [
+                    extractCSS.loader, 
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: DEV_MODE
+                        }
+                    }
+                ],
             }
         ]
     },
@@ -41,5 +49,12 @@ module.exports = {
                 {from: "assets/**/*", context: "./src"}
             ]
         })
-    ]
+    ],
+    devtool: DEV_MODE ? "eval-source-map" : undefined
+}}
+
+module.exports = (env, argv) => {
+    const DEV_MODE = argv.mode == 'development'
+    console.log(argv.mode)
+    return config(DEV_MODE)
 }
