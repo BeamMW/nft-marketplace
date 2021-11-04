@@ -162,6 +162,7 @@ export default class Utils {
 
     static async initialize(params, initcback) {
         APIResCB = params["apiResultHandler"]
+        let headless = params["headless"]
         
         try
         {
@@ -170,12 +171,18 @@ export default class Utils {
             } 
             
             if (Utils.isWeb()) {
-                Utils.showWebLoading()
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
                 let appname   = params["appname"]
-                BEAM = await Utils.createWebAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args))
-                Utils.hideWebLoading()
+
+                if (headless) {
+                    BEAM = await BeamModule()
+                }
+                else {
+                    Utils.showWebLoading()
+                    BEAM = await Utils.createWebAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args))
+                    Utils.hideWebLoading()
+                }
             }
 
             if (Utils.isMobile()) {
