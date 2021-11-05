@@ -32,9 +32,21 @@ const config = (DEV_MODE) => {return {
         ]
     },
     plugins: [
-        new extractCSS({
+        new extractCSS({ 
         }),
         new html({
+            templateContent: ({htmlWebpackPlugin}) => `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <meta charset="utf-8"/>
+                <title>${htmlWebpackPlugin.options.title}</title>
+                </head>
+                <body>
+                <script src="wasm-client.js"></script>
+                </body>
+                </html>
+            `,
             title: "BEAM NFT Gallery",
             favicon: "./src/appicon.svg",
             scriptLoading: "blocking",
