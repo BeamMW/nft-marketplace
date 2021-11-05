@@ -1,3 +1,4 @@
-import { h } from 'vue/dist/vue.runtime.esm-browser.js';
-import htm from 'htm/dist/htm.module.js?module';
+import { h } from '@vue/runtime-core';
+import htm from 'htm';
+
 export default htm.bind(h);
