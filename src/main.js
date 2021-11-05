@@ -51,7 +51,7 @@ utils.initialize(
         
 
         if (err) {
-            return store.setError(err);
+            return store.setError(err, "Failed to initialize application", true);
         }
 
         store.start();

@@ -1,7 +1,7 @@
 import {router} from './router.js';
 import utils from './utils/utils.js';
 import { tabs, sort, common } from './utils/consts.js';
-import { reactive } from 'vue';
+import { reactive, nextTick } from 'vue';
 
 const defaultState = () => {
     return {
@@ -37,8 +37,8 @@ export const store = {
     //
     // Errors
     //
-    setError(error, context) {
-        this.state.error = {error, context}
+    setError(error, context, reload) {
+        this.state.error = {error, context, reload}
         router.push({name: 'gallery'})
     },
 
@@ -47,8 +47,11 @@ export const store = {
     },
 
     clearError() {
-        this.state.error = undefined
-        this.start()
+        if (this.state.error) {
+            let reload = this.state.error.reload
+            this.state.error = undefined
+            reload ? this.reload() : this.start()
+        }
     },
 
     changePopupState(value) {
@@ -79,7 +82,7 @@ export const store = {
         Object.assign(this.state, defaultState())
         router.push({name: 'gallery'})
 
-        Vue.nextTick(() => {
+        nextTick(() => {
             utils.download("./galleryManager.wasm", (err, bytes) => {
                 if (err) return this.setError(err, "Failed to download shader")
                 this.state.shader = bytes

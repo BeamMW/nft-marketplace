@@ -59,7 +59,14 @@ const config = (DEV_MODE) => {return {
             ]
         })
     ],
-    devtool: DEV_MODE ? "eval-source-map" : undefined
+    devtool: DEV_MODE ? "eval-source-map" : undefined,
+    resolve: {
+        alias: {
+            // This is necessary for runtime template compilation
+            // when we user vue template in a pure js, not in a *.vue component
+            'vue': 'vue/dist/vue.esm-browser.js', 
+        }
+    }
 }}
 
 module.exports = (env, argv) => {
