@@ -50,7 +50,7 @@ export const store = {
         if (this.state.error) {
             let reload = this.state.error.reload
             this.state.error = undefined
-            reload ? this.reload() : this.start()
+            reload ? utils.reload() : this.start()
         }
     },
 
