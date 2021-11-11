@@ -392,9 +392,9 @@ batch@0.6.1:
   integrity sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY=
 
 beam-wasm-client-masternet@^6.2.12071:
-  version "6.2.12071"
-  resolved "https://registry.yarnpkg.com/beam-wasm-client-masternet/-/beam-wasm-client-masternet-6.2.12071.tgz#fc44a357dfee6780ded678f962f22e2964e48e61"
-  integrity sha512-WQN/j1nnKb1XuJqv+koQqPbvSQaw/LEmeVfdRTDzSbOnIS1pyeeZ+mMrKbV4kXFtNkaW6knIzjnKSQWu5Vhb/A==
+  version "6.2.12097"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client-masternet/-/beam-wasm-client-masternet-6.2.12097.tgz#f9eb6d5c119fb943a726f106c2ba960a05b4d9e5"
+  integrity sha512-Rtw4TVOsdI/euP49nyduG6JVLkU9AZbMjwGCkUgbbWpuimL8Zdp7BlzTwtY7w/k8iGItdfYrgIq8W2njvn/84A==
 
 binary-extensions@^2.0.0:
   version "2.2.0"
