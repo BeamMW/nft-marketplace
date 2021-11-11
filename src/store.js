@@ -26,7 +26,6 @@ const defaultState = () => {
         popup_type: null,
         id_to_sell: '',
         sort_by: null,
-        refresh_timer: undefined,
         pending_artworks: 0,
     }
 }
@@ -75,10 +74,6 @@ export const store = {
     // Shader, CID, debug helpers
     //
     start () {
-        if (this.state.refresh_timer) {
-            clearInterval(this.state.refresh_timer)
-        }
-
         Object.assign(this.state, defaultState())
         router.push({name: 'gallery'})
 
@@ -88,8 +83,7 @@ export const store = {
                 this.state.shader = bytes
 
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
-                //utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
-                this.state.refresh_timer = setInterval(() => this.refreshAllData(), 10000)
+                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
