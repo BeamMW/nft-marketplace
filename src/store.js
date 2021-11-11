@@ -518,6 +518,13 @@ export const store = {
         )
     },
 
+    deleteArtwork (id) {
+        utils.invokeContract(
+            `role=manager,action=admin_delete,id=${id},cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
     onMakeTx (err, sres, full) {
         if (err) {
             return this.setError(err, "Failed to generate transaction request")

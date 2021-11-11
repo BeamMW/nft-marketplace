@@ -201,6 +201,15 @@ pre {
     background-color: rgba(240, 205, 205, 0.05);
     border-radius: 10px;
 
+    position:relative;
+}
+
+.artwork-delete {
+    position: absolute;
+    left: 263px;
+    top: 5px;
+    width: 15px;
+    cursor: pointer;
 }
 
 .artwork-title {
