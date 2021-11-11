@@ -16,7 +16,7 @@ utils.initialize(
     (err) => {
         const vueApp = createApp(App);
         vueApp.config.globalProperties.$store = store;
-        vueApp.config.globalProperties.$state = readonly(store.state);
+        vueApp.config.globalProperties.$state = store.state;
         vueApp.use(router);
         vueApp.mount('body');
 
