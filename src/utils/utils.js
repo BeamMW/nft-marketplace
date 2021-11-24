@@ -32,6 +32,12 @@ export default class Utils {
         return BEAM && BEAM.headless
     }
 
+    static isChrome () {
+        const userAgent = navigator.userAgent;
+        const isChrome = userAgent.match(/chrome|chromium|crios/i);
+        return isChrome && !(userAgent.indexOf("Edg") != -1);
+    }
+
     static async createMobileAPI(apirescback) {
         return new Promise((resolve) => {
             if (Utils.isAndroid()) {
@@ -270,6 +276,11 @@ export default class Utils {
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
                 let appname   = params["appname"]
+
+                if (!Utils.isChrome()) {
+                    Utils.showChromeDownload();
+                    return false;
+                }
                 
                 if (headless) {
                     Utils.showWebLoader({
@@ -549,6 +560,48 @@ export default class Utils {
         }
 
         bg.appendChild(loadContainer);
+
+        document.body.appendChild(bg);
+    }
+
+    static showChromeDownload() {
+        const styles = Utils.getStyles()
+        Utils.applyStyles(styles);
+        const topColor =  [styles.appsGradientOffset, "px,"].join('');
+        const mainColor = [styles.appsGradientTop, "px,"].join('');
+
+        let bg = document.createElement("div");
+        bg.style.width = "100%";
+        bg.style.height = "100%";
+        bg.style.color = "#fff";
+        bg.id = "chrome-download";
+        bg.style.position = "absolute";
+        bg.style.textAlign = "center";
+        bg.style.backgroundImage = [
+            "linear-gradient(to bottom,",
+            styles.background_main_top, topColor,
+            styles.background_main, mainColor,
+            styles.background_main
+        ].join(' ');
+
+        let notSupp = document.createElement("p");
+        notSupp.innerText = "Your browser is not supported";
+        notSupp.style.color = "#fff";
+        notSupp.style.fontWeight = "bold";
+        notSupp.style.fontSize = "18px";
+        notSupp.style.marginTop = "200px";
+        let download = document.createElement("p");
+        download.innerText = "Download chrome browser";
+        download.style.cursor = "pointer";
+        download.style.color = "#00f6d2";
+
+        download.addEventListener('click', () => {
+            window.open('https://www.google.com/chrome/', 
+                '_blank');
+        });
+
+        bg.appendChild(notSupp);
+        bg.appendChild(download);
 
         document.body.appendChild(bg);
     }
