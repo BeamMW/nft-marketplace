@@ -227,13 +227,13 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        Utils.showWebLoading()
+        Utils.showLoading("web-wallet")
         BEAM = await Utils.createWebAPI(
             apiver, apivermin, appname, 
             (...args) => Utils.handleApiResult(...args)
         )
         headlessClient.stopWallet()
-        Utils.hideWebLoading()
+        Utils.hideLoading()
     }
 
     static async initialize(params, initcback) {
@@ -247,7 +247,7 @@ export default class Utils {
             } 
             
             if (Utils.isWeb()) {
-                Utils.showWebLoading()
+                Utils.showLoading("headless")
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
                 let appname   = params["appname"]
@@ -258,7 +258,7 @@ export default class Utils {
                                 (...args) => Utils.handleApiResult(...args)
                             )
                 } else {
-                    Utils.showWebLoading()
+                    Utils.showLoading("web-wallet")
                     BEAM = await Utils.createWebAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
@@ -399,6 +399,18 @@ export default class Utils {
         return result;
     }
 
+    static showLoading(mode) {
+        if (mode == "headless") {
+            return Utils.showHealessLoading()
+        }
+
+        if (mode == "web-wallet") {
+            Utils.showWebLoading()
+        }
+
+        throw (["unknown loading mode: ", mode].join(''))
+    }
+
     static showWebLoading() {
         let styles = Utils.getStyles()
         Utils.applyStyles(styles);
@@ -494,7 +506,7 @@ export default class Utils {
         document.body.appendChild(bg)
     }
 
-    static hideWebLoading() {
+    static hideLoading() {
         const elem = document.getElementById("dapp-loader");
         elem.parentNode.removeChild(elem);
     }
