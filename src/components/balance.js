@@ -16,6 +16,9 @@ export default {
         },
         show_balance () {
             return this.$state.is_artist || this.$state.balance_beam
+        },
+        is_headless () {
+            return this.$state.is_headless
         }
     },
 
@@ -66,8 +69,12 @@ export default {
         },
         
         onShowKey () {
-            this.$store.setPopupType(popups.KEY);
-            this.$store.changePopupState(true);
+            if (this.is_headless) {
+                alert('connect')
+            } else {
+                this.$store.setPopupType(popups.KEY);
+                this.$store.changePopupState(true);
+            }
         },
 
         onWithdraw () {
