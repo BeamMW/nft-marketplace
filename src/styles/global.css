@@ -37,7 +37,7 @@ html {
 .full-loading {
     text-align: center;
     margin: 0 auto;
-    padding: 4% 5%;
+    margin-top: 50px;
     background-color: transparent;
 }
 
@@ -243,6 +243,7 @@ pre {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
