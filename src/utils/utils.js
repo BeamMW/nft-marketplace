@@ -6,6 +6,7 @@ let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
 let headlessNode = "eu-node01.masternet.beam.mw:8200"
+let InitParams   = undefined
 
 export default class Utils {
     static isMobile () {
@@ -227,7 +228,7 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        Utils.showLoading("web-wallet")
+        Utils.showLoading("web-wallet", InitParams["appname"])
         BEAM = await Utils.createWebAPI(
             apiver, apivermin, appname, 
             (...args) => Utils.handleApiResult(...args)
@@ -237,6 +238,7 @@ export default class Utils {
     }
 
     static async initialize(params, initcback) {
+        InitParams = params
         APIResCB = params["apiResultHandler"]
         let headless = params["headless"]
         
@@ -258,7 +260,7 @@ export default class Utils {
                                 (...args) => Utils.handleApiResult(...args)
                             )
                 } else {
-                    Utils.showLoading("web-wallet")
+                    Utils.showLoading("web-wallet", appname)
                     BEAM = await Utils.createWebAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
@@ -399,19 +401,19 @@ export default class Utils {
         return result;
     }
 
-    static showLoading(mode) {
+    static showLoading(mode, appname) {
         if (mode == "headless") {
-            return Utils.showHealessLoading()
+            return Utils.showHealessLoading(appname)
         }
 
         if (mode == "web-wallet") {
-            Utils.showWebLoading()
+            Utils.showWebLoading(appname)
         }
 
         throw (["unknown loading mode: ", mode].join(''))
     }
 
-    static showWebLoading() {
+    static showWebLoading(appname) {
         let styles = Utils.getStyles()
         Utils.applyStyles(styles);
         const topColor =  [styles.appsGradientOffset, "px,"].join('');
@@ -442,7 +444,7 @@ export default class Utils {
         let titleElem = document.createElement("h3");
         titleElem.innerText = "Connecting to BEAM Web Wallet."; 
         let subtitle = document.createElement("p");
-        subtitle.innerText = "To use BEAM Gallery you should have BEAM Web Wallet installed and allow connection.";
+        subtitle.innerText = ["To use ", appname, " you should have BEAM Web Wallet installed and allow connection."].join("")
 
         let reconnectButton = document.createElement("button");
         reconnectButton.innerText = "Try to connect again";
