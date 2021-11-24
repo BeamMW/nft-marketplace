@@ -146,10 +146,10 @@ export default class Utils {
         })
 
         if (newAPI) {
-            // TODO:HEADLESS
-            //await new Promise((resolve) => {
-            //    headlessClient.stopWallet(resolve)
-            //})
+            BEAM.api.delete()
+            await new Promise((resolve) => {
+                BEAM.client.stopWallet(resolve)
+            })
             BEAM = newAPI
         }
 
