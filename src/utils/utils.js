@@ -156,7 +156,10 @@ export default class Utils {
             await new Promise((resolve) => {
                 BEAM.client.stopWallet(resolve)
             })
-            BEAM = newAPI
+            
+            BEAM = {
+                api: newAPI
+            }
         }
 
         return newAPI
