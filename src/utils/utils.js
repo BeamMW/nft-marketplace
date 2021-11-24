@@ -60,7 +60,8 @@ export default class Utils {
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
                 resolve({
-                    api: channel.objects.BEAM
+                    api: channel.objects.BEAM.api,
+                    styles: channel.objects.BEAM.style
                 })
             })
         })  
@@ -334,9 +335,9 @@ export default class Utils {
     }
 
     static getStyles () {
-        if (BEAM && BEAM.style) {
+        if (BEAM && BEAM.styles) {
             // TODO: проборосить стили из мобайла и экстеншена
-            return BEAM.style
+            return BEAM.styles
         }
 
         return {
