@@ -34,6 +34,13 @@ html {
     word-break:      break-word;
 }
 
+.full-loading {
+    text-align: center;
+    margin: 0 auto;
+    padding: 4% 5%;
+    background-color: transparent;
+}
+
 pre {
     font-family: 'SFProDisplay', sans-serif;
     font-weight: normal;

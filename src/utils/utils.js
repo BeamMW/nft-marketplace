@@ -228,7 +228,7 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        Utils.showLoading("web-wallet", InitParams["appname"])
+        Utils.showLoading("web-wallet")
         BEAM = await Utils.createWebAPI(
             apiver, apivermin, appname, 
             (...args) => Utils.handleApiResult(...args)
@@ -260,7 +260,7 @@ export default class Utils {
                                 (...args) => Utils.handleApiResult(...args)
                             )
                 } else {
-                    Utils.showLoading("web-wallet", appname)
+                    Utils.showLoading("web-wallet")
                     BEAM = await Utils.createWebAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
@@ -401,19 +401,19 @@ export default class Utils {
         return result;
     }
 
-    static showLoading(mode, appname) {
+    static showLoading(mode) {
         if (mode == "headless") {
-            return Utils.showHealessLoading(appname)
+            return Utils.showHealessLoading()
         }
 
         if (mode == "web-wallet") {
-            Utils.showWebLoading(appname)
+            Utils.showWebLoading()
         }
 
         throw (["unknown loading mode: ", mode].join(''))
     }
 
-    static showWebLoading(appname) {
+    static showHealessLoading() {
         let styles = Utils.getStyles()
         Utils.applyStyles(styles);
         const topColor =  [styles.appsGradientOffset, "px,"].join('');
@@ -432,7 +432,51 @@ export default class Utils {
             styles.background_main
         ].join(' ');
         let loadContainer = document.createElement("div");
-        loadContainer.className = "dapp-loading";
+        loadContainer.id = "dapp-loading";
+
+        loadContainer.style.textAlign = 'center';
+        loadContainer.style.margin = '50px auto 0 auto';
+        loadContainer.style.width = '585px';
+        loadContainer.style.padding = '5%';
+        loadContainer.style.backgroundColor = 'transparent';
+
+        let titleElem = document.createElement("h3");
+        titleElem.innerText = [InitParams["appname"], "Is Loading"].join(' ');
+        let subtitle = document.createElement("p");
+        subtitle.innerText = "Please wait...";
+
+        loadContainer.appendChild(titleElem);
+        loadContainer.appendChild(subtitle);
+
+        bg.appendChild(loadContainer);
+
+        document.body.appendChild(bg);
+    }
+
+    static hideWebLoading() {
+        document.getElementById("dapp-loading").remove();
+    }
+
+    static showWebLoading() {
+        let styles = Utils.getStyles()
+        Utils.applyStyles(styles);
+        const topColor =  [styles.appsGradientOffset, "px,"].join('');
+        const mainColor = [styles.appsGradientTop, "px,"].join('');
+
+        let bg = document.createElement("div");
+        bg.style.width = "100%";
+        bg.style.height = "100%";
+        bg.style.color = "#fff";
+        bg.id = "dapp-loader";
+        bg.style.position = "absolute";
+        bg.style.backgroundImage = [
+            "linear-gradient(to bottom,",
+            styles.background_main_top, topColor,
+            styles.background_main, mainColor,
+            styles.background_main
+        ].join(' ');
+        let loadContainer = document.createElement("div");
+        loadContainer.id = "dapp-loading";
 
         loadContainer.style.textAlign = 'center';
         loadContainer.style.margin = '50px auto 0 auto';
@@ -444,7 +488,7 @@ export default class Utils {
         let titleElem = document.createElement("h3");
         titleElem.innerText = "Connecting to BEAM Web Wallet."; 
         let subtitle = document.createElement("p");
-        subtitle.innerText = ["To use ", appname, " you should have BEAM Web Wallet installed and allow connection."].join("")
+        subtitle.innerText = ["To use ", InitParams["appname"], " you should have BEAM Web Wallet installed and allow connection."].join("")
 
         let reconnectButton = document.createElement("button");
         reconnectButton.innerText = "Try to connect again";
@@ -505,7 +549,7 @@ export default class Utils {
 
         bg.appendChild(loadContainer);
 
-        document.body.appendChild(bg)
+        document.body.appendChild(bg);
     }
 
     static hideLoading() {

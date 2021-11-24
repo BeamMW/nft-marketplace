@@ -1,5 +1,5 @@
 import html    from '../utils/html.js';
-import loading from './loading.js';
+import loading from './item-loading.js';
 import dot     from './dot.js';
 import artButton from './art-button.js';
 import { common } from '../utils/consts.js';
@@ -233,3 +233,4 @@ export default {
         }
     }
 }
+    
