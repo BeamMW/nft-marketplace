@@ -31,6 +31,7 @@ export default {
                     <input type="file" multiple accept="image/png, image/jpeg"   
                         v-on:change.native="onUploadArtwork"
                         :disabled="!$state.selected_artist"
+                        onclick="this.value=null;"
                     />
                 </span>
             </div>

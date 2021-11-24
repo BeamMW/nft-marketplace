@@ -1,6 +1,6 @@
 import {router} from './router.js';
 import utils from './utils/utils.js';
-import { tabs, sort, common } from './utils/consts.js';
+import { tabs, sort, common, contract } from './utils/consts.js';
 import { reactive, nextTick } from 'vue';
 
 const defaultState = () => {
@@ -8,7 +8,7 @@ const defaultState = () => {
         loading: true,
         error: undefined,
         shader: undefined,
-        cid: "b51efe78d3e7c83c8dbc3d59d5e06b2bd770139e645bc19e50652632cbdd47d1",
+        cid: contract.cid,
         my_artist_keys: [],
         is_artist: false,
         is_admin: false,
@@ -26,7 +26,6 @@ const defaultState = () => {
         popup_type: null,
         id_to_sell: '',
         sort_by: null,
-        refresh_timer: undefined,
         pending_artworks: 0,
     }
 }
@@ -75,10 +74,6 @@ export const store = {
     // Shader, CID, debug helpers
     //
     start () {
-        if (this.state.refresh_timer) {
-            clearInterval(this.state.refresh_timer)
-        }
-
         Object.assign(this.state, defaultState())
         router.push({name: 'gallery'})
 
@@ -88,8 +83,7 @@ export const store = {
                 this.state.shader = bytes
 
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
-                //utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
-                this.state.refresh_timer = setInterval(() => this.refreshAllData(), 10000)
+                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
@@ -520,6 +514,13 @@ export const store = {
     unlikeArtwork (id) {
         utils.invokeContract(
             `role=user,action=vote,id=${id},val=0,cid=${this.state.cid}`, 
+            (...args) => this.onMakeTx(...args)
+        )
+    },
+
+    deleteArtwork (id) {
+        utils.invokeContract(
+            `role=manager,action=admin_delete,id=${id},cid=${this.state.cid}`, 
             (...args) => this.onMakeTx(...args)
         )
     },

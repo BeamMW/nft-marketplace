@@ -32,9 +32,21 @@ const config = (DEV_MODE) => {return {
         ]
     },
     plugins: [
-        new extractCSS({
+        new extractCSS({ 
         }),
         new html({
+            templateContent: ({htmlWebpackPlugin}) => `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <meta charset="utf-8"/>
+                <title>${htmlWebpackPlugin.options.title}</title>
+                </head>
+                <body>
+                <script src="wasm-client.js"></script>
+                </body>
+                </html>
+            `,
             title: "BEAM NFT Gallery",
             favicon: "./src/appicon.svg",
             scriptLoading: "blocking",
@@ -46,7 +58,16 @@ const config = (DEV_MODE) => {return {
             patterns: [
                 "./src/galleryManager.wasm",
                 "./src/appicon.svg",
-                {from: "assets/**/*", context: "./src"}
+                {   
+                    from: "assets/**/*", 
+                    context: "./src"
+                },
+                {
+                    from: path.join(__dirname, './node_modules/beam-wasm-client-masternet/'),
+                    globOptions: {
+                        ignore: ['**/package.json', '**/README.md'],
+                    },
+                }
             ]
         })
     ],

@@ -47,9 +47,13 @@ export default {
             type: Boolean,
             default: true
         },        
+        is_admin: {
+            type: Boolean,
+            default: false
+        }
     },
 
-    emits: ['buy', 'sell', 'change_price'],
+    emits: ['buy', 'sell', 'change_price', 'delete'],
 
     components: {
         artButton
@@ -75,6 +79,7 @@ export default {
         return html`
             <div class="artwork">
                 ${this.renderPreview()}
+                ${this.renderDelete()}
                 <div class="info-row">
                     <span class="artwork-title">
                         <span>
@@ -95,6 +100,13 @@ export default {
     },
 
     methods: {
+        renderDelete() {
+            if (this.is_admin) {
+                return html`<img class="artwork-delete" src="./assets/icon-delete.svg"/  onclick=${this.onDelete}/>`
+            }
+            return ""
+        },
+
         renderLikes () {
             return html`
                 <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled="${this.can_vote ? 'false' : 'true'}">
@@ -213,6 +225,11 @@ export default {
             if (this.can_change_price) {
                 this.$emit('change_price', this.id)
             }
+        },
+
+        onDelete (ev) {
+            ev.preventDefault()
+            this.$emit("delete", this.id)
         }
     }
 }

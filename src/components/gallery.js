@@ -57,11 +57,13 @@ export default {
                     v-bind:liked="artwork.my_impression == 1"
                     v-bind:in_tx="in_tx"
                     v-bind:can_vote="can_vote"
+                    v-bind:is_admin="is_admin"
                     v-on:sell="onSellArtwork"
                     v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
                     v-on:change_price="onChangePrice"
+                    v-on:delete="onDeleteArtwork"
                     />
                 </div>
             </template>
@@ -107,6 +109,10 @@ export default {
 
         onUnlikeArtwork(id) {
             this.$store.unlikeArtwork(id)
+        },
+
+        onDeleteArtwork(id) {
+            this.$store.deleteArtwork(id)
         },
     }
 }

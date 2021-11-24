@@ -5,8 +5,7 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let headlessDB   = "headless.db"
-let headlessPass = "doesntmatter"
+let headlessDB   = "headless"
 let headlessNode = "eu-node01.masternet.beam.mw:8200"
 
 export default class Utils {
@@ -72,17 +71,8 @@ export default class Utils {
     static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
         let WasmModule = await BeamModule()
         let WasmWalletClient = WasmModule.WasmWalletClient
-
-        await new Promise((resolve, reject) => {
-            WasmWalletClient.MountFS(resolve)  
-        })
-
-        if (!WasmModule.WasmWalletClient.IsInitialized(headlessDB)) {
-            // EM_ASM in code, why not async?
-            WasmWalletClient.CreateHeadlessWallet(headlessDB, headlessPass)
-        }
-
-        let client = new WasmWalletClient(headlessDB, headlessPass, headlessNode)
+        
+        let client = new WasmWalletClient(headlessNode)
         client.startWallet()
 
         client.subscribe((response) => {
@@ -94,10 +84,10 @@ export default class Utils {
         client.setApproveContractInfoHandler((info) => {
             let err = "Unexpected wasm wallet client transaction in headless wallet: " + info
             console.log(err)
-            throw err
+            throw err 
         })
-        
-        return new Promise((resolve, reject) => {
+
+        return new Promise((resolve, reject) => {        
             let appid = WasmWalletClient.GenerateAppID(appname, window.location.href)
             client.createAppAPI(apiver, apivermin, appid, appname, (err, api) => {
                 if (err) {
