@@ -304,7 +304,12 @@ export default class Utils {
             }
 
             if (Utils.isMobile()) {
-                BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args))
+                try {
+                    BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
+                } catch (e) {
+                    Utils.showMobileStoresLinks();
+                    return false;
+                }
             }
 
             let styles = Utils.getStyles()
@@ -603,6 +608,43 @@ export default class Utils {
         bg.appendChild(notSupp);
         bg.appendChild(download);
 
+        document.body.appendChild(bg);
+    }
+
+    static showMobileStoresLinks() {
+        const styles = Utils.getStyles()
+        Utils.applyStyles(styles);
+        const topColor =  [styles.appsGradientOffset, "px,"].join('');
+        const mainColor = [styles.appsGradientTop, "px,"].join('');
+
+        let bg = document.createElement("div");
+        bg.style.width = "100%";
+        bg.style.height = "100%";
+        bg.style.color = "#fff";
+        bg.id = "chrome-download";
+        bg.style.position = "absolute";
+        bg.style.textAlign = "center";
+        bg.style.backgroundImage = [
+            "linear-gradient(to bottom,",
+            styles.background_main_top, topColor,
+            styles.background_main, mainColor,
+            styles.background_main
+        ].join(' ');
+
+        let downloadLink = document.createElement("p");
+        downloadLink.innerText = "Download beam wallet";
+        downloadLink.style.marginTop = "100px";
+        downloadLink.style.fontSize = "20px";
+        downloadLink.style.color = "#00f6d2";
+        downloadLink.addEventListener('click', () => {
+            Utils.isAndroid() 
+            ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet', 
+                '_blank')
+            : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1', 
+            '_blank');
+        });
+
+        bg.appendChild(downloadLink);
         document.body.appendChild(bg);
     }
 
