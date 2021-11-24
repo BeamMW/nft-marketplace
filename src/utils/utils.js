@@ -228,7 +228,9 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        Utils.showLoading("web-wallet-headed")
+        Utils.showWebWalletConnect(() => {
+            alert('cancelled')
+        })
 
         let apiver    = InitParams["api_version"] || "current"
         let apivermin = InitParams["min_api_version"] || ""
@@ -239,11 +241,12 @@ export default class Utils {
             (...args) => Utils.handleApiResult(...args)
         )
 
-        await new Promise((resolve) => {
-            headlessClient.stopWallet(resolve)
-        })
+        // TODO:HEADLESS
+        //await new Promise((resolve) => {
+        //    headlessClient.stopWallet(resolve)
+        //})
         
-        Utils.hideLoading()
+        Utils.hideWebWalletConnect()
         return true
     }
 
@@ -259,23 +262,22 @@ export default class Utils {
             } 
             
             if (Utils.isWeb()) {
-                Utils.showLoading("headless")
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
                 let appname   = params["appname"]
                 
                 if (headless) {
+                    Utils.showHealessLoading()
                     BEAM = await Utils.createHeadlessAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
-                            )
+                            )        
                 } else {
-                    Utils.showLoading("web-wallet")
+                    Utils.showWebLoading()
                     BEAM = await Utils.createWebAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
                             )
-                    Utils.hideWebLoading()
                 }
             }
 
@@ -285,6 +287,7 @@ export default class Utils {
 
             let styles = Utils.getStyles()
             Utils.applyStyles(styles)
+            Utils.hideLoading()
             
             if (!BEAM) {
                 return initcback("Failed to create BEAM API")
@@ -411,20 +414,8 @@ export default class Utils {
         return result;
     }
 
-    static showLoading(mode) {
-        if (mode == "headless") {
-            return Utils.showHealessLoading();
-        }
-
-        if (mode == "web-wallet") {
-            return Utils.showWebLoading(false);
-        }
-
-        if (mode == "web-wallet-headed") {
-            return Utils.showWebLoading(true);
-        }
-
-        throw (["unknown loading mode: ", mode].join(''))
+    static showWebWalletConnect(oncacnel) {
+        return Utils.showWebLoading(true);
     }
 
     static showHealessLoading() {
@@ -467,14 +458,6 @@ export default class Utils {
         bg.appendChild(loadContainer);
 
         document.body.appendChild(bg);
-    }
-
-    static hideWebLoading() {
-        document.getElementById("dapp-loading").remove();
-        const container = document.getElementById('container');
-        if (container) {
-            container.style.filter = 'none'
-        }
     }
 
     static showWebLoading(isHeaded) {
@@ -587,6 +570,14 @@ export default class Utils {
     }
 
     static hideLoading() {
+        document.getElementById("dapp-loading").remove();
+        const container = document.getElementById('container');
+        if (container) {
+            container.style.filter = 'none'
+        }
+    }
+
+    static hideWebWalletConnect () {
         const elem = document.getElementById("dapp-loader");
         elem.parentNode.removeChild(elem);
     }
