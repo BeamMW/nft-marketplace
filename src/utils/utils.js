@@ -48,26 +48,32 @@ export default class Utils {
             else {
                 window.BEAM.callWalletApiResult(apirescback);
             }
-            resolve(window.BEAM);
+            resolve({
+                api: window.BEAM
+            });
         })
     }
 
     static async createDesktopAPI(apirescback) {
         await Utils.injectScript("qrc:///qtwebchannel/qwebchannel.js")
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             new QWebChannel(qt.webChannelTransport, (channel) => {
                 channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
-                resolve(channel.objects.BEAM)
+                resolve({
+                    api: channel.objects.BEAM
+                })
             })
         })  
     }
 
     static async createWebAPI(apiver, apivermin, appname, apirescback) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             window.addEventListener('message', async (ev) => {
                 if (ev.data === 'apiInjected') {
                     await window.BeamApi.callWalletApiResult(apirescback);
-                    resolve(window.BeamApi)
+                    resolve({
+                        api: window.BeamApi
+                    })
                 }
             }, false);
             window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
@@ -76,9 +82,9 @@ export default class Utils {
 
     static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
         await Utils.injectScript("wasm-client.js")
+        
         let WasmModule = await BeamModule()
         let WasmWalletClient = WasmModule.WasmWalletClient
-
         let client = new WasmWalletClient(headlessNode)
         client.startWallet()
 
@@ -173,11 +179,11 @@ export default class Utils {
         }
 
         if (Utils.isWeb()) {
-            return BEAM.callWalletApi(callid, method, params);
+            return BEAM.api.callWalletApi(callid, method, params);
         } 
 
         if (Utils.isMobile()) {
-            return BEAM.callWalletApi(JSON.stringify(request));
+            return BEAM.api.callWalletApi(JSON.stringify(request));
         }
         
         if (Utils.isDesktop()) {
