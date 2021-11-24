@@ -68,9 +68,9 @@ export default {
             }
         },
         
-        onShowKey () {
+        async onShowKey () {
             if (this.is_headless) {
-                alert('connect')
+                this.$store.switchToHeaded()  
             } else {
                 this.$store.setPopupType(popups.KEY);
                 this.$store.changePopupState(true);

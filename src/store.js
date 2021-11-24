@@ -695,5 +695,10 @@ export const store = {
 
         let message = [sliked, slikes, ssold, stvb, snum].join("\n\n")
         alert(message)
+    },
+
+    async switchToHeaded () {
+        await utils.switchToHeaded()
+        this.start()
     }
 }

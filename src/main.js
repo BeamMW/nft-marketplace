@@ -48,7 +48,6 @@ utils.initialize(
                 background_main
             ].join(' ');
         }
-        
 
         if (err) {
             return store.setError(err, "Failed to initialize application", true);

@@ -221,6 +221,21 @@ export default class Utils {
         }
     }
 
+    static async switchToHeaded () {
+        if (!Utils.isHeadless()) {
+            throw "Wallet must be opened in a headless mode"
+        }
+
+        let headlessClient = BEAM.client
+        Utils.showWebLoading()
+        BEAM = await Utils.createWebAPI(
+            apiver, apivermin, appname, 
+            (...args) => Utils.handleApiResult(...args)
+        )
+        headlessClient.stopWallet()
+        Utils.hideWebLoading()
+    }
+
     static async initialize(params, initcback) {
         APIResCB = params["apiResultHandler"]
         let headless = params["headless"]
