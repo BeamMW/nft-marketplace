@@ -235,7 +235,7 @@ export default class Utils {
                 return cback(answer)
             }
 
-            if (!answer.result) {
+            if (typeof answer.result == 'undefined') {
                 return cback({
                     error: "no valid api call result", 
                     answer
