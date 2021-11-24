@@ -235,12 +235,15 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        // Utils.showWebWalletConnect(() => {
-        //     alert('cancelled')
-        // })`
         Utils.showWebLoader({
             isHeadless: true,
-            isConnecting: true
+            isConnecting: true,
+            cancelCallback: (e) => {
+                e.stopPropagation();
+                if (e.target.id === "dapp-loader") {
+                    Utils.hideLoading();
+                }
+            }
         });
 
         let apiver    = InitParams["api_version"] || "current"
@@ -442,7 +445,7 @@ export default class Utils {
     }
 
     static showWebLoader(params) {
-        const {isHeadless, isConnecting} = params;
+        const {isHeadless, isConnecting, cancelCallback} = params;
 
         const styles = Utils.getStyles()
         Utils.applyStyles(styles);
@@ -459,6 +462,8 @@ export default class Utils {
             bg.style.top = '0';
             bg.style.left = '0';
             bg.style.position = 'fixed';
+
+            bg.addEventListener('click', cancelCallback);
         } else {
             bg.style.backgroundImage = [
                 "linear-gradient(to bottom,",
