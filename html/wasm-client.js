@@ -1480,7 +1480,7 @@ function TextDecoderWrapper(encoding) {
  var textDecoder = new TextDecoder(encoding);
  this.decode = function(data) {
   assert(data instanceof Uint8Array);
-  if (data.buffer instanceof SharedArrayBuffer) {
+  if (data.buffer[Symbol.toStringTag] == "SharedArrayBuffer") {
    data = new Uint8Array(data);
   }
   return textDecoder.decode.call(textDecoder, data);
@@ -1783,7 +1783,7 @@ if (ENVIRONMENT_IS_PTHREAD) {
    "maximum": 2147483648 / 65536,
    "shared": true
   });
-  if (!(wasmMemory.buffer instanceof SharedArrayBuffer)) {
+  if (!(wasmMemory.buffer[Symbol.toStringTag] == "SharedArrayBuffer")) {
    err("requested a shared WebAssembly.Memory but the returned buffer is not a SharedArrayBuffer, indicating that while the browser has SharedArrayBuffer it does not have WebAssembly threads support - you may need to set a flag");
    if (ENVIRONMENT_IS_NODE) {
     console.log("(on node you may need: --experimental-wasm-threads --experimental-wasm-bulk-memory and also use a recent version)");
@@ -2166,21 +2166,21 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 738752: function() {
+ 738624: function() {
   console.log("headless wallet created!");
  },
- 738793: function($0) {
+ 738665: function($0) {
   throw new Error("Exception: " + Module.UTF8ToString($0));
  },
- 738855: function() {
+ 738727: function() {
   FS.syncfs(false, function() {
    console.log("wallet created!");
   });
  },
- 738921: function() {
+ 738793: function() {
   throw new Error("File system should be mounted!");
  },
- 738972: function($0, $1) {
+ 738844: function($0, $1) {
   FS.mkdir("/beam_wallet");
   FS.mount(IDBFS, {}, "/beam_wallet");
   console.log("mounting...");
@@ -2192,7 +2192,7 @@ var ASM_CONSTS = {
    }
   });
  },
- 739190: function() {
+ 739062: function() {
   FS.syncfs(false, function() {});
  }
 };
@@ -3176,6 +3176,13 @@ function __emscripten_do_pthread_join(thread, status, block) {
   err("pthread_join attempted on a null thread pointer!");
   return 71;
  }
+ if (ENVIRONMENT_IS_PTHREAD && _pthread_self() == thread) {
+  err("PThread " + thread + " is attempting to join to itself!");
+  return 16;
+ } else if (!ENVIRONMENT_IS_PTHREAD && _emscripten_main_browser_thread_id() == thread) {
+  err("Main thread " + thread + " is attempting to join to itself!");
+  return 16;
+ }
  var self = GROWABLE_HEAP_I32()[thread + 8 >> 2];
  if (self !== thread) {
   err("pthread_join attempted on thread " + thread + ", which does not point to a valid thread, or does not exist anymore!");
@@ -3185,13 +3192,6 @@ function __emscripten_do_pthread_join(thread, status, block) {
  if (detached) {
   err("Attempted to join thread " + thread + ", which was already detached!");
   return 28;
- }
- if (ENVIRONMENT_IS_PTHREAD && _pthread_self() == thread) {
-  err("PThread " + thread + " is attempting to join to itself!");
-  return 16;
- } else if (!ENVIRONMENT_IS_PTHREAD && _emscripten_main_browser_thread_id() == thread) {
-  err("Main thread " + thread + " is attempting to join to itself!");
-  return 16;
  }
  if (block) {
   _emscripten_check_blocking_allowed();
@@ -6146,7 +6146,7 @@ var SOCKFS = {
    } else {
     try {
      var runtimeConfig = Module["websocket"] && "object" === typeof Module["websocket"];
-     var url = "ws:#".replace("#", "//");
+     var url = "wss://".replace("#", "//");
      if (runtimeConfig) {
       if ("string" === typeof Module["websocket"]["url"]) {
        url = Module["websocket"]["url"];
@@ -6451,7 +6451,7 @@ var SOCKFS = {
     buffer = buffer.buffer;
    }
    var data;
-   if (buffer instanceof SharedArrayBuffer) {
+   if (buffer[Symbol.toStringTag] == "SharedArrayBuffer") {
     data = new Uint8Array(new Uint8Array(buffer.slice(offset, offset + length))).buffer;
    } else {
     data = buffer.slice(offset, offset + length);
@@ -7280,7 +7280,7 @@ var PIPEFS = {
     var bucket = pipe.buckets[i];
     currentLength += bucket.offset - bucket.roffset;
    }
-   assert(buffer instanceof ArrayBuffer || buffer instanceof SharedArrayBuffer || ArrayBuffer.isView(buffer));
+   assert(buffer instanceof ArrayBuffer || buffer[Symbol.toStringTag] == "SharedArrayBuffer" || ArrayBuffer.isView(buffer));
    var data = buffer.subarray(offset, offset + length);
    if (length <= 0) {
     return 0;
@@ -7322,7 +7322,7 @@ var PIPEFS = {
   },
   write: function(stream, buffer, offset, length, position) {
    var pipe = stream.node.pipe;
-   assert(buffer instanceof ArrayBuffer || buffer instanceof SharedArrayBuffer || ArrayBuffer.isView(buffer));
+   assert(buffer instanceof ArrayBuffer || buffer[Symbol.toStringTag] == "SharedArrayBuffer" || ArrayBuffer.isView(buffer));
    var data = buffer.subarray(offset, offset + length);
    var dataLen = data.byteLength;
    if (dataLen <= 0) {
@@ -11044,9 +11044,9 @@ var dynCall_iiiiijj = Module["dynCall_iiiiijj"] = createExportWrapper("dynCall_i
 
 var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall_iiiiiijj");
 
-var __emscripten_allow_main_runtime_queued_calls = Module["__emscripten_allow_main_runtime_queued_calls"] = 738272;
+var __emscripten_allow_main_runtime_queued_calls = Module["__emscripten_allow_main_runtime_queued_calls"] = 738144;
 
-var __emscripten_main_thread_futex = Module["__emscripten_main_thread_futex"] = 2240688;
+var __emscripten_main_thread_futex = Module["__emscripten_main_thread_futex"] = 2240560;
 
 function invoke_iii(index, a1, a2) {
  var sp = stackSave();

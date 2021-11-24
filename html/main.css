@@ -48,6 +48,18 @@ html {
     word-break:      break-word;
 }
 
+.full-loading {
+    text-align: center;
+    margin: 0 auto;
+    margin-top: 50px;
+    background-color: transparent;
+}
+
+.full-loading__title {
+    font-size: 25px;
+    font-weight: 400;
+}
+
 pre {
     font-family: 'SFProDisplay', sans-serif;
     font-weight: normal;
@@ -245,6 +257,7 @@ pre {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
@@ -455,6 +468,11 @@ pre {
     font-size: 16px;
     color: #00f6d2;
     margin-left: 10px;
+}
+
+.user-opt__key__connect {
+    font-size: 16px;
+    color: #00f6d2;
 }
 
 .user-opt__user {
