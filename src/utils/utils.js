@@ -229,12 +229,22 @@ export default class Utils {
 
         let headlessClient = BEAM.client
         Utils.showLoading("web-wallet-headed")
+
+        let apiver    = InitParams["api_version"] || "current"
+        let apivermin = InitParams["min_api_version"] || ""
+        let appname   = InitParams["appname"]
+
         BEAM = await Utils.createWebAPI(
             apiver, apivermin, appname, 
             (...args) => Utils.handleApiResult(...args)
         )
-        headlessClient.stopWallet()
+
+        await new Promise((resolve) => {
+            headlessClient.stopWallet(resolve)
+        })
+        
         Utils.hideLoading()
+        return true
     }
 
     static async initialize(params, initcback) {
@@ -407,11 +417,11 @@ export default class Utils {
         }
 
         if (mode == "web-wallet") {
-            Utils.showWebLoading(false);
+            return Utils.showWebLoading(false);
         }
 
         if (mode == "web-wallet-headed") {
-            Utils.showWebLoading(true);
+            return Utils.showWebLoading(true);
         }
 
         throw (["unknown loading mode: ", mode].join(''))

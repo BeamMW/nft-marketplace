@@ -27,7 +27,7 @@ const defaultState = () => {
         id_to_sell: '',
         sort_by: null,
         pending_artworks: 0,
-        is_headless: true
+        is_headless: false
     }
 }
 
@@ -76,6 +76,7 @@ export const store = {
     //
     start () {
         Object.assign(this.state, defaultState())
+        this.state.is_headless = utils.isHeadless()
         router.push({name: 'gallery'})
 
         nextTick(() => {
