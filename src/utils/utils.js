@@ -5,7 +5,6 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let headlessDB   = "headless"
 let headlessNode = "eu-node01.masternet.beam.mw:8200"
 
 export default class Utils {
@@ -32,16 +31,6 @@ export default class Utils {
         return BEAM && BEAM.headless
     }
 
-    static async createDesktopAPI(apirescback) {
-        await Utils.injectScript("qrc:///qtwebchannel/qwebchannel.js")
-        return new Promise((resolve) => {
-            new QWebChannel(qt.webChannelTransport, (channel) => {
-                channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
-                resolve(channel.objects.BEAM)
-            })
-        })  
-    }
-
     static async createMobileAPI(apirescback) {
         return new Promise((resolve) => {
             if (Utils.isAndroid()) {
@@ -56,22 +45,10 @@ export default class Utils {
         })
     }
 
-    static async createWebAPI(apiver, apivermin, appname, apirescback) {
-        return new Promise((resolve, reject) => {
-            window.addEventListener('message', async (ev) => {
-                if (ev.data === 'apiInjected') {
-                    await window.BeamApi.callWalletApiResult(apirescback);
-                    resolve(window.BeamApi)
-                }
-            }, false);
-            window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
-        })
-    }
-
     static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
         let WasmModule = await BeamModule()
         let WasmWalletClient = WasmModule.WasmWalletClient
-        
+
         let client = new WasmWalletClient(headlessNode)
         client.startWallet()
 
@@ -84,10 +61,10 @@ export default class Utils {
         client.setApproveContractInfoHandler((info) => {
             let err = "Unexpected wasm wallet client transaction in headless wallet: " + info
             console.log(err)
-            throw err 
+            throw err
         })
-
-        return new Promise((resolve, reject) => {        
+        
+        return new Promise((resolve, reject) => {
             let appid = WasmWalletClient.GenerateAppID(appname, window.location.href)
             client.createAppAPI(apiver, apivermin, appid, appname, (err, api) => {
                 if (err) {
@@ -107,6 +84,42 @@ export default class Utils {
         })
     }
 
+    static async createDesktopAPI(apirescback) {
+        await Utils.injectScript("qrc:///qtwebchannel/qwebchannel.js")
+        return new Promise(async (resolve, reject) => {
+            new QWebChannel(qt.webChannelTransport, (channel) => {
+                channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
+                resolve(channel.objects.BEAM)
+            })
+        })  
+    }
+
+    static async createWebAPI(apiver, apivermin, appname, apirescback) {
+        return new Promise((resolve, reject) => {
+            window.addEventListener('message', async (ev) => {
+                if (ev.data === 'apiInjected') {
+                    await window.BeamApi.callWalletApiResult(apirescback);
+                    resolve(window.BeamApi)
+                }
+            }, false);
+            window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
+        })
+    }
+
+    static async createMobileAPI(apirescback) {
+        return new Promise((resolve, reject) => {
+            if (Utils.isAndroid()) {
+                document.addEventListener("onCallWalletApiResult", (res) => {
+                    apirescback(res.detail)
+                })
+            }
+            else {
+                window.BEAM.callWalletApiResult(apirescback);
+            }
+            resolve(window.BEAM);
+        })
+    }
+
     static callApi(method, params, cback) {
         let callid = ['call', CallID++].join('-')
         Calls[callid] = cback
@@ -119,13 +132,11 @@ export default class Utils {
         }
 
         //console.log(Utils.formatJSON(request))
-
         if (Utils.isHeadless()) {
             return BEAM.api.callWalletApi(JSON.stringify(request))
         }
 
         if (Utils.isWeb()) {
-            // TODO: change to JSON.stringify
             return BEAM.callWalletApi(callid, method, params);
         } 
 
@@ -221,10 +232,11 @@ export default class Utils {
             } 
             
             if (Utils.isWeb()) {
+                Utils.showWebLoading()
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
                 let appname   = params["appname"]
-
+                
                 if (headless) {
                     BEAM = await Utils.createHeadlessAPI(
                                 apiver, apivermin, appname, 
@@ -245,8 +257,8 @@ export default class Utils {
             }
 
             let styles = Utils.getStyles()
-            Utils.applyStyles(styles); 
-
+            Utils.applyStyles(styles)
+            
             if (!BEAM) {
                 return initcback("Failed to create BEAM API")
             }
