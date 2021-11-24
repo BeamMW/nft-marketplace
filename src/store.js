@@ -27,6 +27,7 @@ const defaultState = () => {
         id_to_sell: '',
         sort_by: null,
         pending_artworks: 0,
+        is_headless: true
     }
 }
 

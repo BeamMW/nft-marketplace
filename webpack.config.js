@@ -43,7 +43,6 @@ const config = (DEV_MODE) => {return {
                 <title>${htmlWebpackPlugin.options.title}</title>
                 </head>
                 <body>
-                <script src="wasm-client.js"></script>
                 </body>
                 </html>
             `,
