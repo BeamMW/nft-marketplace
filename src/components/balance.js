@@ -35,8 +35,7 @@ export default {
                 <div class="user-opt">
                     ${this.renderUserName()}
                     <div class="user-opt__key" onclick=${this.onShowKey}>
-                        <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
-                        <span class="user-opt__key__text">Show my public key</span>
+                        ${this.renderKeyContent()}
                     </div>
                 </div>
             </div>
@@ -64,6 +63,19 @@ export default {
                     <img class="user-opt__user__icon" src="./assets/icon-user.svg"/>
                     <span class="user-opt__user__text">${this.my_artist_name}</span>
                 </div>
+                `;
+            }
+        },
+
+        renderKeyContent () {
+            if (this.is_headless) {
+                return html`
+                    <span class="user-opt__key__connect">Connect to wallet</span>
+                `;
+            } else {
+                return html`
+                    <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
+                    <span class="user-opt__key__text">Show my public key</span>
                 `;
             }
         },

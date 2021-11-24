@@ -72,6 +72,9 @@ export default {
         },
         can_change_price () {
             return this.owned && this.price
+        },
+        is_headless () {
+            return this.$state.is_headless
         }
     },
 
@@ -194,8 +197,13 @@ export default {
 
         onBuy (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
-                this.$emit('buy', this.id)
+
+            if (this.is_headless) {
+                this.$store.switchToHeaded()  
+            } else {
+                if (!this.in_tx) {
+                    this.$emit('buy', this.id)
+                }
             }
         },
 
@@ -208,8 +216,12 @@ export default {
 
         onLike (ev) {
             ev.preventDefault()
-            if (this.can_vote) {
-                this.$emit('like', this.id)
+            if (this.is_headless) {
+                this.$store.switchToHeaded()  
+            } else {
+                if (this.can_vote) {
+                    this.$emit('like', this.id)
+                }
             }
         },
 
@@ -233,4 +245,3 @@ export default {
         }
     }
 }
-    

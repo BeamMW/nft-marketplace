@@ -456,6 +456,11 @@ pre {
     margin-left: 10px;
 }
 
+.user-opt__key__connect {
+    font-size: 16px;
+    color: #00f6d2;
+}
+
 .user-opt__user {
     padding-left: 15px;
     padding-bottom: 12px;
