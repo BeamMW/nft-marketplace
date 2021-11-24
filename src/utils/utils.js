@@ -228,7 +228,7 @@ export default class Utils {
         }
 
         let headlessClient = BEAM.client
-        Utils.showLoading("web-wallet")
+        Utils.showLoading("web-wallet-headed")
         BEAM = await Utils.createWebAPI(
             apiver, apivermin, appname, 
             (...args) => Utils.handleApiResult(...args)
@@ -403,11 +403,15 @@ export default class Utils {
 
     static showLoading(mode) {
         if (mode == "headless") {
-            return Utils.showHealessLoading()
+            return Utils.showHealessLoading();
         }
 
         if (mode == "web-wallet") {
-            Utils.showWebLoading()
+            Utils.showWebLoading(false);
+        }
+
+        if (mode == "web-wallet-headed") {
+            Utils.showWebLoading(true);
         }
 
         throw (["unknown loading mode: ", mode].join(''))
@@ -440,8 +444,10 @@ export default class Utils {
         loadContainer.style.padding = '5%';
         loadContainer.style.backgroundColor = 'transparent';
 
-        let titleElem = document.createElement("h3");
-        titleElem.innerText = [InitParams["appname"], "Is Loading"].join(' ');
+        let titleElem = document.createElement("div");
+        titleElem.style.fontSize = '25px';
+        titleElem.style.fontWeight = '400';
+        titleElem.innerText = [InitParams["appname"], "is loading"].join(' ');
         let subtitle = document.createElement("p");
         subtitle.innerText = "Please wait...";
 
@@ -457,7 +463,7 @@ export default class Utils {
         document.getElementById("dapp-loading").remove();
     }
 
-    static showWebLoading() {
+    static showWebLoading(isHeaded) {
         let styles = Utils.getStyles()
         Utils.applyStyles(styles);
         const topColor =  [styles.appsGradientOffset, "px,"].join('');
@@ -469,12 +475,17 @@ export default class Utils {
         bg.style.color = "#fff";
         bg.id = "dapp-loader";
         bg.style.position = "absolute";
-        bg.style.backgroundImage = [
-            "linear-gradient(to bottom,",
-            styles.background_main_top, topColor,
-            styles.background_main, mainColor,
-            styles.background_main
-        ].join(' ');
+        if (isHeaded) {
+            bg.style.top = '0';
+            bg.style.position = 'fixed';
+        } else {
+            bg.style.backgroundImage = [
+                "linear-gradient(to bottom,",
+                styles.background_main_top, topColor,
+                styles.background_main, mainColor,
+                styles.background_main
+            ].join(' ');
+        }
         let loadContainer = document.createElement("div");
         loadContainer.id = "dapp-loading";
 
@@ -482,7 +493,11 @@ export default class Utils {
         loadContainer.style.margin = '50px auto 0 auto';
         loadContainer.style.width = '585px';
         loadContainer.style.padding = '5%';
-        loadContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        if (isHeaded) {
+            loadContainer.style.backgroundColor = 'rgba(3, 91, 143, 0.8)';
+        } else {
+            loadContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        }
         loadContainer.style.borderRadius = '10px';
 
         let titleElem = document.createElement("h3");

@@ -41,6 +41,11 @@ html {
     background-color: transparent;
 }
 
+.full-loading__title {
+    font-size: 25px;
+    font-weight: 400;
+}
+
 pre {
     font-family: 'SFProDisplay', sans-serif;
     font-weight: normal;

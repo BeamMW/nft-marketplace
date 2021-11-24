@@ -4,7 +4,7 @@ export default {
     render () {
         return html`
             <div class="full-loading">
-                <h3>BEAM Gallery Is Loading</h3>
+                <div class="full-loading__title">BEAM Gallery is loading</div>
                 <p>Please wait...</p>
             </div>
         `
