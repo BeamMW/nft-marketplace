@@ -8,7 +8,11 @@ const config = (DEV_MODE) => {return {
         main: "./src/main.js",
     },
     devServer: {
-        hot: true
+        hot: true,
+        headers: {
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp"
+        }
     },
     output: {
         filename: "[name].bundle.js",
