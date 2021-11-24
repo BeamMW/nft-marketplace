@@ -461,6 +461,10 @@ export default class Utils {
 
     static hideWebLoading() {
         document.getElementById("dapp-loading").remove();
+        const container = document.getElementById('container');
+        if (container) {
+            container.style.filter = 'none'
+        }
     }
 
     static showWebLoading(isHeaded) {
@@ -477,6 +481,7 @@ export default class Utils {
         bg.style.position = "absolute";
         if (isHeaded) {
             bg.style.top = '0';
+            bg.style.left = '0';
             bg.style.position = 'fixed';
         } else {
             bg.style.backgroundImage = [
@@ -494,7 +499,11 @@ export default class Utils {
         loadContainer.style.width = '585px';
         loadContainer.style.padding = '5%';
         if (isHeaded) {
-            loadContainer.style.backgroundColor = 'rgba(3, 91, 143, 0.8)';
+            loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
+            const container = document.getElementById('container');
+            if (container) {
+                container.style.filter = 'blur(3px)'
+            }
         } else {
             loadContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
         }
