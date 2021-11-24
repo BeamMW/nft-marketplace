@@ -52,6 +52,28 @@ export default class Utils {
         })
     }
 
+    static async createDesktopAPI(apirescback) {
+        await Utils.injectScript("qrc:///qtwebchannel/qwebchannel.js")
+        return new Promise(async (resolve, reject) => {
+            new QWebChannel(qt.webChannelTransport, (channel) => {
+                channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
+                resolve(channel.objects.BEAM)
+            })
+        })  
+    }
+
+    static async createWebAPI(apiver, apivermin, appname, apirescback) {
+        return new Promise((resolve, reject) => {
+            window.addEventListener('message', async (ev) => {
+                if (ev.data === 'apiInjected') {
+                    await window.BeamApi.callWalletApiResult(apirescback);
+                    resolve(window.BeamApi)
+                }
+            }, false);
+            window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
+        })
+    }
+
     static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
         await Utils.injectScript("wasm-client.js")
         let WasmModule = await BeamModule()
@@ -92,26 +114,46 @@ export default class Utils {
         })
     }
 
-    static async createDesktopAPI(apirescback) {
-        await Utils.injectScript("qrc:///qtwebchannel/qwebchannel.js")
-        return new Promise(async (resolve, reject) => {
-            new QWebChannel(qt.webChannelTransport, (channel) => {
-                channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
-                resolve(channel.objects.BEAM)
-            })
-        })  
-    }
+    static async switchToWebAPI () {
+        if (!Utils.isHeadless()) {
+            throw "Wallet must be opened in a headless mode"
+        }
 
-    static async createWebAPI(apiver, apivermin, appname, apirescback) {
-        return new Promise((resolve, reject) => {
-            window.addEventListener('message', async (ev) => {
+        let apiver    = InitParams["api_version"] || "current"
+        let apivermin = InitParams["min_api_version"] || ""
+        let appname   = InitParams["appname"]
+        let apirescb  = (...args) => Utils.handleApiResult(...args)
+
+        let newAPI = await new Promise((resolve) => {
+            let listener
+
+            let leave = (res) => {
+                Utils.hideLoading()
+                window.removeEventListener('message', listener)
+                resolve(res)
+            }
+
+            listener = async (ev) => {
                 if (ev.data === 'apiInjected') {
-                    await window.BeamApi.callWalletApiResult(apirescback);
-                    resolve(window.BeamApi)
+                    await window.BeamApi.callWalletApiResult(apirescb)
+                    leave(window.BeamApi)
                 }
-            }, false);
-            window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
+            }
+
+            window.addEventListener('message', listener, false)
+            Utils.showLoading({headless: true, connecting: true, onCancel: leave})
+            window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin)
         })
+
+        if (newAPI) {
+            // TODO:HEADLESS
+            //await new Promise((resolve) => {
+            //    headlessClient.stopWallet(resolve)
+            //})
+            BEAM = newAPI
+        }
+
+        return newAPI
     }
 
     static callApi(method, params, cback) {
@@ -215,41 +257,6 @@ export default class Utils {
         }
     }
 
-    static async switchToHeaded () {
-        if (!Utils.isHeadless()) {
-            throw "Wallet must be opened in a headless mode"
-        }
-
-        let headlessClient = BEAM.client
-        Utils.showWebLoader({
-            isHeadless: true,
-            isConnecting: true,
-            cancelCallback: (e) => {
-                e.stopPropagation();
-                if (e.target.id === "dapp-loader") {
-                    Utils.hideLoading();
-                }
-            }
-        });
-
-        let apiver    = InitParams["api_version"] || "current"
-        let apivermin = InitParams["min_api_version"] || ""
-        let appname   = InitParams["appname"]
-
-        BEAM = await Utils.createWebAPI(
-            apiver, apivermin, appname, 
-            (...args) => Utils.handleApiResult(...args)
-        )
-
-        // TODO:HEADLESS
-        //await new Promise((resolve) => {
-        //    headlessClient.stopWallet(resolve)
-        //})
-        
-        Utils.hideLoading()
-        return true
-    }
-
     static async initialize(params, initcback) {
         InitParams = params
         APIResCB = params["apiResultHandler"]
@@ -272,18 +279,18 @@ export default class Utils {
                 }
                 
                 if (headless) {
-                    Utils.showWebLoader({
-                        isHeadless: true,
-                        isConnecting: false
+                    Utils.showLoading({
+                        headless: true,
+                        connecting: false
                     });
                     BEAM = await Utils.createHeadlessAPI(
                                 apiver, apivermin, appname, 
                                 (...args) => Utils.handleApiResult(...args)
                             )        
                 } else {
-                    Utils.showWebLoader({
-                        isHeadless: false,
-                        isConnecting: true
+                    Utils.showLoading({
+                        headless: false,
+                        connecting: true
                     });
                     BEAM = await Utils.createWebAPI(
                                 apiver, apivermin, appname, 
@@ -430,8 +437,8 @@ export default class Utils {
         return result;
     }
 
-    static showWebLoader(params) {
-        const {isHeadless, isConnecting, cancelCallback} = params;
+    static showLoading(params) {
+        const {headless, connecting, onCancel} = params;
 
         const styles = Utils.getStyles()
         Utils.applyStyles(styles);
@@ -444,12 +451,16 @@ export default class Utils {
         bg.style.color = "#fff";
         bg.id = "dapp-loader";
         bg.style.position = "absolute";
-        if (isHeadless && isConnecting) {
+        if (headless && connecting) {
             bg.style.top = '0';
             bg.style.left = '0';
             bg.style.position = 'fixed';
-
-            bg.addEventListener('click', cancelCallback);
+            bg.addEventListener('click', (ev) => {
+                ev.stopPropagation()
+                if (ev.target.id === "dapp-loader") {
+                    onCancel()
+                }
+            });
         } else {
             bg.style.backgroundImage = [
                 "linear-gradient(to bottom,",
@@ -470,13 +481,13 @@ export default class Utils {
         let titleElem = null;
         let subtitle = null;
         
-        if (isConnecting) {
+        if (connecting) {
             titleElem = document.createElement("h3");
             titleElem.innerText = "Connecting to BEAM Web Wallet."; 
             subtitle = document.createElement("p");
             subtitle.innerText = ["To use ", InitParams["appname"], " you should have BEAM Web Wallet installed and allow connection."].join("")
 
-            if (isHeadless) {
+            if (headless) {
                 loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
                 const container = document.getElementById('container');
                 if (container) {
@@ -499,7 +510,7 @@ export default class Utils {
         loadContainer.appendChild(titleElem);
         loadContainer.appendChild(subtitle);
 
-        if (isConnecting) {
+        if (connecting) {
             let reconnectButton = document.createElement("button");
             reconnectButton.innerText = "Try to connect again";
             reconnectButton.style.height = "44px";

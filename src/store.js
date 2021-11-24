@@ -700,12 +700,8 @@ export const store = {
 
     async switchToHeaded () {
         try {
-            if(await utils.switchToHeaded()) {
-                alert('connected')
+            if (await utils.switchToWebAPI()) {
                 this.start()
-            }
-            else {
-                alert('user cancelled')
             }
         }
         catch(err) {
