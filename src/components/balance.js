@@ -16,9 +16,6 @@ export default {
         },
         show_balance () {
             return this.$state.is_artist || this.$state.balance_beam
-        },
-        is_headless () {
-            return this.$state.is_headless
         }
     },
 
@@ -68,25 +65,15 @@ export default {
         },
 
         renderKeyContent () {
-            if (this.is_headless) {
-                return html`
-                    <span class="user-opt__key__connect">Connect to wallet</span>
-                `;
-            } else {
-                return html`
-                    <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
-                    <span class="user-opt__key__text">Show my public key</span>
-                `;
-            }
+            return html`
+                <img class="user-opt__key__icon" src="./assets/icon-key.svg"/>
+                <span class="user-opt__key__text">Show my public key</span>
+            `
         },
         
         async onShowKey () {
-            if (this.is_headless) {
-                this.$store.switchToHeaded()  
-            } else {
-                this.$store.setPopupType(popups.KEY);
-                this.$store.changePopupState(true);
-            }
+            this.$store.setPopupType(popups.KEY)
+            this.$store.changePopupState(true)
         },
 
         onWithdraw () {

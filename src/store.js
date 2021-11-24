@@ -699,7 +699,17 @@ export const store = {
     },
 
     async switchToHeaded () {
-        await utils.switchToHeaded()
-        this.start()
+        try {
+            if(await utils.switchToHeaded()) {
+                alert('connected')
+                this.start()
+            }
+            else {
+                alert('user cancelled')
+            }
+        }
+        catch(err) {
+            this.setError(err)
+        }
     }
 }

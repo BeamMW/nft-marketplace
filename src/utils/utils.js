@@ -34,8 +34,8 @@ export default class Utils {
 
     static isChrome () {
         const userAgent = navigator.userAgent;
-        const isChrome = userAgent.match(/chrome|chromium|crios/i);
-        return isChrome && !(userAgent.indexOf("Edg") != -1);
+        const isChrome = userAgent.match(/chrome|chromium|crios/i)
+        return isChrome && userAgent.indexOf("Edg") == -1
     }
 
     static async createMobileAPI(apirescback) {
@@ -78,7 +78,7 @@ export default class Utils {
                 if (err) {
                     reject(err)
                 }
-
+                
                 api.setHandler(apirescback)
                 resolve({
                     headless: true,
@@ -106,25 +106,12 @@ export default class Utils {
         return new Promise((resolve, reject) => {
             window.addEventListener('message', async (ev) => {
                 if (ev.data === 'apiInjected') {
+                    alert('api injected')
                     await window.BeamApi.callWalletApiResult(apirescback);
                     resolve(window.BeamApi)
                 }
             }, false);
             window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
-        })
-    }
-
-    static async createMobileAPI(apirescback) {
-        return new Promise((resolve, reject) => {
-            if (Utils.isAndroid()) {
-                document.addEventListener("onCallWalletApiResult", (res) => {
-                    apirescback(res.detail)
-                })
-            }
-            else {
-                window.BEAM.callWalletApiResult(apirescback);
-            }
-            resolve(window.BEAM);
         })
     }
 
@@ -529,14 +516,18 @@ export default class Utils {
             reconnectButton.addEventListener("mouseover", () => {
                 reconnectButton.style.boxShadow = "0 0 8px white";
             }, false);
+
             reconnectButton.addEventListener("mouseout", () => {
                 reconnectButton.style.boxShadow = "none";
             }, false);
 
-
             reconnectButton.addEventListener('click', () => {
-                Utils.reload();
+                let apiver    = InitParams["api_version"] || "current"
+                let apivermin = InitParams["min_api_version"] || ""
+                let appname   = InitParams["appname"]
+                window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
             });
+
             let installButton = document.createElement("button");
             installButton.innerText = "Install BEAM Web Wallet";
             installButton.style.height = "44px";
