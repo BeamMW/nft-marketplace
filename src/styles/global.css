@@ -690,3 +690,7 @@ pre {
 *[disabled="true"] {
     cursor: default !important;
 }
+
+.invisible {
+    opacity: 0;
+}

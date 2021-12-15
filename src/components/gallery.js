@@ -62,6 +62,8 @@ export default {
                     v-bind:in_tx="in_tx"
                     v-bind:can_vote="can_vote"
                     v-bind:is_admin="is_admin"
+                    v-bind:error="artwork.error"
+                    v-bind:loading="artwork.loading"
                     v-on:sell="onSellArtwork"
                     v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"

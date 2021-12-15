@@ -50,6 +50,13 @@ export default {
         is_admin: {
             type: Boolean,
             default: false
+        },
+        loading: {
+            type: Boolean,
+            default: true
+        },
+        error: {
+            default: undefined
         }
     },
 
@@ -60,16 +67,6 @@ export default {
     },
 
     computed: {
-        ownerText () {
-            let res = "";
-            if (this.author) {
-                res = ["by", this.author].join(' ');
-            }
-            // if (this.owned) {
-            //     return res += (res ? " | " : "") + "You own this artwork";
-            // }
-            return res ? res : "Loading...";
-        },
         can_change_price () {
             return this.owned && this.price
         },
@@ -84,16 +81,11 @@ export default {
                 ${this.renderPreview()}
                 ${this.renderDelete()}
                 <div class="info-row">
-                    <span class="artwork-title">
-                        <span>
-                            ${this.title || "Loading..."}
-                        </span>
-                    </span>
+                    ${this.renderTitle()}
                     ${this.renderLikes()}
                 </div>
                 <div class="info-row">
-                    <span class="artwork-owner">${this.ownerText}</span>
-                    ${this.renderMine()}
+                    ${this.renderOwner()}
                 </div>
                 <div class="artwork-bottom-row">
                     ${this.renderPrice()}
@@ -129,34 +121,37 @@ export default {
                         <img src=${image}/>
                     </div>
                 `
-            } else {
-                return html`
-                    <div class="preview-container">
-                        <${loading}/>
-                    </div>
-                `
             }
+
+            return html`
+                <div class="preview-container">
+                    <${loading} error=${!!this.error}/>
+                </div>
+            `
         },
 
-        renderMine() {
-            if (this.owned) {
-                return html`
-                    <span class="mine">
-                        <span>mine</span>
+        renderTitle() {
+            return html`
+                <span class="artwork-title">
+                    <span class="${this.title ? '' : 'invisible'}">
+                        ${this.title || "Loading..."}
                     </span>
-                `;
-            }
+                </span>
+            `
         },
-        
-        renderDot() {
-            if (!this.owned) {
-                return ""
-            }
 
-            let state = 'green'
-            return html`<${dot} state=${state}/>`
+        renderOwner() {
+            let ownerText  = this.author ? ["by", this.author].join(' ') : 'Loading...'
+            let ownerClass = this.author ? '' : 'invisible'
+            
+            return html`
+                <span class="artwork-owner ${ownerClass}">
+                    ${ownerText}
+                </span>
+                ${this.owned ? html`<span class="mine">mine</span>` : ``}
+            `
         },
-        
+
         renderPrice() {
             // if has price - just display it and return
             if (this.price) {

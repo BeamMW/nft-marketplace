@@ -705,3 +705,6 @@ pre {
     cursor: default !important;
 }
 
+.invisible {
+    opacity: 0;
+}

@@ -328,9 +328,15 @@ export const store = {
         utils.ensureField(res, "items", "array")
         let all = [], sale = [], liked = [], mine = [], sold = []
 
-        for (const artwork of res.items) {
-            // TODO: remove if < 2, this is for test only
-            // if (artwork.id < 3) continue
+        for (let artwork of res.items) {
+            let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
+                return item.id == artwork.id;
+            });
+
+            if (oldArtwork) {
+                Object.assign(oldArtwork, artwork)
+                artwork = oldArtwork
+            }
 
             // just for convenience, to make more clear what pk is
             artwork.pk_owner = artwork.pk
@@ -343,21 +349,8 @@ export const store = {
                 }
             }
 
-            let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
-                return item.id == artwork.id;
-            });
-
-            if (oldArtwork) {
-                artwork.title = oldArtwork.title;
-                artwork.bytes = oldArtwork.bytes;
-                artwork.pk_author = oldArtwork.pk_author;
-                artwork.sales = oldArtwork.sales;
-            }
-
-            artwork['author']=(this.state.artists[artwork.pk_author] || {}).label;
-
+            artwork['author'] = (this.state.artists[artwork.pk_author] || {}).label;
             all.push(artwork)
-            let mykeys = this.state.my_artist_keys
 
             // MINE is what I own
             if (artwork.owned) {
@@ -375,11 +368,13 @@ export const store = {
             }
             
             // SOLD - I'm an author but I do not own
+            let mykeys = this.state.my_artist_keys
             if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
                 sold.push(artwork)
             }
 
             if (!oldArtwork) {
+                artwork.loading = true
                 this.loadArtwork(all.length - 1, artwork.id);
             }
         }
@@ -446,46 +441,100 @@ export const store = {
     },
 
     onLoadArtwork(err, res, idx) {
-        if (err) {
-            return this.setError(err, "Failed to download an artwork")
-        }
-
-        utils.ensureField(res, "artist", "string")
-        let pk_author = res.artist
-
-        utils.ensureField(res, "data", "string")
-        var data = this.hexDecodeU8A(res.data)
-
-        // check version
-        if (data[0] != 1) {
-            throw `Invalid format version: ${data[0]}`
-        }
-
-        // parse name
-        let nend = data.findIndex(val => val == 0)
-        if (nend == -1 || nend + 1 == data.length) {
-            throw "Unable to parse image name"
-        }
-
-        let rawName = data.subarray(1, nend)
-        let name = (new TextDecoder()).decode(rawName)
-
-        // parse bytes
-        let bytes = data.subarray(nend + 2)
-
-        // save parsed data
-        // list may have been changed, so we check if artwork with this id is still present
+        // list may have been changed, so we check 
+        // if artwork with this id is still present
         let artwork = this.state.artworks[tabs.ALL][idx]
-        if (artwork && artwork.id) {
-            artwork.title = name
-            artwork.bytes = bytes
-            artwork.pk_author = pk_author
+        if (!artwork) {
+            return
+        }
+
+        try {
+            if (err) throw err
+
+            utils.ensureField(res, "artist", "string")
+            let pk_author = res.artist
+
+            utils.ensureField(res, "data", "string")
+            var data = this.hexDecodeU8A(res.data)
+
+            // check version
+            let version = data[0]
+            if (data[0] == 1) {
+                // parse title
+                let tend = data.findIndex(val => val == 0)
+                if (tend == -1 || tend + 1 == data.length) {
+                    throw "Unable to parse artwork title"
+                }
+
+                let rawTittle = data.subarray(1, tend)
+                let title = (new TextDecoder()).decode(rawTittle)
+                let bytes = data.subarray(tend + 2)
+
+                artwork.title     = title
+                artwork.bytes     = bytes
+                artwork.pk_author = pk_author
+                artwork.loading   = false
+            } 
+            else if (data[0] == 2) {    
+                let rawMeta = data.subarray(1)
+                let meta = JSON.parse((new TextDecoder()).decode(rawMeta))
+
+                utils.ensureField(meta, "title", "string")
+                utils.ensureField(meta, "ipfs_hash", "string")
+
+                artwork.title = meta.title
+                artwork.pk_author = pk_author
+                artwork.ipfs_hash = meta.ipfs_hash
+
+                /*meta.ipfs_hash = 'QmWPMTkzfvN5Ue55WAvFj9uFpN71PqGKUwcZgfDLBCpiTB'
+                if (this.get1) return
+                this.get1 = 1
+
+                utils.callApi('ipfs_gc', {}, (err, res) => {
+                    if (err) {
+                        alert("ipfs_gc: " + JSON.stringify(err))
+                        return 
+                    }
+
+                    alert("ipfs_gc res: " + JSON.stringify(res))
+                    return 
+                })
+
+                return
+                */
+                utils.callApi('ipfs_get', {hash: meta.ipfs_hash, timeout: 3000}, (err, res) => {
+                    artwork.loading = false
+                    
+                    try {
+                        if (err) {
+                            // TODO:IPFS if not found reschedule for the next update
+                            // alert(`IPFS GET error ${JSON.stringify(err)}`)
+                            throw err
+                        }
+
+                        utils.ensureField(res, "data", "array")
+                        artwork.bytes = new Uint8Array(res.data)
+                    }
+                    catch(err) {
+                        artwork.error = err
+                        console.log(err)
+                    }
+                })
+            } 
+            else {
+                throw `Unknown artwork version ${data[0]}`
+            }
 
             // We receive author only now, so add what's missing to SOLD
             let mykeys = this.state.my_artist_keys
             if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
                 this.state.artworks[tabs.SOLD].push(artwork)
             }
+        } 
+        catch(err) {
+            console.log(err)
+            artwork.loading = false
+            artwork.error = err
         }
     },
 
@@ -564,7 +613,7 @@ export const store = {
         )
     },
 
-    uploadArtwork (file, artist_key) {
+    uploadArtworkOld (file, artist_key) {
         let name = file.name.split('.')[0]
         name = [name[0].toUpperCase(), name.substring(1)].join('')
             
@@ -593,8 +642,47 @@ export const store = {
         }
     },
 
-    showStats() {
+    uploadArtwork (file, artist_key) {
+        let name = file.name.split('.')[0]
+        name = [name[0].toUpperCase(), name.substring(1)].join('')
+            
+        try {
+            let reader = new FileReader()
+            reader.readAsArrayBuffer(file)
 
+            reader.onload = ()=> {
+                let imgArray = Array.from(new Uint8Array(reader.result))
+                utils.callApi('ipfs_add', {data: imgArray}, (err, res) => {
+                    if (err) {
+                        return this.setError(err)
+                    }
+
+                    utils.ensureField(res, 'hash', 'string')
+                    alert(`new ipfs hash: ${res.hash}`)
+                    
+                    // Form what we write on blockchain
+                    // 2 (version) then meta
+                    let aver = Uint8Array.from([2])
+                    let meta = JSON.stringify({
+                        title: name,
+                        ipfs_hash: res.hash
+                    })
+                    let ameta = (new TextEncoder()).encode(meta)
+                    let hex = [this.hexEncodeU8A(aver), this.hexEncodeU8A(ameta)].join('')
+
+                    // Register our NFT
+                    utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
+                        (...args) => this.onMakeTx(...args)
+                    )
+                })  
+            }
+        }
+        catch(err) {
+            this.setError(err, "Failed to upload artwork")
+        }
+    },
+
+    showStats() {
         let total = this.state.artworks[tabs.ALL].length
         let left  = total
 
