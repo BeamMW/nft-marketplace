@@ -502,7 +502,7 @@ export const store = {
 
                 return
                 */
-                utils.callApi('ipfs_get', {hash: meta.ipfs_hash, timeout: 3000}, (err, res) => {
+                utils.callApi('ipfs_get', {hash: meta.ipfs_hash}, (err, res) => {
                     artwork.loading = false
                     
                     try {
