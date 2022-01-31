@@ -105,13 +105,18 @@ export default {
       }
     },
     onRemoveFromSale(id) {
-      this.$store.setIdToSell(id);
+      try {
+        this.$store.sellArtwork(id, 0);
+      } catch (err) {
+        this.$store.setError(err, "Failed to remove an item from sale");
+      }
     },
 
     onChangePrice(id) {
       try {
         this.$store.setPopupType(popups.CHANGE_PRICE);
         this.$store.setIdToSell(id);
+
         this.$store.changePopupState(true);
       } catch (err) {
         this.$store.setError(err, "Failed to sell an item");

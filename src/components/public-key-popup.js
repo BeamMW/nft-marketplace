@@ -35,13 +35,14 @@ export default {
 
   mounted: function () {
     this.applyStyles();
+    let elem = document.getElementById("proceed");
 
     const sellInput = document.getElementById("sell-input");
+
     if (sellInput) {
       document
         .getElementById("sell-input")
         .addEventListener("keydown", (event) => {
-          let elem = document.getElementById("proceed");
           elem.onclick = this.onProceed;
           elem.classList.remove("disabled");
           const specialKeys = [
@@ -61,6 +62,7 @@ export default {
           }
 
           const current = document.getElementById("sell-input").value;
+
           const next = current.concat(event.key);
 
           if (!utils.handleString(next)) {
@@ -168,6 +170,7 @@ export default {
                 onclick=${this.onProceed}
                 type="proceed"
                 id="proceed"
+                class="disabled"
               />
             </div>
           </div>
@@ -181,6 +184,7 @@ export default {
 
     onProceed() {
       const current = document.getElementById("sell-input").value;
+
       if (!current) {
         return;
       }

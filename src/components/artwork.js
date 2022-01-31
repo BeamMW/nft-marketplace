@@ -166,10 +166,16 @@ export default {
             <div class="dropdown change" onClick=${this.showMenu}>
               <img src="./assets/icon-actions.svg" />
               <div id="myDropdown" class="dropdown-content">
-                <a onclick=${this.onChangePrice} type="change">
+                <a
+                  onclick=${this.onChangePrice}
+                  type="change"
+                  class="change_price"
+                >
                   Update the price
                 </a>
-                <a onclick=${this.onRemoveFromSale}>Remove from list</a>
+                <a onclick=${this.onRemoveFromSale} class="remove_from_sale"
+                  >Remove from list</a
+                >
               </div>
             </div>
           </span>`;
@@ -253,7 +259,6 @@ export default {
     },
     onRemoveFromSale(ev) {
       ev.preventDefault();
-
       this.$emit("remove_from_sale", this.id);
     },
 
