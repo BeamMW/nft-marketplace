@@ -1,46 +1,52 @@
-import adminui from  './admin-ui.js';
-import artwork from  './artwork.js';
-import balance from  './balance.js';
-import headless from './headless.js';
-import warning from  './tx-warning.js';
-import artworksControls from './artworks-controls.js';
-import { popups } from '../utils/consts.js';
-import publicKeyPopup from './public-key-popup.js';
+import adminui from "./admin-ui.js";
+import artwork from "./artwork.js";
+import balance from "./balance.js";
+import headless from "./headless.js";
+import warning from "./tx-warning.js";
+import artworksControls from "./artworks-controls.js";
+import { popups } from "../utils/consts.js";
+import publicKeyPopup from "./public-key-popup.js";
 
 export default {
-    computed: {
-        in_tx () {
-            return this.$state.in_tx;
-        },
-        is_admin () {
-            return this.$state.is_admin;
-        },
-        artists () {
-            return this.$state.artists;
-        },
-        active_tab () {
-            return this.$state.active_tab
-        },
-        artworks () {
-            let tab = this.$state.active_tab;
-            return this.$state.artworks[tab];
-        },
-        can_vote () {
-            return this.$state.balance_reward > 0;
-        },
-        is_popup_visible() {
-            return this.$state.is_popup_visible;
-        },
-        is_headless () {
-            return this.$state.is_headless
-        }
+  computed: {
+    in_tx() {
+      return this.$state.in_tx;
     },
-
-    components: {
-        artwork, adminui, balance, warning, artworksControls, publicKeyPopup, headless
+    is_admin() {
+      return this.$state.is_admin;
     },
+    artists() {
+      return this.$state.artists;
+    },
+    active_tab() {
+      return this.$state.active_tab;
+    },
+    artworks() {
+      let tab = this.$state.active_tab;
+      return this.$state.artworks[tab];
+    },
+    can_vote() {
+      return this.$state.balance_reward > 0;
+    },
+    is_popup_visible() {
+      return this.$state.is_popup_visible;
+    },
+    is_headless() {
+      return this.$state.is_headless;
+    },
+  },
 
-    template: `
+  components: {
+    artwork,
+    adminui,
+    balance,
+    warning,
+    artworksControls,
+    publicKeyPopup,
+    headless,
+  },
+
+  template: `
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
@@ -69,6 +75,8 @@ export default {
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
                     v-on:change_price="onChangePrice"
+                    v-on:remove_from_sale="onRemoveFromSale"
+
                     v-on:delete="onDeleteArtwork"
                     />
                 </div>
@@ -82,43 +90,44 @@ export default {
         </div>
     `,
 
-    methods: {
-        onBuyArtwork (id) {
-            this.$store.buyArtwork(id);
-        },
+  methods: {
+    onBuyArtwork(id) {
+      this.$store.buyArtwork(id);
+    },
 
-        onSellArtwork (id) {
-            try {
-                this.$store.setPopupType(popups.SELL);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
+    onSellArtwork(id) {
+      try {
+        this.$store.setPopupType(popups.SELL);
+        this.$store.setIdToSell(id);
+        this.$store.changePopupState(true);
+      } catch (err) {
+        this.$store.setError(err, "Failed to sell an item");
+      }
+    },
+    onRemoveFromSale(id) {
+      this.$store.setIdToSell(id);
+    },
 
-        onChangePrice (id) {
-            try {
-                this.$store.setPopupType(popups.CHANGE_PRICE);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
+    onChangePrice(id) {
+      try {
+        this.$store.setPopupType(popups.CHANGE_PRICE);
+        this.$store.setIdToSell(id);
+        this.$store.changePopupState(true);
+      } catch (err) {
+        this.$store.setError(err, "Failed to sell an item");
+      }
+    },
 
-        onLikeArtwork(id) {
-            this.$store.likeArtwork(id)
-        },
+    onLikeArtwork(id) {
+      this.$store.likeArtwork(id);
+    },
 
-        onUnlikeArtwork(id) {
-            this.$store.unlikeArtwork(id)
-        },
+    onUnlikeArtwork(id) {
+      this.$store.unlikeArtwork(id);
+    },
 
-        onDeleteArtwork(id) {
-            this.$store.deleteArtwork(id)
-        }
-    }
-}
+    onDeleteArtwork(id) {
+      this.$store.deleteArtwork(id);
+    },
+  },
+};
