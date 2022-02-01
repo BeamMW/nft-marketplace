@@ -1,9 +1,10 @@
 {
-    "npm.packageManager": "yarn",
-    "search.exclude": {
-        "**/html": true,
-        "yarn.lock": true,
-        "package.json": true,
-        
-    }
+  "npm.packageManager": "yarn",
+  "search.exclude": {
+    "**/html": true,
+    "yarn.lock": true,
+    "package.json": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }
