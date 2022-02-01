@@ -121,6 +121,22 @@ export default class Utils {
         })
     }
 
+    static async stopHeadlessWallet() {
+        return new Promise((resolve, reject) => {
+            BEAM.client.stopWallet((data) => {
+                const running = BEAM.client.isRunning();
+                console.log(`is running: ${BEAM.client.isRunning()}`);
+                console.log('wallet stopped:', data);
+
+                if (running) {
+                    reject(false);
+                } else {
+                    resolve(true);
+                }
+            })
+        })
+    }
+
     static async switchToWebAPI () {
         if (!Utils.isHeadless()) {
             throw "Wallet must be opened in a headless mode"
@@ -131,36 +147,42 @@ export default class Utils {
         let appname   = InitParams["appname"]
         let apirescb  = (...args) => Utils.handleApiResult(...args)
 
-        let newAPI = await new Promise((resolve) => {
-            let listener
-
-            let leave = (res) => {
-                Utils.hideLoading()
-                window.removeEventListener('message', listener)
-                resolve(res)
-            }
-
-            listener = async (ev) => {
+        const newAPI = await new Promise((resolve) => {
+            const listener = async (ev) => {
                 if (ev.data === 'apiInjected') {
                     await window.BeamApi.callWalletApiResult(apirescb)
-                    leave(window.BeamApi)
+                    Utils.hideLoading()
+                    resolve(window.BeamApi)
+                }
+
+                if (ev.data === 'rejected') {
                 }
             }
 
             window.addEventListener('message', listener, false)
-            Utils.showLoading({headless: true, connecting: true, onCancel: leave})
+            Utils.showLoading({
+                headless: true,
+                connecting: true,
+                onCancel: (res) => {
+                    Utils.hideLoading()
+                    window.removeEventListener('message', listener)
+                    //TODO: add cancel handling in wallet
+                    window.postMessage({type: "cancel_beam_api", apiver, apivermin, appname}, window.origin);
+                    resolve(res)
+                },
+                onReconnect: () => {
+                    window.postMessage({type: "retry_beam_api", apiver, apivermin, appname}, window.origin);
+                }
+            })
             window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin)
         })
 
         if (newAPI) {
-            BEAM.api.delete()
-            await new Promise((resolve) => {
-                BEAM.client.stopWallet(resolve)
-            })
-            
+            BEAM.api.delete();
+            await Utils.stopHeadlessWallet();
             BEAM = {
                 api: newAPI
-            }
+            };
         }
 
         return newAPI
@@ -448,7 +470,7 @@ export default class Utils {
     }
 
     static showLoading(params) {
-        const {headless, connecting, onCancel} = params;
+        const {headless, connecting, onCancel, onReconnect} = params;
 
         const styles = Utils.getStyles()
         Utils.applyStyles(styles);
@@ -541,12 +563,7 @@ export default class Utils {
                 reconnectButton.style.boxShadow = "none";
             }, false);
 
-            reconnectButton.addEventListener('click', () => {
-                let apiver    = InitParams["api_version"] || "current"
-                let apivermin = InitParams["min_api_version"] || ""
-                let appname   = InitParams["appname"]
-                window.postMessage({type: "create_beam_api", apiver, apivermin, appname}, window.origin);
-            });
+            reconnectButton.addEventListener('click', onReconnect);
 
             let installButton = document.createElement("button");
             installButton.innerText = "Install BEAM Web Wallet";
