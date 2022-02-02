@@ -62,8 +62,7 @@ export default {
         },
 
         renderTab(type, title) {
-            if (type === tabs.ALL || 
-            (this.$state.artworks[type] !== undefined && this.$state.artworks[type].length > 0)) {
+            if (type === tabs.ALL || type == tabs.LIKED || (this.$state.artworks[type] !== undefined && this.$state.artworks[type].length > 0)) {
                 return html`
                     <span class="tab-item ${this.active_tab === type ? 'tab-active' : ''}" 
                     onclick=${()=>{this.onTabClicked(type)}}>

@@ -28,7 +28,7 @@ export default {
                         <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}} - {{artist.key.substring(0, 4)}}</option>
                     </select>
                     &nbsp;&nbsp;
-                    <input type="file" multiple accept="image/png, image/jpeg"   
+                    <input type="file" multiple accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"   
                         v-on:change.native="onUploadArtwork"
                         :disabled="!$state.selected_artist"
                         onclick="this.value=null;"

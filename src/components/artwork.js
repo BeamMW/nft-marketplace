@@ -23,6 +23,10 @@ export default {
             type: Object,
             default: []
         },
+        mime_type: {
+            type: String,
+            default: "image/jpeg"
+        },
         owned: {
             type: Number,
             default: 0
@@ -115,7 +119,7 @@ export default {
 
         renderPreview() {
             if (this.bytes.length) {
-                let image = URL.createObjectURL(new Blob([this.bytes], {type: 'image/jpeg'}))
+                let image = URL.createObjectURL(new Blob([this.bytes], {type: this.mime_type}))
                 return html`
                     <div class="preview-container">
                         <img src=${image}/>

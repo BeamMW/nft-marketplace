@@ -485,6 +485,7 @@ export const store = {
                 artwork.title = meta.title
                 artwork.pk_author = pk_author
                 artwork.ipfs_hash = meta.ipfs_hash
+                artwork.mime_type = meta.mime_type
 
                 /*meta.ipfs_hash = 'QmWPMTkzfvN5Ue55WAvFj9uFpN71PqGKUwcZgfDLBCpiTB'
                 if (this.get1) return
@@ -665,7 +666,8 @@ export const store = {
                     let aver = Uint8Array.from([2])
                     let meta = JSON.stringify({
                         title: name,
-                        ipfs_hash: res.hash
+                        ipfs_hash: res.hash,
+                        mime_type: file.type
                     })
                     let ameta = (new TextEncoder()).encode(meta)
                     let hex = [this.hexEncodeU8A(aver), this.hexEncodeU8A(ameta)].join('')

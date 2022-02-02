@@ -55,6 +55,7 @@ export default {
                     v-bind:title="artwork.title"
                     v-bind:author="(artists[artwork.pk_author] || {}).label"
                     v-bind:bytes="artwork.bytes"
+                    v-bind:mime_type="artwork.mime_type"
                     v-bind:owned="artwork.owned"
                     v-bind:price="artwork.price"
                     v-bind:likes_cnt="artwork.impressions"
