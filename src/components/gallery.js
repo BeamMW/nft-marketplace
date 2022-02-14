@@ -61,11 +61,11 @@ export default {
     artworksControls,
     publicKeyPopup,
     headless,
+    paginator
   },
 
   template: `
-  <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
-
+        <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
