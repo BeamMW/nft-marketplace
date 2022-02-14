@@ -24,11 +24,13 @@ export default {
                 <span v-if="!artists_count">Add artists to upload artworks</span>
                 <span v-else>
                     <span>Upload for artist:&nbsp;&nbsp;</span>
-                    <select name="upload_artist" v-model="$state.selected_artist">
-                        <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">{{artist.label}} - {{artist.key.substring(0, 4)}}</option>
+                    <select class="upload_artist" v-model="$state.selected_artist">
+                        <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">
+                            {{artist.label}} - {{artist.key.substring(0, 4)}}..{{artist.key.slice(-4)}}
+                        </option>
                     </select>
                     &nbsp;&nbsp;
-                    <input type="file" multiple accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"   
+                    <input type="file" multiple accept="image/png, image/jpeg"   
                         v-on:change.native="onUploadArtwork"
                         :disabled="!$state.selected_artist"
                         onclick="this.value=null;"

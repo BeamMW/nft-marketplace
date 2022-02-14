@@ -1,9 +1,9 @@
-import {router} from './router.js';
-import utils from './utils/utils.js';
-import { tabs, sort, common, contract } from './utils/consts.js';
-import { reactive, nextTick } from 'vue';
+import {router} from './router.js'
+import {tabs, common, contract} from './utils/consts.js'
+import utils from './utils/utils.js'
+import { reactive, nextTick, computed } from 'vue'
 
-const defaultState = () => {
+function defaultState() {
     return {
         loading: true,
         error: undefined,
@@ -13,7 +13,11 @@ const defaultState = () => {
         is_artist: false,
         is_admin: false,
         artworks: {
-            [tabs.ALL]: []
+            [tabs.ALL]:   [],
+            [tabs.MINE]:  [],
+            [tabs.SALE]:  [],
+            [tabs.LIKED]: [],
+            [tabs.SOLD]:  []
         },
         artists: {},
         artists_count: 0,
@@ -27,12 +31,24 @@ const defaultState = () => {
         id_to_sell: '',
         sort_by: null,
         pending_artworks: 0,
-        is_headless: false
+        is_headless: false,
+        current_page: 1
     }
 }
 
+function appstate() {
+    let state = reactive({
+        ...defaultState(),
+        total_pages: computed(() => {
+            let total = state.artworks[state.active_tab].length
+            return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+        })
+    })
+    return state
+}
+
 export const store = {
-    state: reactive(defaultState()),
+    state: appstate(),
 
     //
     // Errors
@@ -134,7 +150,6 @@ export const store = {
                 }
             }
 
-            // this.state.in_tx = inTx
             return
         }
 
@@ -191,7 +206,7 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = !!res.Admin
+        this.state.is_admin = true//!!res.Admin
         this.state.balance_reward = res.voteReward_balance
         this.loadBalance()
     },
@@ -201,19 +216,6 @@ export const store = {
             `role=user,action=view_balance,cid=${this.state.cid}`, 
             (...args) => this.onLoadBalance(...args)
         )
-
-        //if (this.state.is_admin) {
-        //    utils.invokeContract(
-        //        `role=manager,action=view_balance,cid=${this.state.cid}`, 
-        //        (...args) => this.onLoadVotingBalance(...args)
-        //    )
-        //}
-    },
-
-    onLoadRewardsBalance (err, res) {
-        if (err) {
-            return this.setError(err, "Failed to load voting balance")
-        }
     },
 
     onLoadBalance(err, res) {
@@ -266,7 +268,9 @@ export const store = {
             return this.setError(err, "Failed to load artists list")
         }
 
-        utils.ensureField(res, "artists", "array")
+        utils.ensureField(res, "artists", "array");
+        res.artists.sort( (a,b) => a.label > b.label ? 1 : -1)
+
         //
         // OPTIMIZE: 
         //       code below is not optimized, need to ask Vlad  if it is possible for contract/app to
@@ -326,67 +330,59 @@ export const store = {
         }
     
         utils.ensureField(res, "items", "array")
+        let oldstart = 0
         let all = [], sale = [], liked = [], mine = [], sold = []
+        let mykeys = this.state.my_artist_keys
 
-        for (let artwork of res.items) {
-            let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
-                return item.id == artwork.id;
-            });
-
-            if (oldArtwork) {
-                Object.assign(oldArtwork, artwork)
-                artwork = oldArtwork
+        for (let awork of res.items) {
+            let oawork = null
+            for (let idx = oldstart; idx < this.state.artworks[tabs.ALL].length; ++idx) {
+                if (this.state.artworks[tabs.ALL][idx].id == awork.id) {
+                    oldstart = idx + 1
+                    oawork = this.state.artworks[tabs.ALL][idx]
+                    break
+                }
+            }
+        
+            if (oawork) {
+                awork.title     = oawork.title
+                awork.bytes     = oawork.bytes
+                awork.sales     = oawork.sales
+                awork.author    = oawork.author
+                awork.pk_author = oawork.pk_author
+            } 
+            else {
+                awork.author = (this.state.artists[awork.pk_author] || {}).label
             }
 
-            // just for convenience, to make more clear what pk is
-            artwork.pk_owner = artwork.pk
-            delete artwork.pk
-        
-            if (artwork["price.aid"] != undefined) {
-                artwork.price = {
-                    aid: artwork["price.aid"],
-                    amount: artwork["price.amount"]
+            awork.pk_owner = awork.pk
+            delete awork.pk
+
+            if (awork["price.aid"] != undefined) {
+                awork.price = {
+                    aid: awork["price.aid"],
+                    amount: awork["price.amount"]
                 }
             }
 
-            artwork['author'] = (this.state.artists[artwork.pk_author] || {}).label;
-            all.push(artwork)
+            all.push(awork)
+            if (awork.owned) mine.push(awork) // MINE is what I own
+            if (awork.owned && awork.price) sale.push(awork) // SALE is what OWN && what has price set
+            if (awork.my_impression) liked.push(awork) // awork.my_impression
+            if (mykeys.indexOf(awork.pk_author) != -1 && !awork.owned) sold.push(awork) // SOLD - I'm an author but I do not own
+        }    
 
-            // MINE is what I own
-            if (artwork.owned) {
-                mine.push(artwork)
-            }
-
-            // SALE is what OWN && what has price set
-            if (artwork.owned && artwork.price) {
-                sale.push(artwork)
-            }
-            
-            // LIKED is waht I've liked
-            if (artwork.my_impression) {
-                liked.push(artwork)
-            }
-            
-            // SOLD - I'm an author but I do not own
-            let mykeys = this.state.my_artist_keys
-            if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
-                sold.push(artwork)
-            }
-
-            if (!oldArtwork) {
-                artwork.loading = true
-                this.loadArtwork(all.length - 1, artwork.id);
-            }
+        this.state.artworks = {
+            [tabs.ALL]:   all,
+            [tabs.SALE]:  sale,
+            [tabs.LIKED]: liked,
+            [tabs.MINE]:  mine,
+            [tabs.SOLD]:  sold
         }
-        
-        // TODO: need to find a way to optimize this
-        this.state.artworks[tabs.ALL]   = all
-        this.state.artworks[tabs.SALE]  = sale
-        this.state.artworks[tabs.LIKED] = liked
-        this.state.artworks[tabs.MINE]  = mine
-        this.state.artworks[tabs.SOLD]  = sold
-        this.state.loading = false;
-        //this.sortArtWorks();
+
+        this.state.loading = false
+        let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
+        this.setCurrentPage(currPage)
     },
 
     sortArtWorks() {
@@ -429,21 +425,22 @@ export const store = {
         //this.sortArtWorks();
     },
 
-    loadArtwork(idx, id) {
+    loadArtwork(tab, idx, id) {
+        console.log('Load Artwork: ', id)
         this.state.pending_artworks++
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
             (err, res) => {
                 this.state.pending_artworks--
-                this.onLoadArtwork(err, res, idx)
+                this.onLoadArtwork(err, res, tab, idx)
             }
         )  
     },
 
-    onLoadArtwork(err, res, idx) {
+    onLoadArtwork(err, res, tab, idx) {
         // list may have been changed, so we check 
         // if artwork with this id is still present
-        let artwork = this.state.artworks[tabs.ALL][idx]
+        let artwork = this.state.artworks[tab][idx]
         if (!artwork) {
             return
         }
@@ -797,5 +794,23 @@ export const store = {
         catch(err) {
             this.setError(err)
         }
+    },
+
+    setCurrentPage(page) {
+        let artworks = this.state.artworks[this.state.active_tab]
+        let start = (page - 1) * common.ITEMS_PER_PAGE
+        let end   = Math.min(start + common.ITEMS_PER_PAGE, artworks.length)
+        for (let idx = start; idx < end; ++idx) {
+            let art = artworks[idx]
+            if (!art.bytes) {
+                this.loadArtwork(this.state.active_tab, idx, art.id)
+            }
+        }
+        this.state.current_page = page
+    },
+
+    setActiveTab(id) {
+        this.state.active_tab = id
+        this.setCurrentPage(1)
     }
 }

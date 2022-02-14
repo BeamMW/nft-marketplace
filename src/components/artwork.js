@@ -20,8 +20,8 @@ export default {
             default: ""
         },
         bytes: {
-            type: Object,
-            default: []
+            type: Uint8Array,
+            default: new Uint8Array()
         },
         mime_type: {
             type: String,
