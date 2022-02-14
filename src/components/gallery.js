@@ -53,14 +53,25 @@ export default {
         artwork, adminui, balance, warning, artworksControls, publicKeyPopup, headless, paginator
     },
 
-    template: `
+  components: {
+    artwork,
+    adminui,
+    balance,
+    warning,
+    artworksControls,
+    publicKeyPopup,
+    headless,
+  },
+
+  template: `
+  <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
+
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
             <warning v-if="in_tx"></warning>
             <adminui v-if="!in_tx && is_admin"/>
             <artworksControls></artworksControls>
-            <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
             <template v-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"

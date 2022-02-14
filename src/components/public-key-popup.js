@@ -63,15 +63,40 @@ export default {
                 }
             })
 
-            document.getElementById('sell-input').addEventListener('paste', (event) => {
-                if (event.clipboardData !== undefined) {
-                    const text = event.clipboardData.getData('text');
-                    if (!utils.handleString(text)) {
-                        event.preventDefault();
-                    }
-                }
-            });
-        }
+          if (specialKeys.indexOf(event.key) !== -1) {
+            return;
+          }
+
+          const current = document.getElementById("sell-input").value;
+
+          const next = current.concat(event.key);
+
+          if (!utils.handleString(next)) {
+            elem.onclick = null;
+            elem.classList.add("disabled");
+            event.preventDefault();
+          }
+        });
+
+      document
+        .getElementById("sell-input")
+        .addEventListener("paste", (event) => {
+          if (event.clipboardData !== undefined) {
+            const text = event.clipboardData.getData("text");
+            if (!utils.handleString(text)) {
+              event.preventDefault();
+            }
+          }
+        });
+    }
+  },
+
+  methods: {
+    applyStyles() {
+      const { background_popup } = utils.getStyles();
+      document.getElementById("popup-content").style.backgroundColor =
+        background_popup;
+      document.getElementById("container").style.opacity = 0.3;
     },
 
     methods: {
@@ -135,12 +160,10 @@ export default {
                     onclick=${this.onClose} 
                     type="cancel"/>
 
-                    <${artButton} 
-                    onclick=${this.onProceed}
-                    type="proceed"/>
-                </div>
-            `;
-        },
+    onClose() {
+      this.$store.changePopupState(false);
+      document.getElementById("container").style.opacity = 1;
+    },
 
         onClose() {
             this.$store.changePopupState(false);
