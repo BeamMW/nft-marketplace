@@ -14,11 +14,11 @@ html {
   width: 100%;
 }
 
-input,
-select,
-span {
+.admin_input,.admin_select,.admin_span{
   font-size: 18px;
+
 }
+
 .error {
   display: flex;
   align-items: center;
@@ -703,28 +703,8 @@ pre {
   opacity: 0;
 }
 
-.dropdown {
-  position: absolute;
-  display: inline-block;
-  bottom: 18px;
-  right: 10px;
-  cursor: pointer;
-  margin-left: auto;
-}
-.dropdown-content {
-  display: none;
-  position: relative;
-  top: 60px;
-  right: 0px;
-  margin-top: 60px;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.1);
-  min-width: 160px;
-  overflow: auto;
-  z-index: 1;
-}
 
-.dropdown-content a {
+ a.remove_from_sale, a.change_price {
   color: #ffffff;
   margin: 14px 5px;
   text-decoration: none;
@@ -735,8 +715,9 @@ pre {
   font-style: normal;
   line-height: normal;
   letter-spacing: normal;
+  cursor: pointer;
 }
-.dropdown-content a.change_price:before {
+.change_price:before {
   content: "";
   display: block;
   background: url("../assets/icon-change.svg") no-repeat;
@@ -745,7 +726,7 @@ pre {
   float: left;
   margin: 2px 6px 0 0;
 }
-.dropdown-content a.remove_from_sale:before {
+ a.remove_from_sale:before {
   content: "";
   display: block;
   background: url("../assets/icn-eye-crossed-copy.svg") no-repeat;
@@ -756,4 +737,45 @@ pre {
 }
 .show {
   display: block;
+}
+
+.menu-nav {
+  margin-left: auto;
+}
+
+.menu-item {
+  color: #FCC;
+  padding: 3px;
+}
+
+.three-dots:after {
+  cursor: pointer;
+  color: #fff;
+  content: '\2807';
+  font-size: 20px;
+  padding: 0 5px;
+}
+
+
+
+
+.dropdown {
+  position: absolute;
+  right: 10px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  outline: none;
+  opacity: 0;
+  z-index: -1;
+  max-height: 0;
+}
+
+.dropdown-container:focus {
+  outline: none;
+}
+
+.dropdown-container:focus .dropdown {
+  opacity: 1;
+  z-index: 100;
+  max-height: 100vh;
 }

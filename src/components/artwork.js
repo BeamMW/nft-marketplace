@@ -2,6 +2,8 @@ import html from "../utils/html.js";
 import loading from "./item-loading.js";
 import dot from "./dot.js";
 import artButton from "./art-button.js";
+import utils from '../utils/utils.js';
+
 import { common } from "../utils/consts.js";
 
 export default {
@@ -163,21 +165,26 @@ export default {
             <img src="./assets/icon-beam.svg" />
             <span class="artwork-can-buy__amount">${amount}</span>
             <span class="artwork-can-buy__curr">BEAM</span>
-            <div class="dropdown change" onClick=${this.showMenu}>
-              <img src="./assets/icon-actions.svg" />
-              <div id="myDropdown" class="dropdown-content">
-                <a
-                  onclick=${this.onChangePrice}
-                  type="change"
-                  class="change_price"
-                >
-                  Update the price
-                </a>
-                <a onclick=${this.onRemoveFromSale} class="remove_from_sale"
-                  >Remove from list</a
-                >
+            <div class="menu-nav" onClick=${this.showMenu}>
+            <div class="menu-item">      
+            </div>
+            <div class="dropdown-container" tabindex="-1">
+              <div class="three-dots"></div>
+              <div class="dropdown">
+              <a
+              onclick=${this.onChangePrice}
+              type="change"
+              class="change_price"
+            >
+              Update the price
+            </a>
+            <a onclick=${this.onRemoveFromSale} class="remove_from_sale"
+            >Remove from sale</a
+          >
               </div>
             </div>
+          </div>
+        
           </span>`;
         }
 
@@ -248,7 +255,8 @@ export default {
       }
     },
     showMenu() {
-      document.getElementById("myDropdown").classList.toggle("show");
+      document.querySelector(".dropdown").style.backgroundColor = utils.getStyles().background_popup;
+
     },
 
     onChangePrice(ev) {
