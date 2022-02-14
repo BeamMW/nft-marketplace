@@ -87,12 +87,10 @@ export default {
 
   methods: {
     applyStyles() {
-      const { background_main, background_popup } = utils.getStyles();
-
-      document.getElementById("popup").style.backgroundColor =
-        background_main + "40";
+      const { background_popup } = utils.getStyles();
       document.getElementById("popup-content").style.backgroundColor =
         background_popup;
+      document.getElementById("container").style.opacity = 0.3;
     },
 
     renderKeyContent() {
@@ -180,6 +178,7 @@ export default {
 
     onClose() {
       this.$store.changePopupState(false);
+      document.getElementById("container").style.opacity = 1;
     },
 
     onProceed() {
