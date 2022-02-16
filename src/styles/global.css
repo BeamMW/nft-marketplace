@@ -272,7 +272,7 @@ pre {
 .artwork-bottom-row {
   min-height: 41px;
   margin: 10px 0 20px 0;
-  padding: 0 14px;
+  padding: 0px 3px 0px 14px;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -656,7 +656,7 @@ pre {
   position: absolute;
   content: "";
   top: 22px;
-  right: 1em;
+  right: -1em;
   width: 0;
   height: 0;
   border: 5px solid transparent;
