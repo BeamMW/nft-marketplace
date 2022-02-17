@@ -68,7 +68,7 @@ export const store = {
 
   setSortBy(val) {
     this.state.sort_by = val;
-    //this.sortArtWorks();
+    this.sortArtWorks();
   },
 
   //
@@ -417,12 +417,12 @@ export const store = {
     switch (this.state.sort_by) {
       case sort.CREATOR_ASC:
         this.state.artworks[this.state.active_tab] = activeArts.sort((a, b) =>
-          a.author > b.author ? 1 : -1
+          a.id > b.id ? 1 : -1
         );
         break;
       case sort.CREATOR_DESC:
         this.state.artworks[this.state.active_tab] = activeArts.sort((a, b) =>
-          a.author < b.author ? 1 : -1
+          a.id < b.id ? 1 : -1
         );
         break;
       case sort.PRICE_ASC:

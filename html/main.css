@@ -286,7 +286,7 @@ pre {
 .artwork-bottom-row {
   min-height: 41px;
   margin: 10px 0 20px 0;
-  padding: 0 14px;
+  padding: 0px 3px 0px 14px;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -644,7 +644,7 @@ pre {
   outline: none;
   height: 47px;
   line-height: 47px;
-  min-width: 160px;
+  min-width: 175px;
   margin-left: auto;
 }
 
@@ -670,7 +670,7 @@ pre {
   position: absolute;
   content: "";
   top: 22px;
-  right: 1em;
+  right: -16px;
   width: 0;
   height: 0;
   border: 5px solid transparent;
@@ -680,18 +680,20 @@ pre {
 .custom-select .items {
   color: #fff;
   overflow: hidden;
-  border: none;
   position: absolute;
-  background-color: #00446c;
+  border:none;
+  border-radius: 4px;
+  font-size: 16px;
   left: 0;
   right: 0;
   z-index: 1;
   margin-top: 40px;
+  min-width:200px;
 }
 
 .custom-select .items div {
   color: #fff;
-  padding: 9px 0 9px 1em;
+  padding: 15px 0 15px 1em;
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -792,4 +794,17 @@ pre {
   opacity: 1;
   z-index: 100;
   max-height: 100vh;
+}
+
+.w-full {
+  width: 94%;
+}
+
+.sort-container{
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+}
+.sort-text{
+  align-self: center;
 }

@@ -36,6 +36,8 @@ export default {
     },
 
     template: `
+        <div class="sort-container">
+        <span class="sort-text">Sort by</span>
         <div class="custom-select" :tabindex="tabindex" @blur="open = false">
             <div class="selected" :class="{ open: open }" @click="open = !open">
                 {{ selected }}
@@ -47,6 +49,7 @@ export default {
                 </div>
             </div>
         </div>
+    </div>
     `,
 
     methods: {

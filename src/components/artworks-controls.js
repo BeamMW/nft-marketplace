@@ -15,8 +15,10 @@ export default {
 
   render() {
     const selectorOptions = [
-      "Creator: A to Z",
-      "Creator: Z to A",
+      "Added: Newest to Oldest",
+      "Added: Oldest to Newest",
+      "Sold: Newest to Oldest",
+      "Sold: Oldest to Oldest",
       "Price: Low to High",
       "Price: High to Low",
       "Likes: Low to High",
@@ -26,7 +28,7 @@ export default {
     //TODO: catch event from custom-select
     return html`
       <div class="actions-container">
-        <div class="artworks-controls">
+        <div class="artworks-controls w-full">
           <div class="artworks-controls__tabs">
             ${this.renderTab(tabs.ALL, "ALL")}
             ${this.renderTab(tabs.MINE, "MINE")}
@@ -34,16 +36,14 @@ export default {
             ${this.renderTab(tabs.SOLD, "SOLD")}
             ${this.renderTab(tabs.LIKED, "LIKED")}
           </div>
+          <${CustomSelect}
+            options=${selectorOptions}
+            default="Added: Newest to Oldest"
+            class="select"
+          />
         </div>
       </div>
     `;
-
-    //enable after author load fix
-    // <${CustomSelect}
-    // options=${selectorOptions}
-    // default="Sort by"
-    // class="select"
-    // />
   },
 
   methods: {
