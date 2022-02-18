@@ -10,9 +10,6 @@ import paginator from './paginator.js'
 
 export default {
     computed: {
-        in_tx () {
-            return this.$state.in_tx;
-        },
         is_admin () {
             return this.$state.is_admin;
         },
@@ -69,8 +66,7 @@ export default {
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
-            <warning v-if="in_tx"></warning>
-            <adminui v-if="!in_tx && is_admin"/>
+            <adminui v-if="is_admin"/>
             <artworksControls></artworksControls>
             <template v-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
@@ -84,7 +80,6 @@ export default {
                     v-bind:price="artwork.price"
                     v-bind:likes_cnt="artwork.impressions"
                     v-bind:liked="artwork.my_impression == 1"
-                    v-bind:in_tx="in_tx"
                     v-bind:can_vote="can_vote"
                     v-bind:is_admin="is_admin"
                     v-bind:error="artwork.error"
@@ -94,6 +89,7 @@ export default {
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
                     v-on:change_price="onChangePrice"
+                    v-on:remove_from_sale="onRemoveFromSale"
                     v-on:delete="onDeleteArtwork"
                     />
                 </div>
@@ -124,6 +120,10 @@ export default {
             catch (err) {
                 this.$store.setError(err, "Failed to sell an item");
             }
+        },
+
+        onRemoveFromSale (id) {
+            this.$store.sellArtwork(id, 0);
         },
 
         onChangePrice (id) {

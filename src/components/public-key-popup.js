@@ -71,6 +71,19 @@ export default {
                     }
                 }
             });
+
+            sellInput.addEventListener('input', ev => {
+                let disabled = parseFloat(ev.target.value || '0') == 0
+                let proceed = document.getElementById('proceed')
+                
+                if (disabled) {
+                    proceed.classList.add('disabled')
+                } 
+                
+                if (!disabled) {
+                    proceed.classList.remove('disabled')   
+                }
+            })
         }
     },
 
@@ -143,7 +156,10 @@ export default {
 
                     <${artButton} 
                     onclick=${this.onProceed}
-                    type="proceed"/>
+                    id="proceed"
+                    type="proceed"
+                    class="disabled"
+                    />
                 </div>
             `;
         },
@@ -153,10 +169,13 @@ export default {
         },
 
         onProceed() {
-            const current = document.getElementById('sell-input').value;
-            const price = parseFloat(current) * common.GROTHS_IN_BEAM;
-            this.$store.sellArtwork(this.id_to_sell, price);
-            this.onClose();
+            let proceed = document.getElementById('proceed')
+            if (!proceed.classList.contains('disabled')) {
+                const current = document.getElementById('sell-input').value;
+                const price = parseFloat(current) * common.GROTHS_IN_BEAM;
+                this.$store.sellArtwork(this.id_to_sell, price);
+                this.onClose();
+            }
         },
 
         onCopy() {

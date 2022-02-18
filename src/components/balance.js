@@ -11,9 +11,6 @@ export default {
                          this.$state.artists[this.$state.my_artist_keys[1]]
             return (artist || {}).label
         },
-        in_tx () {
-            return this.$state.in_tx
-        },
         show_balance () {
             return this.$state.is_artist || this.$state.balance_beam
         }
@@ -41,7 +38,7 @@ export default {
 
     methods: {
         renderWithdraw () {
-            if (!this.balance_beam || this.in_tx) {
+            if (!this.balance_beam) {
                 return ""
             }
     

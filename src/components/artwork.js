@@ -1,8 +1,9 @@
-import html    from '../utils/html.js';
+import html from '../utils/html.js';
 import loading from './item-loading.js';
-import dot     from './dot.js';
 import artButton from './art-button.js';
+import popupMenu from './popup-menu.js';
 import { common } from '../utils/consts.js';
+import { nextTick } from 'vue';
 
 export default {
     props: {
@@ -35,10 +36,6 @@ export default {
             type: Object,
             default: undefined
         },
-        in_tx: {
-            type: Boolean,
-            default: false
-        },
         likes_cnt: {
             type: Number,
             default: 0,
@@ -67,157 +64,124 @@ export default {
     emits: ['buy', 'sell', 'change_price', 'delete'],
 
     components: {
-        artButton
+        loading,
+        artButton,
+        popupMenu
     },
 
     computed: {
-        can_change_price () {
-            return this.owned && this.price
-        },
         is_headless () {
             return this.$state.is_headless
+        },
+        amount () {
+            if (this.price) {
+                return (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+            }
+        },
+        image () {
+            if (this.bytes.length) {
+                return URL.createObjectURL(new Blob([this.bytes], {type: this.mime_type}))
+            }
         }
     },
 
-    render () {
-        return html`
-            <div class="artwork">
-                ${this.renderPreview()}
-                ${this.renderDelete()}
-                <div class="info-row">
-                    ${this.renderTitle()}
-                    ${this.renderLikes()}
-                </div>
-                <div class="info-row">
-                    ${this.renderOwner()}
-                </div>
-                <div class="artwork-bottom-row">
-                    ${this.renderPrice()}
-                </div>
+    template:`
+        <div class="artwork">
+            
+            <!---- Preview OR Loading ---->
+            <div class="preview-container">
+                <img v-if="image" :src="image"/>
+                <loading v-else :error="!!error"/>
             </div>
-        `
-    },
+
+            <!---- Delete Artwork Button ---->
+            <img v-if="is_admin" class="artwork-delete" src="./assets/icon-delete.svg" v-on:click="onDelete"/>
+        
+            <!---- First info row ---->
+            <div class="info-row">
+                <!---- Title ---->
+                <span class="artwork-title">{{title || "Loading..."}}</span>
+                
+                <!---- Likes ----->
+                <span class="artwork-likes pointer-cursor" v-on="{click: liked ? onUnlike : onLike}" :disabled="can_vote">
+                    <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
+                    <span class="artwork-likes__text">{{likes_cnt}}</span>
+                </span>
+            </div>
+
+            <!---- Second info row, author ---->
+            <div class="info-row">
+                <span class="artwork-author">
+                    {{ this.author ? ['by', this.author].join(' ') : 'Loading...' }}
+                </span>
+            </div>
+
+            <!---- Third info row, price/sell/change ----->
+            <div class="artwork-price-row">
+
+                <!---- has price & owned, display change price / remove from sale options ---->
+                <span v-if="price && owned" class="artwork-can-buy">
+                    <img src="./assets/icon-beam.svg"/>
+                    <span class="artwork-can-buy__amount">{{amount}}</span>
+                    <span class="artwork-can-buy__curr">BEAM</span>
+                    <img class="artwork-can-buy__dots" src="./assets/icon-actions.svg" v-on:click="showOnSaleMenu">
+                    <popupMenu ref="saleMenu">
+                        <div class="item" v-on:click="onChangePrice">
+                            <img src="./assets/icon-change.svg"/>
+                            update the price
+                        </div>
+                        <div class="item" v-on:click="onRemoveFromSale">
+                            <img src="./assets/icon-eye-crossed.svg"/>
+                            remove from sale
+                        </div>
+                    </popupMenu>
+                </span>
+
+                <!---- has price but not owned, can buy ---->
+                <span v-if="price && !owned" class="artwork-can-buy">
+                    <img src="./assets/icon-beam.svg"/>
+                    <span class="artwork-can-buy__amount">{{amount}}</span>
+                    <span class="artwork-can-buy__curr">BEAM</span>
+                    <artButton class="artwork-can-buy__button" type="buy" v-on:click="onBuy"/>
+                </span>
+
+                <!---- doesn't have price & owned, can sell ---->
+                <artButton v-if="!price && owned" class="artwork-can-buy__button" v-on:click="onSell" type="sell"/>
+
+                <!---- doesn't have price & not owned, 
+                       can be anything - not approved yet, not sold by
+                       owner &c. Just dispaly that it is not on sale
+                ---->
+                <span v-if="!price && !owned" class="not-on-sale">
+                    Not for sale
+                </span>
+            </div>
+        </div>
+    `,
 
     methods: {
-        renderDelete() {
-            if (this.is_admin) {
-                return html`<img class="artwork-delete" src="./assets/icon-delete.svg"/  onclick=${this.onDelete}/>`
-            }
-            return ""
-        },
-
-        renderLikes () {
-            return html`
-                <span class="artwork-likes pointer-cursor" onclick=${this.liked ? this.onUnlike : this.onLike} disabled="${this.can_vote ? 'false' : 'true'}">
-                    <img src="./assets/icon-heart${this.liked ? '-red' : ''}.svg"/>
-                    <span class="artwork-likes__text">
-                        ${this.likes_cnt}
-                    </span>
-                </span>
-            `
-        },
-
-        renderPreview() {
-            if (this.bytes.length) {
-                let image = URL.createObjectURL(new Blob([this.bytes], {type: this.mime_type}))
-                return html`
-                    <div class="preview-container">
-                        <img src=${image}/>
-                    </div>
-                `
-            }
-
-            return html`
-                <div class="preview-container">
-                    <${loading} error=${!!this.error}/>
-                </div>
-            `
-        },
-
-        renderTitle() {
-            return html`
-                <span class="artwork-title">
-                    <span class="${this.title ? '' : 'invisible'}">
-                        ${this.title || "Loading..."}
-                    </span>
-                </span>
-            `
-        },
-
-        renderOwner() {
-            let ownerText  = this.author ? ["by", this.author].join(' ') : 'Loading...'
-            let ownerClass = this.author ? '' : 'invisible'
-            
-            return html`
-                <span class="artwork-owner ${ownerClass}">
-                    ${ownerText}
-                </span>
-                ${this.owned ? html`<span class="mine">mine</span>` : ``}
-            `
-        },
-
-        renderPrice() {
-            // if has price - just display it and return
-            if (this.price) {
-                let amount = (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
-                
-                // TODO: if owned && has price should be able to cancel or change price
-                //       probably not for the first version
-                if (this.owned) {
-                    return html`<span class="artwork-can-buy">
-                        <img src="./assets/icon-beam.svg"/>
-                        <span class="artwork-can-buy__amount">${amount}</span>
-                        <span class="artwork-can-buy__curr">BEAM</span>
-                        <${artButton} class="artwork-can-buy__button" onclick=${this.onChangePrice} type="change"/>
-                    </span>`
-                }
-                
-                // if not owned can only buy
-                return html`
-                    <span class="artwork-can-buy">
-                        <img src="./assets/icon-beam.svg"/>
-                        <span class="artwork-can-buy__amount">${amount}</span>
-                        <span class="artwork-can-buy__curr">BEAM</span>
-                        <${artButton} class="artwork-can-buy__button" onclick=${this.onBuy} type="buy"/>
-                    </span>
-                `
-            }
-
-            // doesn't have price and is own image
-            if (this.owned) {
-                return html`<${artButton} class="artwork-can-buy__button" onclick=${this.onSell} type="sell"/>`
-            }
-
-            // doesn't have price and is not own image
-            // means can be anything - not approved yet, not sold by
-            // owner &c. Just dispaly that it is not on sale
-            return html`<span class='not-on-sale'>Not for sale</span>`
-        },
-
         onBuy (ev) {
             ev.preventDefault()
-
             if (this.is_headless) {
                 this.$store.switchToHeaded()  
-            } else {
-                if (!this.in_tx) {
-                    this.$emit('buy', this.id)
-                }
+            } 
+            else {
+                this.$emit('buy', this.id)
             }
         },
 
         onSell (ev) {
             ev.preventDefault()
-            if (!this.in_tx) {
-                this.$emit('sell', this.id)
-            }
+            this.$emit('sell', this.id)
         },
 
         onLike (ev) {
             ev.preventDefault()
-            if (this.is_headless) {
+            if (this.is_headless) 
+            {
                 this.$store.switchToHeaded()  
-            } else {
+            } 
+            else {
                 if (this.can_vote) {
                     this.$emit('like', this.id)
                 }
@@ -231,16 +195,24 @@ export default {
             }
         },
 
+        showOnSaleMenu(ev) {
+            ev.preventDefault()
+            this.$refs.saleMenu.open(ev)
+        },
+
         onChangePrice (ev) {
             ev.preventDefault()
-            if (this.can_change_price) {
-                this.$emit('change_price', this.id)
-            }
+            this.$emit('change_price', this.id)
         },
 
         onDelete (ev) {
             ev.preventDefault()
             this.$emit("delete", this.id)
+        },
+
+        onRemoveFromSale(ev) {
+            ev.preventDefault()
+            this.$emit("remove_from_sale", this.id)
         }
     }
 }

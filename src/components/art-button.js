@@ -12,16 +12,10 @@ export default {
         }
     },
 
-    computed: {
-        in_tx () {
-            return this.$state.in_tx;
-        },
-    },
-
     render () {
         if (this.type === 'sell' || this.type === 'change' || this.type === 'buy') {
             return html`
-                <div class="button ${this.type} ${this.in_tx ? 'disabled' : ''}">
+                <div class="button ${this.type}">
                     <img src="./assets/icon-button.svg"/>
                     <span class="button__text">${this.type}</span>
                 </div>

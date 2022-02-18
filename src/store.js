@@ -24,7 +24,6 @@ function defaultState() {
         artists_count: 0,
         balance_beam: 0,
         balance_reward: 0,
-        in_tx: false,
         selected_artist: undefined,
         active_tab: tabs.ALL,
         is_popup_visible: false,

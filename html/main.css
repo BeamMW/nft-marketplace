@@ -247,7 +247,7 @@ pre {
     margin-left: 5px;
 }
 
-.artwork-owner {
+.artwork-author {
     font-size: 12px;
     color: rgba(255, 255, 255, .5);
     display: inline-block;
@@ -282,10 +282,10 @@ pre {
     margin-bottom: 3px;
 }
 
-.artwork-bottom-row {
+.artwork-price-row {
     min-height: 41px;
     margin: 10px 0 20px 0;
-    padding: 0 14px;
+    padding: 0 12px 0 14px;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -710,10 +710,6 @@ pre {
     cursor: default !important;
 }
 
-.invisible {
-    opacity: 0;
-}
-
 .paginator {
     display: flex;
     justify-content: center;
@@ -769,3 +765,36 @@ pre {
     cursor: auto;
     color: #00f6d2;
 }
+
+.artwork-can-buy__dots {
+    margin-left: auto;
+    cursor: pointer;
+    margin-right: -4px;
+}
+
+.popup-menu {
+    border-radius: 10px;
+    z-index: 999;
+    position: fixed;
+    outline: none;
+    padding: 10px 20px;
+
+}
+
+.popup-menu .item {
+    color: #fff;
+    padding: 6px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    line-height: normal !important;
+}
+
+.popup-menu .item:hover {
+    color: #00f6d2;
+}
+
+.popup-menu .item img {
+    margin-right: 10px;
+}
+
