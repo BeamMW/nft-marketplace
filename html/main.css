@@ -505,15 +505,15 @@ pre {
 }
 
 .popup {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  position: fixed;
-  top: 0%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
 }
 
 .popup .popup__content-key{

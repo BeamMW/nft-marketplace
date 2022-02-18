@@ -9,6 +9,7 @@ function defaultState() {
         error: undefined,
         shader: undefined,
         cid: contract.cid,
+        cid_checked: false,
         my_artist_keys: [],
         is_artist: false,
         is_admin: false,
@@ -101,29 +102,10 @@ export const store = {
                 this.state.shader = bytes
 
                 //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
-                utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, (err) => this.checkError(err))
+                utils.callApi("ev_subunsub", {ev_system_state: true}, (err) => this.checkError(err))
                 utils.invokeContract("role=manager,action=view", (...args) => this.onCheckCID(...args), this.state.shader)
             })
         })
-    },
-
-    refreshAllData () {
-        this.loadParams()
-    },
-
-    onCheckCID (err, res) {
-        if (err) {
-            return this.setError(err, "Failed to verify cid")     
-        }
-
-        if (!res.contracts.some(el => el.cid == this.state.cid)) {
-            throw `CID not found '${this.state.cid}'`
-        }
-
-        utils.invokeContract(
-            `role=artist,action=get_key,cid=${this.state.cid}`, 
-            (...args) => this.onGetArtistKeyCID(...args), this.shader
-        )
     },
 
     onShowMethods (err, res) {
@@ -131,26 +113,9 @@ export const store = {
         alert(utils.formatJSON(res))
     },
 
-    //
-    // Transactions
-    //
     onApiResult(err, res, full) {
         if (err) {
             return this.setError(err,  "API handling error")
-        }
-
-        if (full.id == 'ev_txs_changed') {   
-            let inTx = false            
-            let txs = full.result.txs
-            
-            for (let tx of txs) {
-                if (tx.status == 0 || tx.status == 1 || tx.status == 5) {
-                    inTx = true
-                    break
-                }
-            }
-
-            return
         }
 
         if (full.id == 'ev_system_state') {
@@ -162,9 +127,27 @@ export const store = {
         this.setError(full, "Unexpected API result")
     },
 
-    //
-    // Self info, balance & stuff
-    //
+    onCheckCID (err, res) {
+        if (err) {
+            return this.setError(err, "Failed to verify cid")     
+        }
+
+        if (!res.contracts.some(el => el.cid == this.state.cid)) {
+            throw `CID not found '${this.state.cid}'`
+        }
+
+        this.state.cid_checked = true
+        this.refreshAllData()
+    },
+
+    refreshAllData () {
+        // TODO: move loading sequence to promises, now loadBalance initiates update chain
+        utils.invokeContract(
+            `role=artist,action=get_key,cid=${this.state.cid}`, 
+            (...args) => this.onGetArtistKeyCID(...args), this.shader
+        )
+    },
+
     onGetArtistKeyCID(err, res) {
         if (err) {
             return this.setError(err, "Failed to get artist key")     
@@ -186,13 +169,6 @@ export const store = {
         
         utils.ensureField(res, "key", "string")
         this.state.my_artist_keys.push(res.key)
-        this.refreshAllData()
-    },
-
-    loadParams () {
-        // TODO: move loading sequence to promises, now loadBalance initiates update chain
-        //       do not chain functions, but execue promises arrayy
-        //       cancel all pending promises in new ev_system_state
         utils.invokeContract(
             `role=manager,action=view_params,cid=${this.state.cid}`, 
             (...args) => this.onLoadParams(...args)
@@ -208,10 +184,6 @@ export const store = {
         utils.ensureField(res, "voteReward_balance", "number")
         this.state.is_admin = true//!!res.Admin
         this.state.balance_reward = res.voteReward_balance
-        this.loadBalance()
-    },
-    
-    loadBalance() {
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
             (...args) => this.onLoadBalance(...args)
