@@ -13,17 +13,6 @@ html {
     width:       100%;
 }
 
-.error {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    height:          100%;
-    width:           100%;
-    overflow:        hidden;
-    word-break:      break-word;
-    color:           red;
-}
-
 .loading {
     display:         flex;
     align-items:     center;
@@ -34,11 +23,7 @@ html {
     word-break:      break-word;
 }
 
-pre {
-    font-family: 'SFProDisplay', sans-serif;
-    font-weight: normal;
-    white-space: pre-wrap;
-}
+
 
 .balance-container {
     display: flex;
@@ -373,7 +358,7 @@ pre {
 }
 
 .disabled {
-    opacity: 0.2;
+    opacity: 0.3;
     cursor: auto !important;
 }
 
@@ -676,7 +661,7 @@ pre {
 
 *[disabled="true"] {
     cursor: default !important;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .paginator {

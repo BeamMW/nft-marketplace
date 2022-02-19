@@ -1,4 +1,4 @@
-import App from './components/app.js'
+import App from './components/app.vue'
 import {store} from './store.js'
 import {router} from './router.js'
 import utils from './utils/utils.js'

@@ -103,7 +103,7 @@ export default {
                 <span class="artwork-title">{{title || "Loading..."}}</span>
                 
                 <!---- Likes ----->
-                <span class="artwork-likes pointer-cursor" v-on="{click: liked ? onUnlike : onLike}" :disabled="can_vote">
+                <span class="artwork-likes pointer-cursor" v-on="{click: liked ? onUnlike : onLike}" :disabled="!can_vote">
                     <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
                     <span class="artwork-likes__text">{{likes_cnt}}</span>
                 </span>

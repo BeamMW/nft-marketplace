@@ -11,6 +11,25 @@
   font-weight: 400;
 }
 
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/error.vue?vue&type=style&index=0&id=ea0f4bb0&scoped=true&lang=stylus ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.error[data-v-ea0f4bb0] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+  color: #c55b61;
+}
+.error pre[data-v-ea0f4bb0] {
+  font-family: 'SFProDisplay', sans-serif;
+  font-weight: normal;
+  white-space: pre-wrap;
+}
+
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/popup-menu.vue?vue&type=style&index=0&id=6326aff0&scoped=true&lang=stylus ***!
   \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -65,17 +84,6 @@ html {
     width:       100%;
 }
 
-.error {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    height:          100%;
-    width:           100%;
-    overflow:        hidden;
-    word-break:      break-word;
-    color:           red;
-}
-
 .loading {
     display:         flex;
     align-items:     center;
@@ -86,11 +94,7 @@ html {
     word-break:      break-word;
 }
 
-pre {
-    font-family: 'SFProDisplay', sans-serif;
-    font-weight: normal;
-    white-space: pre-wrap;
-}
+
 
 .balance-container {
     display: flex;
@@ -425,7 +429,7 @@ pre {
 }
 
 .disabled {
-    opacity: 0.2;
+    opacity: 0.3;
     cursor: auto !important;
 }
 
@@ -728,7 +732,7 @@ pre {
 
 *[disabled="true"] {
     cursor: default !important;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .paginator {
