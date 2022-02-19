@@ -2,6 +2,7 @@ const path = require('path')
 const html = require('html-webpack-plugin')
 const copy = require("copy-webpack-plugin")
 const extractCSS = require("mini-css-extract-plugin")
+const {VueLoaderPlugin} = require("vue-loader")
 
 const config = (DEV_MODE) => {return {
     entry: {
@@ -22,6 +23,28 @@ const config = (DEV_MODE) => {return {
     module: {
         rules: [
             {
+                test: /\.vue$/,
+                loader: 'vue-loader'
+            },
+            {
+                test: /\.styl(us)?$/i,
+                use: [
+                    extractCSS.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: DEV_MODE
+                        }
+                    },
+                    {
+                        loader: 'stylus-loader',
+                        options: {
+                            sourceMap: DEV_MODE
+                        }
+                    }
+                ],
+            },
+            {
                 test: /\.css$/i,
                 use: [
                     extractCSS.loader, 
@@ -36,8 +59,8 @@ const config = (DEV_MODE) => {return {
         ]
     },
     plugins: [
-        new extractCSS({ 
-        }),
+        new VueLoaderPlugin(),
+        new extractCSS(),
         new html({
             templateContent: ({htmlWebpackPlugin}) => `
                 <!DOCTYPE html>
@@ -74,14 +97,7 @@ const config = (DEV_MODE) => {return {
             ]
         })
     ],
-    devtool: DEV_MODE ? "eval-source-map" : undefined,
-    resolve: {
-        alias: {
-            // This is necessary for runtime template compilation
-            // when we user vue template in a pure js, not in a *.vue component
-            'vue': 'vue/dist/vue.esm-browser.js', 
-        }
-    }
+    devtool: DEV_MODE ? "eval-source-map" : undefined
 }}
 
 module.exports = (env, argv) => {

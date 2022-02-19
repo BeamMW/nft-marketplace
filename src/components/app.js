@@ -1,4 +1,4 @@
-import Loading from './loading.js'
+import Loading from './loading.vue'
 import ErrView from './error.js'
 
 export default {

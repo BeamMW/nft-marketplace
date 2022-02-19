@@ -1,13 +1,41 @@
+<template>
+  <div class="popup-menu" v-show="show" :style="style" tabindex="0">
+      <slot></slot>
+  </div>
+</template>
+
+<style scoped lang="stylus">
+  .popup-menu {
+      border-radius: 10px
+      z-index:  999
+      position: fixed
+      outline:  none
+      padding:  10px 20px
+
+      :slotted(.item) {
+        color: #fff
+        padding: 6px 0
+        cursor: pointer
+        display: flex
+        align-items: center
+        line-height: normal !important
+
+        &:hover {
+          color: #00f6d2;
+        }
+
+        &>img {
+          margin-right: 10px;
+        }
+      }
+  }
+</style>
+
+<script>
 import {nextTick} from 'vue'
 import utils from '../utils/utils.js'
 
 export default {
-  template:`
-    <div class="popup-menu" v-show="show" :style="style" tabindex="0">
-      <slot></slot>
-    </div>
-  `,
-
   data() {
     return {
       left: 0,
@@ -81,3 +109,4 @@ export default {
     }
   },
 }
+</script>

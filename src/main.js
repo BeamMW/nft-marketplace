@@ -2,7 +2,7 @@ import App from './components/app.js'
 import {store} from './store.js'
 import {router} from './router.js'
 import utils from './utils/utils.js'
-import {createApp, readonly} from 'vue'
+import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import "./styles/fonts.css"
 import "./styles/global.css"
 

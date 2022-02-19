@@ -2,7 +2,6 @@ import adminui from  './admin-ui.js'
 import artwork from  './artwork.js'
 import balance from  './balance.js'
 import headless from './headless.js'
-import warning from  './tx-warning.js'
 import artworksControls from './artworks-controls.js'
 import { popups, tabs, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
@@ -47,21 +46,10 @@ export default {
     },
 
     components: {
-        artwork, adminui, balance, warning, artworksControls, publicKeyPopup, headless, paginator
+        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator
     },
 
-  components: {
-    artwork,
-    adminui,
-    balance,
-    warning,
-    artworksControls,
-    publicKeyPopup,
-    headless,
-    paginator
-  },
-
-  template: `
+    template: `
         <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>

@@ -1,7 +1,7 @@
 import html from '../utils/html.js';
 import loading from './item-loading.js';
 import artButton from './art-button.js';
-import popupMenu from './popup-menu.js';
+import popupMenu from './popup-menu.vue'
 import { common } from '../utils/consts.js';
 import { nextTick } from 'vue';
 
