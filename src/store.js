@@ -418,7 +418,6 @@ export const store = {
     this.state.artworks[tabs.MINE] = mine;
     this.state.artworks[tabs.SOLD] = sold;
     this.state.filteredArtwors = { ...this.state.artworks };
-    console.log(this.state.filteredArtwors)
     this.state.loading = false;
     //this.sortArtWorks();
   },
