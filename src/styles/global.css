@@ -630,7 +630,7 @@ pre {
   outline: none;
   height: 47px;
   line-height: 47px;
-  min-width: 175px;
+  min-width: 20px;
   margin-left: auto;
 }
 
@@ -641,11 +641,10 @@ pre {
   padding-left: 1em;
   cursor: pointer;
   user-select: none;
-
   opacity: 0.7;
   font-size: 14px;
   font-weight: bold;
-  letter-spacing: 0.47px;
+  letter-spacing: normal;
 }
 
 .custom-select .selected.open {
@@ -737,9 +736,7 @@ pre {
   float: left;
   margin: 2px 6px 0 0;
 }
-.show {
-  display: block;
-}
+
 
 .menu-nav {
   margin-left: auto;
@@ -793,4 +790,16 @@ pre {
 }
 .sort-text{
   align-self: center;
+  color: #fff;
+  opacity: 0.5; 
+}
+
+.show{
+  display: flex;
+  margin-left: 200px;
+
+}
+
+.hide {
+  display: none;
 }

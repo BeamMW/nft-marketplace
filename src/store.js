@@ -16,6 +16,10 @@ const defaultState = () => {
       [tabs.ALL]: [],
     },
     artists: {},
+    authors: [],
+    filteredArtwors: {
+      [tabs.ALL]: [],
+    },
     artists_count: 0,
     balance_beam: 0,
     balance_reward: 0,
@@ -348,7 +352,8 @@ export const store = {
       sale = [],
       liked = [],
       mine = [],
-      sold = [];
+      sold = [],
+      allAuthors = [];
 
     for (let artwork of res.items) {
       let oldArtwork = this.state.artworks[tabs.ALL].find((item) => {
@@ -372,8 +377,8 @@ export const store = {
       }
 
       artwork["author"] = (this.state.artists[artwork.pk_author] || {}).label;
+      allAuthors.push(artwork["author"]);
       all.push(artwork);
-
       // MINE is what I own
       if (artwork.owned) {
         mine.push(artwork);
@@ -400,13 +405,20 @@ export const store = {
         this.loadArtwork(all.length - 1, artwork.id);
       }
     }
+    function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index;
+    }
 
+    allAuthors = allAuthors.filter(onlyUnique);
     // TODO: need to find a way to optimize this
+    this.state.authors = allAuthors;
     this.state.artworks[tabs.ALL] = all;
     this.state.artworks[tabs.SALE] = sale;
     this.state.artworks[tabs.LIKED] = liked;
     this.state.artworks[tabs.MINE] = mine;
     this.state.artworks[tabs.SOLD] = sold;
+    this.state.filteredArtwors = { ...this.state.artworks };
+    console.log(this.state.filteredArtwors)
     this.state.loading = false;
     //this.sortArtWorks();
   },
@@ -452,6 +464,20 @@ export const store = {
       default:
         break;
     }
+  },
+
+  filterByAuthor(selectedAuthor) {
+    let tabAll = [...this.state.filteredArtwors[tabs.ALL]];
+    
+    this.state.artworks[tabs.ALL] = tabAll.filter(
+      (artwork) => {
+        if(selectedAuthor === "Everyone") {
+          return artwork.author;
+        } else {
+         return  artwork.author === selectedAuthor
+        }
+      }
+    );
   },
 
   setActiveTab(id) {

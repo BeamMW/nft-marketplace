@@ -7,6 +7,9 @@ export default {
     active_tab() {
       return this.$state.active_tab;
     },
+    authors() {
+      return this.$state.authors;
+    },
   },
 
   components: {
@@ -24,7 +27,6 @@ export default {
       "Likes: Low to High",
       "Likes: High to Low",
     ];
-
     //TODO: catch event from custom-select
     return html`
       <div class="actions-container">
@@ -37,9 +39,19 @@ export default {
             ${this.renderTab(tabs.LIKED, "LIKED")}
           </div>
           <${CustomSelect}
+            options=${["Everyone", ...this.authors]}
+            default="Everyone"
+            name="Author"
+            key="Filter"
+            class="select ${this.active_tab === 0 && this.authors.length !== 1
+              ? " show"
+              : " hide"}"
+          />
+          <${CustomSelect}
             options=${selectorOptions}
             default="Added: Newest to Oldest"
             class="select"
+            key="Sort"
           />
         </div>
       </div>
@@ -77,6 +89,9 @@ export default {
           </span>
         `;
       }
+    },
+    openDropdown() {
+      this.$refs.dropdown.open();
     },
   },
 };
