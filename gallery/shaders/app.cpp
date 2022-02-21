@@ -12,16 +12,12 @@
     macro(ContractID, cid) \
     macro(PubKey, pkArtist)
 
-#define Gallery_manager_set_artist(macro) \
+#define Gallery_manager_manage_artist(macro) \
     macro(ContractID, cid) \
     macro(PubKey, pkArtist) \
     macro(uint32_t, bEnable)
 
 #define Gallery_manager_view_balance(macro)  macro(ContractID, cid)
-
-#define Gallery_manager_upload(macro) \
-    macro(ContractID, cid) \
-    macro(PubKey, pkArtist)
 
 #define Gallery_manager_add_rewards(macro) \
     macro(ContractID, cid) \
@@ -40,9 +36,8 @@
     macro(manager, view_params) \
     macro(manager, view_artists) \
     macro(manager, view_artist) \
-    macro(manager, set_artist) \
+    macro(manager, manage_artist) \
     macro(manager, view_balance) \
-    macro(manager, upload) \
     macro(manager, add_rewards) \
     macro(manager, my_admin_key) \
     macro(manager, explicit_upgrade) \
@@ -51,9 +46,13 @@
 #define Gallery_artist_view(macro) macro(ContractID, cid)
 #define Gallery_artist_get_key(macro) macro(ContractID, cid)
 
+#define Gallery_artist_upload(macro) \
+    macro(ContractID, cid) \
+
 #define GalleryRole_artist(macro) \
     macro(artist, view) \
     macro(artist, get_key) \
+    macro(artist, upload) \
 
 #define Gallery_user_view_item(macro) \
     macro(ContractID, cid) \
@@ -94,11 +93,15 @@
     macro(Gallery::Masterpiece::ID, id) \
     macro(uint32_t, val) \
 
+#define Gallery_user_become_artist(macro) \
+    macro(ContractID, cid) \
+
 #define GalleryRole_user(macro) \
     macro(user, view_item) \
     macro(user, view_items) \
     macro(user, download) \
     macro(user, set_price) \
+    macro(user, become_artist) \
     macro(user, transfer) \
     macro(user, buy) \
     macro(user, view_balance) \
@@ -244,6 +247,7 @@ struct MyArtist
     {
         Env::DocAddText("label", m_szLabel);
         Env::DocAddNum("hReg", m_hRegistered);
+        Env::DocAddNum32("isApproved", is_approved);
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artist::Key>& key)
@@ -316,45 +320,29 @@ ON_METHOD(manager, view_artist)
     PrintArtist(cid, pkArtist, true);
 }
 
-ON_METHOD(manager, set_artist)
+ON_METHOD(manager, manage_artist)
 {
-    struct {
-        Gallery::Method::ManageArtist args;
-        char m_szLabel[Gallery::Artist::s_LabelMaxLen + 1];
-    } d;
+    Gallery::Method::ManageArtist args;
 
-    d.args.m_pkArtist = pkArtist;
+    args.m_pkArtist = pkArtist;
 
-    uint32_t nArgSize = sizeof(d.args);
+    args.req = bEnable ?
+        Gallery::Method::ManageArtist::RequestType::APPROVE :
+        Gallery::Method::ManageArtist::RequestType::DELETE;
 
-    if (bEnable)
-    {
-        uint32_t nSize = Env::DocGetText("label", d.m_szLabel, _countof(d.m_szLabel)); // including 0-term
-        if (nSize <= 1)
-        {
-            OnError("label required");
-            return;
-        }
-
-        if (nSize > _countof(d.m_szLabel))
-        {
-            OnError("label too long");
-            return;
-        }
-
-        d.args.m_LabelLen = nSize - 1;
-        nArgSize += d.args.m_LabelLen;
-    }
-    else
-        d.args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
-
+    args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
 
     KeyMaterial::MyAdminKey kid;
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &kid, 1, "Gallery set artist", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery manage artist", 0);
 }
 
-ON_METHOD(manager, upload)
+ON_METHOD(artist, upload)
 {
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey pkArtist;
+    km.Get(pkArtist);
+
     auto nDataLen = Env::DocGetBlob("data", nullptr, 0);
     if (!nDataLen)
     {
@@ -374,9 +362,15 @@ ON_METHOD(manager, upload)
         return;
     }
 
+    /*
     SigRequest sig;
     sig.m_pID = KeyMaterial::g_szAdmin;
     sig.m_nID = sizeof(KeyMaterial::g_szAdmin) - sizeof(char);
+    */
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
 
     // estimate charge, it may be non-negligible.
     // - Patent verification: LoadVar + SaveVar, 25K units
@@ -542,6 +536,46 @@ ON_METHOD(manager, view_balance)
         }
     }
     wlk.PrintTotals();
+}
+
+ON_METHOD(user, become_artist)
+{
+    struct {
+        Gallery::Method::ManageArtist args;
+        char m_szLabel[Gallery::Artist::s_LabelMaxLen + 1];
+    } d;
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey pkArtist;
+    km.Get(pkArtist);
+
+    d.args.m_pkArtist = pkArtist;
+    d.args.req = Gallery::Method::ManageArtist::RequestType::CREATE;
+
+    uint32_t nArgSize = sizeof(d.args);
+
+    uint32_t nSize = Env::DocGetText("label", d.m_szLabel, _countof(d.m_szLabel)); // including 0-term
+    if (nSize <= 1)
+    {
+        OnError("label required");
+        return;
+    }
+
+    if (nSize > _countof(d.m_szLabel))
+    {
+        OnError("label too long");
+        return;
+    }
+
+    d.args.m_LabelLen = nSize - 1;
+    nArgSize += d.args.m_LabelLen;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Gallery set artist", 0);
 }
 
 ON_METHOD(user, download)

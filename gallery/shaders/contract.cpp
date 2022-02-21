@@ -92,24 +92,48 @@ BEAM_EXPORT void Method_2(void*)
 
 BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 {
+    using ArtistReqType = Gallery::Method::ManageArtist::RequestType;
+
     Gallery::Artist::Key ak;
     _POD_(ak.m_pkUser) = r.m_pkArtist;
 
+    // call from user:become_artist
     if (r.m_LabelLen <= Gallery::Artist::s_LabelMaxLen)
     {
+        Env::Halt_if(r.req != ArtistReqType::CREATE);
+
         struct ArtistPlus : public Gallery::Artist {
             char m_szLabel[s_LabelMaxLen];
         } a;
 
+        a.is_approved = false;
         a.m_hRegistered = Env::get_Height();
         Env::Memcpy(a.m_szLabel, &r + 1, r.m_LabelLen);
 
         Env::Halt_if(Env::SaveVar(&ak, sizeof(ak), &a, sizeof(Gallery::Artist) + r.m_LabelLen, KeyTag::Internal)); // will fail if already exists
-    } else
-        Env::Halt_if(!Env::DelVar_T(ak)); // will fail if doesn't exist
+        Env::AddSig(r.m_pkArtist);
+    } else { // call from manager:manage_artist
+        switch (r.req) {
+        case ArtistReqType::APPROVE: {
+            struct ArtistPlus : public Gallery::Artist {
+                char m_szLabel[s_LabelMaxLen];
+            } a;
 
-    MyState s;
-    s.AddSigAdmin();
+            uint32_t artist_size = Env::LoadVar_T(ak, a);
+            a.is_approved = true;
+            Env::SaveVar(&ak, sizeof(ak), &a, artist_size, KeyTag::Internal); // will fail if already exists
+            break;
+        }
+        case ArtistReqType::DELETE:
+            Env::Halt_if(!Env::DelVar_T(ak)); // will fail if doesn't exist
+            break;
+        default:
+            Env::Halt();
+        }
+
+        MyState s;
+        s.AddSigAdmin();
+    }
 }
 
 BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
@@ -143,7 +167,8 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     Env::SaveVar_T(ssmk, m);
     Env::SaveVar_T(fsmk, ssmk.h_last_updated);
 
-    s.AddSigAdmin();
+    //s.AddSigAdmin();
+    Env::AddSig(r.m_pkArtist);
 
     Gallery::Events::Add::Key eak;
     eak.m_ID = ssmk.m_ID;
@@ -160,7 +185,6 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
         nData -= nMaxEventSize;
         pData += nMaxEventSize;
     }
-    
 }
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
