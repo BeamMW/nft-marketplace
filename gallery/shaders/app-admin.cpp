@@ -95,6 +95,9 @@ ON_METHOD(manager, view)
 {
     static const ShaderID s_pSid[] = {
         Gallery::s_SID_0,
+        Gallery::s_SID_1,
+        Gallery::s_SID_2,
+        Gallery::s_SID_3,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
