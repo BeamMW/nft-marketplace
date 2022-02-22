@@ -84,7 +84,7 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val;
-        //this.sortArtWorks();
+        this.sortArtWorks();
     },
 
     //
@@ -795,5 +795,6 @@ export const store = {
     setActiveTab(id) {
         this.state.active_tab = id
         this.setCurrentPage(1)
+        this.sortArtWorks();
     }
 }
