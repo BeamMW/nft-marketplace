@@ -354,6 +354,7 @@ export const store = {
         this.state.loading = false
         let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
         this.setCurrentPage(currPage)
+        this.sortArtWorks();
     },
 
     sortArtWorks() {
@@ -361,27 +362,38 @@ export const store = {
 
         switch(this.state.sort_by) {
             case sort.CREATOR_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author > b.author? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id > b.id? 1 : -1);
                 break;
             case sort.CREATOR_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author < b.author? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id < b.id? 1 : -1);
                 break;
             case sort.PRICE_ASC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
-                    if (a.price !== undefined && b.price !== undefined) {
-                        return a.price.amount > b.price.amount? 1 : -1;
-                    } 
-                });
+                    if(a.price === undefined || a.price.amount === undefined) {
+                        return 1;
+                    }
+                     if(b.price === undefined || b.price.amount === undefined) {
+                         return -1;
+                     }
+                    return  a.price.amount > b.price.amount ? 1 : -1
+                    });
                 break;
             case sort.PRICE_DESC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
-                    if (a.price !== undefined && b.price !== undefined) {
-                        return a.price.amount < b.price.amount? 1 : -1;
-                    } 
-                });
+                    if(a.price === undefined || a.price.amount === undefined) {
+                        return 1;
+                    }
+                     if(b.price === undefined || b.price.amount === undefined) {
+                         return -1;
+                     }
+                    return  a.price.amount < b.price.amount ? 1 : -1
+                    });
                 break;
             case sort.LIKES_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions > b.impressions? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                    console.log(a.impressions > b.impressions? 1 : -1)
+                    return a.impressions > b.impressions? 1 : -1
+                    });
                 break;
             case sort.LIKES_DESC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions < b.impressions? 1 : -1);

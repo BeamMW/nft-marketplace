@@ -121,7 +121,7 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 100%;
+    width: 94%;
 }
 
 .artworks-controls__tabs {
@@ -724,5 +724,95 @@ html {
     margin-left: auto;
     cursor: pointer;
     margin-right: -4px;
+}
+
+.admin_input,.admin_select,.admin_span{
+    font-size: 18px;
+}
+
+
+.sort-container {
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+}
+.sort-text{
+    align-self: center;
+    color: #fff;
+    opacity: 0.5; 
+}
+  
+  .show {
+    display: flex;
+    margin-left: 200px; 
+}
+  
+  .hide {
+    display: none;
+}
+
+.custom-select {
+    position: relative;
+    display: flex;
+    text-align: left;
+    outline: none;
+    height: 47px;
+    line-height: 47px;
+    min-width: 20px;
+    margin-left: auto;
+}
+  
+  .custom-select .selected {
+    background-color: transparent;
+    border-radius: 6px;
+    color: #fff;
+    padding-left: 1em;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: normal;
+}
+  
+  .custom-select .selected.open {
+    border: none;
+}
+  
+  .custom-select .selected:after {
+    position: absolute;
+    content: "";
+    top: 22px;
+    right: -16px;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-color: #fff transparent transparent transparent;
+}
+  
+  .custom-select .items {
+    color: #fff;
+    overflow: hidden;
+    position: absolute;
+    border:none;
+    border-radius: 4px;
+    font-size: 16px;
+    left: -50px;
+    right: 0;
+    z-index: 1;
+    margin-top: 40px;
+    min-width:200px;
+}
+  
+  .custom-select .items div {
+    color: #fff;
+    padding: 15px 0 15px 1em;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+  
+  .custom-select .items div:hover {
+    color: #00f6d2;
 }
 

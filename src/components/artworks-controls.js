@@ -27,12 +27,12 @@ export default {
 
     render () {
         const selectorOptions = [
-            'Creator: A to Z',
-            'Creator: Z to A',
-            'Price: Low to High',
-            'Price: High to Low',
-            'Likes: Low to High',
-            'Likes: High to Low'
+            "Added: Newest to Oldest",
+            "Added: Oldest to Newest",
+            "Price: Low to High",
+            "Price: High to Low",
+            "Likes: Low to High",
+            "Likes: High to Low",
         ];
 
         //TODO: catch event from custom-select
@@ -46,6 +46,12 @@ export default {
                         ${this.sold_tab_state ? this.renderTab(tabs.SOLD, 'SOLD') : null}
                         ${this.liked_tab_state ? this.renderTab(tabs.LIKED, 'LIKED') : null}
                     </div>
+                  <${CustomSelect}
+                    options=${selectorOptions}
+                    default="Added: Newest to Oldest"
+                    class="select"
+                    key="Sort"
+                  />
                 </div>
             </div>
         `;
