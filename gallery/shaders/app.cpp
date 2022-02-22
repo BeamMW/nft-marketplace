@@ -6,7 +6,9 @@
 
 #define Gallery_manager_view(macro)
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
-#define Gallery_manager_view_artists(macro) macro(ContractID, cid)
+#define Gallery_manager_view_artists(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
 
 #define Gallery_manager_view_artist(macro) \
     macro(ContractID, cid) \
@@ -190,6 +192,10 @@ ON_METHOD(manager, view)
         Gallery::s_SID_1,
         Gallery::s_SID_2,
         Gallery::s_SID_3,
+        Gallery::s_SID_4,
+        Gallery::s_SID_5,
+        Gallery::s_SID_6,
+        Gallery::s_SID_7,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -253,7 +259,7 @@ struct MyArtist
         Env::DocAddNum32("isApproved", is_approved);
     }
 
-    bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artist::Key>& key)
+    bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artist::SecondStageKey>& key)
     {
         while (true)
         {
@@ -274,53 +280,56 @@ struct MyArtist
 };
 #pragma pack (pop)
 
-ON_METHOD(manager, view_artists)
+bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool bFindAll, bool bMustFind)
 {
-    Env::Key_T<Gallery::Artist::Key> k0, k1;
+    Env::Key_T<Gallery::Artist::SecondStageKey> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
     _POD_(k1.m_Prefix.m_Cid) = cid;
-    _POD_(k0.m_KeyInContract.m_pkUser).SetZero();
-    _POD_(k1.m_KeyInContract.m_pkUser).SetObject(0xff);
 
-    Env::DocArray gr0("artists");
+    if (bFindAll) {
+        _POD_(k0.m_KeyInContract.m_pkUser).SetZero();
+        _POD_(k1.m_KeyInContract.m_pkUser).SetObject(0xff);
+    } else {
+        _POD_(k0.m_KeyInContract.m_pkUser) = pkArtist;
+        _POD_(k1.m_KeyInContract.m_pkUser) = pkArtist;
+    }
+    k0.m_KeyInContract.h_last_updated = bFindAll ? Utils::FromBE(h0) : 0;
+    k1.m_KeyInContract.h_last_updated = static_cast<Height>(-1);
 
     Env::VarReader r(k0, k1);
-    while (true)
-    {
-        MyArtist a;
-        if (!a.ReadNext(r, k0))
-            break;
+    MyArtist a;
+    if (bFindAll) {
+        Env::DocArray gr0("artists");
 
-        Env::DocGroup gr1("");
+        while (true) {
+            if (!a.ReadNext(r, k0))
+                break;
 
-        Env::DocAddBlob_T("key", k0.m_KeyInContract.m_pkUser);
+            Env::DocGroup gr1("");
+            Env::DocAddBlob_T("key", k0.m_KeyInContract.m_pkUser);
+            Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+            a.Print();
+        }
+    } else {
+        if (!a.ReadNext(r, k0)) {
+            if (bMustFind)
+                OnError("not found");
+            return false;
+        }
         a.Print();
     }
+
+    return true;
 }
 
-bool PrintArtist(const ContractID& cid, const PubKey& pkArtist, bool bMustFind)
+ON_METHOD(manager, view_artists)
 {
-    Env::Key_T<Gallery::Artist::Key> key;
-    _POD_(key.m_Prefix.m_Cid) = cid;
-    _POD_(key.m_KeyInContract.m_pkUser) = pkArtist;
-
-    Env::VarReader r(key, key);
-
-    MyArtist a;
-    if (a.ReadNext(r, key))
-    {
-        a.Print();
-        return true;
-    }
-
-    if (bMustFind)
-        OnError("not found");
-    return false;
+    PrintArtists(cid, PubKey{}, h0, true, false);
 }
 
 ON_METHOD(manager, view_artist)
 {
-    PrintArtist(cid, pkArtist, true);
+    PrintArtists(cid, pkArtist, 0, false, true);
 }
 
 ON_METHOD(manager, manage_artist)
@@ -336,7 +345,7 @@ ON_METHOD(manager, manage_artist)
     args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
 
     KeyMaterial::MyAdminKey kid;
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery manage artist", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery manage artist", 120000);
 }
 
 ON_METHOD(artist, upload)
@@ -365,12 +374,6 @@ ON_METHOD(artist, upload)
         return;
     }
 
-    /*
-    SigRequest sig;
-    sig.m_pID = KeyMaterial::g_szAdmin;
-    sig.m_nID = sizeof(KeyMaterial::g_szAdmin) - sizeof(char);
-    */
-
     SigRequest sig;
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
@@ -389,6 +392,7 @@ ON_METHOD(artist, upload)
         Env::Cost::LoadVar_For(sizeof(Gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(Gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(Gallery::Artist)) +
+        Env::Cost::LoadVar_For(sizeof(Gallery::Artist::SecondStageKey)) +
         Env::Cost::SaveVar_For(sizeof(Gallery::Masterpiece)) +
         Env::Cost::SaveVar_For(sizeof(Height)) +
         Env::Cost::AddSig +
@@ -625,13 +629,13 @@ ON_METHOD(artist, view)
     PubKey pk;
     km.Get(pk);
 
-    if (PrintArtist(cid, pk, false))
+    if (PrintArtists(cid, pk, 0, false, false))
         return;
 
     // try workaround
     km.SetCid();
     km.Get(pk);
-    PrintArtist(cid, pk, true);
+    PrintArtists(cid, pk, 0, false, true);
 
 }
 

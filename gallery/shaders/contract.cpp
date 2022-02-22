@@ -94,12 +94,14 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 {
     using ArtistReqType = Gallery::Method::ManageArtist::RequestType;
 
-    Gallery::Artist::Key ak;
-    _POD_(ak.m_pkUser) = r.m_pkArtist;
+    Gallery::Artist::FirstStageKey fsak;
+    _POD_(fsak.m_pkUser) = r.m_pkArtist;
 
     struct ArtistPlus : public Gallery::Artist {
         char m_szLabel[s_LabelMaxLen];
     } a;
+
+    Gallery::Artist::SecondStageKey ssak;
 
     // call from user:become_artist
     if (r.m_LabelLen <= Gallery::Artist::s_LabelMaxLen)
@@ -108,18 +110,31 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
         a.is_approved = false;
         a.m_hRegistered = Env::get_Height();
         Env::Memcpy(a.m_szLabel, &r + 1, r.m_LabelLen);
-        Env::Halt_if(Env::SaveVar(&ak, sizeof(ak), &a, sizeof(Gallery::Artist) + r.m_LabelLen, KeyTag::Internal)); // will fail if already exists
+
+        Gallery::Artist::SecondStageKey ssak;
+        _POD_(ssak.m_pkUser) = r.m_pkArtist;
+        ssak.h_last_updated = Utils::FromBE(a.m_hRegistered);
+
+        Env::Halt_if(Env::SaveVar_T(fsak, ssak));
+        Env::SaveVar(&ssak, sizeof(ssak), &a, sizeof(Gallery::Artist) + r.m_LabelLen, KeyTag::Internal); // will fail if already exists
         Env::AddSig(r.m_pkArtist);
     } else { // call from manager:manage_artist
+        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
         switch (r.req) {
         case ArtistReqType::APPROVE: {
-            uint32_t artist_size = Env::LoadVar(&ak, sizeof(ak), &a, sizeof(a), KeyTag::Internal);
+            uint32_t artist_size = Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
+            Env::DelVar_T(ssak);
+
             a.is_approved = true;
-            Env::SaveVar(&ak, sizeof(ak), &a, artist_size, KeyTag::Internal); // will fail if already exists
+            ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+
+            Env::SaveVar_T(fsak, ssak);
+            Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
             break;
         }
         case ArtistReqType::DELETE:
-            Env::Halt_if(!Env::DelVar_T(ak)); // will fail if doesn't exist
+            Env::Halt_if(!Env::DelVar_T(ssak));
+            Env::Halt_if(!Env::DelVar_T(fsak));
             break;
         default:
             Env::Halt();
@@ -150,11 +165,17 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 
     {
         // verify artist
-        Gallery::Artist::Key ak;
-        _POD_(ak.m_pkUser) = r.m_pkArtist;
+        Gallery::Artist::FirstStageKey fsak;
+        _POD_(fsak.m_pkUser) = r.m_pkArtist;
 
-        Gallery::Artist a;
-        Env::Halt_if(!Env::LoadVar(&ak, sizeof(ak), &a, sizeof(a), KeyTag::Internal));
+        Gallery::Artist::SecondStageKey ssak;
+        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
+
+        struct ArtistPlus : public Gallery::Artist {
+            char m_szLabel[s_LabelMaxLen];
+        } a;
+
+        Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
         Env::Halt_if(!a.is_approved);
     }
 
@@ -162,7 +183,6 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     Env::SaveVar_T(ssmk, m);
     Env::SaveVar_T(fsmk, ssmk.h_last_updated);
 
-    //s.AddSigAdmin();
     Env::AddSig(r.m_pkArtist);
 
     Gallery::Events::Add::Key eak;
