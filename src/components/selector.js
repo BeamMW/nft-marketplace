@@ -7,22 +7,23 @@ export default {
           type: Array,
           required: true,
         },
-        default: {
-          type: String,
+        selected: {
+          type: Number,
           required: false,
-          default: null,
+          default: 0,
         },
         tabindex: {
           type: Number,
           required: false,
           default: 0,
         },
-        name: {
+        title: {
             type: String,
             required: false,
-            default: "Sort by",
+            default: "",
         },
       },
+
 
       computed: {
         active_tab() {
@@ -31,40 +32,30 @@ export default {
         style() {
           return {
             "background-color": utils.getStyles().background_popup,
+             "width": this.title === "Sort by" ? "200px" : "100px"
           }
         }
       },
 
-      },
     data() {
         return {
-            selected: this.default
-            ? this.default
-            : this.options.length > 0
-            ? this.options[0]
-            : null,
             show: false,
         };
     },
-
-    mounted() {
-        this.$emit("input", this.selected);
-        const { background_popup } = utils.getStyles();
-            
-        document.getElementById('selector-items').style.backgroundColor = background_popup;
-    },
+    emits: ['sort_by'],
 
     template: `
-    <div class="sort-container" :id="name">
-    <span class="sort-text">{{name}}</span>
+    <div class="sort-container">
+    <span class="sort-text">{{title}}</span>
     <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
         <div class="selected" :class="{ open: show }" @click="open">
-            {{ selected }}
+            {{ options[selected].name }}
         </div>
         <div class="items" v-show="show"  :style="style">
             <div v-for="(option, i) of options || []" :key="i"
-            @click="selected = option; show = false; onSelected(i, option);">
-                {{ option }}
+            
+            @click="onSelected(i,option)">
+                {{ option.name }}
             </div>
         </div>
       </div>
@@ -72,9 +63,11 @@ export default {
     `,
 
     methods: {
-        onSelected(val) {
-            this.$store.setSortBy(val);
-          },
+        onSelected(idx,opt) {
+          this.selected = idx;
+          this.$emit('sort_by',opt)
+          this.show = false;
+        },
           close() {
             this.show = false;
           },
@@ -103,6 +96,5 @@ export default {
               document.addEventListener("scroll", scrollAway, true);
             });
           },
-        }
     }
 }

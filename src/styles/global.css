@@ -148,7 +148,7 @@ html {
     background-color: #00f6d2;
 }
 
-.tab-active {
+.tabActive {
     color: #fff;
 }
 
@@ -797,11 +797,10 @@ html {
     border:none;
     border-radius: 4px;
     font-size: 16px;
-    left: -50px;
+    left: -20px;
     right: 0;
     z-index: 1;
     margin-top: 40px;
-    min-width:200px;
 }
   
   .custom-select .items div {
