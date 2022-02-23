@@ -81,6 +81,7 @@ export default {
         
         onSortBy(opt) {
             this.$store.setSortBy(opt.sort_type);
+            this.$parent.$refs.artslist.scrollTop = 0
         },
     }
 }

@@ -405,12 +405,13 @@ export const store = {
                 break;
             case sort.LIKES_ASC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
-                    console.log(a.impressions > b.impressions? 1 : -1)
                     return a.impressions > b.impressions? 1 : -1
                     });
                 break;
             case sort.LIKES_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions < b.impressions? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                    return a.impressions < b.impressions? 1 : -1
+                 });
                 break;
             default:
               break;

@@ -886,4 +886,8 @@ html {
     color: #00f6d2;
 }
 
-
+.highlightLine{
+    font-size: 14px;
+    font-weight: bold;
+    color: #00f6d2;
+}

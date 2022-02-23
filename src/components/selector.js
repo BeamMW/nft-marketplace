@@ -39,6 +39,7 @@ export default {
 
     data() {
         return {
+            selected_option: this.selected,
             show: false,
         };
     },
@@ -49,13 +50,12 @@ export default {
     <span class="sort-text">{{title}}</span>
     <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
         <div class="selected" :class="{ open: show }" @click="open">
-            {{ options[selected].name }}
+            {{ options[selected_option].name }}
         </div>
         <div class="items" v-show="show"  :style="style">
             <div v-for="(option, i) of options || []" :key="i"
-            
             @click="onSelected(i,option)">
-                {{ option.name }}
+                <span :class="{ highlightLine: selected_option === i}">{{ option.name }}</span>
             </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default {
 
     methods: {
         onSelected(idx,opt) {
-          this.selected = idx;
+          this.selected_option = idx;
           this.$emit('sort_by',opt)
           this.show = false;
         },
