@@ -20,11 +20,11 @@ export default {
     template: `
         <div class="admin-column">
             <div class="admin-row">
-                <input type="button" value="Add new artist" v-on:click.native="onAddArtist"  class="admin_input"/>
-                <span v-if="!artists_count"  class="admin_span">Add artists to upload artworks</span>
-                <span v-else  class="admin_span">
-                    <span  class="admin_span">Upload for artist:&nbsp;&nbsp;</span>
-                    <select class="admin_select" v-model="$state.selected_artist">
+                <input type="button" value="Add new artist" v-on:click.native="onAddArtist"/>
+                <span v-if="!artists_count">Add artists to upload artworks</span>
+                <span v-else>
+                    <span>Upload for artist:&nbsp;&nbsp;</span>
+                    <select class="upload_artist" v-model="$state.selected_artist">
                         <option v-for="artist in artists" v-bind:value="{key: artist.key, label: artist.label}">
                             {{artist.label}} - {{artist.key.substring(0, 4)}}..{{artist.key.slice(-4)}}
                         </option>
@@ -34,15 +34,14 @@ export default {
                         v-on:change.native="onUploadArtwork"
                         :disabled="!$state.selected_artist"
                         onclick="this.value=null;"
-                        class="admin_input"
                     />
                 </span>
             </div>
             <div class="admin-row">
-                <span class="admin_span">Rewards left: {{balance_reward}}</span>&nbsp;&nbsp;&nbsp;
-                <input type="button" value="Add Rewards" v-on:click.native="onAddRewards"  class="admin_input"/>
-                <input type="button" value="Show Stats" v-on:click.native="onStats" :disabled="pending_artworks != 0"  class="admin_input"/>
-                <span v-if="pending_artworks"  class="admin_span">Artworks to load: {{pending_artworks}}</span>
+                <span>Rewards left: {{balance_reward}}</span>&nbsp;&nbsp;&nbsp;
+                <input type="button" value="Add Rewards" v-on:click.native="onAddRewards"/>
+                <input type="button" value="Show Stats" v-on:click.native="onStats" :disabled="pending_artworks != 0"/>
+                <span v-if="pending_artworks">Artworks to load: {{pending_artworks}}</span>
             </div>
         </div>
         `,

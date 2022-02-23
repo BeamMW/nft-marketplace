@@ -278,8 +278,7 @@ export const store = {
         } 
         // END OF NOT OPTIMIZED
         this.state.artists_count = res.artists.length
-        this.loadArtworks()
-        
+        this.loadArtworks() 
     },
 
     //
@@ -431,6 +430,7 @@ export const store = {
     },
 
     loadArtwork(tab, idx, id) {
+        console.log('Load Artwork: ', id)
         this.state.pending_artworks++
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
@@ -815,9 +815,8 @@ export const store = {
 
     setActiveTab(id) {
         this.state.active_tab = id
+        this.sortArtWorks()
         this.setCurrentPage(1)
-        this.sortArtWorks();
-
     },
 
     filterByAuthor(selectedAuthor) {

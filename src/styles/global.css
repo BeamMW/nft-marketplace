@@ -148,7 +148,7 @@ html {
     background-color: #00f6d2;
 }
 
-.tabActive {
+.tab-active {
     color: #fff;
 }
 
@@ -663,11 +663,6 @@ html {
     cursor: pointer;
     margin-right: -4px;
 }
-
-.admin_input,.admin_select,.admin_span{
-    font-size: 18px;
-}
-
 
 .selector-container {
     margin-left: auto;

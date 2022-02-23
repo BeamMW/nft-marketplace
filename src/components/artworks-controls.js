@@ -57,7 +57,7 @@ export default {
         <div class="actions-container">
             <div class="artworks-controls">
                 <div class="artworks-controls__tabs">
-                    <span v-for="(tab,i) of tabs_sort_by" class="tab-item" :class="{ tabActive: active_tab === tab.id}" @click="onTabClicked(tab.id)">
+                    <span v-for="(tab,i) of tabs_sort_by" class="tab-item" :class="{ 'tab-active': active_tab === tab.id}" @click="onTabClicked(tab.id)">
                         <div class="tab-item__title">{{tab.name}}</div>
                         <div v-if="active_tab === tab.id" class="tab-item__bottom-line"></div>
                     </span>
