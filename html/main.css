@@ -192,7 +192,7 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 94%;
+    width: 100%;
 }
 
 .artworks-controls__tabs {
@@ -780,12 +780,12 @@ html {
 }
 
 
-.sort-container {
+.selector-container {
     margin-left: auto;
     display: flex;
     justify-content: center;
 }
-.sort-text{
+.selector-title{
     align-self: center;
     color: #fff;
     opacity: 0.5; 
@@ -867,4 +867,10 @@ html {
     font-size: 14px;
     font-weight: bold;
     color: #00f6d2;
+}
+
+.artwork-controls__selectors{
+    display: flex;
+    margin-left: auto;
+    padding-right: 20px;
 }

@@ -62,19 +62,21 @@ export default {
                         <div v-if="active_tab === tab.id" class="tab-item__bottom-line"></div>
                     </span>
                 </div>
-                <selector
-                    v-on:sort_by="onSortBy"
-                    :options="authors"
-                    :selected="active_sort_by"
-                    title="Author"
-                    v-if="authors.length > 1"
-                 />
-                <selector
-                    v-on:sort_by="onSortBy"
-                    :options="selector_options"
-                    :selected="active_sort_by"
-                    title="Sort by"
-                />
+                <div class="artwork-controls__selectors">
+                    <selector
+                        v-on:selected="onAuthor"
+                        :options="authors"
+                        :selected="0"
+                        title="Author"
+                        v-if="authors.length > 1"
+                    />
+                    <selector
+                        v-on:selected="onSortBy"
+                        :options="selector_options"
+                        :selected="active_sort_by"
+                        title="Sort by"
+                    />
+                </div>
            </div>
         </div>
     `,
@@ -90,5 +92,8 @@ export default {
             this.$store.setSortBy(opt.sort_type);
             this.$parent.$refs.artslist.scrollTop = 0
         },
+        onAuthor() {
+            
+        }
     }
 }
