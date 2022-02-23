@@ -85,6 +85,7 @@ export const store = {
     setSortBy(val) {
         this.state.sort_by = val
         this.sortArtWorks()
+        this.setCurrentPage(this.state.current_page)
     },
 
     //
@@ -353,9 +354,7 @@ export const store = {
 
         this.state.loading = false
         let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
-        if (this.state.sort_by !== 0) {
-            this.sortArtWorks()
-        }
+        if (this.state.sort_by !== 0) this.sortArtWorks()
         this.setCurrentPage(currPage)
     },
 
@@ -411,7 +410,7 @@ export const store = {
     },
 
     loadArtwork(tab, idx, id) {
-        console.log('Load Artwork: ', id)
+        console.log(`Load Artwork: idx ${idx}, id ${id}`)
         this.state.pending_artworks++
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
@@ -782,22 +781,26 @@ export const store = {
     },
 
     setCurrentPage(page) {
+        this.state.current_page = page
+        this.loadCurrentArtworks()
+    },
+
+    loadCurrentArtworks () {
         let artworks = this.state.artworks[this.state.active_tab]
-        let start = (page - 1) * common.ITEMS_PER_PAGE
-        let end   = Math.min(start + common.ITEMS_PER_PAGE, artworks.length)
+        let start = (this.state.current_page - 1) * common.ITEMS_PER_PAGE
+        let end = Math.min(start + common.ITEMS_PER_PAGE, artworks.length)
         for (let idx = start; idx < end; ++idx) {
             let art = artworks[idx]
             if (!art.bytes) {
                 this.loadArtwork(this.state.active_tab, idx, art.id)
             }
         }
-        this.state.current_page = page
     },
 
     setActiveTab(id) {
         this.state.active_tab = id
         this.sortArtWorks()
-        this.setCurrentPage(1)
+        this.loadCurrentArtworks()
     },
 
     filterByAuthor(selectedAuthor) {
