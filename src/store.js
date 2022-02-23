@@ -1,5 +1,5 @@
 import {router} from './router.js'
-import {tabs, common, contract} from './utils/consts.js'
+import {tabs, common, contract,sort} from './utils/consts.js'
 import utils from './utils/utils.js'
 import { reactive, nextTick, computed } from 'vue'
 
@@ -29,10 +29,14 @@ function defaultState() {
         is_popup_visible: false,
         popup_type: null,
         id_to_sell: '',
-        sort_by: null,
+        sort_by: sort.NEWEST_TO_OLDEST,
         pending_artworks: 0,
         is_headless: false,
-        current_page: 1
+        current_page: 1,
+        filteredArtwors: {
+            [tabs.ALL]: [],
+        },
+        authors: [],
     }
 }
 
@@ -84,7 +88,7 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val;
-        //this.sortArtWorks();
+        this.sortArtWorks();
     },
 
     //
@@ -275,6 +279,7 @@ export const store = {
         // END OF NOT OPTIMIZED
         this.state.artists_count = res.artists.length
         this.loadArtworks()
+        
     },
 
     //
@@ -302,8 +307,11 @@ export const store = {
     
         utils.ensureField(res, "items", "array")
         let oldstart = 0
-        let all = [], sale = [], liked = [], mine = [], sold = []
+        let all = [], sale = [], liked = [], mine = [], sold = [],allAuthors = []
         let mykeys = this.state.my_artist_keys
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index && value !== undefined;
+          }
 
         for (let awork of res.items) {
             let oawork = null
@@ -336,7 +344,8 @@ export const store = {
                 }
             }
 
-            all.push(awork)
+            allAuthors.push((this.state.artists[awork.pk_author] || {}).label);
+              all.push(awork)
             if (awork.owned) mine.push(awork) // MINE is what I own
             if (awork.owned && awork.price) sale.push(awork) // SALE is what OWN && what has price set
             if (awork.my_impression) liked.push(awork) // awork.my_impression
@@ -350,41 +359,67 @@ export const store = {
             [tabs.MINE]:  mine,
             [tabs.SOLD]:  sold
         }
+        
+        allAuthors = allAuthors.filter(onlyUnique);
+        let arr = [{name:"Everyone"}]
+        for(let i=0;i<=allAuthors.length;i++) {
+            if(allAuthors[i] !== undefined) {
+                arr.push({name: allAuthors[i]})
+            }
+        }
+        this.state.authors = arr;
 
+        this.state.filteredArtwors = { ...this.state.artworks };
         this.state.loading = false
         let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
         this.setCurrentPage(currPage)
+        
+        if(this.state.sort_by !== 0) {
+            this.sortArtWorks();
+        }
     },
 
     sortArtWorks() {
         let activeArts = this.state.artworks[this.state.active_tab];
  
         switch(this.state.sort_by) {
-            case sort.CREATOR_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author > b.author? 1 : -1);
+            case sort.NEWEST_TO_OLDEST:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id > b.id? 1 : -1);
                 break;
-            case sort.CREATOR_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author < b.author? 1 : -1);
+            case sort.OLDEST_TO_NEWEST:
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id < b.id? 1 : -1);
                 break;
             case sort.PRICE_ASC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
-                    if (a.price !== undefined && b.price !== undefined) {
-                        return a.price.amount > b.price.amount? 1 : -1;
-                    } 
-                });
+                    if(a.price === undefined || a.price.amount === undefined) {
+                        return 1;
+                    }
+                     if(b.price === undefined || b.price.amount === undefined) {
+                         return -1;
+                     }
+                    return  a.price.amount > b.price.amount ? 1 : -1
+                    });
                 break;
             case sort.PRICE_DESC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
-                    if (a.price !== undefined && b.price !== undefined) {
-                        return a.price.amount < b.price.amount? 1 : -1;
-                    } 
-                });
+                    if(a.price === undefined || a.price.amount === undefined) {
+                        return 1;
+                    }
+                     if(b.price === undefined || b.price.amount === undefined) {
+                         return -1;
+                     }
+                    return  a.price.amount < b.price.amount ? 1 : -1
+                    });
                 break;
             case sort.LIKES_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions > b.impressions? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                    return a.impressions > b.impressions? 1 : -1
+                    });
                 break;
             case sort.LIKES_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.impressions < b.impressions? 1 : -1);
+                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                    return a.impressions < b.impressions? 1 : -1
+                 });
                 break;
             default:
               break;
@@ -393,11 +428,9 @@ export const store = {
 
     setActiveTab(id) {
         this.state.active_tab = id;
-        //this.sortArtWorks();
     },
 
     loadArtwork(tab, idx, id) {
-        console.log('Load Artwork: ', id)
         this.state.pending_artworks++
         utils.invokeContract(
             `role=user,action=download,cid=${this.state.cid},id=${id}`, 
@@ -783,5 +816,23 @@ export const store = {
     setActiveTab(id) {
         this.state.active_tab = id
         this.setCurrentPage(1)
-    }
+        this.sortArtWorks();
+
+    },
+
+    filterByAuthor(selectedAuthor) {
+        let tabAll = [...this.state.filteredArtwors[tabs.ALL]];
+        
+        this.state.artworks[tabs.ALL] = tabAll.filter(
+          (artwork) => {
+            console.log(artwork)
+            if(selectedAuthor === "Everyone") {
+              return artwork;
+            } else {
+             return  artwork.author === selectedAuthor
+            }
+          }
+        );
+      },
+    
 }

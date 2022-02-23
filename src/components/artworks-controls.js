@@ -1,62 +1,85 @@
 import html from '../utils/html.js';
-import { tabs } from '../utils/consts.js';
-import CustomSelect from './selector.js';
+import { tabs, sort } from '../utils/consts.js';
+import selector from './selector.js';
 
 export default {
     computed: {
         active_tab () {
             return this.$state.active_tab
         },
-        mine_tab_state () {
-            return this.$state.artworks[tabs.MINE].length > 0
+        authors() {
+            return this.$state.authors;
         },
-        liked_tab_state () {
-            return this.$state.artworks[tabs.LIKED].length > 0
+        active_sort_by() {
+            return this.$state.sort_by;
         },
-        sold_tab_state () {
-            return this.$state.artworks[tabs.SOLD].length > 0
-        },
-        sale_tab_state () {
-            return this.$state.artworks[tabs.SALE].length > 0
-        },
+        tabs_sort_by() {
+          const result = [{ name: "All", id:tabs.ALL }];
+
+          if(this.$state.artworks[tabs.MINE].length > 0) {
+              result.push({ name: "MINE", id: tabs.MINE })
+          }
+
+          if(this.$state.artworks[tabs.SALE].length > 0) {
+              result.push({ name: "SALE", id: tabs.SALE })
+          }
+
+          if(this.$state.artworks[tabs.SOLD].length > 0) {
+              result.push({ name: "SOLD", id: tabs.SOLD })
+          }
+
+          if(this.$state.artworks[tabs.LIKED].length > 0) {
+              result.push({ name: "LIKED", id: tabs.LIKED })
+          }
+
+          return result;
+        }
     },
 
     components: {
-        CustomSelect
+        selector
     },
 
-    render () {
-        const selectorOptions = [
-            'Creator: A to Z',
-            'Creator: Z to A',
-            'Price: Low to High',
-            'Price: High to Low',
-            'Likes: Low to High',
-            'Likes: High to Low'
-        ];
+    data() {
+        return {
+            selector_options: [
+                { name: "Added: Newest to Oldest", sort_type: sort.NEWEST_TO_OLDEST },
+                { name: "Added: Oldest to Newest", sort_type: sort.OLDEST_TO_NEWEST },
+                { name: "Price: Low to High", sort_type: sort.PRICE_ASC },
+                { name: "Price: High to Low", sort_type: sort.PRICE_DESC },
+                { name: "Likes: Low to High", sort_type: sort.LIKES_ASC },
+                { name: "Likes: High to Low", sort_type: sort.LIKES_DESC }
+             ],
+        }
+    },
 
-        //TODO: catch event from custom-select
-        return html`
-            <div class="actions-container">
-                <div class="artworks-controls">
-                    <div class="artworks-controls__tabs">
-                        ${this.renderTab(tabs.ALL, 'ALL')}
-                        ${this.mine_tab_state ? this.renderTab(tabs.MINE, 'MINE') : null}
-                        ${this.sale_tab_state ? this.renderTab(tabs.SALE, 'SALE') : null}
-                        ${this.sold_tab_state ? this.renderTab(tabs.SOLD, 'SOLD') : null}
-                        ${this.liked_tab_state ? this.renderTab(tabs.LIKED, 'LIKED') : null}
-                    </div>
+    template: `
+        <div class="actions-container">
+            <div class="artworks-controls">
+                <div class="artworks-controls__tabs">
+                    <span v-for="(tab,i) of tabs_sort_by" class="tab-item" :class="{ tabActive: active_tab === tab.id}" @click="onTabClicked(tab.id)">
+                        <div class="tab-item__title">{{tab.name}}</div>
+                        <div v-if="active_tab === tab.id" class="tab-item__bottom-line"></div>
+                    </span>
                 </div>
-            </div>
-        `;
-
-        //enable after author load fix
-        // <${CustomSelect}
-        // options=${selectorOptions}
-        // default="Sort by"
-        // class="select"
-        // />
-    },
+                <div class="artwork-controls__selectors">
+                    <selector
+                        v-on:selected="onAuthor"
+                        :options="authors"
+                        :selected="0"
+                        title="Author"
+                        v-if="authors.length > 1"
+                    />
+                    <selector
+                        v-on:selected="onSortBy"
+                        :options="selector_options"
+                        :selected="active_sort_by"
+                        title="Sort by"
+                    />
+                </div>
+           </div>
+        </div>
+    `,
 
     methods: {
         onTabClicked(id) {
@@ -64,23 +87,13 @@ export default {
                 this.$store.setActiveTab(id);
             }
         },
-
-        renderActiveLine(id) {
-            if (id === this.active_tab) {
-                return html`
-                    <div class="tab-item__bottom-line"></div>
-                `;
-            }
+        
+        onSortBy(opt) {
+            this.$store.setSortBy(opt.sort_type);
+            this.$parent.$refs.artslist.scrollTop = 0
         },
-
-        renderTab(type, title) {
-            return html`
-                <span class="tab-item ${this.active_tab === type ? 'tab-active' : ''}" 
-                onclick=${()=>{this.onTabClicked(type)}}>
-                    <div class="tab-item__title">${title}</div>
-                    ${this.renderActiveLine(type)}
-                </span>
-            `;
+        onAuthor() {
+            
         }
     }
 }

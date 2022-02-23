@@ -18,8 +18,8 @@ export const popups = {
 }
 
 export const sort = {
-    CREATOR_ASC: 0,
-    CREATOR_DESC: 1,
+    NEWEST_TO_OLDEST: 0,
+    OLDEST_TO_NEWEST: 1,
     PRICE_ASC: 2,
     PRICE_DESC: 3,
     LIKES_ASC: 4,
