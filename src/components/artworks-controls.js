@@ -14,25 +14,25 @@ export default {
             return this.$state.sort_by;
         },
         tabs_sort_by() {
-          const result = [{ name: "All", id:tabs.ALL }];
+            const result = [{ name: "All", id:tabs.ALL }]
 
-          if(this.$state.artworks[tabs.MINE].length > 0) {
-              result.push({ name: "MINE", id: tabs.MINE })
-          }
+            if(this.$state.artworks[tabs.MINE].length > 0) {
+                result.push({ name: "MINE", id: tabs.MINE })
+            }
 
-          if(this.$state.artworks[tabs.SALE].length > 0) {
-              result.push({ name: "SALE", id: tabs.SALE })
-          }
+            if(this.$state.artworks[tabs.SALE].length > 0) {
+                result.push({ name: "SALE", id: tabs.SALE })
+            }
 
-          if(this.$state.artworks[tabs.SOLD].length > 0) {
-              result.push({ name: "SOLD", id: tabs.SOLD })
-          }
+            if(this.$state.artworks[tabs.SOLD].length > 0) {
+                result.push({ name: "SOLD", id: tabs.SOLD })
+            }
 
-          if(this.$state.artworks[tabs.LIKED].length > 0) {
-              result.push({ name: "LIKED", id: tabs.LIKED })
-          }
+            if(this.$state.artworks[tabs.LIKED].length > 0) {
+                result.push({ name: "LIKED", id: tabs.LIKED })
+            }
 
-          return result;
+            return result
         }
     },
 
@@ -83,16 +83,14 @@ export default {
     methods: {
         onTabClicked(id) {
             if (this.active_tab !== id) {
-                this.$store.setActiveTab(id);
+                this.$store.setActiveTab(id)
             }
-        },
-        
+        },   
         onSortBy(opt) {
-            this.$store.setSortBy(opt.sort_type);
+            this.$store.setSortBy(opt.sort_type)
             this.$parent.$refs.artslist.scrollTop = 0
         },
         onAuthor() {
-            
         }
     }
 }
