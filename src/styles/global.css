@@ -586,46 +586,6 @@ html {
     margin-left: 10px;
 }
 
-.custom-select {
-    position: relative;
-    display: flex;
-    text-align: left;
-    outline: none;
-    height: 47px;
-    line-height: 47px;
-    min-width: 160px;
-    margin-left: auto;
-}
-
-.custom-select .selected {
-    background-color: transparent;
-    border-radius: 6px;
-    color: #fff;
-    padding-left: 1em;
-    cursor: pointer;
-    user-select: none;
-
-
-    opacity: 0.7;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.47px;
-}
-
-.custom-select .selected.open {
-    border: none;
-}
-
-.custom-select .selected:after {
-    position: absolute;
-    content: "";
-    top: 22px;
-    right: 1em;
-    width: 0;
-    height: 0;
-    border: 5px solid transparent;
-    border-color: #fff transparent transparent transparent;
-}
 
 
 
@@ -729,6 +689,27 @@ html {
     display: none;
 }
 
+.highlightLine{
+    font-size: 14px;
+    font-weight: bold;
+    color: #00f6d2;
+}
+
+.artwork-controls__selectors{
+    display: inline-flex;
+    gap:40px;
+    margin-left: auto;
+    padding-right: 2px;
+}
+
+.artwork-controls__selectors > div:first-child {
+   margin-right: 20px;
+}
+
+
+
+
+
 .custom-select {
     position: relative;
     display: flex;
@@ -736,13 +717,11 @@ html {
     outline: none;
     height: 47px;
     line-height: 47px;
-    min-width: 20px;
+    min-width: 0px;
     margin-left: auto;
 }
-  
-  .custom-select .selected {
-    background-color: transparent;
-    border-radius: 6px;
+
+.custom-select .selected {
     color: #fff;
     padding-left: 1em;
     cursor: pointer;
@@ -750,24 +729,19 @@ html {
     opacity: 0.7;
     font-size: 14px;
     font-weight: bold;
-    letter-spacing: normal;
+    letter-spacing: 0.47px;
 }
-  
-  .custom-select .selected.open {
+
+.custom-select .selected.open {
     border: none;
 }
-  
-  .custom-select .selected:after {
-    position: absolute;
-    content: "";
-    top: 22px;
-    right: -16px;
-    width: 0;
-    height: 0;
-    border: 5px solid transparent;
-    border-color: #fff transparent transparent transparent;
+
+.custom-select .arrow {
+    width:8px;
+    height:8px;
+    margin-left:3px;
 }
-  
+
   .custom-select .items {
     color: #fff;
     overflow: hidden;
@@ -790,16 +764,4 @@ html {
   
   .custom-select .items div:hover {
     color: #00f6d2;
-}
-
-.highlightLine{
-    font-size: 14px;
-    font-weight: bold;
-    color: #00f6d2;
-}
-
-.artwork-controls__selectors{
-    display: flex;
-    margin-left: auto;
-    padding-right: 20px;
 }
