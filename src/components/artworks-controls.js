@@ -64,6 +64,13 @@ export default {
                 </div>
                 <selector
                     v-on:sort_by="onSortBy"
+                    :options="authors"
+                    :selected="active_sort_by"
+                    title="Author"
+                    v-if="authors.length > 1"
+                 />
+                <selector
+                    v-on:sort_by="onSortBy"
                     :options="selector_options"
                     :selected="active_sort_by"
                     title="Sort by"

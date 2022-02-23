@@ -32,7 +32,8 @@ export default {
         style() {
           return {
             "background-color": utils.getStyles().background_popup,
-             "width": this.title === "Sort by" ? "200px" : "100px"
+             "width": this.title === "Sort by" ? "200px" : "100px",
+             "left": this.title === "Sort by" ? "-50px" : "-20px",
           }
         }
       },

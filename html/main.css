@@ -698,29 +698,7 @@ html {
     border-color: #fff transparent transparent transparent;
 }
 
-.custom-select .items {
-    color: #fff;
-    overflow: hidden;
-    border: none;
-    position: absolute;
-    background-color: #00446c;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    margin-top: 40px;
-}
 
-.custom-select .items div {
-    color: #fff;
-    padding: 9px 0 9px 1em;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-}
-
-.custom-select .items div:hover {
-    color: #00f6d2;
-}
 
 .selectHide {
     display: none;
@@ -868,7 +846,6 @@ html {
     border:none;
     border-radius: 4px;
     font-size: 16px;
-    left: -20px;
     right: 0;
     z-index: 1;
     margin-top: 40px;

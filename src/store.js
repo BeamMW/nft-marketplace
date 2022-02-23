@@ -88,7 +88,6 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val;
-        console.log(val)
         this.sortArtWorks();
     },
 
@@ -360,8 +359,16 @@ export const store = {
             [tabs.MINE]:  mine,
             [tabs.SOLD]:  sold
         }
+        
         allAuthors = allAuthors.filter(onlyUnique);
-        this.state.authors = allAuthors;
+        let arr = [{name:"Everyone"}]
+        for(let i=0;i<=allAuthors.length;i++) {
+            if(allAuthors[i] !== undefined) {
+                arr.push({name: allAuthors[i]})
+            }
+        }
+        this.state.authors = arr;
+
         this.state.filteredArtwors = { ...this.state.artworks };
         this.state.loading = false
         let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
