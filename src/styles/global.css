@@ -680,12 +680,12 @@ html {
     opacity: 0.5; 
 }
   
-  .show {
+.show {
     display: flex;
     margin-left: 200px; 
 }
   
-  .hide {
+.hide {
     display: none;
 }
 
@@ -705,10 +705,6 @@ html {
 .artwork-controls__selectors > div:first-child {
    margin-right: 20px;
 }
-
-
-
-
 
 .custom-select {
     position: relative;
@@ -742,9 +738,8 @@ html {
     margin-left:3px;
 }
 
-  .custom-select .items {
+.custom-select .items {
     color: #fff;
-    overflow: hidden;
     position: absolute;
     border:none;
     border-radius: 4px;
@@ -752,16 +747,18 @@ html {
     right: 0;
     z-index: 1;
     margin-top: 40px;
+    padding: 0 20px;
 }
   
-  .custom-select .items div {
+.custom-select .items div {
     color: #fff;
-    padding: 15px 0 15px 1em;
+    padding: 15px 0 15px 0;
+    white-space: nowrap;
     line-height: 1;
     cursor: pointer;
     user-select: none;
 }
   
-  .custom-select .items div:hover {
+.custom-select .items div:hover {
     color: #00f6d2;
 }
