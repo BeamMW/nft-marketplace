@@ -358,7 +358,7 @@ export const store = {
 
     sortArtWorks() {
         let activeArts = this.state.artworks[this.state.active_tab];
-
+ 
         switch(this.state.sort_by) {
             case sort.CREATOR_ASC:
                 this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.author > b.author? 1 : -1);
