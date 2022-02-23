@@ -8,7 +8,7 @@ export default {
             return this.$state.active_tab
         },
         authors() {
-            return this.$state.authors;
+            return [{name: "Everyone"}]
         },
         active_sort_by() {
             return this.$state.sort_by;
@@ -68,7 +68,6 @@ export default {
                         :options="authors"
                         :selected="0"
                         title="Author"
-                        v-if="authors.length > 1"
                     />
                     <selector
                         v-on:selected="onSortBy"

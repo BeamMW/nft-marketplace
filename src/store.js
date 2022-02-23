@@ -32,11 +32,7 @@ function defaultState() {
         sort_by: sort.NEWEST_TO_OLDEST,
         pending_artworks: 0,
         is_headless: false,
-        current_page: 1,
-        filteredArtwors: {
-            [tabs.ALL]: [],
-        },
-        authors: [],
+        current_page: 1
     }
 }
 
@@ -87,8 +83,8 @@ export const store = {
     },
 
     setSortBy(val) {
-        this.state.sort_by = val;
-        this.sortArtWorks();
+        this.state.sort_by = val
+        this.sortArtWorks()
     },
 
     //
@@ -305,13 +301,10 @@ export const store = {
         }
     
         utils.ensureField(res, "items", "array")
-        let oldstart = 0
-        let all = [], sale = [], liked = [], mine = [], sold = [],allAuthors = []
-        let mykeys = this.state.my_artist_keys
-        function onlyUnique(value, index, self) {
-            return self.indexOf(value) === index && value !== undefined;
-          }
 
+        let oldstart = 0
+        let all = [], sale = [], liked = [], mine = [], sold = []
+        let mykeys = this.state.my_artist_keys
         for (let awork of res.items) {
             let oawork = null
             for (let idx = oldstart; idx < this.state.artworks[tabs.ALL].length; ++idx) {
@@ -343,8 +336,7 @@ export const store = {
                 }
             }
 
-            allAuthors.push((this.state.artists[awork.pk_author] || {}).label);
-              all.push(awork)
+            all.push(awork)
             if (awork.owned) mine.push(awork) // MINE is what I own
             if (awork.owned && awork.price) sale.push(awork) // SALE is what OWN && what has price set
             if (awork.my_impression) liked.push(awork) // awork.my_impression
@@ -358,24 +350,13 @@ export const store = {
             [tabs.MINE]:  mine,
             [tabs.SOLD]:  sold
         }
-        
-        allAuthors = allAuthors.filter(onlyUnique);
-        let arr = [{name:"Everyone"}]
-        for(let i=0;i<=allAuthors.length;i++) {
-            if(allAuthors[i] !== undefined) {
-                arr.push({name: allAuthors[i]})
-            }
-        }
-        this.state.authors = arr;
 
-        this.state.filteredArtwors = { ...this.state.artworks };
         this.state.loading = false
         let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
-        this.setCurrentPage(currPage)
-        
-        if(this.state.sort_by !== 0) {
-            this.sortArtWorks();
+        if (this.state.sort_by !== 0) {
+            this.sortArtWorks()
         }
+        this.setCurrentPage(currPage)
     },
 
     sortArtWorks() {
