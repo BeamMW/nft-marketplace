@@ -691,6 +691,7 @@ html {
     color: rgba(255, 255, 255, .5);
     font-size: 14px;
     text-align: center;
+    user-select: none;
 }
 
 .paginator > .prev:hover:not([disabled="true"]),
@@ -717,6 +718,7 @@ html {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
+  user-select: none;
 }
 
 .paginator >.page:hover:not([selected="true"]) {
@@ -762,8 +764,7 @@ html {
 }
 
 .artwork-controls__selectors{
-    display: inline-flex;
-    gap:40px;
+    display: flex;
     margin-left: auto;
     padding-right: 2px;
 }
