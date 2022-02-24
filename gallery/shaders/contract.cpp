@@ -121,21 +121,19 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
     } else { // call from manager:manage_artist
         Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
         switch (r.req) {
-        case ArtistReqType::APPROVE: {
+        case ArtistReqType::ENABLE:
+        case ArtistReqType::DISABLE: {
             uint32_t artist_size = Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
+            Env::Halt_if(!artist_size);
             Env::DelVar_T(ssak);
 
-            a.is_approved = true;
+            a.is_approved = (r.req == ArtistReqType::ENABLE);
             ssak.h_last_updated = Utils::FromBE(Env::get_Height());
 
             Env::SaveVar_T(fsak, ssak);
             Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
             break;
         }
-        case ArtistReqType::DELETE:
-            Env::Halt_if(!Env::DelVar_T(ssak));
-            Env::Halt_if(!Env::DelVar_T(fsak));
-            break;
         default:
             Env::Halt();
         }

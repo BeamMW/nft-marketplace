@@ -339,8 +339,8 @@ ON_METHOD(manager, manage_artist)
     args.m_pkArtist = pkArtist;
 
     args.req = bEnable ?
-        Gallery::Method::ManageArtist::RequestType::APPROVE :
-        Gallery::Method::ManageArtist::RequestType::DELETE;
+        Gallery::Method::ManageArtist::RequestType::ENABLE :
+        Gallery::Method::ManageArtist::RequestType::DISABLE;
 
     args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
 

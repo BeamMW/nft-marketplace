@@ -149,7 +149,7 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 10;
 
-            enum class RequestType { CREATE, DELETE, APPROVE } req;
+            enum class RequestType { CREATE, DISABLE, ENABLE } req;
             PubKey m_pkArtist;
             uint32_t m_LabelLen; // set Artist::s_LabelMaxLen to remove
             // followed by label
