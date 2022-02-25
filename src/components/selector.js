@@ -50,7 +50,7 @@ export default {
         </div>
         <div class="items" v-show="show"  :style="style">
             <div v-for="(option, i) of options || []" :key="i"
-                @click="onSelected(option)">
+                @click="onSelected(option,i)">
                 <span :class="{ highlightLine: selected === i}">{{ option.name }}</span>
             </div>
         </div>
@@ -59,8 +59,8 @@ export default {
     `,
 
     methods: {
-      onSelected(opt) {
-        this.$emit('selected',opt)
+      onSelected(opt,i) {
+        this.$emit('selected',opt,i)
         this.show = false
       },
       close() {

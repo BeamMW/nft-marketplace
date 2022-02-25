@@ -13,6 +13,9 @@ export default {
         active_sort_by() {
             return this.$state.sort_by;
         },
+        author_sort_by() {
+            return this.$state.author_sort_by;
+        },
         tabs_sort_by() {
           const result = [{ name: "All", id:tabs.ALL }];
 
@@ -66,7 +69,7 @@ export default {
                     <selector
                         v-on:selected="onAuthor"
                         :options="authors"
-                        :selected="0"
+                        :selected="author_sort_by"
                         title="Author"
                         v-if="authors.length > 1"
                     />
@@ -92,8 +95,10 @@ export default {
             this.$store.setSortBy(opt.sort_type);
             this.$parent.$refs.artslist.scrollTop = 0
         },
-        onAuthor() {
-            
+        onAuthor(opt,i) {
+            this.$store.setByAuthor(opt.name,i);
+            this.$parent.$refs.artslist.scrollTop = 0
+
         }
     }
 }
