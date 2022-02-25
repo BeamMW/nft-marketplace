@@ -769,7 +769,7 @@ html {
     padding-right: 2px;
 }
 
-.artwork-controls__selectors > div:first-child {
+.artwork-controls__selectors > div:not(:last-child) {
    margin-right: 20px;
 }
 

@@ -14,32 +14,23 @@ export default {
             return this.$state.sort_by;
         },
         tabs_sort_by() {
-            const result = [{ name: "All", id:tabs.ALL }]
-
-            if(this.$state.artworks[tabs.MINE].length > 0) {
-                result.push({ name: "MINE", id: tabs.MINE })
-            }
-
-            if(this.$state.artworks[tabs.SALE].length > 0) {
-                result.push({ name: "SALE", id: tabs.SALE })
-            }
-
-            if(this.$state.artworks[tabs.SOLD].length > 0) {
-                result.push({ name: "SOLD", id: tabs.SOLD })
-            }
-
-            if(this.$state.artworks[tabs.LIKED].length > 0) {
-                result.push({ name: "LIKED", id: tabs.LIKED })
-            }
-
-            return result
+            return [
+                { name: "All", id:tabs.ALL },
+                { name: "MINE", id: tabs.MINE },
+                { name: "SALE", id: tabs.SALE },
+                { name: "SOLD", id: tabs.SOLD },
+                { name: "LIKED", id: tabs.LIKED }
+            ]
         },
         artist_options () {
-            let result = [{name: "Everyone", key: 0}]
-            for(let aid in this.artists) {
-                let artist = this.artists[aid]
-                result.push({name: artist.label, key: artist.key})
-            } 
+            let result = []
+            if (this.active_tab != tabs.SOLD) {
+                result.push({name: "Everyone", key: 0})
+                for(let aid in this.artists) {
+                    let artist = this.artists[aid]
+                    result.push({name: artist.label, key: artist.key})
+                } 
+            }
             return result
         },
         active_filter_by_artist () {
@@ -86,6 +77,7 @@ export default {
                         :options="artist_options"
                         :selected="active_filter_by_artist"
                         title="Author"
+                        v-if="artist_options.length"
                     />
                     <selector
                         v-on:selected="onSortBy"
@@ -106,11 +98,16 @@ export default {
         },   
         onSortBy(opt) {
             this.$store.setSortBy(opt.sort_type)
-            this.$parent.$refs.artslist.scrollTop = 0
+            this.scrollToTop()
         },
         onAuthor(opt) {
             this.$store.setFilterByArtist(opt.key)
-            this.$parent.$refs.artslist.scrollTop = 0
+            this.scrollToTop()
+        },
+        scrollToTop(){
+            if (this.$parent.$refs.artslist) {
+                this.$parent.$refs.artslist.scrollTop = 0
+            }
         }
     }
 }

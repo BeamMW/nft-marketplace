@@ -13,20 +13,20 @@ export default {
             return this.$state.is_admin;
         },
         artists () {
-            return this.$state.artists;
+            return this.$state.artists
         },
         active_tab () {
             return this.$state.active_tab
         },
         artworks () {
-            let all = this.$state.artworks[this.$state.active_tab]
-            let artworks  = []
+            let all = this.$state.artworks
+            let result  = []
             let start = (this.current_page - 1) * common.ITEMS_PER_PAGE
             let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
             for (let idx = start; idx < end; ++idx) {
-                artworks.push(all[idx])
+                result.push(all[idx])
             }
-            return artworks
+            return result
         },
         can_vote () {
             return this.$state.balance_reward > 0;
