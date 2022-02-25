@@ -30,6 +30,7 @@ function defaultState() {
         popup_type: null,
         id_to_sell: '',
         sort_by: sort.NEWEST_TO_OLDEST,
+        filter_by_artist: 0,
         pending_artworks: 0,
         is_headless: false,
         current_page: 1
@@ -84,6 +85,12 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val
+        this.sortArtWorks()
+        this.setCurrentPage(this.state.current_page)
+    },
+
+    setFilterByArtist(val) {
+        this.state.filter_by_artist = val
         this.sortArtWorks()
         this.setCurrentPage(this.state.current_page)
     },
@@ -807,15 +814,14 @@ export const store = {
         let tabAll = [...this.state.filteredArtwors[tabs.ALL]];
         
         this.state.artworks[tabs.ALL] = tabAll.filter(
-          (artwork) => {
+            (artwork) => {
             console.log(artwork)
             if(selectedAuthor === "Everyone") {
-              return artwork;
+                return artwork;
             } else {
-             return  artwork.author === selectedAuthor
+                return  artwork.author === selectedAuthor
             }
-          }
+            }
         );
-      },
-    
+    },
 }

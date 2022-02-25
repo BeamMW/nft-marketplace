@@ -7,8 +7,8 @@ export default {
         active_tab () {
             return this.$state.active_tab
         },
-        authors() {
-            return [{name: "Everyone"}]
+        artists () {
+            return this.$state.artists
         },
         active_sort_by() {
             return this.$state.sort_by;
@@ -33,6 +33,24 @@ export default {
             }
 
             return result
+        },
+        artist_options () {
+            let result = [{name: "Everyone", key: 0}]
+            for(let aid in this.artists) {
+                let artist = this.artists[aid]
+                result.push({name: artist.label, key: artist.key})
+            } 
+            return result
+        },
+        active_filter_by_artist () {
+            let key = this.$state.filter_by_artist
+            let artists = this.artist_options
+            for (let idx = 0; idx <artists.length; ++idx) {
+                if (key == artists[idx].key) {
+                    return idx
+                }
+            }
+            return 0
         }
     },
 
@@ -65,8 +83,8 @@ export default {
                 <div class="artwork-controls__selectors">
                     <selector
                         v-on:selected="onAuthor"
-                        :options="authors"
-                        :selected="0"
+                        :options="artist_options"
+                        :selected="active_filter_by_artist"
                         title="Author"
                     />
                     <selector
@@ -90,7 +108,9 @@ export default {
             this.$store.setSortBy(opt.sort_type)
             this.$parent.$refs.artslist.scrollTop = 0
         },
-        onAuthor() {
+        onAuthor(opt) {
+            this.$store.setFilterByArtist(opt.key)
+            this.$parent.$refs.artslist.scrollTop = 0
         }
     }
 }
