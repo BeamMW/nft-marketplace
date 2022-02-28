@@ -1,9 +1,6 @@
 <template>
   <div class="container">
-    <div class="back-btn" v-on:click="onBack">
-      <img src="~assets/icon-back.svg"/>
-      Back to Gallery
-    </div>
+    <backBtn text="Back to Gallery" @click="$emit('back')"/>
     <div class="details">
       <div class="title">{{title}}</div>
       <div class="separator"/>
@@ -19,22 +16,6 @@
     display: flex
     flex-direction: column
     margin-top: 15px
-
-    & .back-btn {
-      display: flex
-      align-items: center
-      cursor: pointer
-      font-size: 14px
-      font-weight: bolder
-      letter-spacing: 1.5px
-      opacity: 0.5
-
-      & img {
-        margin-right: 0.25em
-        width: 14px
-        height: 14px
-      }
-    }
 
     & .details {
       margin-top: 15px
@@ -67,6 +48,7 @@
 
 <script>
 import artPrice from './artwork-price.vue'
+import backBtn from './back-btn.vue'
 
 export default {
   props: {
@@ -91,13 +73,8 @@ export default {
   ],
 
   components: {
-    artPrice
-  },
-
-  methods: {
-    onBack(ev) {
-      this.$emit('back')
-    }
+    artPrice,
+    backBtn
   }
 }
 </script>
