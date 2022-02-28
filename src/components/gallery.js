@@ -13,9 +13,6 @@ export default {
         is_admin () {
             return this.$state.is_admin;
         },
-        artists () {
-            return this.$state.artists
-        },
         active_tab () {
             return this.$state.active_tab
         },
@@ -28,9 +25,6 @@ export default {
                 result.push(all[idx])
             }
             return result
-        },
-        can_vote () {
-            return this.$state.balance_reward > 0;
         },
         is_popup_visible() {
             return this.$state.is_popup_visible;
@@ -74,28 +68,15 @@ export default {
             <adetails v-if="details_id != -1"
                 v-on:back="onDetailsBack"
                 v-bind:artwork="details"
-                v-bind:author="(artists[details.pk_author] || {}).label"
             />
             <template v-else-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
-                    v-bind:artwork="artwork"
-                    v-bind:id="artwork.id"
-                    v-bind:title="artwork.title"
-                    v-bind:author="(artists[artwork.pk_author] || {}).label"
-                    v-bind:bytes="artwork.bytes"
-                    v-bind:mime_type="artwork.mime_type"
-                    v-bind:owned="artwork.owned"
-                    v-bind:price="artwork.price"
-                    v-bind:likes_cnt="artwork.impressions"
-                    v-bind:can_vote="can_vote"
-                    v-bind:is_admin="is_admin"
-                    v-bind:error="artwork.error"
-                    v-bind:loading="artwork.loading"
-                    v-on:like="onLikeArtwork"
-                    v-on:unlike="onUnlikeArtwork"
-                    v-on:delete="onDeleteArtwork"
-                    v-on:details="onDetails"
+                        v-bind:artwork="artwork"
+                        v-on:like="onLikeArtwork"
+                        v-on:unlike="onUnlikeArtwork"
+                        v-on:delete="onDeleteArtwork"
+                        v-on:details="onDetails"
                     />
                 </div>
                 <paginator

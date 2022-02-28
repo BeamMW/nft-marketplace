@@ -6,54 +6,6 @@ export default {
         artwork: {
             type: Object,
             required: true,
-        },
-        id: {
-            type: Number,
-            required: true
-        },
-        author: {
-            type: String,
-            required: false
-        },
-        title: {
-            type: String,
-            required: true,
-            default: ""
-        },
-        bytes: {
-            type: Uint8Array,
-            default: new Uint8Array()
-        },
-        mime_type: {
-            type: String,
-            default: "image/jpeg"
-        },
-        owned: {
-            type: Number,
-            default: 0
-        },
-        price: {
-            type: Object,
-            default: undefined
-        },
-        likes_cnt: {
-            type: Number,
-            default: 0,
-        },
-        can_vote: {
-            type: Boolean,
-            default: true
-        },        
-        is_admin: {
-            type: Boolean,
-            default: false
-        },
-        loading: {
-            type: Boolean,
-            default: true
-        },
-        error: {
-            default: undefined
         }
     },
 
@@ -65,18 +17,55 @@ export default {
     },
 
     computed: {
+        is_admin () {
+            return this.$state.is_admin
+        },
+
         is_headless () {
             return this.$state.is_headless
         },
 
+        id () {
+            return this.artwork.id
+        },
+
+        title () {
+            return this.artwork.title
+        },
+
         image () {
-            if (this.bytes.length) {
-                return URL.createObjectURL(new Blob([this.bytes], {type: this.mime_type}))
+            let bytes = this.artwork.bytes
+            if (bytes) {
+                return URL.createObjectURL(new Blob([bytes], {type: this.artwork.mime_type}))
             }
         },
         
+        likes_cnt () {
+            return this.artwork.impressions
+        },
+
         liked () {
             return !!this.artwork.my_impression
+        },
+        
+        can_vote () {
+            return this.$state.balance_reward > 0
+        },
+
+        loading () {
+            return artwork.loading
+        },
+
+        error () {
+            return artwork.error
+        },
+
+        artists () {
+            return this.$state.artists
+        },
+
+        author () {
+            return (artists[artwork.pk_author] || {}).label
         }
     },
 
@@ -120,7 +109,6 @@ export default {
 
     methods: {
         onLike (ev) {
-            ev.preventDefault()
             if (this.is_headless) 
             {
                 this.$store.switchToHeaded()  
@@ -133,19 +121,16 @@ export default {
         },
 
         onUnlike (ev) {
-            ev.preventDefault()
             if (this.can_vote) {
                 this.$emit('unlike', this.id)
             }
         },
 
         onDelete (ev) {
-            ev.preventDefault()
             this.$emit("delete", this.id)
         },
 
         onDetails(ev) {
-            ev.preventDefault()
             this.$emit("details", this.id)
         }
     }

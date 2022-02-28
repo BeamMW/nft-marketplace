@@ -55,16 +55,20 @@ export default {
     artwork: {
       type: Object,
       required: true
-    },
-    author: {
-      type: String,
-      required: true
     }
   },
 
   computed: {
     title () {
       return this.artwork.title
+    },
+
+    artists () {
+      return this.$state.artists
+    },
+
+    author () {
+      return (this.artists[this.artwork.pk_author] || {}).label
     }
   },
 
