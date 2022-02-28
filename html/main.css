@@ -55,15 +55,48 @@
   margin-right: 10px;
 }
 
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/artwork-price.vue?vue&type=style&index=0&id=17d8fb60&scoped=true&lang=stylus ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.container[data-v-17d8fb60] {
+  display: flex;
+  line-height: 2;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+}
+.container .amount[data-v-17d8fb60],
+.container .curr[data-v-17d8fb60] {
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+.container .dots[data-v-17d8fb60] {
+  margin-left: auto;
+  cursor: pointer;
+  margin-right: -4px;
+}
+.container .button[data-v-17d8fb60] {
+  margin-left: auto;
+}
+.not-for-sale[data-v-17d8fb60] {
+  margin-left: auto;
+  opacity: 0.5;
+  font-size: 14px;
+  font-style: italic;
+  color: #fff;
+}
+
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/artwork-details.vue?vue&type=style&index=0&id=b1dac1ee&scoped=true&lang=stylus ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.details[data-v-b1dac1ee] {
+.container[data-v-b1dac1ee] {
   display: flex;
   flex-direction: column;
   margin-top: 15px;
 }
-.details .back-btn[data-v-b1dac1ee] {
+.container .back-btn[data-v-b1dac1ee] {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -72,10 +105,33 @@
   letter-spacing: 1.5px;
   opacity: 0.5;
 }
-.details .back-btn img[data-v-b1dac1ee] {
+.container .back-btn img[data-v-b1dac1ee] {
   margin-right: 0.25em;
   width: 14px;
   height: 14px;
+}
+.container .details[data-v-b1dac1ee] {
+  margin-top: 15px;
+  border: none;
+  background-color: rgba(240,205,205,0.05);
+  border-radius: 20px;
+  width: calc(100% - 100px);
+  padding: 35px 50px;
+}
+.container .details .title[data-v-b1dac1ee] {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+.container .details .author[data-v-b1dac1ee] {
+  font-size: 16px;
+  color: #fff;
+}
+.container .details .separator[data-v-b1dac1ee] {
+  height: 1px;
+  margin: 20px 0;
+  opacity: 0.2;
+  border-top: solid 1px #fff;
 }
 
 /*!************************************************************************************************!*\
@@ -340,26 +396,6 @@ html {
     margin-left: 10px;
 }
 
-.artwork-can-buy {
-    display: flex;
-    line-height: 2;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-}
-
-.artwork-can-buy__amount,
-.artwork-can-buy__curr {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.artwork-can-buy__button {
-    margin-left: auto;
-}
-
 .empty-gallery {
     margin: 100px auto 0 auto;
     display: flex;
@@ -373,14 +409,6 @@ html {
     font-size: 14px;
     line-height: 1.43;
     text-align: center;
-    color: #fff;
-}
-
-.not-on-sale {
-    margin-left: auto;
-    opacity: 0.5;
-    font-size: 14px;
-    font-style: italic;
     color: #fff;
 }
 
@@ -750,12 +778,6 @@ html {
 .paginator > .page[selected="true"] {
     cursor: auto;
     color: #00f6d2;
-}
-
-.artwork-can-buy__dots {
-    margin-left: auto;
-    cursor: pointer;
-    margin-right: -4px;
 }
 
 .selector-container {

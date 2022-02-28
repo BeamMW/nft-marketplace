@@ -3,7 +3,7 @@ import artwork from  './artwork.js'
 import balance from  './balance.js'
 import headless from './headless.js'
 import artworksControls from './artworks-controls.js'
-import { popups, tabs, common } from '../utils/consts.js'
+import { popups, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
 import adetails from './artwork-details.vue'
@@ -43,6 +43,14 @@ export default {
         },
         total_pages () {
             return this.$state.total_pages
+        },
+        details () {
+            for (let artwork of this.artworks) {
+                if (artwork.id == this.details_id) {
+                    return artwork
+                }
+            }
+            return undefined
         }
     },
 
@@ -65,10 +73,13 @@ export default {
             <artworksControls v-if="details_id == -1"></artworksControls>
             <adetails v-if="details_id != -1"
                 v-on:back="onDetailsBack"
+                v-bind:artwork="details"
+                v-bind:author="(artists[details.pk_author] || {}).label"
             />
             <template v-else-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
+                    v-bind:artwork="artwork"
                     v-bind:id="artwork.id"
                     v-bind:title="artwork.title"
                     v-bind:author="(artists[artwork.pk_author] || {}).label"
@@ -77,17 +88,12 @@ export default {
                     v-bind:owned="artwork.owned"
                     v-bind:price="artwork.price"
                     v-bind:likes_cnt="artwork.impressions"
-                    v-bind:liked="artwork.my_impression == 1"
                     v-bind:can_vote="can_vote"
                     v-bind:is_admin="is_admin"
                     v-bind:error="artwork.error"
                     v-bind:loading="artwork.loading"
-                    v-on:sell="onSellArtwork"
-                    v-on:buy="onBuyArtwork"
                     v-on:like="onLikeArtwork"
                     v-on:unlike="onUnlikeArtwork"
-                    v-on:change_price="onChangePrice"
-                    v-on:remove_from_sale="onRemoveFromSale"
                     v-on:delete="onDeleteArtwork"
                     v-on:details="onDetails"
                     />
@@ -106,36 +112,6 @@ export default {
     `,
 
     methods: {
-        onBuyArtwork (id) {
-            this.$store.buyArtwork(id);
-        },
-
-        onSellArtwork (id) {
-            try {
-                this.$store.setPopupType(popups.SELL);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
-
-        onRemoveFromSale (id) {
-            this.$store.sellArtwork(id, 0);
-        },
-
-        onChangePrice (id) {
-            try {
-                this.$store.setPopupType(popups.CHANGE_PRICE);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
-
         onLikeArtwork(id) {
             this.$store.likeArtwork(id)
         },

@@ -246,26 +246,6 @@ html {
     margin-left: 10px;
 }
 
-.artwork-can-buy {
-    display: flex;
-    line-height: 2;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-}
-
-.artwork-can-buy__amount,
-.artwork-can-buy__curr {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.artwork-can-buy__button {
-    margin-left: auto;
-}
-
 .empty-gallery {
     margin: 100px auto 0 auto;
     display: flex;
@@ -279,14 +259,6 @@ html {
     font-size: 14px;
     line-height: 1.43;
     text-align: center;
-    color: #fff;
-}
-
-.not-on-sale {
-    margin-left: auto;
-    opacity: 0.5;
-    font-size: 14px;
-    font-style: italic;
     color: #fff;
 }
 
@@ -656,12 +628,6 @@ html {
 .paginator > .page[selected="true"] {
     cursor: auto;
     color: #00f6d2;
-}
-
-.artwork-can-buy__dots {
-    margin-left: auto;
-    cursor: pointer;
-    margin-right: -4px;
 }
 
 .selector-container {

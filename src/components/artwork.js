@@ -1,11 +1,12 @@
-import html from '../utils/html.js';
-import loading from './item-loading.js';
-import artButton from './art-button.js';
-import popupMenu from './popup-menu.vue'
-import { common } from '../utils/consts.js';
+import loading from './item-loading.js'
+import artPrice from './artwork-price.vue'
 
 export default {
     props: {
+        artwork: {
+            type: Object,
+            required: true,
+        },
         id: {
             type: Number,
             required: true
@@ -39,10 +40,6 @@ export default {
             type: Number,
             default: 0,
         },
-        liked: {
-            type: Boolean,
-            default: false
-        },
         can_vote: {
             type: Boolean,
             default: true
@@ -60,27 +57,26 @@ export default {
         }
     },
 
-    emits: ['buy', 'sell', 'change_price', 'delete', 'details'],
+    emits: ['delete', 'details'],
 
     components: {
         loading,
-        artButton,
-        popupMenu
+        artPrice
     },
 
     computed: {
         is_headless () {
             return this.$state.is_headless
         },
-        amount () {
-            if (this.price) {
-                return (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
-            }
-        },
+
         image () {
             if (this.bytes.length) {
                 return URL.createObjectURL(new Blob([this.bytes], {type: this.mime_type}))
             }
+        },
+        
+        liked () {
+            return !!this.artwork.my_impression
         }
     },
 
@@ -89,7 +85,7 @@ export default {
             
             <!---- Preview OR Loading ---->
             <div class="preview-container">
-                <img v-if="image" :src="image"/ v-on:click="onDetails">
+                <img v-if="image" :src="image" v-on:click="onDetails">
                 <loading v-else :error="!!error"/>
             </div>
 
@@ -115,65 +111,14 @@ export default {
                 </span>
             </div>
 
-            <!---- Third info row, price/sell/change ----->
+            <!---- Third info row, price/buy/sell ----->
             <div class="artwork-price-row">
-
-                <!---- has price & owned, display change price / remove from sale options ---->
-                <span v-if="price && owned" class="artwork-can-buy">
-                    <img src="./assets/icon-beam.svg"/>
-                    <span class="artwork-can-buy__amount">{{amount}}</span>
-                    <span class="artwork-can-buy__curr">BEAM</span>
-                    <img class="artwork-can-buy__dots" src="./assets/icon-actions.svg" v-on:click="showOnSaleMenu">
-                    <popupMenu ref="saleMenu">
-                        <div class="item" v-on:click="onChangePrice">
-                            <img src="./assets/icon-change.svg"/>
-                            update the price
-                        </div>
-                        <div class="item" v-on:click="onRemoveFromSale">
-                            <img src="./assets/icon-eye-crossed.svg"/>
-                            remove from sale
-                        </div>
-                    </popupMenu>
-                </span>
-
-                <!---- has price but not owned, can buy ---->
-                <span v-if="price && !owned" class="artwork-can-buy">
-                    <img src="./assets/icon-beam.svg"/>
-                    <span class="artwork-can-buy__amount">{{amount}}</span>
-                    <span class="artwork-can-buy__curr">BEAM</span>
-                    <artButton class="artwork-can-buy__button" type="buy" v-on:click="onBuy"/>
-                </span>
-
-                <!---- doesn't have price & owned, can sell ---->
-                <artButton v-if="!price && owned" class="artwork-can-buy__button" v-on:click="onSell" type="sell"/>
-
-                <!---- doesn't have price & not owned, 
-                       can be anything - not approved yet, not sold by
-                       owner &c. Just dispaly that it is not on sale
-                ---->
-                <span v-if="!price && !owned" class="not-on-sale">
-                    Not for sale
-                </span>
+                <artPrice v-bind:artwork="artwork"/>
             </div>
         </div>
     `,
 
     methods: {
-        onBuy (ev) {
-            ev.preventDefault()
-            if (this.is_headless) {
-                this.$store.switchToHeaded()  
-            } 
-            else {
-                this.$emit('buy', this.id)
-            }
-        },
-
-        onSell (ev) {
-            ev.preventDefault()
-            this.$emit('sell', this.id)
-        },
-
         onLike (ev) {
             ev.preventDefault()
             if (this.is_headless) 
@@ -194,24 +139,9 @@ export default {
             }
         },
 
-        showOnSaleMenu(ev) {
-            ev.preventDefault()
-            this.$refs.saleMenu.open(ev)
-        },
-
-        onChangePrice (ev) {
-            ev.preventDefault()
-            this.$emit('change_price', this.id)
-        },
-
         onDelete (ev) {
             ev.preventDefault()
             this.$emit("delete", this.id)
-        },
-
-        onRemoveFromSale(ev) {
-            ev.preventDefault()
-            this.$emit("remove_from_sale", this.id)
         },
 
         onDetails(ev) {
