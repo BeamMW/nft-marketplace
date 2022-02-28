@@ -53,11 +53,11 @@ export default {
         },
 
         loading () {
-            return artwork.loading
+            return this.artwork.loading
         },
 
         error () {
-            return artwork.error
+            return this.artwork.error
         },
 
         artists () {
@@ -65,7 +65,7 @@ export default {
         },
 
         author () {
-            return (artists[artwork.pk_author] || {}).label
+            return (this.artists[this.artwork.pk_author] || {}).label
         }
     },
 
