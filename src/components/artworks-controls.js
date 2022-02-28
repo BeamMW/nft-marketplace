@@ -1,6 +1,6 @@
 import html from '../utils/html.js';
 import { tabs, sort } from '../utils/consts.js';
-import selector from './selector.js';
+import selector from './selector.vue';
 
 export default {
     computed: {
