@@ -72,13 +72,13 @@ export default {
                     </span>
                 </div>
                 <div class="artwork-controls__selectors">
-                    <selector
+                    <!--selector
                         v-on:selected="onAuthor"
                         :options="artist_options"
                         :selected="active_filter_by_artist"
                         title="Author"
                         v-if="artist_options.length"
-                    />
+                    /-->
                     <selector
                         v-on:selected="onSortBy"
                         :options="selector_options"

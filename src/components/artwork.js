@@ -3,7 +3,6 @@ import loading from './item-loading.js';
 import artButton from './art-button.js';
 import popupMenu from './popup-menu.vue'
 import { common } from '../utils/consts.js';
-import { nextTick } from 'vue';
 
 export default {
     props: {
@@ -61,7 +60,7 @@ export default {
         }
     },
 
-    emits: ['buy', 'sell', 'change_price', 'delete'],
+    emits: ['buy', 'sell', 'change_price', 'delete', 'details'],
 
     components: {
         loading,
@@ -90,7 +89,7 @@ export default {
             
             <!---- Preview OR Loading ---->
             <div class="preview-container">
-                <img v-if="image" :src="image"/>
+                <img v-if="image" :src="image"/ v-on:click="onDetails">
                 <loading v-else :error="!!error"/>
             </div>
 
@@ -213,6 +212,11 @@ export default {
         onRemoveFromSale(ev) {
             ev.preventDefault()
             this.$emit("remove_from_sale", this.id)
+        },
+
+        onDetails(ev) {
+            ev.preventDefault()
+            this.$emit("details", this.id)
         }
     }
 }

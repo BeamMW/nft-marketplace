@@ -20,6 +20,11 @@ const config = (DEV_MODE) => {return {
         path: path.resolve(__dirname, "html"),
         clean: true
     },
+    resolve: {
+        alias: {
+            "assets": path.resolve(__dirname, "src/assets/") 
+        }  
+    },
     module: {
         rules: [
             {
@@ -55,6 +60,17 @@ const config = (DEV_MODE) => {return {
                         }
                     }
                 ],
+            },
+            {   
+                test: /\.(gif|png|jpe?g|svg)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: 'assets/[name].[ext]'
+                        }
+                    }
+                ]
             }
         ]
     },

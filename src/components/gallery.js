@@ -6,6 +6,7 @@ import artworksControls from './artworks-controls.js'
 import { popups, tabs, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
+import adetails from './artwork-details.vue'
 
 export default {
     computed: {
@@ -45,8 +46,14 @@ export default {
         }
     },
 
+    data () {
+        return {
+            details_id: -1
+        }
+    },
+
     components: {
-        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator
+        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails
     },
 
     template: `
@@ -55,8 +62,11 @@ export default {
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
             <adminui v-if="is_admin"/>
-            <artworksControls></artworksControls>
-            <template v-if="artworks.length > 0">
+            <artworksControls v-if="details_id == -1"></artworksControls>
+            <adetails v-if="details_id != -1"
+                v-on:back="onDetailsBack"
+            />
+            <template v-else-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
                     v-bind:id="artwork.id"
@@ -79,6 +89,7 @@ export default {
                     v-on:change_price="onChangePrice"
                     v-on:remove_from_sale="onRemoveFromSale"
                     v-on:delete="onDeleteArtwork"
+                    v-on:details="onDetails"
                     />
                 </div>
                 <paginator
@@ -140,6 +151,14 @@ export default {
         onPageChanged(page) {
             this.$store.setCurrentPage(page)
             this.$refs.artslist.scrollTop = 0
+        },
+
+        onDetails (id) {
+            this.details_id = id
+        },
+
+        onDetailsBack() {
+            this.details_id = -1
         }
     }
 }

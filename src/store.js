@@ -190,7 +190,7 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = true//!!res.Admin
+        this.state.is_admin = false//!!res.Admin
         this.state.balance_reward = res.voteReward_balance
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
@@ -387,50 +387,54 @@ export const store = {
             })
         }
 
-        /*let activeArts = this.state.artworks[this.state.active_tab];
- 
         switch(this.state.sort_by) {
             case sort.NEWEST_TO_OLDEST:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id > b.id? 1 : -1);
+                this.state.artworks =  this.state.artworks.sort((a,b) => a.id > b.id? 1 : -1)
                 break;
+
             case sort.OLDEST_TO_NEWEST:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => a.id < b.id? 1 : -1);
+                this.state.artworks =  this.state.artworks.sort((a,b) => a.id < b.id? 1 : -1)
                 break;
+
             case sort.PRICE_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
                     if(a.price === undefined || a.price.amount === undefined) {
                         return 1;
                     }
-                     if(b.price === undefined || b.price.amount === undefined) {
-                         return -1;
-                     }
-                    return  a.price.amount > b.price.amount ? 1 : -1
-                    });
-                break;
+                    if(b.price === undefined || b.price.amount === undefined) {
+                        return -1;
+                    }
+                    return a.price.amount > b.price.amount ? 1 : -1
+                });
+                break
+
             case sort.PRICE_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) => {
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
                     if(a.price === undefined || a.price.amount === undefined) {
-                        return 1;
+                        return 1
                     }
-                     if(b.price === undefined || b.price.amount === undefined) {
-                         return -1;
-                     }
+                    if(b.price === undefined || b.price.amount === undefined) {
+                         return -1
+                    }
                     return  a.price.amount < b.price.amount ? 1 : -1
-                    });
-                break;
+                })
+                break
+
             case sort.LIKES_ASC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
                     return a.impressions > b.impressions? 1 : -1
-                    });
-                break;
+                })
+                break
+
             case sort.LIKES_DESC:
-                this.state.artworks[this.state.active_tab] = activeArts.sort((a,b) =>{
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
                     return a.impressions < b.impressions? 1 : -1
-                 });
-                break;
+                })
+                break
+
             default:
-              break;
-        }*/
+              break
+        }
     },
 
     loadArtwork(tab, idx, id) {
@@ -828,5 +832,9 @@ export const store = {
         this.state.active_tab = id
         this.applySortAndFilters()
         this.setCurrentPage(1)
+    },
+
+    showDetails(id) {
+        router.push({name: 'details'})
     }
 }

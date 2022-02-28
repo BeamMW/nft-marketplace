@@ -23,12 +23,11 @@ html {
     word-break:      break-word;
 }
 
-
-
 .balance-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 .balance {
@@ -78,8 +77,7 @@ html {
 .admin-column {
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
-    margin-bottom: -15px;
+    margin-bottom: 10px;
 }
 
 .admin-column select.upload_artist {
@@ -114,7 +112,6 @@ html {
 .actions-container {
     display: flex;
     flex-direction: row;
-    margin-top: 30px;
 }
 
 .artworks-controls {
@@ -223,6 +220,7 @@ html {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    cursor: pointer;
 }
 
 .artwork > .info-row {
