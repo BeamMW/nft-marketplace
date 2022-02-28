@@ -1,22 +1,20 @@
 <template>
-<div class="selector-container">
-      <span class="title">{{title}}</span>
-      <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
-        <div class="selected" :class="{ open: show }" @click="open">
-            {{ options[selected].name }}
-              <img src="~assets/icon-down.svg"  class="arrow" />
+  <div class="selector-container">
+        <span class="title">{{title}}</span>
+        <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
+          <div class="selected" :class="{ open: show }" @click="open">
+              {{ options[selected].name }}
+                <img src="~assets/icon-down.svg"  class="arrow" />
+          </div>
+          <div class="items" v-show="show"  :style="style">
+              <div v-for="(option, i) of options || []" :key="i"
+                  @click="onSelected(option)">
+                  <span :class="{ highlightLine: selected === i}">{{ option.name }}</span>
+              </div>
+          </div>
         </div>
-        <div class="items" v-show="show"  :style="style">
-            <div v-for="(option, i) of options || []" :key="i"
-                @click="onSelected(option)">
-                <span :class="{ highlightLine: selected === i}">{{ option.name }}</span>
-            </div>
-        </div>
-      </div>
-    </div>
-
+  </div>
 </template>
-
 
 <style scoped lang="stylus">
   .selector-container {
@@ -49,6 +47,7 @@
               font-size: 14px
               font-weight: bold
               letter-spacing: 0.47px
+
               &.open {
                   border: none
               }
@@ -70,6 +69,7 @@
               z-index: 1
               margin-top: 40px
               padding: 0 20px
+              
               div {
                   color: #fff
                   padding: 15px 0 15px 0
@@ -85,6 +85,7 @@
       }
   }    
 </style>
+
 <script>
 import { nextTick } from 'vue';
 import utils from '../utils/utils.js';
