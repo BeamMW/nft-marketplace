@@ -1,5 +1,5 @@
 /*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/loading.vue?vue&type=style&index=0&id=24a16d5c&lang=stylus&scoped=true ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-2.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/loading.vue?vue&type=style&index=0&id=24a16d5c&lang=stylus&scoped=true ***!
   \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .app-loading[data-v-24a16d5c] {
   text-align: center;
@@ -12,7 +12,7 @@
 }
 
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/error.vue?vue&type=style&index=0&id=ea0f4bb0&scoped=true&lang=stylus ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-2.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/error.vue?vue&type=style&index=0&id=ea0f4bb0&scoped=true&lang=stylus ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .error[data-v-ea0f4bb0] {
   display: flex;
@@ -31,7 +31,7 @@
 }
 
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/popup-menu.vue?vue&type=style&index=0&id=6326aff0&scoped=true&lang=stylus ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-2.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/popup-menu.vue?vue&type=style&index=0&id=6326aff0&scoped=true&lang=stylus ***!
   \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .popup-menu[data-v-6326aff0] {
   border-radius: 10px;
@@ -55,8 +55,72 @@
   margin-right: 10px;
 }
 
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-2.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/selector.vue?vue&type=style&index=0&id=71708f22&scoped=true&lang=stylus ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.selector-container[data-v-71708f22] {
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+}
+.selector-title[data-v-71708f22] {
+  align-self: center;
+  color: #fff;
+  opacity: 0.5;
+}
+.custom-select[data-v-71708f22] {
+  position: relative;
+  display: flex;
+  text-align: left;
+  outline: none;
+  height: 47px;
+  line-height: 47px;
+  min-width: 0px;
+  margin-left: auto;
+}
+.custom-select .selected[data-v-71708f22] {
+  color: #fff;
+  padding-left: 1em;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.7;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.47px;
+}
+.custom-select .selected.open[data-v-71708f22] {
+  border: none;
+}
+.custom-select .arrow[data-v-71708f22] {
+  width: 8px;
+  height: 8px;
+  margin-left: 3px;
+}
+.custom-select .items[data-v-71708f22] {
+  color: #fff;
+  position: absolute;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  right: 0;
+  z-index: 1;
+  margin-top: 40px;
+  padding: 0 20px;
+}
+.custom-select .items div[data-v-71708f22] {
+  color: #fff;
+  padding: 15px 0 15px 0;
+  white-space: nowrap;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+.custom-select .items div[data-v-71708f22]:hover {
+  color: #00f6d2;
+}
+
 /*!************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./src/styles/fonts.css ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-3.use[1]!./src/styles/fonts.css ***!
   \************************************************************************************************/
 @font-face {
     font-family: "SFProDisplay";
@@ -67,7 +131,7 @@
     font-style: normal;
 }
 /*!*************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./src/styles/global.css ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-3.use[1]!./src/styles/global.css ***!
   \*************************************************************************************************/
 /* common start */
 
@@ -739,18 +803,6 @@ html {
     font-size: 18px;
 }
 
-
-.selector-container {
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-}
-.selector-title{
-    align-self: center;
-    color: #fff;
-    opacity: 0.5; 
-}
-  
 .show {
     display: flex;
     margin-left: 200px; 
@@ -777,59 +829,3 @@ html {
    margin-right: 20px;
 }
 
-.custom-select {
-    position: relative;
-    display: flex;
-    text-align: left;
-    outline: none;
-    height: 47px;
-    line-height: 47px;
-    min-width: 0px;
-    margin-left: auto;
-}
-
-.custom-select .selected {
-    color: #fff;
-    padding-left: 1em;
-    cursor: pointer;
-    user-select: none;
-    opacity: 0.7;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.47px;
-}
-
-.custom-select .selected.open {
-    border: none;
-}
-
-.custom-select .arrow {
-    width:8px;
-    height:8px;
-    margin-left:3px;
-}
-
-.custom-select .items {
-    color: #fff;
-    position: absolute;
-    border:none;
-    border-radius: 4px;
-    font-size: 16px;
-    right: 0;
-    z-index: 1;
-    margin-top: 40px;
-    padding: 0 20px;
-}
-  
-.custom-select .items div {
-    color: #fff;
-    padding: 15px 0 15px 0;
-    white-space: nowrap;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-}
-  
-.custom-select .items div:hover {
-    color: #00f6d2;
-}

@@ -27,6 +27,14 @@ const config = (DEV_MODE) => {return {
                 loader: 'vue-loader'
             },
             {
+                test: /\.(jpe?g|png|svg)(\?[a-z0-9=.]+)?$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                    }
+                ]
+            },
+            {
                 test: /\.styl(us)?$/i,
                 use: [
                     extractCSS.loader,

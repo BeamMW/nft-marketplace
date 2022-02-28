@@ -20,6 +20,7 @@
     "mini-css-extract-plugin": "^2.4.3",
     "stylus": "^0.56.0",
     "stylus-loader": "^6.2.0",
+    "url-loader": "^4.1.1",
     "vue": "^3.2.31",
     "vue-loader": "^17.0.0",
     "vue-router": "4",
