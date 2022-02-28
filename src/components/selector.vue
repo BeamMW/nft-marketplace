@@ -26,6 +26,7 @@
           align-self: center
           color: #fff
           opacity: 0.5
+          padding-bottom: 3px
       }
 
       .custom-select {
