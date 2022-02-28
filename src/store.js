@@ -190,7 +190,7 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = false//!!res.Admin
+        this.state.is_admin = !!res.Admin
         this.state.balance_reward = res.voteReward_balance
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
