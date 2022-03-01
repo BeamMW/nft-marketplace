@@ -1,6 +1,6 @@
 <template>
     <div class="loading darker">
-    {{ this.error ? 'Failed to load artwork' : 'Loading...' }}
+    {{ error ? 'Failed to load artwork' : 'Loading...' }}
     </div>
 </template>
 
