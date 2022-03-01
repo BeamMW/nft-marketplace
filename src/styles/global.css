@@ -13,16 +13,6 @@ html {
     width:       100%;
 }
 
-.loading {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    height:          100%;
-    width:           100%;
-    overflow:        hidden;
-    word-break:      break-word;
-}
-
 .balance-container {
     display: flex;
     flex-direction: row;
@@ -598,64 +588,6 @@ html {
 *[disabled="true"] {
     cursor: default !important;
     opacity: 0.5;
-}
-
-.paginator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 2px;
-}
-
-.paginator > .prev,
-.paginator > .next {
-    width: 68px !important;
-    height: 22px;
-    margin: 0 20px 0 0;
-    border-radius: 2px;
-    background-color: rgba(255, 255, 255, .1);
-    color: rgba(255, 255, 255, .5);
-    font-size: 14px;
-    text-align: center;
-    user-select: none;
-}
-
-.paginator > .prev:hover:not([disabled="true"]),
-.paginator > .next:hover:not([disabled="true"]) {
-    color: rgba(255, 255, 255, .9);
-    cursor: pointer;
-}
-
-.paginator > .prev[disabled="true"],
-.paginator > .next[disabled="true"] {
-    color: rgba(255, 255, 255, .15);
-}
-
-.paginator > .prev {
-    margin: 0 13px 0 0;
-}
-
-.paginator > .next {
-    margin: 0 0 0 16px;
-}
-
-.paginator > .page {
-  margin: 3px 7px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  user-select: none;
-}
-
-.paginator >.page:hover:not([selected="true"]) {
-    color: rgba(255, 255, 255, .9);
-    cursor: pointer
-}
-
-.paginator > .page[selected="true"] {
-    cursor: auto;
-    color: #00f6d2;
 }
 
 .artwork-can-buy__dots {

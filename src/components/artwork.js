@@ -1,5 +1,5 @@
 import html from '../utils/html.js';
-import loading from './item-loading.js';
+import loading from './item-loading.vue';
 import artButton from './art-button.js';
 import popupMenu from './popup-menu.vue'
 import { common } from '../utils/consts.js';
