@@ -179,28 +179,72 @@
   flex-direction: column;
   margin-top: 15px;
 }
-.container .details[data-v-b1dac1ee] {
+.container .details-row[data-v-b1dac1ee] {
+  display: flex;
+  flex-direction: row;
   margin-top: 15px;
-  border: none;
-  background-color: rgba(240,205,205,0.05);
-  border-radius: 20px;
-  width: calc(100% - 100px);
-  padding: 35px 50px;
 }
-.container .details .title[data-v-b1dac1ee] {
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-}
-.container .details .author[data-v-b1dac1ee] {
-  font-size: 16px;
-  color: #fff;
-}
-.container .details .separator[data-v-b1dac1ee] {
+.container .details-row .separator[data-v-b1dac1ee] {
   height: 1px;
   margin: 20px 0;
   opacity: 0.2;
   border-top: solid 1px #fff;
+}
+.container .details-row .artwork-container[data-v-b1dac1ee] {
+  flex: 0 0 50%;
+  box-sizing: border-box;
+  padding-right: 10px;
+  max-width: 50%;
+}
+.container .details-row .artwork-container .artwork-box[data-v-b1dac1ee] {
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.container .details-row .artwork-container .artwork-box > img[data-v-b1dac1ee] {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+.container .details-row .info-container[data-v-b1dac1ee] {
+  flex: 0 0 50%;
+  box-sizing: border-box;
+  padding-left: 10px;
+  max-width: 50%;
+}
+.container .details-row .info-container .info-box[data-v-b1dac1ee] {
+  background-color: rgba(255,255,255,0.05);
+  min-height: 360px;
+  border-radius: 10px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 35px 40px;
+  display: flex;
+  flex-direction: column;
+}
+.container .details-row .info-container .info-box .title[data-v-b1dac1ee] {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.container .details-row .info-container .info-box .author[data-v-b1dac1ee] {
+  font-size: 16px;
+  color: #fff;
+  margin-top: 8px;
+}
+.container .details-row .info-container .info-box .author > span[data-v-b1dac1ee] {
+  color: #00f6d2;
+  margin-left: 4px;
+}
+.container .details-row .info-container .info-box .price[data-v-b1dac1ee] {
+  margin-top: auto;
 }
 
 /*!************************************************************************************************!*\

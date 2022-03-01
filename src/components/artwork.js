@@ -1,5 +1,6 @@
 import loading from './item-loading.js'
 import artPrice from './artwork-price.vue'
+import artPreview from './artwork-preview.vue'
 
 export default {
     props: {
@@ -13,7 +14,8 @@ export default {
 
     components: {
         loading,
-        artPrice
+        artPrice,
+        artPreview
     },
 
     computed: {
@@ -32,13 +34,6 @@ export default {
         title () {
             return this.artwork.title
         },
-
-        image () {
-            let bytes = this.artwork.bytes
-            if (bytes) {
-                return URL.createObjectURL(new Blob([bytes], {type: this.artwork.mime_type}))
-            }
-        },
         
         likes_cnt () {
             return this.artwork.impressions
@@ -56,10 +51,6 @@ export default {
             return this.artwork.loading
         },
 
-        error () {
-            return this.artwork.error
-        },
-
         artists () {
             return this.$state.artists
         },
@@ -73,9 +64,8 @@ export default {
         <div class="artwork">
             
             <!---- Preview OR Loading ---->
-            <div class="preview-container">
-                <img v-if="image" :src="image" v-on:click="onDetails">
-                <loading v-else :error="!!error"/>
+            <div class="preview-container" v-on:click="onDetails">
+                <artPreview v-bind:artwork="artwork"/>
             </div>
 
             <!---- Delete Artwork Button ---->
