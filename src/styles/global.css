@@ -20,72 +20,10 @@ html {
     margin-bottom: 10px;
 }
 
-.balance {
-    width: 442px;
-    height: 78px;
-    border-radius: 10px;
-    background-color: rgba(255,255,255,0.1);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0 20px;
-    padding-left: 20px;
-}
-
-.balance-value {
-    margin-left: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.balance-withdraw {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.balance-withdraw__icon {
-    width: 16px;
-    height: 16px;
-}
-
-.balance-withdraw__text {
-    margin-left: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #0bccf7;
-}
-
 .show-key {
     font-size: 16px;
     color: #00f6d2;
     margin-right: 10px;
-}
-
-.admin-column {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-}
-
-.admin-column select.upload_artist {
-    font-size: 0.95em;
-}
-
-.admin-row {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-}
-
-.admin-row > *:not(first) {
-    margin-top: 20px;
-}
-
-.admin-row > input {
-    margin-right: 20px;
 }
 
 .vertical-container {
@@ -388,29 +326,9 @@ html {
     cursor: pointer;
 }
 
-.user-opt__key__text {
-    font-size: 16px;
-    color: #00f6d2;
-    margin-left: 10px;
-}
-
 .user-opt__key__connect {
     font-size: 16px;
     color: #00f6d2;
-}
-
-.user-opt__user {
-    padding-left: 15px;
-    padding-bottom: 12px;
-    display: flex;
-    align-items: center;
-}
-
-.user-opt__user__text {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    margin-left: 7px;
 }
 
 .mine {
