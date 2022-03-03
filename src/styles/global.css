@@ -13,13 +13,6 @@ html {
     width:       100%;
 }
 
-.balance-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
 .show-key {
     font-size: 16px;
     color: #00f6d2;
@@ -269,26 +262,6 @@ html {
 
 .button:not(.disabled):hover {
     box-shadow: 0 0 8px white;
-}
-
-.user-opt {
-    display: flex;
-    flex-direction: column;
-    margin-left: auto;
-}
-
-.user-opt__key {
-    padding: 14px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, .1);
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.user-opt__key__connect {
-    font-size: 16px;
-    color: #00f6d2;
 }
 
 .mine {
