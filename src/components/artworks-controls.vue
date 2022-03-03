@@ -1,4 +1,90 @@
-import html from '../utils/html.js';
+<template>
+    <div class="actions-container">
+    <div class="artworks-controls">
+        <div class="tabs">
+            <span
+             v-for="(tab) of tabs_sort_by"
+             v-bind:key="tab.id"
+             :class="[ active_tab === tab.id ? 'tab-active' : '','tab-item']" 
+             @click="onTabClicked(tab.id)"
+             >
+                <div class="title">{{ tab.name }}</div>
+                <div v-if="active_tab === tab.id" class="bottom-line"></div>
+            </span>
+        </div>
+        <div class="selectors">
+           <!-- <selector
+                v-on:selected="onAuthor"
+                :options="artist_options"
+                :selected="active_filter_by_artist"
+                title="Author"
+                v-if="artist_options.length"
+            /> -->
+            <selector
+                v-on:selected="onSortBy"
+                :options="selector_options"
+                :selected="active_sort_by"
+                title="Sort by"
+            />
+        </div>
+    </div>
+    </div>
+</template>
+
+<style scoped lang="stylus">
+.actions-container {
+    display: flex;
+    flex-direction: row;
+
+    .artworks-controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        
+        .tabs {
+            display: flex;
+            flex-direction: row;
+
+            .tab-active {
+                color: #fff;
+            }
+
+            .tab-item {
+                color: rgba(255, 255, 255, .3);
+                font-size: 12px;
+                font-weight: bold;
+                cursor: pointer;
+
+                .title {
+                    padding: 4px 16px;
+                    text-transform: uppercase;
+                }
+
+                .bottom-line {
+                    height: 2px;
+                    width: 100%;
+                    box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7);
+                    background-color: #00f6d2;
+                }
+            }
+        }
+    }
+    
+    .selectors {
+        display: flex;
+        margin-left: auto;
+        padding-right: 2px;
+    
+        & > div:not(:last-child) {
+        margin-right: 20px;
+        }
+    }
+
+}
+</style>
+
+<script>
 import { tabs, sort } from '../utils/consts.js';
 import selector from './selector.vue';
 
@@ -62,34 +148,6 @@ export default {
         }
     },
 
-    template: `
-        <div class="actions-container">
-            <div class="artworks-controls">
-                <div class="artworks-controls__tabs">
-                    <span v-for="(tab,i) of tabs_sort_by" class="tab-item" :class="{ 'tab-active': active_tab === tab.id}" @click="onTabClicked(tab.id)">
-                        <div class="tab-item__title">{{tab.name}}</div>
-                        <div v-if="active_tab === tab.id" class="tab-item__bottom-line"></div>
-                    </span>
-                </div>
-                <div class="artwork-controls__selectors">
-                    <!--selector
-                        v-on:selected="onAuthor"
-                        :options="artist_options"
-                        :selected="active_filter_by_artist"
-                        title="Author"
-                        v-if="artist_options.length"
-                    /-->
-                    <selector
-                        v-on:selected="onSortBy"
-                        :options="selector_options"
-                        :selected="active_sort_by"
-                        title="Sort by"
-                    />
-                </div>
-           </div>
-        </div>
-    `,
-
     methods: {
         onTabClicked(id) {
             if (this.active_tab !== id) {
@@ -111,3 +169,4 @@ export default {
         }
     }
 }
+</script>
