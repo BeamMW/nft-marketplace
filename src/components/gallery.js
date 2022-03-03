@@ -1,7 +1,7 @@
 import adminui from  './admin-ui.vue'
 import artwork from  './artwork.js'
 import balance from  './balance.vue'
-import headless from './headless.js'
+import headless from './headless.vue'
 import artworksControls from './artworks-controls.vue'
 import { popups, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
