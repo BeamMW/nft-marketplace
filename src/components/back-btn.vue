@@ -29,7 +29,7 @@ export default {
     text: {
       type: String,
       required: false,
-      default: "Back"
+      default: "back"
     },
   }
 }

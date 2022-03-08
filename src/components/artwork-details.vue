@@ -19,6 +19,11 @@
         </div>
       </div>
     </div>
+    <div class="table-title">Nft trading history</div>
+    <!--ag-grid-vue
+      class="table ag-theme-alpine"
+      :columnDefs="columnDefs"
+    /-->
   </div>
 </template>
 
@@ -26,7 +31,25 @@
   .container {
     display: flex
     flex-direction: column
-    margin-top: 15px
+    box-sizing: border-box
+    padding-top: 15px
+    width: 100%
+    height: 100%
+
+    & .table-title {
+      box-sizing: border-box
+      padding: 30px 0 20px 0
+      color: rgba(255, 255, 255, 0.5)
+      font-size: 14px
+      text-transform: uppercase
+      font-weight: bold
+      letter-spacing: 3.1px
+    }
+
+    & .table {
+      margin-top: 10px
+      min-height: 200px
+    }
 
     & .details-row {
       display: flex
@@ -112,6 +135,9 @@
 import artPrice from './artwork-price.vue'
 import backBtn from './back-btn.vue'
 import artPreview from './artwork-preview.vue'
+import "ag-grid-community/dist/styles/ag-grid.css"
+import "ag-grid-community/dist/styles/ag-theme-alpine.css"
+import { AgGridVue } from "ag-grid-vue3"
 
 export default {
   props: {
@@ -135,6 +161,16 @@ export default {
     }
   },
 
+  data () {
+    return {
+      columnDefs: [
+        { headerName: "Coin",   field: "coin" },
+        { headerName: "Amount", field: "amount"},
+        { headerName: "Date",   field: "date" },
+      ],
+    }
+  },
+
   emits: [
     'back'
   ],
@@ -142,7 +178,8 @@ export default {
   components: {
     artPrice,
     artPreview,
-    backBtn
+    backBtn,
+    AgGridVue
   },
 
   methods: {

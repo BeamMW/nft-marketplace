@@ -190,7 +190,7 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = !!res.Admin
+        this.state.is_admin = false//!!res.Admin
         this.state.balance_reward = res.voteReward_balance
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
@@ -316,6 +316,10 @@ export const store = {
         let mykeys = this.state.my_artist_keys
 
         for (let awork of res.items) {
+            if (awork.sales) {
+                alert(JSON.stringify(awork.sales))
+            }
+
             let oawork = null
             for (let idx = oldstart; idx < oartworks.length; ++idx) {
                 if (oartworks[idx].id == awork.id) {

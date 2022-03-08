@@ -22,8 +22,8 @@ const config = (DEV_MODE) => {return {
     },
     resolve: {
         alias: {
-            "assets": path.resolve(__dirname, "src/assets/") 
-        }  
+            "assets": path.resolve(__dirname, "src/assets/"), 
+        }
     },
     module: {
         rules: [
