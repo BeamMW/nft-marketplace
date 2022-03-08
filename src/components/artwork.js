@@ -1,6 +1,9 @@
 import html from '../utils/html.js';
 import loading from './item-loading.js';
-import artButton from './art-button.js';
+// import artButton from './art-button.js';
+//test
+import artButton from './button.vue';
+///
 import popupMenu from './popup-menu.vue'
 import { common } from '../utils/consts.js';
 import { nextTick } from 'vue';
@@ -142,11 +145,11 @@ export default {
                     <img src="./assets/icon-beam.svg"/>
                     <span class="artwork-can-buy__amount">{{amount}}</span>
                     <span class="artwork-can-buy__curr">BEAM</span>
-                    <artButton class="artwork-can-buy__button" type="buy" v-on:click="onBuy"/>
+                    <artButton class="artwork-can-buy__button" v-on:click="onBuy" type="buy" title="test 2"/>
                 </span>
 
                 <!---- doesn't have price & owned, can sell ---->
-                <artButton v-if="!price && owned" class="artwork-can-buy__button" v-on:click="onSell" type="sell"/>
+                <artButton v-if="!price && owned" class="artwork-can-buy__button" v-on:click="onSell" type="sell" title="test"/>
 
                 <!---- doesn't have price & not owned, 
                        can be anything - not approved yet, not sold by

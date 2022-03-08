@@ -1,63 +1,7 @@
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/loading.vue?vue&type=style&index=0&id=24a16d5c&lang=stylus&scoped=true ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.app-loading[data-v-24a16d5c] {
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 50px;
-}
-.app-loading .title[data-v-24a16d5c] {
-  font-size: 25px;
-  font-weight: 400;
-}
-
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/error.vue?vue&type=style&index=0&id=ea0f4bb0&scoped=true&lang=stylus ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.error[data-v-ea0f4bb0] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  word-break: break-word;
-  color: #c55b61;
-}
-.error pre[data-v-ea0f4bb0] {
-  font-family: 'SFProDisplay', sans-serif;
-  font-weight: normal;
-  white-space: pre-wrap;
-}
-
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[4].use[0]!./src/components/popup-menu.vue?vue&type=style&index=0&id=6326aff0&scoped=true&lang=stylus ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.popup-menu[data-v-6326aff0] {
-  border-radius: 10px;
-  z-index: 999;
-  position: fixed;
-  outline: none;
-  padding: 10px 20px;
-}
-.popup-menu .item[data-v-6326aff0-s] {
-  color: #fff;
-  padding: 6px 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  line-height: normal !important;
-}
-.popup-menu .item[data-v-6326aff0-s]:hover {
-  color: #00f6d2;
-}
-.popup-menu .item[data-v-6326aff0-s]>img {
-  margin-right: 10px;
-}
-
-/*!************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./src/styles/fonts.css ***!
-  \************************************************************************************************/
+.app-loading[data-v-18b2f77c]{text-align:center;margin:0 auto;margin-top:50px}.app-loading .title[data-v-18b2f77c]{font-size:25px;font-weight:400}
+.error[data-v-75b5c9a8]{display:flex;align-items:center;justify-content:center;height:100%;width:100%;overflow:hidden;word-break:break-word;color:#c55b61}.error pre[data-v-75b5c9a8]{font-family:'SFProDisplay',sans-serif;font-weight:normal;white-space:pre-wrap}
+.button[data-v-2eb866ae]{padding:11px 25px;border-radius:50px;display:flex;align-items:center;color:#032e49;font-size:14px;font-weight:bold;cursor:pointer}.button.text[data-v-2eb866ae]{margin-left:5px;line-height:1}.buy[data-v-2eb866ae]{background-color:#da68f5}.sell[data-v-2eb866ae],.change[data-v-2eb866ae]{background-color:#0bccf7}.cancel[data-v-2eb866ae],.close[data-v-2eb866ae]{background-color:rgba(255,255,255,0.1);color:#fff}.proceed[data-v-2eb866ae]{margin-left:30px;background-color:#0bccf7}.copy[data-v-2eb866ae]{margin-left:30px;background-color:#00f6d2}.button[data-v-2eb866ae]:not(.disabled):hover{box-shadow:0 0 8px #fff}
+.popup-menu[data-v-451d68b1]{border-radius:10px;z-index:999;position:fixed;outline:none;padding:10px 20px}.popup-menu .item[data-v-451d68b1-s]{color:#fff;padding:6px 0;cursor:pointer;display:flex;align-items:center;line-height:normal !important}.popup-menu .item[data-v-451d68b1-s]:hover{color:#00f6d2}.popup-menu .item[data-v-451d68b1-s]>img{margin-right:10px}
 @font-face {
     font-family: "SFProDisplay";
     font-display: swap;
@@ -66,9 +10,6 @@
     font-weight: normal;
     font-style: normal;
 }
-/*!*************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-2.use[1]!./src/styles/global.css ***!
-  \*************************************************************************************************/
 /* common start */
 
 html, body {
@@ -433,7 +374,7 @@ html {
     cursor: auto !important;
 }
 
-.button {
+/* .button {
     padding: 11px 25px;
     border-radius: 50px;
     display: flex;
@@ -476,7 +417,7 @@ html {
 
 .button:not(.disabled):hover {
     box-shadow: 0 0 8px white;
-}
+} */
 
 .user-opt {
     display: flex;

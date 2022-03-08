@@ -7,6 +7,9 @@ import { popups, tabs, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
 
+/// test
+import BUTTON from './button.vue'
+
 export default {
     computed: {
         is_admin () {
