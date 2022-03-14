@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import loading from './item-loading.js'
+import loading from './item-loading.vue'
 
 export default {
   props: {

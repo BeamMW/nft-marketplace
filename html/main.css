@@ -111,6 +111,22 @@
   color: #fff;
 }
 
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/item-loading.vue?vue&type=style&index=0&id=864488dc&lang=stylus&scoped=true ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.loading[data-v-864488dc] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+}
+.loading .darker[data-v-864488dc] {
+  opacity: 0.5;
+}
+
 /*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/balance.vue?vue&type=style&index=0&id=14992afc&lang=stylus&scoped=true ***!
   \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -184,6 +200,33 @@
   margin-left: 10px;
 }
 .balance-container .user-opt .key .key__connect[data-v-14992afc] {
+  font-size: 16px;
+  color: #00f6d2;
+}
+
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/headless.vue?vue&type=style&index=0&id=18f031ee&lang=stylus&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.balance-container[data-v-18f031ee] {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.balance-container .user-opt[data-v-18f031ee] {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+}
+.balance-container .user-opt .key[data-v-18f031ee] {
+  padding: 14px;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.balance-container .user-opt .connect[data-v-18f031ee] {
   font-size: 16px;
   color: #00f6d2;
 }
@@ -569,13 +612,6 @@ html {
     width:       100%;
 }
 
-.balance-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
 .show-key {
     font-size: 16px;
     color: #00f6d2;
@@ -825,26 +861,6 @@ html {
 
 .button:not(.disabled):hover {
     box-shadow: 0 0 8px white;
-}
-
-.user-opt {
-    display: flex;
-    flex-direction: column;
-    margin-left: auto;
-}
-
-.user-opt__key {
-    padding: 14px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, .1);
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.user-opt__key__connect {
-    font-size: 16px;
-    color: #00f6d2;
 }
 
 .mine {
