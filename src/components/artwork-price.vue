@@ -82,6 +82,7 @@
 
 <script>
 import { common, popups } from '../utils/consts.js'
+import utils from '../utils/utils.js'
 import artButton from './art-button.js'
 import popupMenu from './popup-menu.vue'
 
@@ -117,7 +118,7 @@ export default {
     
     amount () {
       if (this.price) {
-        return (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+        return utils.formatAmount(this.price.amount)
       }
     }
   },

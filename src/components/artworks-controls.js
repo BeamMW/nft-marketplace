@@ -52,8 +52,8 @@ export default {
     data() {
         return {
             selector_options: [
-                { name: "Added: Newest to Oldest", sort_type: sort.NEWEST_TO_OLDEST },
                 { name: "Added: Oldest to Newest", sort_type: sort.OLDEST_TO_NEWEST },
+                { name: "Added: Newest to Oldest", sort_type: sort.NEWEST_TO_OLDEST },
                 { name: "Price: Low to High", sort_type: sort.PRICE_ASC },
                 { name: "Price: High to Low", sort_type: sort.PRICE_DESC },
                 { name: "Likes: Low to High", sort_type: sort.LIKES_ASC },

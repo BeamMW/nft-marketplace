@@ -745,4 +745,12 @@ export default class Utils {
         let res = JSON.stringify(obj, null, 2)
         return res == "{}" ? obj.toString() : res
     }
+
+    static formatAmount(amount) {
+        return (amount / 100000000).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+    }
+
+    static formatHeight(height) {
+        return new Intl.NumberFormat().format(height)
+    }
 }

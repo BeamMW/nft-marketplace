@@ -30,11 +30,12 @@ function defaultState() {
         is_popup_visible: false,
         popup_type: null,
         id_to_sell: '',
-        sort_by: sort.NEWEST_TO_OLDEST,
+        sort_by: sort.OLDEST_TO_NEWEST,
         filter_by_artist: 0,
         pending_artworks: 0,
         is_headless: false,
-        current_page: 1
+        current_page: 1,
+        use_ipfs: false
     }
 }
 
@@ -86,12 +87,14 @@ export const store = {
 
     setSortBy(val) {
         this.state.sort_by = val
+        this.state.current_page = 1
         this.applySortAndFilters()
         this.loadCurrentArtworks()
     },
 
     setFilterByArtist(val) {
         this.state.filter_by_artist = val
+        this.state.current_page = 1
         this.applySortAndFilters()
         this.loadCurrentArtworks()
     },
@@ -190,7 +193,7 @@ export const store = {
 
         utils.ensureField(res, "Admin", "number")
         utils.ensureField(res, "voteReward_balance", "number")
-        this.state.is_admin = false//!!res.Admin
+        this.state.is_admin = !!res.Admin
         this.state.balance_reward = res.voteReward_balance
         utils.invokeContract(
             `role=user,action=view_balance,cid=${this.state.cid}`, 
@@ -320,6 +323,11 @@ export const store = {
                 alert(JSON.stringify(awork.sales))
             }
 
+            if (awork.id == 2) {
+                let a = 0;
+                a++
+            }
+
             let oawork = null
             for (let idx = oldstart; idx < oartworks.length; ++idx) {
                 if (oartworks[idx].id == awork.id) {
@@ -392,12 +400,16 @@ export const store = {
         }
 
         switch(this.state.sort_by) {
-            case sort.NEWEST_TO_OLDEST:
-                this.state.artworks =  this.state.artworks.sort((a,b) => a.id > b.id? 1 : -1)
+            case sort.OLDEST_TO_NEWEST:
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
+                    return a.id < b.id ? -1 : 1
+                })
                 break;
 
-            case sort.OLDEST_TO_NEWEST:
-                this.state.artworks =  this.state.artworks.sort((a,b) => a.id < b.id? 1 : -1)
+            case sort.NEWEST_TO_OLDEST:
+                this.state.artworks =  this.state.artworks.sort((a,b) => {
+                    return a.id < b.id ? 1 : -1
+                })
                 break;
 
             case sort.PRICE_ASC:
@@ -454,6 +466,11 @@ export const store = {
     },
 
     onLoadArtwork(err, res, id, idx) {
+        if (id == 2) {
+            let a = 0;
+            a++
+        }
+
         // list may have been changed, so we check 
         // if artwork with this id is still present
         let artwork = this.state.artworks[idx]
@@ -488,7 +505,7 @@ export const store = {
                 artwork.pk_author = pk_author
                 artwork.loading   = false
             } 
-            else if (data[0] == 2) {    
+            else if (data[0] == 2 && this.use_ipfs) {   
                 let rawMeta = data.subarray(1)
                 let meta = JSON.parse((new TextDecoder()).decode(rawMeta))
 
@@ -631,7 +648,14 @@ export const store = {
         )
     },
 
-    uploadArtworkOld (file, artist_key) {
+    uploadArtwork (file, artist_key) {
+        if (this.use_ipfs) {
+            return this.uploadArtworkIPFS(file, artist_key)
+        }
+        return this.uploadArtworkChain(file, artist_key)
+    },
+
+    uploadArtworkChain (file, artist_key) {
         let name = file.name.split('.')[0]
         name = [name[0].toUpperCase(), name.substring(1)].join('')
             
@@ -660,7 +684,7 @@ export const store = {
         }
     },
 
-    uploadArtwork (file, artist_key) {
+    uploadArtworkIPFS (file, artist_key) {
         let name = file.name.split('.')[0]
         name = [name[0].toUpperCase(), name.substring(1)].join('')
             
@@ -699,6 +723,17 @@ export const store = {
         catch(err) {
             this.setError(err, "Failed to upload artwork")
         }
+    },
+
+    getSalesHistory(id, cback) {
+        utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${id}`,
+            (err, res) => {
+                if (err) {
+                    return this.setError(err)
+                }
+                cback(res.sales)
+            }
+        )
     },
 
     showStats() {

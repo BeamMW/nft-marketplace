@@ -57,6 +57,10 @@ export default {
 
         author () {
             return (this.artists[this.artwork.pk_author] || {}).label
+        },
+
+        error () {
+            return !!this.artwork.error
         }
     },
 
@@ -74,19 +78,22 @@ export default {
             <!---- First info row ---->
             <div class="info-row">
                 <!---- Title ---->
-                <span class="artwork-title">{{title || "Loading..."}}</span>
-                
+                <div class="artwork-title" v-if="loading">Loading...</div>
+                <div class="artwork-title" v-else-if="error">Failed to load artwork</div>
+                <div class="artwork-title" v-else>{{title}}</div>
                 <!---- Likes ----->
-                <span class="artwork-likes pointer-cursor" v-on="{click: liked ? onUnlike : onLike}" :disabled="!can_vote">
+                <div class="artwork-likes pointer-cursor" v-on="{click: liked ? onUnlike : onLike}" :disabled="!can_vote">
                     <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
                     <span class="artwork-likes__text">{{likes_cnt}}</span>
-                </span>
+                </div>
             </div>
 
             <!---- Second info row, author ---->
             <div class="info-row">
-                <span class="artwork-author">
-                    {{ this.author ? ['by', this.author].join(' ') : 'Loading...' }}
+                <span class="artwork-author" v-if="loading">Loading...</span>
+                <span class="artwork-author" v-else-if="error"></span>
+                <span class="artwork-author" v-else>
+                        {{['by', this.author].join(' ')}}
                 </span>
             </div>
 
