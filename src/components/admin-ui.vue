@@ -33,14 +33,10 @@
     flex-direction: column
     margin-bottom: 10px
 
-    .upload_artist {
+    select.upload_artist {
         font-size: 0.95em
     }
-
-    span, input,select {
-        font-size: 1.05em
-    }
-
+    
     .admin-row {
         display:         flex
         align-items:     center

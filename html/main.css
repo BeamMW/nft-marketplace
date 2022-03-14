@@ -38,13 +38,8 @@
   flex-direction: column;
   margin-bottom: 10px;
 }
-.admin-column .upload_artist[data-v-7c5d5e3c] {
+.admin-column select.upload_artist[data-v-7c5d5e3c] {
   font-size: 0.95em;
-}
-.admin-column span[data-v-7c5d5e3c],
-.admin-column input[data-v-7c5d5e3c],
-.admin-column select[data-v-7c5d5e3c] {
-  font-size: 1.05em;
 }
 .admin-column .admin-row[data-v-7c5d5e3c] {
   display: flex;
@@ -191,6 +186,116 @@
 .balance-container .user-opt .key .key__connect[data-v-14992afc] {
   font-size: 16px;
   color: #00f6d2;
+}
+
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/selector.vue?vue&type=style&index=0&id=71708f22&scoped=true&lang=stylus ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.selector-container[data-v-71708f22] {
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+}
+.selector-container .title[data-v-71708f22] {
+  align-self: center;
+  color: #fff;
+  opacity: 0.5;
+  padding-bottom: 3px;
+}
+.selector-container .custom-select[data-v-71708f22] {
+  position: relative;
+  display: flex;
+  text-align: left;
+  outline: none;
+  height: 47px;
+  line-height: 47px;
+  min-width: 0px;
+  margin-left: auto;
+}
+.selector-container .custom-select .selected[data-v-71708f22] {
+  color: #fff;
+  padding-left: 1em;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.7;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.47px;
+}
+.selector-container .custom-select .selected.open[data-v-71708f22] {
+  border: none;
+}
+.selector-container .custom-select .arrow[data-v-71708f22] {
+  width: 8px;
+  height: 8px;
+  margin-left: 3px;
+}
+.selector-container .custom-select .items[data-v-71708f22] {
+  color: #fff;
+  position: absolute;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  right: 0;
+  z-index: 1;
+  margin-top: 40px;
+  padding: 0 20px;
+}
+.selector-container .custom-select .items div[data-v-71708f22] {
+  color: #fff;
+  padding: 15px 0 15px 0;
+  white-space: nowrap;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+.selector-container .custom-select .items div[data-v-71708f22]:hover {
+  color: #00f6d2;
+}
+
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/artworks-controls.vue?vue&type=style&index=0&id=f5326038&scoped=true&lang=stylus ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.actions-container[data-v-f5326038] {
+  display: flex;
+  flex-direction: row;
+}
+.actions-container .artworks-controls[data-v-f5326038] {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+.actions-container .artworks-controls .tabs[data-v-f5326038] {
+  display: flex;
+  flex-direction: row;
+}
+.actions-container .artworks-controls .tabs .tab-active[data-v-f5326038] {
+  color: #fff;
+}
+.actions-container .artworks-controls .tabs .tab-item[data-v-f5326038] {
+  color: rgba(255,255,255,0.3);
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.actions-container .artworks-controls .tabs .tab-item .title[data-v-f5326038] {
+  padding: 4px 16px;
+  text-transform: uppercase;
+}
+.actions-container .artworks-controls .tabs .tab-item .bottom-line[data-v-f5326038] {
+  height: 2px;
+  width: 100%;
+  box-shadow: 0 0 5px 0 rgba(0,246,210,0.7);
+  background-color: #00f6d2;
+}
+.actions-container .selectors[data-v-f5326038] {
+  display: flex;
+  margin-left: auto;
+  padding-right: 2px;
+}
+.actions-container .selectors > div[data-v-f5326038]:not(:last-child) {
+  margin-right: 20px;
 }
 
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
