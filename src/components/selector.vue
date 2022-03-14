@@ -4,7 +4,7 @@
         <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
           <div class="selected" :class="{ open: show }" @click="open">
               {{ options[selected].name }}
-              <img src="~assets/icon-down.svg"  class="arrow" />
+                <img src="~assets/icon-down.svg"  class="arrow" />
           </div>
           <div class="items" v-show="show"  :style="style">
               <div v-for="(option, i) of options || []" :key="i"
