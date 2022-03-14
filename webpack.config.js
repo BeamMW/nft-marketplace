@@ -117,7 +117,8 @@ const config = (DEV_MODE) => {return {
 }}
 
 module.exports = (env, argv) => {
-    const DEV_MODE = argv.mode == 'development'
-    console.log(argv.mode)
+    const mode = argv.mode
+    console.log('Mode:', mode)
+    const DEV_MODE = mode == 'development'
     return config(DEV_MODE)
 }
