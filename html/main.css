@@ -993,17 +993,6 @@ html {
     cursor: auto;
     color: #00f6d2;
 }
-
-.selector-container {
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-}
-.selector-title{
-    align-self: center;
-    color: #fff;
-    opacity: 0.5; 
-}
   
 .show {
     display: flex;
