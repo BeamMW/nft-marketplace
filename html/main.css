@@ -30,6 +30,34 @@
   white-space: pre-wrap;
 }
 
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/admin-ui.vue?vue&type=style&index=0&id=7c5d5e3c&lang=stylus&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.admin-column[data-v-7c5d5e3c] {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.admin-column .upload_artist[data-v-7c5d5e3c] {
+  font-size: 0.95em;
+}
+.admin-column span[data-v-7c5d5e3c],
+.admin-column input[data-v-7c5d5e3c],
+.admin-column select[data-v-7c5d5e3c] {
+  font-size: 1.05em;
+}
+.admin-column .admin-row[data-v-7c5d5e3c] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-column .admin-row > *[data-v-7c5d5e3c]:not(first) {
+  margin-top: 20px;
+}
+.admin-column .admin-row > input[data-v-7c5d5e3c] {
+  margin-right: 20px;
+}
+
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/popup-menu.vue?vue&type=style&index=0&id=6326aff0&scoped=true&lang=stylus ***!
   \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -88,68 +116,80 @@
   color: #fff;
 }
 
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/selector.vue?vue&type=style&index=0&id=71708f22&scoped=true&lang=stylus ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.selector-container[data-v-71708f22] {
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/balance.vue?vue&type=style&index=0&id=14992afc&lang=stylus&scoped=true ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.balance-container[data-v-14992afc] {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.balance-container .balance[data-v-14992afc] {
+  width: 442px;
+  height: 78px;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  padding-left: 20px;
+}
+.balance-container .balance .value[data-v-14992afc] {
+  margin-left: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+}
+.balance-container .balance .withdraw[data-v-14992afc] {
   margin-left: auto;
   display: flex;
-  justify-content: center;
-}
-.selector-container .title[data-v-71708f22] {
-  align-self: center;
-  color: #fff;
-  opacity: 0.5;
-  padding-bottom: 3px;
-}
-.selector-container .custom-select[data-v-71708f22] {
-  position: relative;
-  display: flex;
-  text-align: left;
-  outline: none;
-  height: 47px;
-  line-height: 47px;
-  min-width: 0px;
-  margin-left: auto;
-}
-.selector-container .custom-select .selected[data-v-71708f22] {
-  color: #fff;
-  padding-left: 1em;
+  align-items: center;
   cursor: pointer;
-  user-select: none;
-  opacity: 0.7;
+}
+.balance-container .balance .icon[data-v-14992afc] {
+  width: 16px;
+  height: 16px;
+}
+.balance-container .balance .text[data-v-14992afc] {
+  margin-left: 8px;
   font-size: 14px;
   font-weight: bold;
-  letter-spacing: 0.47px;
+  color: #0bccf7;
 }
-.selector-container .custom-select .selected.open[data-v-71708f22] {
-  border: none;
+.balance-container .user-opt[data-v-14992afc] {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
 }
-.selector-container .custom-select .arrow[data-v-71708f22] {
-  width: 8px;
-  height: 8px;
-  margin-left: 3px;
+.balance-container .user-opt .user[data-v-14992afc] {
+  padding-left: 15px;
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
 }
-.selector-container .custom-select .items[data-v-71708f22] {
+.balance-container .user-opt .user .user__text[data-v-14992afc] {
+  font-size: 18px;
+  font-weight: bold;
   color: #fff;
-  position: absolute;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  right: 0;
-  z-index: 1;
-  margin-top: 40px;
-  padding: 0 20px;
+  margin-left: 7px;
 }
-.selector-container .custom-select .items div[data-v-71708f22] {
-  color: #fff;
-  padding: 15px 0 15px 0;
-  white-space: nowrap;
-  line-height: 1;
+.balance-container .user-opt .key[data-v-14992afc] {
+  padding: 14px;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  user-select: none;
 }
-.selector-container .custom-select .items div[data-v-71708f22]:hover {
+.balance-container .user-opt .key .key__text[data-v-14992afc] {
+  font-size: 16px;
+  color: #00f6d2;
+  margin-left: 10px;
+}
+.balance-container .user-opt .key .key__connect[data-v-14992afc] {
+  font-size: 16px;
   color: #00f6d2;
 }
 
@@ -431,72 +471,10 @@ html {
     margin-bottom: 10px;
 }
 
-.balance {
-    width: 442px;
-    height: 78px;
-    border-radius: 10px;
-    background-color: rgba(255,255,255,0.1);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0 20px;
-    padding-left: 20px;
-}
-
-.balance-value {
-    margin-left: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.balance-withdraw {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.balance-withdraw__icon {
-    width: 16px;
-    height: 16px;
-}
-
-.balance-withdraw__text {
-    margin-left: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #0bccf7;
-}
-
 .show-key {
     font-size: 16px;
     color: #00f6d2;
     margin-right: 10px;
-}
-
-.admin-column {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-}
-
-.admin-column select.upload_artist {
-    font-size: 0.95em;
-}
-
-.admin-row {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-}
-
-.admin-row > *:not(first) {
-    margin-top: 20px;
-}
-
-.admin-row > input {
-    margin-right: 20px;
 }
 
 .vertical-container {
@@ -508,46 +486,6 @@ html {
 
 .web .vertical-container {
     height: 85%;
-}
-
-.actions-container {
-    display: flex;
-    flex-direction: row;
-}
-
-.artworks-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-}
-
-.artworks-controls__tabs {
-    display: flex;
-    flex-direction: row;
-}
-
-.tab-item {
-    color: rgba(255, 255, 255, .3);
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.tab-item__title {
-    padding: 4px 16px;
-    text-transform: uppercase;
-}
-
-.tab-item__bottom-line {
-    height: 2px;
-    width: 100%;
-    box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7);
-    background-color: #00f6d2;
-}
-
-.tab-active {
-    color: #fff;
 }
 
 .artworks {
@@ -799,29 +737,9 @@ html {
     cursor: pointer;
 }
 
-.user-opt__key__text {
-    font-size: 16px;
-    color: #00f6d2;
-    margin-left: 10px;
-}
-
 .user-opt__key__connect {
     font-size: 16px;
     color: #00f6d2;
-}
-
-.user-opt__user {
-    padding-left: 15px;
-    padding-bottom: 12px;
-    display: flex;
-    align-items: center;
-}
-
-.user-opt__user__text {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    margin-left: 7px;
 }
 
 .mine {
@@ -998,16 +916,6 @@ html {
     font-size: 14px;
     font-weight: bold;
     color: #00f6d2;
-}
-
-.artwork-controls__selectors{
-    display: flex;
-    margin-left: auto;
-    padding-right: 2px;
-}
-
-.artwork-controls__selectors > div:not(:last-child) {
-   margin-right: 20px;
 }
 
 .custom-select {

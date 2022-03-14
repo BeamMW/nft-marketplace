@@ -1,6 +1,6 @@
-import adminui from  './admin-ui.js'
+import adminui from  './admin-ui.vue'
 import artwork from  './artwork.js'
-import balance from  './balance.js'
+import balance from  './balance.vue'
 import headless from './headless.js'
 import artworksControls from './artworks-controls.js'
 import { popups, common } from '../utils/consts.js'
