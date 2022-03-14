@@ -4,7 +4,8 @@ import balance from  './balance.vue'
 import headless from './headless.vue'
 import artworksControls from './artworks-controls.vue'
 import { popups, common } from '../utils/consts.js'
-import publicKeyPopup from './public-key-popup.js'
+import publicKeyPopup from './public-key-dialog.vue'
+import pricePopup from './price-dialog.vue';
 import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
 
@@ -29,6 +30,9 @@ export default {
         is_popup_visible() {
             return this.$state.is_popup_visible;
         },
+        popup_type () {
+            return this.$state.popup_type;
+        },
         is_headless () {
             return this.$state.is_headless
         },
@@ -50,16 +54,18 @@ export default {
 
     data () {
         return {
-            details_id: -1
+            details_id: -1,
+            allPopups: popups,
         }
     },
 
     components: {
-        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails
+        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails, pricePopup
     },
 
     template: `
-        <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
+        <publicKeyPopup v-if="is_popup_visible && popup_type === allPopups.KEY"></publicKeyPopup>
+        <pricePopup v-if="is_popup_visible && popup_type === allPopups.SELL"></pricePopup>
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
