@@ -23,7 +23,8 @@
       <span class="amount">{{amount}}</span>
       <span class="curr">BEAM</span>
       <artButton 
-        class="button" type="buy" 
+        type="buy"
+        text="buy"
         @click="onBuy"
       />
   </span>
@@ -31,7 +32,8 @@
   <!---- doesn't have price & owned, can sell ---->
   <span v-if="!price && owned" class="container">
     <artButton 
-      class="button" type="sell"
+      type="sell"
+      text="sell"
       @click="onSell" 
     />
   </span>
@@ -82,7 +84,7 @@
 
 <script>
 import { common, popups } from '../utils/consts.js'
-import artButton from './art-button.js'
+import artButton from './button.vue'
 import popupMenu from './popup-menu.vue'
 
 export default {

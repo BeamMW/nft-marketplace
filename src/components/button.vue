@@ -1,23 +1,36 @@
 <template>
   <div class="button" :class="type">
-    <img />
-    <span class="text">{{ title }}</span>
+    <img 
+      v-if="type === 'sell' || type === 'buy' || type === 'change'" 
+      src="~assets/icon-button.svg" 
+    />
+    <img 
+      v-if="type === 'close' || type === 'cancel'"
+      src="~assets/icon-cancel.svg"
+    />
+    <img 
+      v-if="type === 'copy'"
+      src="~assets/icon-copy-blue.svg"
+    />
+    <img 
+      v-if="type === 'proceed'"
+      src="~assets/icon-receive-proceed.svg"
+    />
+    <span class="text">{{ text }}</span>
   </div>
 </template>
 
 <script>
-
 export default {
   props: {
     type: {
       type: String,
       required: true,
     },
-    title: {
+    text: {
       type: String,
       required: true,
     },
-    icon: {}
   }
 }
 </script>
@@ -32,8 +45,9 @@ export default {
   font-size: 14px
   font-weight: bold
   cursor: pointer
+  margin-left: auto
 
-  &.text {
+  & .text {
     margin-left: 5px
     line-height: 1
   }

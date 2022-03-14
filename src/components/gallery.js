@@ -8,9 +8,6 @@ import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
 import adetails from './artwork-details.vue'
 
-/// test
-import BUTTON from './button.vue'
-
 export default {
     computed: {
         is_admin () {
