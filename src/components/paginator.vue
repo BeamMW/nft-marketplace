@@ -56,6 +56,7 @@
         color: rgba(255, 255, 255, 0.5)
         cursor: pointer
         user-select: none
+        
         &[selected="true"] {
           cursor: auto
           color: #00f6d2
