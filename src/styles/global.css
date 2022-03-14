@@ -33,7 +33,7 @@ html {
 .artworks {
     display:   flex;
     flex-wrap: wrap;
-    overflow-y: overlay;
+    overflow-y: auto;
     overflow-x: hidden;
     margin-top: 20px;
 }
@@ -253,6 +253,7 @@ html {
 .button__text {
     margin-left: 5px;
     line-height: 1;
+    font-weight: bold;
 }
 
 .button:not(.disabled):hover {
@@ -296,4 +297,3 @@ html {
 .hide {
     display: none;
 }
-

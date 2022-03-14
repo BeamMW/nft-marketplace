@@ -11,12 +11,6 @@ export const tabs = {
     SOLD: 4,
 }
 
-export const popups = {
-    KEY: 0,
-    SELL: 1,
-    CHANGE_PRICE: 2,
-}
-
 export const sort = {
     OLDEST_TO_NEWEST: 0,
     NEWEST_TO_OLDEST: 1,

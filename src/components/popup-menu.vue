@@ -1,6 +1,6 @@
 <template>
   <div class="popup-menu" v-show="show" :style="style" tabindex="0">
-      <slot></slot>
+    <slot></slot>
   </div>
 </template>
 

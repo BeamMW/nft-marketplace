@@ -27,8 +27,6 @@ function defaultState() {
         balance_reward: 0,
         selected_artist: undefined,
         active_tab: tabs.ALL,
-        is_popup_visible: false,
-        popup_type: null,
         id_to_sell: '',
         sort_by: sort.OLDEST_TO_NEWEST,
         filter_by_artist: 0,
@@ -71,14 +69,6 @@ export const store = {
             this.state.error = undefined
             reload ? utils.reload() : this.start()
         }
-    },
-
-    changePopupState(value) {
-        this.state.is_popup_visible = value;
-    },
-
-    setPopupType(value) {
-        this.state.popup_type = value;
     },
 
     setIdToSell(id) {

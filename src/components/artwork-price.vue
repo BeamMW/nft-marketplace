@@ -81,17 +81,16 @@
 </style>
 
 <script>
-import { common, popups } from '../utils/consts.js'
 import utils from '../utils/utils.js'
 import artButton from './art-button.js'
 import popupMenu from './popup-menu.vue'
 
 export default {
   props: {
-      artwork: {
-        type: Object,
-        required: true,
-      }
+    artwork: {
+      type: Object,
+      required: true,
+    }
   },
 
   components: {
@@ -130,12 +129,10 @@ export default {
 
     onChangePrice (id) {
       try {
-          this.$store.setPopupType(popups.CHANGE_PRICE);
-          this.$store.setIdToSell(this.id);
-          this.$store.changePopupState(true);
+        this.$store.setIdToSell(this.id);
       } 
       catch (err) {
-          this.$store.setError(err, "Failed to sell an item");
+        this.$store.setError(err, "Failed to sell an item");
       }
     },
 
@@ -150,9 +147,7 @@ export default {
 
     onSell () {
       try {
-        this.$store.setPopupType(popups.SELL)
         this.$store.setIdToSell(this.id)
-        this.$store.changePopupState(true)
       } 
       catch (err) {
           this.$store.setError(err, "Failed to sell an item")

@@ -1,15 +1,15 @@
 <template>
-    <div class="popup" id="popup">
-         <div  :class="[popupType === allPopups.KEY ? 'content-key' : 'content-sell']"
-                id="popup-content"   
-        >
-        <slot name="dialog"  :onClose="onClose"></slot>
-         </div>
-    </div>
+    <Teleport to="body">
+        <div v-if="show" class="modal-dialog">
+            <div class="modal-content" :style="style">
+                <slot/>
+            </div>
+        </div>
+    </Teleport>
 </template>
 
 <style lang="stylus" scoped>
-.popup {
+.modal-dialog {
     width: 100%
     height: 100%
     overflow: hidden
@@ -19,68 +19,43 @@
     justify-content: center
     align-items: center
     z-index: 100
+    background-color: transparent
     
-    .content-key {
+    .modal-content {
         padding: 40px
         border-radius: 10px
-        display: flex
-        flex-direction: column
-        align-items: center
-        width: 760px
-    }
-
-    .content-sell {
-        padding: 40px
-        border-radius: 10px
-        display: flex
-        flex-direction: column
-        align-items: center
-        width: 390px
     }
 }
 </style>
 
 <script>
-import { popups } from '../utils/consts.js';
-import utils from '../utils/utils.js';
-import artButton from './art-button.js';
+import utils from '../utils/utils.js'
 
 export default {
-
-    components: {
-        artButton
-    },
-    props: ['popupType'],
-
-    data() {
+    data () {
         return {
-        allPopups: popups,
+            show: false,
+        };
+    },
+
+    computed: {
+        style() {
+            return {
+                "background-color": utils.getStyles().background_popup,
+            }
         }
     },
 
-    mounted: function () {
-        this.applyStyles();
-    },
-
-    unmounted: function () {
-        this.removeStyles()
-    },
-
     methods: {
-        applyStyles() {
-            const { background_popup } = utils.getStyles()
-            document.getElementById("popup-content").style.backgroundColor = background_popup
-            document.getElementById("container").style.opacity = 0.3
-        },
-
-        removeStyles() {
+        close () {
+            this.show = false
             document.getElementById("container").style.opacity = 1
         },
 
-        onClose() {
-            this.$store.changePopupState(false)
-        },
+        open () {
+            this.show = true
+            document.getElementById("container").style.opacity = 0.3
+        }
     }
 }
-
 </script>

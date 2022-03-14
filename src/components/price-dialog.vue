@@ -1,5 +1,5 @@
 <template>
-    <modal :popupType="allPopups.SELL" ref="modal">
+    <modal ref="modal">
         <template v-slot:dialog="{ onClose }">
                 <div class="sell__title">
                     Set the price
@@ -129,22 +129,13 @@
 <script>
 import modal from './modal.vue'
 import artButton from './art-button.js';
-import { popups } from '../utils/consts.js';
 
 export default {
-
     components: { 
         modal, artButton
     },
 
-    data () {
-        return {
-            allPopups: popups,
-        }
-    },
-
-    mounted:function () { 
-        
+    mounted () { 
         const sellInput = document.getElementById('sell-input');
         if (sellInput) {
             document.getElementById('sell-input').addEventListener('keydown', (event) => {

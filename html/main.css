@@ -127,6 +127,55 @@
   opacity: 0.5;
 }
 
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/modal.vue?vue&type=style&index=0&id=0eaeaf66&lang=stylus&scoped=true ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.modal-dialog[data-v-0eaeaf66] {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  background-color: transparent;
+}
+.modal-dialog .modal-content[data-v-0eaeaf66] {
+  padding: 40px;
+  border-radius: 10px;
+}
+
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/public-key-dialog.vue?vue&type=style&index=0&id=2c61017a&scoped=true&lang=stylus ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.content[data-v-2c61017a] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.content .title[data-v-2c61017a] {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+.content .data[data-v-2c61017a] {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.content .data .copy-icon[data-v-2c61017a] {
+  margin-left: 10px;
+  cursor: pointer;
+}
+.content .controls[data-v-2c61017a] {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: row;
+}
+
 /*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/balance.vue?vue&type=style&index=0&id=14992afc&lang=stylus&scoped=true ***!
   \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -134,6 +183,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-content: center;
   margin-bottom: 10px;
 }
 .balance-container .balance[data-v-14992afc] {
@@ -159,34 +209,33 @@
   align-items: center;
   cursor: pointer;
 }
-.balance-container .balance .icon[data-v-14992afc] {
-  width: 16px;
-  height: 16px;
-}
 .balance-container .balance .text[data-v-14992afc] {
   margin-left: 8px;
   font-size: 14px;
   font-weight: bold;
   color: #0bccf7;
 }
-.balance-container .user-opt[data-v-14992afc] {
+.balance-container .user[data-v-14992afc] {
   display: flex;
   flex-direction: column;
-  margin-left: auto;
+  align-items: center;
 }
-.balance-container .user-opt .user[data-v-14992afc] {
-  padding-left: 15px;
+.balance-container .user .icon[data-v-14992afc] {
+  width: 16px;
+  height: 16px;
+}
+.balance-container .user .name[data-v-14992afc] {
   padding-bottom: 12px;
   display: flex;
   align-items: center;
 }
-.balance-container .user-opt .user .user__text[data-v-14992afc] {
+.balance-container .user .name .text[data-v-14992afc] {
   font-size: 18px;
   font-weight: bold;
   color: #fff;
   margin-left: 7px;
 }
-.balance-container .user-opt .key[data-v-14992afc] {
+.balance-container .user .key[data-v-14992afc] {
   padding: 14px;
   border-radius: 10px;
   background-color: rgba(255,255,255,0.1);
@@ -194,12 +243,12 @@
   align-items: center;
   cursor: pointer;
 }
-.balance-container .user-opt .key .key__text[data-v-14992afc] {
+.balance-container .user .key .text[data-v-14992afc] {
   font-size: 16px;
   color: #00f6d2;
   margin-left: 10px;
 }
-.balance-container .user-opt .key .key__connect[data-v-14992afc] {
+.balance-container .user .key .connect[data-v-14992afc] {
   font-size: 16px;
   color: #00f6d2;
 }
@@ -344,61 +393,6 @@
 }
 .actions-container .selectors > div[data-v-f5326038]:not(:last-child) {
   margin-right: 20px;
-}
-
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/modal.vue?vue&type=style&index=0&id=0eaeaf66&lang=stylus&scoped=true ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.popup[data-v-0eaeaf66] {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  position: fixed;
-  top: 0px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-.popup .content-key[data-v-0eaeaf66] {
-  padding: 40px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 760px;
-}
-.popup .content-sell[data-v-0eaeaf66] {
-  padding: 40px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 390px;
-}
-
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/public-key-dialog.vue?vue&type=style&index=0&id=2c61017a&scoped=true&lang=stylus ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-.key__title[data-v-2c61017a] {
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-}
-.key__data[data-v-2c61017a] {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.key__data .copy-icon[data-v-2c61017a] {
-  margin-left: 10px;
-  cursor: pointer;
-}
-.key__controls[data-v-2c61017a] {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: row;
 }
 
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
@@ -768,7 +762,7 @@ html {
 .artworks {
     display:   flex;
     flex-wrap: wrap;
-    overflow-y: overlay;
+    overflow-y: auto;
     overflow-x: hidden;
     margin-top: 20px;
 }
@@ -988,6 +982,7 @@ html {
 .button__text {
     margin-left: 5px;
     line-height: 1;
+    font-weight: bold;
 }
 
 .button:not(.disabled):hover {
@@ -1031,5 +1026,4 @@ html {
 .hide {
     display: none;
 }
-
 

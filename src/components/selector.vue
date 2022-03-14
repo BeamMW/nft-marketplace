@@ -6,7 +6,7 @@
               {{ options[selected].name }}
                 <img src="~assets/icon-down.svg"  class="arrow" />
           </div>
-          <div class="items" v-show="show"  :style="style">
+          <div class="items" v-show="show" :style="style">
               <div v-for="(option, i) of options || []" :key="i"
                   @click="onSelected(option)">
                   <span :class="{ highlight: selected === i}">{{ option.name }}</span>
@@ -121,56 +121,59 @@ export default {
     },
   },
 
-    computed: {
-      style() {
-        return {
-            "background-color": utils.getStyles().background_popup,
-          }
-      }
+  computed: {
+    style() {
+      return {
+          "background-color": utils.getStyles().background_popup,
+        }
+    }
+  },
+
+  data() {
+      return {
+          show: false,
+      };
+  },
+
+  emits: ['selected'],
+
+  methods: {
+    onSelected(opt) {
+      this.$emit('selected',opt)
+      this.show = false
+    },
+    
+    close() {
+      this.show = false
     },
 
-    data() {
-        return {
-            show: false,
-        };
-    },
-
-    emits: ['selected'],
-
-
-    methods: {
-      onSelected(opt) {
-        this.$emit('selected',opt)
-        this.show = false
-      },
-      close() {
-        this.show = false
-      },
-      open(ev) {
-        this.show = true
-  
-        nextTick(() => {
-          let downAway = (evc) => {
-            if (!this.$el.contains(evc.target)) {
-              document.removeEventListener("mousedown", downAway, true)
-              this.close()
-            }
-          }
-          let clickAway = (evc) => {
-            if (ev != evc) {
-              document.removeEventListener("click", clickAway, true)
-              this.close()
-            }
-          }
-          let scrollAway = (evc) => {
-            document.removeEventListener("scroll", scrollAway, scroll)
+    open(ev) {
+      this.show = true
+      nextTick(() => {
+        let downAway = (evc) => {
+          if (!this.$el.contains(evc.target)) {
+            document.removeEventListener("mousedown", downAway, true)
             this.close()
           }
-          document.addEventListener("mousedown", downAway, true)
-          document.addEventListener("click", clickAway, true)
-          document.addEventListener("scroll", scrollAway, true)
-        })
-      },
-    }
+        }
+        
+        let clickAway = (evc) => {
+          if (ev != evc) {
+            document.removeEventListener("click", clickAway, true)
+            this.close()
+          }
+        }
+        
+        let scrollAway = (evc) => {
+          document.removeEventListener("scroll", scrollAway, scroll)
+          this.close()
+        }
+        
+        document.addEventListener("mousedown", downAway, true)
+        document.addEventListener("click", clickAway, true)
+        document.addEventListener("scroll", scrollAway, true)
+      })
+    },
+  }
 }
 </script>

@@ -1,4 +1,5 @@
 <template>
+    <publicKeyModal ref="keyModal"/>
     <div class="balance-container">
         <div :class="[show_balance ? '' : 'hidden', 'balance']">
             <img src="~assets/icon-beam.svg"/>
@@ -10,14 +11,14 @@
                 <span class="text">withdraw</span>
             </div>
         </div>
-        <div class="user-opt">
-            <div v-if="my_artist_name" class="user" v-on:click="onShowKey">
-                <img class="user__icon" src="~assets/icon-user.svg"/>
-                <span class="user__text">{{ my_artist_name }}</span>
+        <div class="user" v-on:click="onShowKey">
+            <div v-if="my_artist_name" class="name">
+                <img class="icon" src="~assets/icon-user.svg"/>
+                <span class="text">{{ my_artist_name }}</span>
             </div>
-            <div class="key" v-on:click="onShowKey">
-                <img class="key__icon" src="~assets/icon-key.svg"/>
-                <span class="key__text">Show my public key</span>
+            <div class="key">
+                <img class="icon" src="~assets/icon-key.svg"/>
+                <span class="text">Show my public key</span>
             </div>
         </div>
     </div>
@@ -28,6 +29,7 @@
     display: flex
     flex-direction: row
     justify-content: space-between
+    align-content: center
     margin-bottom: 10px
 
     .balance {
@@ -55,11 +57,6 @@
             cursor: pointer
         }
 
-        .icon {
-            width: 16px
-            height: 16px
-        }
-
         .text {
             margin-left: 8px
             font-size: 14px
@@ -68,18 +65,22 @@
         }
     }
 
-    .user-opt {
+    .user {
         display: flex
         flex-direction: column
-        margin-left: auto
+        align-items: center
 
-        .user {
-            padding-left: 15px
+        .icon {
+            width: 16px
+            height: 16px
+        }
+
+        .name {
             padding-bottom: 12px
             display: flex
             align-items: center
             
-            .user__text {
+            .text {
                 font-size: 18px
                 font-weight: bold
                 color: #fff
@@ -95,13 +96,13 @@
             align-items: center
             cursor: pointer
 
-            .key__text {
+            .text {
                 font-size: 16px
                 color: #00f6d2
                 margin-left: 10px
             }
 
-            .key__connect {
+            .connect {
                 font-size: 16px
                 color: #00f6d2
             }
@@ -111,9 +112,14 @@
 </style>
 
 <script>
-import { common, popups } from '../utils/consts.js';
+import { common } from '../utils/consts.js'
+import publicKeyModal from './public-key-dialog.vue'
 
 export default {
+    components: {
+        publicKeyModal
+    },
+
     computed: {
         balance_beam () {
             return this.$state.balance_beam / common.GROTHS_IN_BEAM;
@@ -129,9 +135,8 @@ export default {
     },
 
     methods: {
-        async onShowKey () {
-            this.$store.setPopupType(popups.KEY)
-            this.$store.changePopupState(true)
+        onShowKey () {
+            this.$refs.keyModal.open()
         },
 
         onWithdraw () {
