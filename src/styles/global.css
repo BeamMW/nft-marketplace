@@ -362,7 +362,8 @@ html {
     cursor: auto !important;
 }
 
-/* .button {
+/* DEPRECATED: remove after button.vue component is used throughout the project */
+.button {
     padding: 11px 25px;
     border-radius: 50px;
     display: flex;
@@ -405,7 +406,7 @@ html {
 
 .button:not(.disabled):hover {
     box-shadow: 0 0 8px white;
-} */
+}
 
 .user-opt {
     display: flex;

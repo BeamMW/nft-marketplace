@@ -6,7 +6,6 @@
 </template>
 
 <script>
-// import pic from '../assets/icon-button'
 
 export default {
   props: {
@@ -37,7 +36,7 @@ export default {
   &.text {
     margin-left: 5px
     line-height: 1
-}
+  }
 }
 
 .buy {
