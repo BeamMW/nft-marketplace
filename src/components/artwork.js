@@ -1,4 +1,4 @@
-import loading from './item-loading.js'
+import loading from './item-loading.vue';
 import artPrice from './artwork-price.vue'
 import artPreview from './artwork-preview.vue'
 

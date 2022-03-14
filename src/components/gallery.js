@@ -5,7 +5,7 @@ import headless from './headless.js'
 import artworksControls from './artworks-controls.js'
 import { popups, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
-import paginator from './paginator.js'
+import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
 
 export default {
