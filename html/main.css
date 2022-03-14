@@ -351,17 +351,10 @@
   margin-top: 10px;
   margin-bottom: 2px;
 }
-.paginator > .prev[data-v-5f72e89e] {
-  margin: 0 13px 0 0;
-}
-.paginator > .next[data-v-5f72e89e] {
-  margin: 0 0 0 16px;
-}
 .paginator > .prev[data-v-5f72e89e],
 .paginator > .next[data-v-5f72e89e] {
   width: 68px !important;
   height: 22px;
-  margin: 0 20px 0 0;
   border-radius: 2px;
   background-color: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.5);
@@ -377,6 +370,12 @@
 .paginator > .next[data-v-5f72e89e]:hover:not([disabled="true"]) {
   color: rgba(255,255,255,0.9);
   cursor: pointer;
+}
+.paginator > .prev[data-v-5f72e89e] {
+  margin: 0 13px 0 0;
+}
+.paginator > .next[data-v-5f72e89e] {
+  margin: 0 0 0 16px;
 }
 .paginator > .page[data-v-5f72e89e] {
   margin: 3px 7px;

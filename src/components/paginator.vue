@@ -20,19 +20,10 @@
     margin-top: 10px
     margin-bottom: 2px
 
-    & > .prev {
-        margin: 0 13px 0 0
-    }
-
-    & > .next {
-        margin: 0 0 0 16px
-    }
-
     & > .prev,
     & > .next {
         width: 68px !important
         height: 22px
-        margin: 0 20px 0 0
         border-radius: 2px
         background-color: rgba(255, 255, 255, .1)
         color: rgba(255, 255, 255, .5)
@@ -49,6 +40,14 @@
            cursor: pointer
         }
     }
+
+    & > .prev {
+        margin: 0 13px 0 0
+    }
+
+    & > .next {
+        margin: 0 0 0 16px
+    }
     
     & > .page {
         margin: 3px 7px
@@ -56,7 +55,7 @@
         color: rgba(255, 255, 255, 0.5)
         cursor: pointer
         user-select: none
-        
+
         &[selected="true"] {
           cursor: auto
           color: #00f6d2
