@@ -342,6 +342,24 @@ acorn@^8.4.1:
   resolved "https://registry.npmjs.org/acorn/-/acorn-8.5.0.tgz"
   integrity sha512-yXbYeFy+jUuYd3/CDcg2NkIYE991XYX/bje7LmjJigUciaeO1JR4XxXgCIV1/Zc/dRuFEyw1L0pbA+qynJkW5Q==
 
+ag-grid-community@^27.0.1, ag-grid-community@~27.0.0:
+  version "27.0.1"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-27.0.1.tgz#7ce5c000d321ba2c22447837e793b1d8366f4cdb"
+  integrity sha512-wV3CLLJWet0I7lmlVjVjACVWQ1WmGYflEyc2nKK3u5CDKa9ewQGYcwZW92i+E+9rmGH6R7oaL3DFKzNWD6C56w==
+
+ag-grid-vue3@^27.0.0:
+  version "27.0.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-vue3/-/ag-grid-vue3-27.0.0.tgz#f9e1c526f3ce00a0c8f3602669bf8d4f234d9565"
+  integrity sha512-q2yWdCqhLsPQLBqL1IshgshCEPEDw1z/B/3Fky8GOOTwAAeIRsgeYaKaiPGPtHDozgEo8weOLNpysNYsTM/x3g==
+  dependencies:
+    ag-grid-community "~27.0.0"
+    vue "^3.0.0"
+
+ag-grid-vue@^27.0.0:
+  version "27.0.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-vue/-/ag-grid-vue-27.0.0.tgz#ac6c35196aa20c997dbfc72f0182034a9110e18f"
+  integrity sha512-dEEIQw/Y5qVB8TEdsEkG0gPyHI7Suu1rXnHJQi/FjE8/iO9ET4h6mEij7GIhp8Uf8Yr+QBvOP5FbRX7smvxdCQ==
+
 aggregate-error@^3.0.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/aggregate-error/-/aggregate-error-3.1.0.tgz"
@@ -1120,6 +1138,14 @@ faye-websocket@^0.11.3:
   integrity sha512-CzbClwlXAuiRQAlUyfqPgvPoNKTckTPGfwZV4ZdAhVcP2lh9KUxJg2b5GkE7XbjKQ3YJnQ9z6D9ntLAlB+tP8g==
   dependencies:
     websocket-driver ">=0.5.1"
+
+file-loader@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-6.2.0.tgz#baef7cf8e1840df325e4390b4484879480eebe4d"
+  integrity sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==
+  dependencies:
+    loader-utils "^2.0.0"
+    schema-utils "^3.0.0"
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -2679,6 +2705,21 @@ vary@~1.1.2:
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
+vue-class-component@^7.1.0:
+  version "7.2.6"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-7.2.6.tgz#8471e037b8e4762f5a464686e19e5afc708502e4"
+  integrity sha512-+eaQXVrAm/LldalI272PpDe3+i4mPis0ORiMYxF6Ae4hyuCh15W8Idet7wPUEs4N4YptgFHGys4UrgNQOMyO6w==
+
+vue-class-component@^8.0.0-rc.1:
+  version "8.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-8.0.0-rc.1.tgz#db692cd97656eb9a08206c03d0b7398cdb1d9420"
+  integrity sha512-w1nMzsT/UdbDAXKqhwTmSoyuJzUXKrxLE77PCFVuC6syr8acdFDAq116xgvZh9UCuV0h+rlCtxXolr3Hi3HyPQ==
+
+vue-datatables-net@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/vue-datatables-net/-/vue-datatables-net-2.0.0.tgz#799dc25923915deb10761441e084cc7c5fe339c8"
+  integrity sha512-vVfXPfxqS0seAu+/F4i/wRVCryTZzl2U7rT6qbuCgY800Ta0gsCxQmNvSim8U2WZv6VYhfvNL1EA6asgAiQ6YQ==
+
 vue-loader@^17.0.0:
   version "17.0.0"
   resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-17.0.0.tgz#2eaa80aab125b19f00faa794b5bd867b17f85acb"
@@ -2688,6 +2729,13 @@ vue-loader@^17.0.0:
     hash-sum "^2.0.0"
     loader-utils "^2.0.0"
 
+vue-property-decorator@^8.0.0:
+  version "8.5.1"
+  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-8.5.1.tgz#571a91cf8d2b507f537d79bf8275af3184572fff"
+  integrity sha512-O6OUN2OMsYTGPvgFtXeBU3jPnX5ffQ9V4I1WfxFQ6dqz6cOUbR3Usou7kgFpfiXDvV7dJQSFcJ5yUPgOtPPm1Q==
+  dependencies:
+    vue-class-component "^7.1.0"
+
 vue-router@4:
   version "4.0.12"
   resolved "https://registry.npmjs.org/vue-router/-/vue-router-4.0.12.tgz"
@@ -2695,7 +2743,7 @@ vue-router@4:
   dependencies:
     "@vue/devtools-api" "^6.0.0-beta.18"
 
-vue@^3.2.31:
+vue@^3.0.0, vue@^3.2.31:
   version "3.2.31"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.2.31.tgz#e0c49924335e9f188352816788a4cca10f817ce6"
   integrity sha512-odT3W2tcffTiQCy57nOT93INw1auq5lYLLYtWpPYQQYQOOdHiqFct9Xhna6GJ+pJQaF67yZABraH47oywkJgFw==

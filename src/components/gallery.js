@@ -3,9 +3,10 @@ import artwork from  './artwork.js'
 import balance from  './balance.js'
 import headless from './headless.js'
 import artworksControls from './artworks-controls.js'
-import { popups, tabs, common } from '../utils/consts.js'
+import { popups, common } from '../utils/consts.js'
 import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
+import adetails from './artwork-details.vue'
 
 /// test
 import BUTTON from './button.vue'
@@ -15,24 +16,18 @@ export default {
         is_admin () {
             return this.$state.is_admin;
         },
-        artists () {
-            return this.$state.artists;
-        },
         active_tab () {
             return this.$state.active_tab
         },
         artworks () {
-            let all = this.$state.artworks[this.$state.active_tab]
-            let artworks  = []
+            let all = this.$state.artworks
+            let result  = []
             let start = (this.current_page - 1) * common.ITEMS_PER_PAGE
             let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
             for (let idx = start; idx < end; ++idx) {
-                artworks.push(all[idx])
+                result.push(all[idx])
             }
-            return artworks
-        },
-        can_vote () {
-            return this.$state.balance_reward > 0;
+            return result
         },
         is_popup_visible() {
             return this.$state.is_popup_visible;
@@ -45,11 +40,25 @@ export default {
         },
         total_pages () {
             return this.$state.total_pages
+        },
+        details () {
+            for (let artwork of this.artworks) {
+                if (artwork.id == this.details_id) {
+                    return artwork
+                }
+            }
+            return undefined
+        }
+    },
+
+    data () {
+        return {
+            details_id: -1
         }
     },
 
     components: {
-        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator
+        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails
     },
 
     template: `
@@ -58,30 +67,19 @@ export default {
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
             <adminui v-if="is_admin"/>
-            <artworksControls></artworksControls>
-            <template v-if="artworks.length > 0">
+            <artworksControls v-if="details_id == -1"></artworksControls>
+            <adetails v-if="details_id != -1"
+                v-on:back="onDetailsBack"
+                v-bind:artwork="details"
+            />
+            <template v-else-if="artworks.length > 0">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
-                    v-bind:id="artwork.id"
-                    v-bind:title="artwork.title"
-                    v-bind:author="(artists[artwork.pk_author] || {}).label"
-                    v-bind:bytes="artwork.bytes"
-                    v-bind:mime_type="artwork.mime_type"
-                    v-bind:owned="artwork.owned"
-                    v-bind:price="artwork.price"
-                    v-bind:likes_cnt="artwork.impressions"
-                    v-bind:liked="artwork.my_impression == 1"
-                    v-bind:can_vote="can_vote"
-                    v-bind:is_admin="is_admin"
-                    v-bind:error="artwork.error"
-                    v-bind:loading="artwork.loading"
-                    v-on:sell="onSellArtwork"
-                    v-on:buy="onBuyArtwork"
-                    v-on:like="onLikeArtwork"
-                    v-on:unlike="onUnlikeArtwork"
-                    v-on:change_price="onChangePrice"
-                    v-on:remove_from_sale="onRemoveFromSale"
-                    v-on:delete="onDeleteArtwork"
+                        v-bind:artwork="artwork"
+                        v-on:like="onLikeArtwork"
+                        v-on:unlike="onUnlikeArtwork"
+                        v-on:delete="onDeleteArtwork"
+                        v-on:details="onDetails"
                     />
                 </div>
                 <paginator
@@ -98,36 +96,6 @@ export default {
     `,
 
     methods: {
-        onBuyArtwork (id) {
-            this.$store.buyArtwork(id);
-        },
-
-        onSellArtwork (id) {
-            try {
-                this.$store.setPopupType(popups.SELL);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
-
-        onRemoveFromSale (id) {
-            this.$store.sellArtwork(id, 0);
-        },
-
-        onChangePrice (id) {
-            try {
-                this.$store.setPopupType(popups.CHANGE_PRICE);
-                this.$store.setIdToSell(id);
-                this.$store.changePopupState(true);
-            } 
-            catch (err) {
-                this.$store.setError(err, "Failed to sell an item");
-            }
-        },
-
         onLikeArtwork(id) {
             this.$store.likeArtwork(id)
         },
@@ -143,6 +111,14 @@ export default {
         onPageChanged(page) {
             this.$store.setCurrentPage(page)
             this.$refs.artslist.scrollTop = 0
+        },
+
+        onDetails (id) {
+            this.details_id = id
+        },
+
+        onDetailsBack() {
+            this.details_id = -1
         }
     }
 }

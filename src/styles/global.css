@@ -23,12 +23,11 @@ html {
     word-break:      break-word;
 }
 
-
-
 .balance-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 .balance {
@@ -78,8 +77,7 @@ html {
 .admin-column {
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
-    margin-bottom: -15px;
+    margin-bottom: 10px;
 }
 
 .admin-column select.upload_artist {
@@ -114,7 +112,6 @@ html {
 .actions-container {
     display: flex;
     flex-direction: row;
-    margin-top: 30px;
 }
 
 .artworks-controls {
@@ -223,6 +220,7 @@ html {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    cursor: pointer;
 }
 
 .artwork > .info-row {
@@ -248,26 +246,6 @@ html {
     margin-left: 10px;
 }
 
-.artwork-can-buy {
-    display: flex;
-    line-height: 2;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-}
-
-.artwork-can-buy__amount,
-.artwork-can-buy__curr {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.artwork-can-buy__button {
-    margin-left: auto;
-}
-
 .empty-gallery {
     margin: 100px auto 0 auto;
     display: flex;
@@ -281,14 +259,6 @@ html {
     font-size: 14px;
     line-height: 1.43;
     text-align: center;
-    color: #fff;
-}
-
-.not-on-sale {
-    margin-left: auto;
-    opacity: 0.5;
-    font-size: 14px;
-    font-style: italic;
     color: #fff;
 }
 
@@ -587,70 +557,8 @@ html {
     margin-left: 10px;
 }
 
-.custom-select {
-    position: relative;
-    display: flex;
-    text-align: left;
-    outline: none;
-    height: 47px;
-    line-height: 47px;
-    min-width: 160px;
-    margin-left: auto;
-}
-
-.custom-select .selected {
-    background-color: transparent;
-    border-radius: 6px;
-    color: #fff;
-    padding-left: 1em;
-    cursor: pointer;
-    user-select: none;
 
 
-    opacity: 0.7;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.47px;
-}
-
-.custom-select .selected.open {
-    border: none;
-}
-
-.custom-select .selected:after {
-    position: absolute;
-    content: "";
-    top: 22px;
-    right: 1em;
-    width: 0;
-    height: 0;
-    border: 5px solid transparent;
-    border-color: #fff transparent transparent transparent;
-}
-
-.custom-select .items {
-    color: #fff;
-    overflow: hidden;
-    border: none;
-    position: absolute;
-    background-color: #00446c;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    margin-top: 40px;
-}
-
-.custom-select .items div {
-    color: #fff;
-    padding: 9px 0 9px 1em;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-}
-
-.custom-select .items div:hover {
-    color: #00f6d2;
-}
 
 .selectHide {
     display: none;
@@ -683,6 +591,7 @@ html {
     color: rgba(255, 255, 255, .5);
     font-size: 14px;
     text-align: center;
+    user-select: none;
 }
 
 .paginator > .prev:hover:not([disabled="true"]),
@@ -709,6 +618,7 @@ html {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
+  user-select: none;
 }
 
 .paginator >.page:hover:not([selected="true"]) {
@@ -721,9 +631,95 @@ html {
     color: #00f6d2;
 }
 
-.artwork-can-buy__dots {
+.selector-container {
     margin-left: auto;
-    cursor: pointer;
-    margin-right: -4px;
+    display: flex;
+    justify-content: center;
+}
+.selector-title{
+    align-self: center;
+    color: #fff;
+    opacity: 0.5; 
+}
+  
+.show {
+    display: flex;
+    margin-left: 200px; 
+}
+  
+.hide {
+    display: none;
 }
 
+.highlightLine{
+    font-size: 14px;
+    font-weight: bold;
+    color: #00f6d2;
+}
+
+.artwork-controls__selectors{
+    display: flex;
+    margin-left: auto;
+    padding-right: 2px;
+}
+
+.artwork-controls__selectors > div:not(:last-child) {
+   margin-right: 20px;
+}
+
+.custom-select {
+    position: relative;
+    display: flex;
+    text-align: left;
+    outline: none;
+    height: 47px;
+    line-height: 47px;
+    min-width: 0px;
+    margin-left: auto;
+}
+
+.custom-select .selected {
+    color: #fff;
+    padding-left: 1em;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.47px;
+}
+
+.custom-select .selected.open {
+    border: none;
+}
+
+.custom-select .arrow {
+    width:8px;
+    height:8px;
+    margin-left:3px;
+}
+
+.custom-select .items {
+    color: #fff;
+    position: absolute;
+    border:none;
+    border-radius: 4px;
+    font-size: 16px;
+    right: 0;
+    z-index: 1;
+    margin-top: 40px;
+    padding: 0 20px;
+}
+  
+.custom-select .items div {
+    color: #fff;
+    padding: 15px 0 15px 0;
+    white-space: nowrap;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+  
+.custom-select .items div:hover {
+    color: #00f6d2;
+}
