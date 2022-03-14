@@ -35,7 +35,7 @@ function defaultState() {
         pending_artworks: 0,
         is_headless: false,
         current_page: 1,
-        use_ipfs: false
+        use_ipfs: true
     }
 }
 
@@ -505,7 +505,7 @@ export const store = {
                 artwork.pk_author = pk_author
                 artwork.loading   = false
             } 
-            else if (data[0] == 2 && this.use_ipfs) {   
+            else if (data[0] == 2 && this.state.use_ipfs) {   
                 let rawMeta = data.subarray(1)
                 let meta = JSON.parse((new TextDecoder()).decode(rawMeta))
 
