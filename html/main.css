@@ -295,6 +295,11 @@
 .selector-container .custom-select .items div[data-v-71708f22]:hover {
   color: #00f6d2;
 }
+.selector-container .custom-select .items .highlight[data-v-71708f22] {
+  font-size: 14px;
+  font-weight: bold;
+  color: #00f6d2;
+}
 
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/artworks-controls.vue?vue&type=style&index=0&id=f5326038&scoped=true&lang=stylus ***!
@@ -1032,9 +1037,4 @@ html {
     display: none;
 }
 
-.highlightLine{
-    font-size: 14px;
-    font-weight: bold;
-    color: #00f6d2;
-}
 

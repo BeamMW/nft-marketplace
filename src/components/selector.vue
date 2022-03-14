@@ -9,7 +9,7 @@
           <div class="items" v-show="show"  :style="style">
               <div v-for="(option, i) of options || []" :key="i"
                   @click="onSelected(option)">
-                  <span :class="{ highlightLine: selected === i}">{{ option.name }}</span>
+                  <span :class="{ highlight: selected === i}">{{ option.name }}</span>
               </div>
           </div>
         </div>
@@ -72,16 +72,23 @@
               padding: 0 20px
               
               div {
-                  color: #fff
-                  padding: 15px 0 15px 0
-                  white-space: nowrap
-                  line-height: 1
-                  cursor: pointer
-                  user-select: none
-                  &:hover {
-                      color: #00f6d2
-                  }
+                color: #fff
+                padding: 15px 0 15px 0
+                white-space: nowrap
+                line-height: 1
+                cursor: pointer
+                user-select: none
+                
+                &:hover {
+                    color: #00f6d2
+                }
               }  
+
+              .highlight{
+                font-size: 14px;
+                font-weight: bold
+                color: #00f6d2
+              }
           }
       }
   }    
