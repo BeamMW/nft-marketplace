@@ -157,6 +157,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     Gallery::Masterpiece m;
     _POD_(m).SetZero();
     _POD_(m.m_pkOwner) = r.m_pkArtist;
+    _POD_(m.m_pkAuthor) = r.m_pkArtist;
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1);
     uint32_t nData = r.m_Size;

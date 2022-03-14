@@ -196,6 +196,7 @@ ON_METHOD(manager, view)
         Gallery::s_SID_5,
         Gallery::s_SID_6,
         Gallery::s_SID_7,
+        Gallery::s_SID_8,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -749,6 +750,9 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::ID id, Impre
 
     if (m.m_Aid)
         Env::DocAddBlob_T("checkout.aid", m.m_Aid);
+
+    Env::DocAddBlob_T("pk_author", m.m_pkAuthor);
+
     if (!_POD_(m.m_pkOwner).IsZero())
     {
         Env::DocAddBlob_T("pk", m.m_pkOwner);
