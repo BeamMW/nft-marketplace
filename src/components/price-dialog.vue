@@ -129,6 +129,8 @@
 <script>
 import modal from './modal.vue'
 import artButton from './art-button.js';
+import utils from '../utils/utils.js'
+import {common} from '../utils/consts.js'
 
 export default {
     components: { 
