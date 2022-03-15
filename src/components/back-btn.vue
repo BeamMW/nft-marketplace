@@ -1,7 +1,7 @@
 <template>
   <div class="back-btn">
     <img src="~assets/icon-back.svg"/>
-    {{text}}
+    {{ text }}
   </div>
 </template>
 
@@ -29,7 +29,7 @@ export default {
     text: {
       type: String,
       required: false,
-      default: "back"
+      default: 'back'
     },
   }
 }

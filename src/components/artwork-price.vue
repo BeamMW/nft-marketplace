@@ -1,39 +1,33 @@
 <template>
   <!---- has price & owned, display change price / remove from sale options ---->
   <span v-if="price && owned" class="container">
-      <img src="~assets/icon-beam.svg"/>
-      <span class="amount">{{amount}}</span>
-      <span class="curr">BEAM</span>
-      <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu">
-      <popupMenu ref="saleMenu">
-          <div class="item" @click="onChangePrice">
-              <img src="~assets/icon-change.svg"/>
-              update the price
-          </div>
-          <div class="item" @click="onRemoveFromSale">
-              <img src="~assets/icon-eye-crossed.svg"/>
-              remove from sale
-          </div>
-      </popupMenu>
+    <img src="~assets/icon-beam.svg"/>
+    <span class="amount">{{ amount }}</span>
+    <span class="curr">BEAM</span>
+    <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu">
+    <popupMenu ref="saleMenu">
+      <div class="item" @click="onChangePrice">
+        <img src="~assets/icon-change.svg"/>
+        update the price
+      </div>
+      <div class="item" @click="onRemoveFromSale">
+        <img src="~assets/icon-eye-crossed.svg"/>
+        remove from sale
+      </div>
+    </popupMenu>
   </span>
   
   <!---- has price but not owned, can buy ---->
   <span v-if="price && !owned" class="container">
-      <img src="~assets/icon-beam.svg"/>
-      <span class="amount">{{amount}}</span>
-      <span class="curr">BEAM</span>
-      <artButton 
-        class="button" type="buy" 
-        @click="onBuy"
-      />
+    <img src="~assets/icon-beam.svg"/>
+    <span class="amount">{{ amount }}</span>
+    <span class="curr">BEAM</span>
+    <artButton class="button" type="buy" @click="onBuy"/>
   </span>
 
   <!---- doesn't have price & owned, can sell ---->
   <span v-if="!price && owned" class="container">
-    <artButton 
-      class="button" type="sell"
-      @click="onSell" 
-    />
+    <artButton class="button" type="sell" @click="onSell"/>
   </span>
 
   <!---- doesn't have price & not owned, 
@@ -41,7 +35,7 @@
          owner &c. Just dispaly that it is not on sale
   ---->
   <span v-if="!price && !owned" class="not-for-sale">
-      Not for sale
+    Not for sale
   </span>
 </template>
 
@@ -86,16 +80,16 @@ import artButton from './art-button.js'
 import popupMenu from './popup-menu.vue'
 
 export default {
+  components: {
+    artButton,
+    popupMenu
+  },
+
   props: {
     artwork: {
       type: Object,
       required: true,
     }
-  },
-
-  components: {
-    artButton,
-    popupMenu
   },
 
   computed: {
@@ -119,25 +113,26 @@ export default {
       if (this.price) {
         return utils.formatAmount(this.price.amount)
       }
+      return undefined
     }
   },
 
   methods: {
     onSaleMenu(ev) {
-        this.$refs.saleMenu.open(ev)
+      this.$refs.saleMenu.open(ev)
     },
 
     onChangePrice (id) {
       try {
-        this.$store.setIdToSell(this.id);
+        this.$store.setIdToSell(this.id)
       } 
       catch (err) {
-        this.$store.setError(err, "Failed to sell an item");
+        this.$store.setError(err, 'Failed to sell an item')
       }
     },
 
     onRemoveFromSale () {
-      this.$store.sellArtwork(this.id, 0);
+      this.$store.sellArtwork(this.id, 0)
     },
 
     onBuy () {
@@ -150,7 +145,7 @@ export default {
         this.$store.setIdToSell(this.id)
       } 
       catch (err) {
-          this.$store.setError(err, "Failed to sell an item")
+        this.$store.setError(err, 'Failed to sell an item')
       }
     }
   }

@@ -4,19 +4,19 @@
     <div class="details-row"> 
       <div class="artwork-container">
         <div class="artwork-box">
-          <artPreview v-bind:artwork="artwork"/>
+          <artPreview key="" :artwork="artwork"/>
         </div>
       </div>
       <div class="info-container">
         <div class="info-box">
-          <div class="title" v-if="title || !error">{{title || "Loading..."}}</div>
-          <div class="title" v-else>Failed to load artwork</div>
-          <div class="author" v-if="author">by <span @click="onAuthor">{{author}}</span></div>
-          <div class="author" v-else-if="error">{{artwork.error}}</div>
-          <div class="author" v-else>Loading...</div>
+          <div v-if="title || !error" class="title">{{ title || "Loading..." }}</div>
+          <div v-else class="title">Failed to load artwork</div>
+          <div v-if="author" class="author">by <span @click="onAuthor">{{ author }}</span></div>
+          <div v-else-if="error" class="author">{{ artwork.error }}</div>
+          <div v-else class="author">Loading...</div>
           <div class="price">
             <div class="separator"/>
-            <artPrice v-bind:artwork="artwork"/>
+            <artPrice :artwork="artwork"/>
           </div>
         </div>
       </div>
@@ -25,29 +25,29 @@
     <div class="table-head"> 
       <div width="120px">Coin</div>
       <div width="200px">Amount</div>
-      <div class="sorted" v-if="sales && sales.length">
+      <div v-if="sales && sales.length" class="sorted">
         Height
-        <img src="~assets/icon-down.svg" class="arrow" />
+        <img src="~assets/icon-down.svg" class="arrow"/>
       </div>
       <div v-else>
         Height
       </div>
     </div>  
-    <div class="table-body" v-if="sales != undefined && sales.length">
-      <div class="row" v-for="(sale, index) in sales.slice().reverse()" v-bind:key="`sale-${index}`">
+    <div v-if="sales != undefined && sales.length" class="table-body">
+      <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${index}`" class="row">
         <div>
           <img src="~assets/icon-beam.svg"/>
           <span class="curr">BEAM</span>
         </div>
-        <div class="text">{{formatAmount(sale.amount)}}</div>
-        <div class="text">{{formatHeight(sale.height)}}</div>
+        <div class="text">{{ formatAmount(sale.amount) }}</div>
+        <div class="text">{{ formatHeight(sale.height) }}</div>
       </div>
     </div>
-    <div class="table-body-empty" v-else-if="sales !== undefined && !sales.length">
+    <div v-else-if="sales !== undefined && !sales.length" class="table-body-empty">
       <img src="~assets/icon-wallet-empty.svg"/>
       <div>Trading history is empty</div>
     </div>  
-    <div class="table-body-loading" v-else>
+    <div v-else class="table-body-loading">
       Loading...
     </div>
   </div>
@@ -260,7 +260,6 @@ import artPrice from './artwork-price.vue'
 import backBtn from './back-btn.vue'
 import artPreview from './artwork-preview.vue'
 import utils from '../utils/utils.js'
-
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -268,10 +267,25 @@ import { AgGridVue } from "ag-grid-vue3"
 */
 
 export default {
+  components: {
+    artPrice,
+    artPreview,
+    backBtn
+  },
   props: {
     artwork: {
       type: Object,
       required: true
+    }
+  },
+
+  emits: [
+    'back'
+  ], 
+
+  data () {
+    return {
+      sales: undefined
     }
   },
 
@@ -302,22 +316,6 @@ export default {
     this.$store.getSalesHistory(this.id, (sales) => {
       this.sales = sales
     })
-  }, 
-
-  data () {
-    return {
-      sales: undefined
-    }
-  },
-
-  emits: [
-    'back'
-  ],
-
-  components: {
-    artPrice,
-    artPreview,
-    backBtn
   },
 
   methods: {  

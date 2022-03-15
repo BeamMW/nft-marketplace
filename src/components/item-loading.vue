@@ -1,9 +1,8 @@
 <template>
-    <div class="loading darker">
+  <div class="loading darker">
     {{ error ? 'Failed to load artwork' : 'Loading...' }}
-    </div>
+  </div>
 </template>
-
 
 <style lang="stylus" scoped>
 .loading {
@@ -23,12 +22,12 @@
 
 <script>
 export default {
-    props: {
-        error: {
-            type: Boolean,
-            default: false,
-            required: false
-        }
-    },
+  props: {
+    error: {
+      type: Boolean,
+      default: false,
+      required: false
+    }
+  },
 }
 </script>

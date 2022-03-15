@@ -1,11 +1,11 @@
 <template>
-    <div class="balance-container">
-        <div class="user-opt">
-            <div class="key" v-on:click="onConnect">
-            <span class="connect">Connect to wallet</span>
-            </div>
-        </div>
+  <div class="balance-container">
+    <div class="user-opt">
+      <div class="key" @click="onConnect">
+        <span class="connect">Connect to wallet</span>
+      </div>
     </div>
+  </div>
 </template>
 
 <style lang="stylus" scoped>
@@ -39,10 +39,10 @@
 
 <script>
 export default {
-    methods: {
-        async onConnect () {
-            this.$store.switchToHeaded()  
-        }
+  methods: {
+    async onConnect () {
+      this.$store.switchToHeaded()  
     }
+  }
 }
 </script>

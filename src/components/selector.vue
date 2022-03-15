@@ -1,18 +1,17 @@
 <template>
   <div class="selector-container">
-        <span class="title">{{title}}</span>
-        <div class="custom-select" :tabindex="tabindex" @blur="show  = false">
-          <div class="selected" :class="{ open: show }" @click="open">
-              {{ options[selected].name }}
-                <img src="~assets/icon-down.svg"  class="arrow" />
-          </div>
-          <div class="items" v-show="show" :style="style">
-              <div v-for="(option, i) of options || []" :key="i"
-                  @click="onSelected(option)">
-                  <span :class="{ highlight: selected === i}">{{ option.name }}</span>
-              </div>
-          </div>
+    <span class="title">{{ title }}</span>
+    <div class="custom-select" :tabindex="tabindex" @blur="show = false">
+      <div class="selected" :class="{ open: show }" @click="open">
+        {{ options[selected].name }}
+        <img src="~assets/icon-down.svg" class="arrow"/>
+      </div>
+      <div v-show="show" class="items" :style="style">
+        <div v-for="(option, i) of options || []" :key="i" @click="onSelected(option)">
+          <span :class="{ highlight: selected === i}">{{ option.name }}</span>
         </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -95,8 +94,8 @@
 </style>
 
 <script>
-import { nextTick } from 'vue';
-import utils from '../utils/utils.js';
+import {nextTick} from 'vue'
+import utils from '../utils/utils.js'
 
 export default {
   props: {
@@ -115,27 +114,27 @@ export default {
       default: 0,
     },
     title: {
-        type: String,
-        required: false,
-        default: "",
+      type: String,
+      required: false,
+      default: '',
     },
+  },
+
+  emits: ['selected'],
+
+  data() {
+    return {
+      show: false,
+    }
   },
 
   computed: {
     style() {
       return {
-          "background-color": utils.getStyles().background_popup,
-        }
+        'background-color': utils.getStyles().background_popup,
+      }
     }
   },
-
-  data() {
-      return {
-          show: false,
-      };
-  },
-
-  emits: ['selected'],
 
   methods: {
     onSelected(opt) {
@@ -152,26 +151,26 @@ export default {
       nextTick(() => {
         let downAway = (evc) => {
           if (!this.$el.contains(evc.target)) {
-            document.removeEventListener("mousedown", downAway, true)
+            document.removeEventListener('mousedown', downAway, true)
             this.close()
           }
         }
         
         let clickAway = (evc) => {
           if (ev != evc) {
-            document.removeEventListener("click", clickAway, true)
+            document.removeEventListener('click', clickAway, true)
             this.close()
           }
         }
         
         let scrollAway = (evc) => {
-          document.removeEventListener("scroll", scrollAway, scroll)
+          document.removeEventListener('scroll', scrollAway, scroll)
           this.close()
         }
         
-        document.addEventListener("mousedown", downAway, true)
-        document.addEventListener("click", clickAway, true)
-        document.addEventListener("scroll", scrollAway, true)
+        document.addEventListener('mousedown', downAway, true)
+        document.addEventListener('click', clickAway, true)
+        document.addEventListener('scroll', scrollAway, true)
       })
     },
   }

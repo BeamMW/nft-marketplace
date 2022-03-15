@@ -1,27 +1,27 @@
 <template>
-    <publicKeyModal ref="keyModal"/>
-    <div class="balance-container">
-        <div :class="[show_balance ? '' : 'hidden', 'balance']">
-            <img src="~assets/icon-beam.svg"/>
-            <div class="value">
-                {{ balance_beam }} BEAM
-            </div>
-            <div v-if="balance_beam" v-on:click="onWithdraw" class="withdraw">
-                <img class="icon" src="~assets/icon-receive.svg"/>
-                <span class="text">withdraw</span>
-            </div>
-        </div>
-        <div class="user" v-on:click="onShowKey">
-            <div v-if="my_artist_name" class="name">
-                <img class="icon" src="~assets/icon-user.svg"/>
-                <span class="text">{{ my_artist_name }}</span>
-            </div>
-            <div class="key">
-                <img class="icon" src="~assets/icon-key.svg"/>
-                <span class="text">Show my public key</span>
-            </div>
-        </div>
+  <publicKeyModal ref="keyModal"/>
+  <div class="balance-container">
+    <div :class="[show_balance ? '' : 'hidden', 'balance']">
+      <img src="~assets/icon-beam.svg"/>
+      <div class="value">
+        {{ balance_beam }} BEAM
+      </div>
+      <div v-if="balance_beam" class="withdraw" @click="onWithdraw">
+        <img class="icon" src="~assets/icon-receive.svg"/>
+        <span class="text">withdraw</span>
+      </div>
     </div>
+    <div class="user" @click="onShowKey">
+      <div v-if="my_artist_name" class="name">
+        <img class="icon" src="~assets/icon-user.svg"/>
+        <span class="text">{{ my_artist_name }}</span>
+      </div>
+      <div class="key">
+        <img class="icon" src="~assets/icon-key.svg"/>
+        <span class="text">Show my public key</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="stylus" scoped>
@@ -112,36 +112,36 @@
 </style>
 
 <script>
-import { common } from '../utils/consts.js'
+import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
 
 export default {
-    components: {
-        publicKeyModal
-    },
+  components: {
+    publicKeyModal
+  },
 
-    computed: {
-        balance_beam () {
-            return this.$state.balance_beam / common.GROTHS_IN_BEAM;
-        },
-        my_artist_name () {
-            let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
+  computed: {
+    balance_beam () {
+      return this.$state.balance_beam / common.GROTHS_IN_BEAM
+    },
+    my_artist_name () {
+      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
                          this.$state.artists[this.$state.my_artist_keys[1]]
-            return (artist || {}).label
-        },
-        show_balance () {
-            return this.$state.is_artist || this.$state.balance_beam
-        }
+      return (artist || {}).label
+    },
+    show_balance () {
+      return this.$state.is_artist || this.$state.balance_beam
+    }
+  },
+
+  methods: {
+    onShowKey () {
+      this.$refs.keyModal.open()
     },
 
-    methods: {
-        onShowKey () {
-            this.$refs.keyModal.open()
-        },
-
-        onWithdraw () {
-            this.$store.withdrawBEAM()
-        }
+    onWithdraw () {
+      this.$store.withdrawBEAM()
     }
+  }
 }
 </script>

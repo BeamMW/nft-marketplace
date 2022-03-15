@@ -2,67 +2,67 @@ import artPrice from './artwork-price.vue'
 import artPreview from './artwork-preview.vue'
 
 export default {
-    props: {
-        artwork: {
-            type: Object,
-            required: true,
-        }
+  props: {
+    artwork: {
+      type: Object,
+      required: true,
+    }
+  },
+
+  emits: ['delete', 'details'],
+
+  components: {
+    artPrice,
+    artPreview
+  },
+
+  computed: {
+    is_admin () {
+      return this.$state.is_admin
     },
 
-    emits: ['delete', 'details'],
-
-    components: {
-        artPrice,
-        artPreview
+    is_headless () {
+      return this.$state.is_headless
     },
 
-    computed: {
-        is_admin () {
-            return this.$state.is_admin
-        },
+    id () {
+      return this.artwork.id
+    },
 
-        is_headless () {
-            return this.$state.is_headless
-        },
-
-        id () {
-            return this.artwork.id
-        },
-
-        title () {
-            return this.artwork.title
-        },
+    title () {
+      return this.artwork.title
+    },
         
-        likes_cnt () {
-            return this.artwork.impressions
-        },
-
-        liked () {
-            return !!this.artwork.my_impression
-        },
-        
-        can_vote () {
-            return this.$state.balance_reward > 0
-        },
-
-        loading () {
-            return this.artwork.loading
-        },
-
-        artists () {
-            return this.$state.artists
-        },
-
-        author () {
-            return (this.artists[this.artwork.pk_author] || {}).label
-        },
-
-        error () {
-            return !!this.artwork.error
-        }
+    likes_cnt () {
+      return this.artwork.impressions
     },
 
-    template:`
+    liked () {
+      return !!this.artwork.my_impression
+    },
+        
+    can_vote () {
+      return this.$state.balance_reward > 0
+    },
+
+    loading () {
+      return this.artwork.loading
+    },
+
+    artists () {
+      return this.$state.artists
+    },
+
+    author () {
+      return (this.artists[this.artwork.pk_author] || {}).label
+    },
+
+    error () {
+      return !!this.artwork.error
+    }
+  },
+
+  template:`
         <div class="artwork">
             
             <!---- Preview OR Loading ---->
@@ -102,31 +102,31 @@ export default {
         </div>
     `,
 
-    methods: {
-        onLike (ev) {
-            if (this.is_headless) 
-            {
-                this.$store.switchToHeaded()  
-            } 
-            else {
-                if (this.can_vote) {
-                    this.$emit('like', this.id)
-                }
-            }
-        },
-
-        onUnlike (ev) {
-            if (this.can_vote) {
-                this.$emit('unlike', this.id)
-            }
-        },
-
-        onDelete (ev) {
-            this.$emit("delete", this.id)
-        },
-
-        onDetails(ev) {
-            this.$emit("details", this.id)
+  methods: {
+    onLike (ev) {
+      if (this.is_headless) 
+      {
+        this.$store.switchToHeaded()  
+      } 
+      else {
+        if (this.can_vote) {
+          this.$emit('like', this.id)
         }
+      }
+    },
+
+    onUnlike (ev) {
+      if (this.can_vote) {
+        this.$emit('unlike', this.id)
+      }
+    },
+
+    onDelete (ev) {
+      this.$emit('delete', this.id)
+    },
+
+    onDetails(ev) {
+      this.$emit('details', this.id)
     }
+  }
 }

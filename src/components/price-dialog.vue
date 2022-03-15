@@ -1,42 +1,34 @@
 <template>
-    <modal ref="modal">
-        <template v-slot:dialog="{ onClose }">
-                <div class="sell__title">
-                    Set the price
-                </div>
+  <modal ref="modal">
+    <template v-slot:dialog="{ onClose }">
+      <div class="sell__title">
+        Set the price
+      </div>
 
-                <div class="sell__input">
-                    <input type="text"
-                    id="sell-input"
-                    class="input__elem" 
-                    placeholder="0"/>
-                    <span class="input__text">BEAM</span>
-                </div>
+      <div class="sell__input">
+        <input id="sell-input"
+               type="text"
+               class="input__elem" 
+               placeholder="0"
+        />
+        <span class="input__text">BEAM</span>
+      </div>
 
-                <div class="sell__fee">
-                    <span class="fee__title">Fee</span>
-                    <span class="fee__value">0.011 BEAM</span>
-                </div>
+      <div class="sell__fee">
+        <span class="fee__title">Fee</span>
+        <span class="fee__value">0.011 BEAM</span>
+      </div>
 
-                <div class="sell__info">
-                    Small transaction fee must be paid
-                </div>
+      <div class="sell__info">
+        Small transaction fee must be paid
+      </div>
 
-                <div class="sell__controls">
-                    <artButton
-                    v-on:click="onClose"
-                    type="cancel"
-                    />
-
-                    <artButton
-                    v-on:click="onProceed"
-                    id="proceed"
-                    type="proceed"
-                    class="disabled"
-                    />
-                </div>
-        </template>
-    </modal>
+      <div class="sell__controls">
+        <artButton type="cancel" @click="onClose"/>
+        <artButton id="proceed" class="disabled" type="proceed" @click="onProceed"/>
+      </div>
+    </template>
+  </modal>
 </template>
 
 <style scoped lang="stylus">
@@ -128,76 +120,76 @@
 
 <script>
 import modal from './modal.vue'
-import artButton from './art-button.js';
+import artButton from './art-button.js'
 import utils from '../utils/utils.js'
 import {common} from '../utils/consts.js'
 
 export default {
-    components: { 
-        modal, artButton
-    },
+  components: { 
+    modal, artButton
+  },
 
-    mounted () { 
-        const sellInput = document.getElementById('sell-input');
-        if (sellInput) {
-            document.getElementById('sell-input').addEventListener('keydown', (event) => {
-                const specialKeys = [
-                    'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
-                    'Control', 'Delete', 'F5'
-                ];
-
-                if (specialKeys.indexOf(event.key) !== -1) {
-                    return;
-                }
-
-                const current = document.getElementById('sell-input').value;
-                const next = current.concat(event.key);
-            
-                if (!utils.handleString(next)) {
-                    event.preventDefault();
-                }
-            })
-
-            document.getElementById('sell-input').addEventListener('paste', (event) => {
-                if (event.clipboardData !== undefined) {
-                    const text = event.clipboardData.getData('text');
-                    if (!utils.handleString(text)) {
-                        event.preventDefault();
-                    }
-                }
-            });
-
-            sellInput.addEventListener('input', ev => {
-                let disabled = parseFloat(ev.target.value || '0') == 0
-                let proceed = document.getElementById('proceed')
-                
-                if (disabled) {
-                    proceed.classList.add('disabled')
-                } 
-                
-                if (!disabled) {
-                    proceed.classList.remove('disabled')   
-                }
-            })
-        }
-    },
-
-    computed: {
-        id_to_sell () {
-            return this.$state.id_to_sell;
-        }
-    },
-
-    methods: {
-        onProceed() {
-            let proceed = document.getElementById('proceed')
-            if (!proceed.classList.contains('disabled')) {
-                const current = document.getElementById('sell-input').value;
-                const price = parseFloat(current) * common.GROTHS_IN_BEAM;
-                this.$store.sellArtwork(this.id_to_sell, price);
-                this.onClose();
-            }
-        },
+  computed: {
+    id_to_sell () {
+      return this.$state.id_to_sell
     }
+  },
+
+  mounted () { 
+    const sellInput = document.getElementById('sell-input')
+    if (sellInput) {
+      document.getElementById('sell-input').addEventListener('keydown', (event) => {
+        const specialKeys = [
+          'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
+          'Control', 'Delete', 'F5'
+        ]
+
+        if (specialKeys.indexOf(event.key) !== -1) {
+          return
+        }
+
+        const current = document.getElementById('sell-input').value
+        const next = current.concat(event.key)
+            
+        if (!utils.handleString(next)) {
+          event.preventDefault()
+        }
+      })
+
+      document.getElementById('sell-input').addEventListener('paste', (event) => {
+        if (event.clipboardData !== undefined) {
+          const text = event.clipboardData.getData('text')
+          if (!utils.handleString(text)) {
+            event.preventDefault()
+          }
+        }
+      })
+
+      sellInput.addEventListener('input', ev => {
+        let disabled = parseFloat(ev.target.value || '0') == 0
+        let proceed = document.getElementById('proceed')
+                
+        if (disabled) {
+          proceed.classList.add('disabled')
+        } 
+                
+        if (!disabled) {
+          proceed.classList.remove('disabled')   
+        }
+      })
+    }
+  },
+
+  methods: {
+    onProceed() {
+      let proceed = document.getElementById('proceed')
+      if (!proceed.classList.contains('disabled')) {
+        const current = document.getElementById('sell-input').value
+        const price = parseFloat(current) * common.GROTHS_IN_BEAM
+        this.$store.sellArtwork(this.id_to_sell, price)
+        this.onClose()
+      }
+    },
+  }
 }
 </script>

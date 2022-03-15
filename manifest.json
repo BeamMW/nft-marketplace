@@ -1,7 +1,7 @@
 {
-	"name": "NFT Marketplace",
-	"description": "Buy and sell NFTs",
-	"url": "localapp/html/index.html",
-	"guid": "nft-marketplace",
-	"min_api_version": "6.2"
+  "name": "NFT Marketplace",
+  "description": "Buy and sell NFTs",
+  "url": "localapp/html/index.html",
+  "guid": "nft-marketplace",
+  "min_api_version": "6.2"
 }

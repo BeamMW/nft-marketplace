@@ -1,11 +1,11 @@
 <template>
-    <Teleport to="body">
-        <div v-if="show" class="modal-dialog">
-            <div class="modal-content" :style="style">
-                <slot/>
-            </div>
-        </div>
-    </Teleport>
+  <Teleport to="body">
+    <div v-if="show" class="modal-dialog">
+      <div class="modal-content" :style="style">
+        <slot/>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style lang="stylus" scoped>
@@ -32,30 +32,30 @@
 import utils from '../utils/utils.js'
 
 export default {
-    data () {
-        return {
-            show: false,
-        };
-    },
-
-    computed: {
-        style() {
-            return {
-                "background-color": utils.getStyles().background_popup,
-            }
-        }
-    },
-
-    methods: {
-        close () {
-            this.show = false
-            document.getElementById("container").style.opacity = 1
-        },
-
-        open () {
-            this.show = true
-            document.getElementById("container").style.opacity = 0.3
-        }
+  data () {
+    return {
+      show: false,
     }
+  },
+
+  computed: {
+    style() {
+      return {
+        'background-color': utils.getStyles().background_popup,
+      }
+    }
+  },
+
+  methods: {
+    close () {
+      this.show = false
+      document.getElementById('container').style.opacity = 1
+    },
+
+    open () {
+      this.show = true
+      document.getElementById('container').style.opacity = 0.3
+    }
+  }
 }
 </script>

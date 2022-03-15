@@ -1,57 +1,56 @@
-import html from '../utils/html.js';
-import { common } from '../utils/consts.js';
+import html from '../utils/html.js'
 
 export default {
-    props: {
-        type: {
-            type: String,
-            required: true
-        },
-        data: {
-            type: String
-        }
+  props: {
+    type: {
+      type: String,
+      required: true
     },
+    data: {
+      type: String
+    }
+  },
 
-    render () {
-        if (this.type === 'sell' || this.type === 'change' || this.type === 'buy') {
-            return html`
+  render () {
+    if (this.type === 'sell' || this.type === 'change' || this.type === 'buy') {
+      return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-button.svg"/>
                     <span class="button__text">${this.type}</span>
                 </div>
-            `;
-        } else if (this.type === 'close') {
-            return html`
+            `
+    } else if (this.type === 'close') {
+      return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-cancel.svg"/>
                     <span class="button__text">close</span>
                 </div>
-            `;
-        } else if (this.type === 'cancel') {
-            return html`
+            `
+    } else if (this.type === 'cancel') {
+      return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-cancel.svg"/>
                     <span class="button__text">cancel</span>
                 </div>
-            `;
-        } else if (this.type === 'copy') {
-            return html`
+            `
+    } else if (this.type === 'copy') {
+      return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-copy-blue.svg"/>
                     <span class="button__text">copy and close</span>
                 </div>
-            `;
-        } else if (this.type === 'proceed') {
-            return html`
+            `
+    } else if (this.type === 'proceed') {
+      return html`
                 <div class="button ${this.type}">
                     <img src="./assets/icon-receive-proceed.svg"/>
                     <span class="button__text">proceed</span>
                 </div>
-            `;
-        }
-    },
-
-    methods: {
-
+            `
     }
+  },
+
+  methods: {
+
+  }
 }
