@@ -27,7 +27,6 @@ function defaultState() {
     balance_reward: 0,
     selected_artist: undefined,
     active_tab: tabs.ALL,
-    id_to_sell: '',
     sort_by: sort.OLDEST_TO_NEWEST,
     filter_by_artist: 0,
     pending_artworks: 0,
@@ -69,10 +68,6 @@ export const store = {
       this.state.error = undefined
       reload ? utils.reload() : this.start()
     }
-  },
-
-  setIdToSell(id) {
-    this.state.id_to_sell = id
   },
 
   setSortBy(val) {

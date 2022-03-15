@@ -1,4 +1,5 @@
 <template>
+  <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork"/>
   <!---- has price & owned, display change price / remove from sale options ---->
   <span v-if="price && owned" class="container">
     <img src="~assets/icon-beam.svg"/>
@@ -78,11 +79,13 @@
 import utils from '../utils/utils.js'
 import artButton from './art-button.js'
 import popupMenu from './popup-menu.vue'
+import artworkPriceModal from './price-dialog.vue'
 
 export default {
   components: {
     artButton,
-    popupMenu
+    popupMenu,
+    artworkPriceModal
   },
 
   props: {
@@ -121,14 +124,12 @@ export default {
     onSaleMenu(ev) {
       this.$refs.saleMenu.open(ev)
     },
+    onSellArtwork (price) {
+      this.$store.sellArtwork(this.id, price)
+    },
 
-    onChangePrice (id) {
-      try {
-        this.$store.setIdToSell(this.id)
-      } 
-      catch (err) {
-        this.$store.setError(err, 'Failed to sell an item')
-      }
+    onChangePrice () {
+      this.$refs.priceModal.open()
     },
 
     onRemoveFromSale () {
@@ -141,12 +142,7 @@ export default {
     },
 
     onSell () {
-      try {
-        this.$store.setIdToSell(this.id)
-      } 
-      catch (err) {
-        this.$store.setError(err, 'Failed to sell an item')
-      }
+      this.$refs.priceModal.open()
     }
   }
 }

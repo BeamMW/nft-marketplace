@@ -1,44 +1,43 @@
 <template>
   <modal ref="modal">
-    <template v-slot:dialog="{ onClose }">
-      <div class="sell__title">
-        Set the price
-      </div>
+    <div class="title">
+      Set the price
+    </div>
 
-      <div class="sell__input">
-        <input id="sell-input"
-               type="text"
-               class="input__elem" 
-               placeholder="0"
-        />
-        <span class="input__text">BEAM</span>
-      </div>
+    <div class="input">
+      <input id="sell-input"
+             v-model="price"
+             type="text" 
+             class="elem"
+             placeholder="0"
+      />
+      <span class="text">BEAM</span>
+    </div>
 
-      <div class="sell__fee">
-        <span class="fee__title">Fee</span>
-        <span class="fee__value">0.011 BEAM</span>
-      </div>
+    <div class="fee">
+      <span class="title">Fee</span>
+      <span class="value">0.011 BEAM</span>
+    </div>
 
-      <div class="sell__info">
-        Small transaction fee must be paid
-      </div>
+    <div class="info">
+      Small transaction fee must be paid
+    </div>
 
-      <div class="sell__controls">
-        <artButton type="cancel" @click="onClose"/>
-        <artButton id="proceed" class="disabled" type="proceed" @click="onProceed"/>
-      </div>
-    </template>
+    <div class="controls">
+      <artButton type="cancel" @click="close"/>
+      <artButton id="proceed" class="disabled" type="proceed" @click="onProceed"/>
+    </div>
   </modal>
 </template>
 
 <style scoped lang="stylus">
-.sell__title {
+.title {
     font-size: 18px
     font-weight: bold
     color: #fff
 }
 
-.sell__input {
+.input {
     margin-top: 20px
     height: 45px
     width: 100%
@@ -48,7 +47,7 @@
     flex-direction: row
     align-items: center
 
-    .input__elem {
+    .elem {
         background: rgba(255, 255, 255, 0)
         border: none
         font-size: 24px
@@ -70,7 +69,7 @@
         }
     }
 
-    .input__text {
+    .text {
         margin-right: 8px
         font-size: 16px
         margin-left: auto
@@ -78,19 +77,19 @@
     }
 
 }
-.sell__fee {
+.fee {
     display: flex
     flex-direction: row
     margin-top: 20px
     align-self: flex-start
     
-    .fee__title {
+    .title {
         opacity: 0.5
         font-size: 12px
         color: #fff
     }
 
-    .fee__value {
+    .value {
         font-size: 14px
         font-weight: 500
         color: #0bccf7
@@ -98,7 +97,7 @@
     }
 }
 
-.sell__info {
+.info {
     margin-top: 30px
     opacity: 0.7
     font-size: 14px
@@ -106,7 +105,7 @@
     color: #fff
 }
 
-.sell__controls {
+.controls {
     margin-top: 30px
     display: flex
     flex-direction: row
@@ -127,46 +126,55 @@ import {common} from '../utils/consts.js'
 export default {
   components: { 
     modal, artButton
+  }, 
+  emits:['sell-artwork'],
+
+  data() {  
+    return {
+      price: '',
+    } 
   },
-
-  computed: {
-    id_to_sell () {
-      return this.$state.id_to_sell
-    }
+  watch: {
+    price(value){ 
+      this.price = value 
+      this.validatePrice(value) 
+    },  
   },
+    
+  methods: {
 
-  mounted () { 
-    const sellInput = document.getElementById('sell-input')
-    if (sellInput) {
-      document.getElementById('sell-input').addEventListener('keydown', (event) => {
-        const specialKeys = [
-          'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
-          'Control', 'Delete', 'F5'
-        ]
+    validatePrice(value) {
+      const sellInput = document.getElementById('sell-input')
 
-        if (specialKeys.indexOf(event.key) !== -1) {
-          return
-        }
+      if (sellInput) {
+        document.getElementById('sell-input').addEventListener('keydown', (event) => {
+          const specialKeys = [
+            'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
+            'Control', 'Delete', 'F5'
+          ]
 
-        const current = document.getElementById('sell-input').value
-        const next = current.concat(event.key)
+          if (specialKeys.indexOf(event.key) !== -1) {
+            return
+          }
+
+          const current = document.getElementById('sell-input').value
+          const next = current.concat(event.key)
             
-        if (!utils.handleString(next)) {
-          event.preventDefault()
-        }
-      })
-
-      document.getElementById('sell-input').addEventListener('paste', (event) => {
-        if (event.clipboardData !== undefined) {
-          const text = event.clipboardData.getData('text')
-          if (!utils.handleString(text)) {
+          if (!utils.handleString(next)) {
             event.preventDefault()
           }
-        }
-      })
+        })
 
-      sellInput.addEventListener('input', ev => {
-        let disabled = parseFloat(ev.target.value || '0') == 0
+        document.getElementById('sell-input').addEventListener('paste', (event) => {
+          if (event.clipboardData !== undefined) {
+            const text = event.clipboardData.getData('text')
+            if (!utils.handleString(text)) {
+              event.preventDefault()
+            }
+          }
+        })
+
+        let disabled = parseFloat(value || '0') == 0
         let proceed = document.getElementById('proceed')
                 
         if (disabled) {
@@ -176,20 +184,28 @@ export default {
         if (!disabled) {
           proceed.classList.remove('disabled')   
         }
-      })
-    }
-  },
+      }
+    },
 
-  methods: {
     onProceed() {
       let proceed = document.getElementById('proceed')
       if (!proceed.classList.contains('disabled')) {
         const current = document.getElementById('sell-input').value
         const price = parseFloat(current) * common.GROTHS_IN_BEAM
-        this.$store.sellArtwork(this.id_to_sell, price)
-        this.onClose()
+        this.$emit('sell-artwork',price)
+        this.close()
+        this.price = ''
       }
     },
+
+    open () {
+      this.$refs.modal.open()
+    },
+
+    close () {
+      this.$refs.modal.close()
+      this.price = ''
+    }
   }
 }
 </script>
