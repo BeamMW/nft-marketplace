@@ -577,6 +577,7 @@ html {
     overflow: hidden;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    cursor: pointer;
 }
 
 .artwork img {
@@ -768,10 +769,10 @@ html {
 }
 
 .user-opt__user {
-    padding-left: 15px;
     padding-bottom: 12px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .user-opt__user__text {
