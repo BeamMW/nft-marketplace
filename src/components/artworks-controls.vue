@@ -24,6 +24,8 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
+
+        <button @click="onBecomeArtist">Become an Artist</button>
       </div>
     </div>
   </div>
@@ -147,6 +149,9 @@ export default {
   },
 
   methods: {
+    onBecomeArtist() {
+      this.$store.becomeArtist()
+    },
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)
