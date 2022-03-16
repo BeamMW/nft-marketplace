@@ -1,82 +1,194 @@
 <template>
-  <div class="button" :class="type">
+  <button 
+    class="button" 
+    :class="[transparency, color, side_icon, disabled_button]" 
+    :disabled="disabled"
+  >
     <img 
-      v-if="type === 'sell' || type === 'buy' || type === 'change'" 
-      src="~assets/icon-button.svg" 
+      v-if="icon" 
+      :src="icon" 
     />
-    <img 
-      v-if="type === 'close' || type === 'cancel'"
-      src="~assets/icon-cancel.svg"
-    />
-    <img 
-      v-if="type === 'copy'"
-      src="~assets/icon-copy-blue.svg"
-    />
-    <img 
-      v-if="type === 'proceed'"
-      src="~assets/icon-receive-proceed.svg"
-    />
-    <span class="text">{{ text }}</span>
-  </div>
+    <span class="text" :style="color_text">{{ text }}</span>
+  </button>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      //
+      text_colors: {
+        magenta: "#da68f5",
+        blue: "#0bccf7",
+        green: "#00f6d2",
+        semiTransparent: "rgba(255, 255, 255, 0.1)",
+        darkBlue: "#032e49",
+        white: "#ffffff"
+      }
+    }
+  },
+
   props: {
-    type: {
+    transparent: {
+      type: Boolean,
+      default: false
+    },
+    semi_transparent: {
+      type: Boolean,
+      default: false
+    },
+    // magenta, blue, green, semiTransparent, darkBlue
+    color: {
       type: String,
-      required: true,
+    },
+    // icon source
+    icon: {
+      type: String,  
+    },
+    // left, right
+    icon_position: {
+      type: String,
+      default: 'left'
     },
     text: {
       type: String,
-      required: true,
     },
+    // available colors from data.text_colors
+    text_color: {
+      type: String,
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  computed: {
+    side_icon() {
+      if (this.icon_position === 'right') {
+        return 'trailingIcon'
+      }
+
+      if (this.icon && !this.text) {
+        return 'singleIcon'
+      }
+
+      return 'leadingIcon'
+    },
+    transparency() {
+      if (this.transparent) {
+        return 'transparent'
+      }
+
+      if (this.semi_transparent) {
+        return 'semiTransparent'
+      }
+    },
+    color_text() {
+      if (this.text && this.text_color) {
+        return {
+          "color": this.text_colors[this.text_color]
+        }
+      }
+    },
+    disabled_button() {
+      if (this.disabled) {
+        return 'disabled'
+      }
+    }
   }
 }
 </script>
 
 <style scoped lang="stylus">
+$magenta = #da68f5
+$blue = #0bccf7
+$green = #00f6d2
+$semiTransparent = rgba(255, 255, 255, 0.1)
+$darkBlue = #032e49
+$white = #ffffff
+
+$marginIcon = 8px
+
 .button {
+  height: 38px
   padding: 11px 25px
   border-radius: 50px
   display: flex
+  flex-wrap: wrap
   align-items: center
-  color: #032e49
+  color: $darkBlue
   font-size: 14px
   font-weight: bold
   cursor: pointer
-  margin-left: auto
+  border: none
+
+  &:not(.disabled):hover {
+    box-shadow: 0 0 8px white
+  }
+
+  &:focus {
+    outline: none
+  }  
 
   & .text {
-    margin-left: 5px
     line-height: 1
   }
 }
 
-.buy {
-  background-color: #da68f5
+.disabled {
+  opacity: 0.3;
+  cursor: auto !important;
 }
 
-.sell, .change {
-  background-color: #0bccf7
+.transparent {
+  height: min-content
+  background: transparent
+  padding: 0
+
+  &:not(.disabled):hover {
+    box-shadow: none
+  }
 }
 
-.cancel, .close {
-  background-color: rgba(255, 255, 255, 0.1)
+.semiTransparent {
+  background: $semiTransparent
+}
+
+.leadingIcon {
+  img {
+    margin-right: $marginIcon
+  }
+}
+
+.trailingIcon {
+  flex-direction: row-reverse
+  
+  img {
+    margin-left: $marginIcon
+  }
+}
+
+.singleIcon {
+  img {
+    margin: 0
+  }
+}
+
+.magenta {
+  background-color: $magenta
+}
+
+.blue {
+  background-color: $blue
+}
+
+.green {
+  background-color: $green
+}
+
+.black {
+  background-color: $black
   color: #fff
-}
-
-.proceed {
-  margin-left: 30px
-  background-color: #0bccf7
-}
-
-.copy {
-  margin-left: 30px
-  background-color: #00f6d2
-}
-
-.button:not(.disabled):hover {
-  box-shadow: 0 0 8px white
 }
 </style>

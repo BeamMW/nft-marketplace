@@ -5,5 +5,9 @@
         "yarn.lock": true,
         "package.json": true,
         
-    }
+    },
+    "cSpell.words": [
+      "muka",
+      "poshla"
+    ]
 }
