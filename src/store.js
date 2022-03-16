@@ -840,5 +840,10 @@ export const store = {
 
     showDetails(id) {
         router.push({name: 'details'})
+    },
+
+    becomeArtist() {
+        router.push({name: 'becomeArtist'})
+
     }
 }

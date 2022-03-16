@@ -85,12 +85,18 @@ export default {
                         :selected="active_sort_by"
                         title="Sort by"
                     />
+
+                    <button v-on:click="onBecomeArtist">Become an Artist</button>
                 </div>
            </div>
         </div>
     `,
 
     methods: {
+        onBecomeArtist() {
+            this.$store.becomeArtist();
+        },
+
         onTabClicked(id) {
             if (this.active_tab !== id) {
                 this.$store.setActiveTab(id)
