@@ -8,6 +8,8 @@ import publicKeyPopup from './public-key-popup.js'
 import paginator from './paginator.js'
 import adetails from './artwork-details.vue'
 
+import PRESENTATION from './button-presentation.vue'
+
 export default {
     computed: {
         is_admin () {
@@ -55,7 +57,7 @@ export default {
     },
 
     components: {
-        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails
+        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails, PRESENTATION
     },
 
     template: `
@@ -84,6 +86,10 @@ export default {
                     v-bind:total="total_pages"
                     v-on:page-changed="onPageChanged"
                 />
+
+                <!---- uncomment the line below to see an example button ----->
+                <!---- <PRESENTATION/> ---->
+                
             </template>
             <div class="empty-gallery" v-else>
                 <img class="empty-gallery__icon" src="./assets/icon-empty-gallery.svg"/>
