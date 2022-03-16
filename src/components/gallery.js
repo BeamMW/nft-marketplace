@@ -1,67 +1,71 @@
-import adminui from  './admin-ui.js'
-import artwork from  './artwork.js'
-import balance from  './balance.js'
-import headless from './headless.js'
-import artworksControls from './artworks-controls.js'
-import { popups, common } from '../utils/consts.js'
-import publicKeyPopup from './public-key-popup.js'
-import paginator from './paginator.js'
+import adminui from './admin-ui.vue'
+import artwork from './artwork.js'
+import balance from './balance.vue'
+import headless from './headless.vue'
+import artworksControls from './artworks-controls.vue'
+import { common } from '../utils/consts.js'
+import pricePopup from './price-dialog.vue'
+import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
 
 import PRESENTATION from './button-presentation.vue'
 
 export default {
-    computed: {
-        is_admin () {
-            return this.$state.is_admin;
-        },
-        active_tab () {
-            return this.$state.active_tab
-        },
-        artworks () {
-            let all = this.$state.artworks
-            let result  = []
-            let start = (this.current_page - 1) * common.ITEMS_PER_PAGE
-            let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
-            for (let idx = start; idx < end; ++idx) {
-                result.push(all[idx])
-            }
-            return result
-        },
-        is_popup_visible() {
-            return this.$state.is_popup_visible;
-        },
-        is_headless () {
-            return this.$state.is_headless
-        },
-        current_page () {
-            return this.$state.current_page
-        },
-        total_pages () {
-            return this.$state.total_pages
-        },
-        details () {
-            for (let artwork of this.artworks) {
-                if (artwork.id == this.details_id) {
-                    return artwork
-                }
-            }
-            return undefined
+  computed: {
+    is_admin() {
+      return this.$state.is_admin
+    },
+    active_tab() {
+      return this.$state.active_tab
+    },
+    artworks() {
+      let all = this.$state.artworks
+      let result = []
+      let start = (this.current_page - 1) * common.ITEMS_PER_PAGE
+      let end = Math.min(start + common.ITEMS_PER_PAGE, all.length)
+      for (let idx = start; idx < end; ++idx) {
+        result.push(all[idx])
+      }
+      return result
+    },
+    is_headless() {
+      return this.$state.is_headless
+    },
+    current_page() {
+      return this.$state.current_page
+    },
+    total_pages() {
+      return this.$state.total_pages
+    },
+    details() {
+      for (let artwork of this.artworks) {
+        if (artwork.id == this.details_id) {
+          return artwork
         }
+      }
+      return undefined
     },
+  },
 
-    data () {
-        return {
-            details_id: -1
-        }
-    },
+  data() {
+    return {
+      details_id: -1,
+    }
+  },
 
-    components: {
-        artwork, adminui, balance, artworksControls, publicKeyPopup, headless, paginator, adetails, PRESENTATION
-    },
+  components: {
+    artwork,
+    adminui,
+    balance,
+    artworksControls,
+    headless,
+    paginator,
+    adetails,
+    pricePopup,
+  },
 
-    template: `
-        <publicKeyPopup v-if="is_popup_visible"></publicKeyPopup>
+  template: `
+        <!--pricePopup v-if="is_popup_visible && popup_type === allPopups.SELL"></pricePopup-->
         <div class="vertical-container" id="container">
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
@@ -98,30 +102,30 @@ export default {
         </div>
     `,
 
-    methods: {
-        onLikeArtwork(id) {
-            this.$store.likeArtwork(id)
-        },
+  methods: {
+    onLikeArtwork(id) {
+      this.$store.likeArtwork(id)
+    },
 
-        onUnlikeArtwork(id) {
-            this.$store.unlikeArtwork(id)
-        },
+    onUnlikeArtwork(id) {
+      this.$store.unlikeArtwork(id)
+    },
 
-        onDeleteArtwork(id) {
-            this.$store.deleteArtwork(id)
-        },
+    onDeleteArtwork(id) {
+      this.$store.deleteArtwork(id)
+    },
 
-        onPageChanged(page) {
-            this.$store.setCurrentPage(page)
-            this.$refs.artslist.scrollTop = 0
-        },
+    onPageChanged(page) {
+      this.$store.setCurrentPage(page)
+      this.$refs.artslist.scrollTop = 0
+    },
 
-        onDetails (id) {
-            this.details_id = id
-        },
+    onDetails(id) {
+      this.details_id = id
+    },
 
-        onDetailsBack() {
-            this.details_id = -1
-        }
-    }
+    onDetailsBack() {
+      this.details_id = -1
+    },
+  },
 }

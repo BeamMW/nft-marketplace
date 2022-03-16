@@ -1,13 +1,22 @@
 {
-    "npm.packageManager": "yarn",
-    "search.exclude": {
-        "**/html": true,
-        "yarn.lock": true,
-        "package.json": true,
-        
-    },
-    "cSpell.words": [
-      "muka",
-      "poshla"
-    ]
+  "npm.packageManager": "yarn",
+  "search.exclude": {
+    "**/html": true,
+    "**/node_modules": true,
+    "yarn.lock": true,
+    "package-lock.json": true,
+    "**/*.svg": true,
+  },
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+    "javascript"
+  ],
+  "editor.formatOnSave": true,
 }

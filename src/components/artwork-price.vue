@@ -1,164 +1,147 @@
 <template>
+  <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork" />
   <!---- has price & owned, display change price / remove from sale options ---->
   <span v-if="price && owned" class="container">
-      <img src="~assets/icon-beam.svg"/>
-      <span class="amount">{{amount}}</span>
-      <span class="curr">BEAM</span>
-      <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu">
-      <popupMenu ref="saleMenu">
-          <div class="item" @click="onChangePrice">
-              <img src="~assets/icon-change.svg"/>
-              update the price
-          </div>
-          <div class="item" @click="onRemoveFromSale">
-              <img src="~assets/icon-eye-crossed.svg"/>
-              remove from sale
-          </div>
-      </popupMenu>
+    <img src="~assets/icon-beam.svg" />
+    <span class="amount">{{ amount }}</span>
+    <span class="curr">BEAM</span>
+    <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu" />
+    <popupMenu ref="saleMenu">
+      <div class="item" @click="onChangePrice">
+        <img src="~assets/icon-change.svg" />
+        update the price
+      </div>
+      <div class="item" @click="onRemoveFromSale">
+        <img src="~assets/icon-eye-crossed.svg" />
+        remove from sale
+      </div>
+    </popupMenu>
   </span>
-  
+
   <!---- has price but not owned, can buy ---->
   <span v-if="price && !owned" class="container">
-      <img src="~assets/icon-beam.svg"/>
-      <span class="amount">{{amount}}</span>
-      <span class="curr">BEAM</span>
-      <artButton 
-        type="buy"
-        text="buy"
-        @click="onBuy"
-      />
+    <img src="~assets/icon-beam.svg" />
+    <span class="amount">{{ amount }}</span>
+    <span class="curr">BEAM</span>
+    <artButton class="button" type="buy" @click="onBuy" />
   </span>
 
   <!---- doesn't have price & owned, can sell ---->
   <span v-if="!price && owned" class="container">
-    <artButton 
-      type="sell"
-      text="sell"
-      @click="onSell" 
-    />
+    <artButton class="button" type="sell" @click="onSell" />
   </span>
 
   <!---- doesn't have price & not owned, 
          can be anything - not approved yet, not sold by
          owner &c. Just dispaly that it is not on sale
   ---->
-  <span v-if="!price && !owned" class="not-for-sale">
-      Not for sale
-  </span>
+  <span v-if="!price && !owned" class="not-for-sale"> Not for sale </span>
 </template>
 
 <style scoped lang="stylus">
-  .container {
-    display: flex
-    line-height: 2
-    flex-wrap: wrap
-    align-items: center
-    width: 100%
+.container {
+  display: flex;
+  line-height: 2;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
 
-    & .amount, & .curr {
-      margin-left: 5px
-      font-size: 18px
-      font-weight: bold
-      color: #fff
-    } 
-
-    & .dots {
-      margin-left: auto
-      cursor: pointer
-      margin-right: -4px
-    }
-
-    & .button {
-      margin-left: auto
-    }
+  & .amount, & .curr {
+    margin-left: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
   }
 
-  .not-for-sale {
-    margin-left: auto
-    opacity: 0.5
-    font-size: 14px
-    font-style: italic
-    color: #fff
+  & .dots {
+    margin-left: auto;
+    cursor: pointer;
+    margin-right: -4px;
   }
+
+  & .button {
+    margin-left: auto;
+  }
+}
+
+.not-for-sale {
+  margin-left: auto;
+  opacity: 0.5;
+  font-size: 14px;
+  font-style: italic;
+  color: #fff;
+}
 </style>
 
 <script>
-import { common, popups } from '../utils/consts.js'
-import artButton from './button.vue'
-import popupMenu from './popup-menu.vue'
+import utils from "../utils/utils.js";
+import artButton from "./art-button.js";
+import popupMenu from "./popup-menu.vue";
+import artworkPriceModal from "./price-dialog.vue";
 
 export default {
-  props: {
-      artwork: {
-        type: Object,
-        required: true,
-      }
-  },
-
   components: {
     artButton,
-    popupMenu
+    popupMenu,
+    artworkPriceModal,
+  },
+
+  props: {
+    artwork: {
+      type: Object,
+      required: true,
+    },
   },
 
   computed: {
-    is_headless () {
-      return this.$state.is_headless
+    is_headless() {
+      return this.$state.is_headless;
     },
 
-    id () {
-      return this.artwork.id
+    id() {
+      return this.artwork.id;
     },
-    
-    owned () {
-      return this.artwork.owned
+
+    owned() {
+      return this.artwork.owned;
     },
-    
-    price () {
-      return this.artwork.price
+
+    price() {
+      return this.artwork.price;
     },
-    
-    amount () {
+
+    amount() {
       if (this.price) {
-        return (this.price.amount / common.GROTHS_IN_BEAM).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+        return utils.formatAmount(this.price.amount);
       }
-    }
+      return undefined;
+    },
   },
 
   methods: {
     onSaleMenu(ev) {
-        this.$refs.saleMenu.open(ev)
+      this.$refs.saleMenu.open(ev);
+    },
+    onSellArtwork(price) {
+      this.$store.sellArtwork(this.id, price);
     },
 
-    onChangePrice (id) {
-      try {
-          this.$store.setPopupType(popups.CHANGE_PRICE);
-          this.$store.setIdToSell(this.id);
-          this.$store.changePopupState(true);
-      } 
-      catch (err) {
-          this.$store.setError(err, "Failed to sell an item");
-      }
+    onChangePrice() {
+      this.$refs.priceModal.open();
     },
 
-    onRemoveFromSale () {
+    onRemoveFromSale() {
       this.$store.sellArtwork(this.id, 0);
     },
 
-    onBuy () {
-      if (this.is_headless) return this.$store.switchToHeaded()
-      this.$store.buyArtwork(this.id)
+    onBuy() {
+      if (this.is_headless) return this.$store.switchToHeaded();
+      this.$store.buyArtwork(this.id);
     },
 
-    onSell () {
-      try {
-        this.$store.setPopupType(popups.SELL)
-        this.$store.setIdToSell(this.id)
-        this.$store.changePopupState(true)
-      } 
-      catch (err) {
-          this.$store.setError(err, "Failed to sell an item")
-      }
-    }
-  }
-}
+    onSell() {
+      this.$refs.priceModal.open();
+    },
+  },
+};
 </script>
