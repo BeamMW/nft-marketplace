@@ -1,16 +1,15 @@
 <template>
-  <div  :class="['container', id === 'name' ? 'name_input' : '']">
+  <div :class="['container', id === 'name' ? 'name_input' : '']">
     <label v-if="label" class="label_elem">{{ label }}</label>
-    <i class="icon" v-if="imgName">
-            <img :src="`../assets/${imgName}.svg`" alt="icon"/>
-       </i>
-    <input
-        v-bind="$attrs"
-        :value="modelValue"
-        :placeholder="placeholder"
-        :style="style"
-        @input="$emit('update:modelValue', $event.target.value)"
-        :class="['input_elem', isValid ? '' : 'error_elem']"
+    <i v-if="imgName" class="icon">
+      <img :src="`../assets/${imgName}.svg`" alt="icon"/>
+    </i>
+    <input v-bind="$attrs"
+           :value="modelValue"
+           :placeholder="placeholder"
+           :style="style"
+           :class="['input_elem', isValid ? '' : 'error_elem']"
+           @input="$emit('update:modelValue', $event.target.value)"
     >
   </div>
 </template>
@@ -62,7 +61,6 @@
     }
 }
 
-
   }
 </style>
 
@@ -96,31 +94,36 @@ export default {
     },
     imgName: {
       type: String,
+      default:'',
       required: false,
     },
     paddingLeft: {
       type: String,
+      default:'',
       required: false
     },
     width: {
       type: String,
+      default:'',
       required: false
     },
     height: {
       type: String,
+      default:'',
       required: false
     }
   },
+  emits: {'update:modelValue': null},
 
-      computed: {
-      style() {
-        return {
-            "padding-left": this.paddingLeft + 'px',
-             width: this.width + 'px',
-             height: this.height + 'px'
-          }
+  computed: {
+    style() {
+      return {
+        'padding-left': this.paddingLeft + 'px',
+        width: this.width + 'px',
+        height: this.height + 'px'
       }
-    },
+    }
+  },
 
 }
 </script>

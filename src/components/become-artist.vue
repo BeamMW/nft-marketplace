@@ -7,66 +7,53 @@
     </p>
     <div class="fields">
       <div class="col-first">
-     <inputField
-        v-model="name"
-        label="Artist Name*"
-        id="name"
-        placeholder=""
-        paddingLeft="5"        
-        width="424"
-        :isValid="error.name"
-        type="text"
-      />
-      <inputField
-        v-model="website"
-        label="Website"
-        id="website"
-        placeholder="https://website.name/"
-        imgName="glob"
-        paddingLeft="50"
-        width="374"
-        :isValid="error.website"
-        type="text"
-      />
-      <inputField
-        v-model="twitter"
-        label="Twitter"
-        id="twitter"
-        placeholder="@twitter"
-        imgName="twitter"
-        paddingLeft="50"
-        width="374"
-        :isValid="error.twitter"
-        type="text"
-      />
-      <inputField
-        v-model="instagram"
-        label="Instagram"
-        id="instagram"
-        placeholder="@instagram"
-        imgName="instagram"
-        paddingLeft="50"
-        width="374"
-        :isValid="error.instagram"
-        type="text"
-      />
+        <inputField id="name"
+                    v-model="name"
+                    label="Artist Name*"
+                    placeholder=""
+                    padding-left="5"        
+                    width="424"
+                    :is-valid="error.name"
+                    type="text"
+        />
+        <inputField id="website"
+                    v-model="website"
+                    label="Website"
+                    placeholder="https://website.name/"
+                    img-name="glob"
+                    padding-left="50"
+                    width="374"
+                    :is-valid="error.website"
+                    type="text"
+        />
+        <inputField id="twitter"
+                    v-model="twitter"
+                    label="Twitter"
+                    placeholder="@twitter"
+                    img-name="twitter"
+                    padding-left="50"
+                    width="374"
+                    :is-valid="error.twitter"
+                    type="text"
+        />
+        <inputField id="instagram"
+                    v-model="instagram"
+                    label="Instagram"
+                    placeholder="@instagram"
+                    img-name="instagram"
+                    padding-left="50"
+                    width="374"
+                    :is-valid="error.instagram"
+                    type="text"
+        />
       </div>
-      <div>
-        <inputField
-        v-model="aboutMe"
-        label="About me"
-        id="aboutMe"
-        paddingLeft="5"
-        width="424"
-        height="79"
-        :isValid="error.aboutMe"
-        type="text"
-      />
-      </div>
+      <!-- <div>
+        here will be About me
+      </div> -->
     </div>
   </div>
   <div class="actions">
-    <div class="button close">
+    <div class="button close" @click="close">
       <img src="~assets/icon-cancel.svg"/>
       <span class="text">cancel</span>
     </div>
@@ -143,7 +130,12 @@
 import inputField from './input-field.vue'
 
 export default {
- data () {
+  
+  components: {
+    inputField
+  },
+  emits:['close-become-artist'],
+  data () {
     return {
       name: '',
       website: '',
@@ -159,38 +151,36 @@ export default {
       }
     }
   },
-   watch: {
+  watch: {
     name(value){
-      this.name = value;
-      this.validateName(value);
+      this.name = value
+      this.validateName(value)
     },
 
     website(value){
-      this.website = value;
-      this.validdateURL(value);
+      this.website = value
+      this.validdateURL(value)
     },
 
     twitter(value){
-      this.twitter = value;
-      this.validateTwitterNickname(value);
+      this.twitter = value
+      this.validateTwitterNickname(value)
     },
 
     instagram(value){
-      this.instagram = value;
-      this.validateInstagramickname(value);
+      this.instagram = value
+      this.validateInstagramickname(value)
     },
 
     aboutMe(value){
-      this.aboutMe = value;
-      this.validateAboutMe(value);
+      this.aboutMe = value
+      this.validateAboutMe(value)
     }
   },
-  
-  components: {
-    inputField
-  },
-
   methods: {
+    close() {
+      this.$emit('close-become-artist')
+    },
     validateName(value) {
       return this.error.name = value.length > 0 
     },
@@ -201,13 +191,13 @@ export default {
         '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
         '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
         '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-        this.error.website =!!pattern.test(str);
-        return this.error.website
+        '(\\#[-a-z\\d_]*)?$','i') // fragment locator
+      this.error.website =!!pattern.test(str)
+      return this.error.website
     },
 
     validateTwitterNickname(value) {
-      return this.error.twitter = value.startsWith('@') && value.length < 16;
+      return this.error.twitter = value.startsWith('@') && value.length < 16
     },
 
     validateInstagramickname(value) {

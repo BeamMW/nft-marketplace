@@ -7,6 +7,7 @@ import {common} from '../utils/consts.js'
 import pricePopup from './price-dialog.vue'
 import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
+import becomeArtist from './become-artist.vue'
 
 export default {
   computed: {
@@ -48,21 +49,23 @@ export default {
   data () {
     return {
       details_id: -1,
+      isBecomeArtist: false,
     }
   },
 
   components: {
-    artwork, adminui, balance, artworksControls, headless, paginator, adetails, pricePopup
+    artwork, adminui, balance, artworksControls, headless, paginator, adetails, pricePopup,becomeArtist
   },
 
   template: `
         <!--pricePopup v-if="is_popup_visible && popup_type === allPopups.SELL"></pricePopup-->
         <div class="vertical-container" id="container">
-            <headless v-if="is_headless"></headless>
-            <balance v-else></balance>
-            <adminui v-if="is_admin"/>
-            <artworksControls v-if="details_id == -1"></artworksControls>
-            <adetails v-if="details_id != -1"
+            <headless v-if="is_headless && !isBecomeArtist"></headless>
+            <balance v-if="!is_headless  && !isBecomeArtist"></balance>
+            <adminui v-if="is_admin && !isBecomeArtist"/>
+            <artworksControls v-if="details_id == -1 && !isBecomeArtist" @become-artist="onBecomeArtist"></artworksControls>
+            <becomeArtist v-if="isBecomeArtist" @close-become-artist="onCloseBecomeArtist"></becomeArtist>
+            <adetails v-if="details_id != -1 && !isBecomeArtist"
                 v-on:back="onDetailsBack"
                 v-bind:artwork="details"
             />
@@ -113,6 +116,13 @@ export default {
 
     onDetailsBack() {
       this.details_id = -1
+    },
+
+    onBecomeArtist() {
+      this.isBecomeArtist = true
+    },
+    onCloseBecomeArtist() {
+      this.isBecomeArtist = false
     }
   }
 }
