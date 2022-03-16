@@ -848,12 +848,12 @@ export const store = {
     this.setCurrentPage(1)
   },
 
-    showDetails(id) {
-        router.push({name: 'details'})
-    },
+  showDetails(id) {
+    router.push({name: 'details'})
+  },
 
-    becomeArtist() {
-        router.push({name: 'becomeArtist'})
+  becomeArtist() {
+    router.push({name: 'becomeArtist'})
 
-    }
+  }
 }
