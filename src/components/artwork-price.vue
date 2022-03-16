@@ -124,12 +124,17 @@ export default {
     onSaleMenu(ev) {
       this.$refs.saleMenu.open(ev)
     },
-    onSellArtwork (price) {
-      this.$store.sellArtwork(this.id, price)
-    },
 
     onChangePrice () {
       this.$refs.priceModal.open()
+    },
+
+    onSell () {
+      this.$refs.priceModal.open()
+    },
+
+    onSellArtwork (price) {
+      this.$store.sellArtwork(this.id, price)
     },
 
     onRemoveFromSale () {
@@ -139,10 +144,6 @@ export default {
     onBuy () {
       if (this.is_headless) return this.$store.switchToHeaded()
       this.$store.buyArtwork(this.id)
-    },
-
-    onSell () {
-      this.$refs.priceModal.open()
     }
   }
 }

@@ -32,7 +32,7 @@ function defaultState() {
     pending_artworks: 0,
     is_headless: false,
     current_page: 1,
-    use_ipfs: false
+    use_ipfs: true
   }
 }
 
