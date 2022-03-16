@@ -1,8 +1,8 @@
 <template>
-    <div class="app-loading">
-        <div class="title">BEAM Gallery is loading</div>
-        <p>Please wait...</p>
-    </div>
+  <div class="app-loading">
+    <div class="title">BEAM Gallery is loading</div>
+    <p>Please wait...</p>
+  </div>
 </template>
 
 <style lang="stylus" scoped>

@@ -1,6 +1,6 @@
 <template>
-  <div class="popup-menu" v-show="show" :style="style" tabindex="0">
-      <slot></slot>
+  <div v-show="show" class="popup-menu" :style="style" tabindex="0">
+    <slot></slot>
   </div>
 </template>
 
@@ -49,7 +49,7 @@ export default {
       return {
         top: this.top + 'px',
         left: this.left + 'px',
-        "background-color": utils.getStyles().background_popup,
+        'background-color': utils.getStyles().background_popup,
       }
     }
   },

@@ -1,8 +1,8 @@
 <template>
   <div class="back-btn">
-      <img src="~assets/icon-back.svg"/>
-      {{text}}
-    </div>
+    <img src="~assets/icon-back.svg"/>
+    {{ text }}
+  </div>
 </template>
 
 <style scoped lang="stylus">
@@ -29,7 +29,7 @@ export default {
     text: {
       type: String,
       required: false,
-      default: "back"
+      default: 'back'
     },
   }
 }
