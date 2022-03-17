@@ -18,5 +18,4 @@
   "eslint.validate": [
     "javascript"
   ],
-  "editor.formatOnSave": true,
 }
