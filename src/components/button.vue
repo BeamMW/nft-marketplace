@@ -1,6 +1,7 @@
 <template>
   <button class="button"
-          :class="[transparency, color, side_icon, disabled_button]"
+          :style="left_margin_value"
+          :class="[transparency, color, side_icon, left_margin_default, disabled_button]"
           :disabled="disabled"
   >
     <img v-if="icon" :src="icon"/>
@@ -9,15 +10,18 @@
 </template>
 
 <style scoped lang="stylus">
+$font = 'SFProDisplay', sans-serif
 $magenta = #da68f5
 $blue = #0bccf7
 $green = #00f6d2
 $semiTransparent = rgba(255, 255, 255, 0.1)
 $darkBlue = #032e49
 $white = #ffffff
-$marginIcon = 8px
+$marginIcon = 5px
+$marginLeft = 30px
 
 .button {
+  font-family: $font
   height: 38px
   padding: 11px 25px
   border-radius: 50px
@@ -40,6 +44,7 @@ $marginIcon = 8px
 
   & .text {
     line-height: 1
+    font-weight: bold
   }
 }
 
@@ -80,6 +85,10 @@ $marginIcon = 8px
   img {
     margin: 0
   }
+}
+
+.marginLeft {
+  margin-left: $marginLeft
 }
 
 .magenta {
@@ -135,6 +144,14 @@ export default {
       type: String,
       default: String,
     },
+    margin_left_default: {
+      type: Boolean,
+      default: false
+    },
+    margin_left_value: {
+      type: Number,
+      default: Number
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -180,7 +197,7 @@ export default {
     color_text() {
       if (this.text && this.text_color) {
         return {
-          color: this.text_colors[this.text_color],
+          'color': this.text_colors[this.text_color],
         }
       }
 
@@ -193,7 +210,30 @@ export default {
 
       return ''
     },
+    left_margin_default() {
+      if (this.margin_left_default && this.margin_left_value) {
+        return alert('ERROR: only one pror is required: "left_margin_default" or "left_margin_value"')
+      }
+
+      if (this.margin_left_default && !this.margin_left_value) {
+        return 'marginLeft'
+      }
+
+      return ''
+    },
+    left_margin_value() {
+      if (this.margin_left_value && this.margin_left_default) {
+        {
+          return alert('ERROR: only one pror is required: "left_margin_default" or "left_margin_value"')
+        }
+      }
+
+      if (this.margin_left_value && !this.margin_left_default) {
+        return {'margin-left': `${this.margin_left_value}px`}
+      }
+
+      return ''
+    }
   },
 }
 </script>
-
