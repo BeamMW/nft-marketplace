@@ -82,6 +82,45 @@
         color: #ffffff
       }
     }
+
+    .fee {
+      display: flex
+      flex-direction: row
+      margin-top: 20px
+      align-self: flex-start
+      
+      .title {
+        opacity: 0.5
+        font-size: 12px
+        color: #fff
+      }
+
+      .value {
+        font-size: 14px
+        font-weight: 500
+        color: #0bccf7
+        margin-left: 10px
+      }
+    }
+
+    .info {
+      margin-top: 30px
+      opacity: 0.7
+      font-size: 14px
+      font-style: italic
+      color: #fff
+    }
+
+    .controls {
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+    }
+
+    .disabled {
+      opacity: 0.3
+      cursor: auto !important
+    }
   }
 </style>
 
