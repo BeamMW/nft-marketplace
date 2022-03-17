@@ -4,6 +4,7 @@ const copy = require('copy-webpack-plugin')
 const extractCSS = require('mini-css-extract-plugin')
 const {VueLoaderPlugin} = require('vue-loader')
 const ESLint = require('eslint-webpack-plugin')
+const SLint = require('stylelint-webpack-plugin')
 
 const config = (DEV_MODE) => {return {
   entry: {
@@ -78,6 +79,9 @@ const config = (DEV_MODE) => {return {
   plugins: [
     new ESLint({
       extensions: ['js', 'vue']
+    }),
+    new SLint({
+      files: ['**/*.{vue,css,stylus}'],
     }),
     new VueLoaderPlugin(),
     new extractCSS(),

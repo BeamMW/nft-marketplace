@@ -15,35 +15,35 @@
 </template>
 
 <style scoped lang="stylus">
-    .content {
-        display: flex
-        flex-direction: column
-        align-items: center
-        
-        .title {
-            font-size: 18px
-            font-weight: bold
-            color: #fff
-        }
-
-        .data {
-            margin-top: 30px
-            display: flex
-            flex-direction: row
-            align-items: center
-
-            .copy-icon {
-                margin-left: 10px
-                cursor: pointer
-            }
-        }
-        
-        .controls {
-            margin-top: 30px
-            display: flex
-            flex-direction: row
-        }
+  .content {
+    display: flex
+    flex-direction: column
+    align-items: center
+    
+    .title {
+      font-size: 18px
+      font-weight: bold
+      color: #fff
     }
+
+    .data {
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+      align-items: center
+
+      .copy-icon {
+        margin-left: 10px
+        cursor: pointer
+      }
+    }
+      
+    .controls {
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+    }
+  }
 </style>
 
 <script>

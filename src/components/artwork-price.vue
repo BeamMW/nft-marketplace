@@ -48,12 +48,13 @@
     align-items: center
     width: 100%
 
-    & .amount, & .curr {
+    & .amount
+    & .curr {
       margin-left: 5px
       font-size: 18px
       font-weight: bold
       color: #fff
-    } 
+    }
 
     & .dots {
       margin-left: auto

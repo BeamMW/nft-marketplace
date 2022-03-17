@@ -6,28 +6,28 @@
 
 <style scoped lang="stylus">
   .popup-menu {
-      border-radius: 10px
-      z-index:  999
-      position: fixed
-      outline:  none
-      padding:  10px 20px
+    border-radius: 10px
+    z-index:  999
+    position: fixed
+    outline:  none
+    padding:  10px 20px
 
-      :slotted(.item) {
-        color: #fff
-        padding: 6px 0
-        cursor: pointer
-        display: flex
-        align-items: center
-        line-height: normal !important
+    :slotted(.item) {
+      color: #fff
+      padding: 6px 0
+      cursor: pointer
+      display: flex
+      align-items: center
+      line-height: normal !important
 
-        &:hover {
-          color: #00f6d2;
-        }
-
-        &>img {
-          margin-right: 10px;
-        }
+      &:hover {
+        color: #00f6d2
       }
+
+      &>img {
+        margin-right: 10px
+      }
+    }
   }
 </style>
 

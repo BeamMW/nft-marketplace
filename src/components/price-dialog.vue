@@ -48,7 +48,7 @@
       height: 45px
       width: 100%
       border-radius: 10px
-      background-color: rgba(255, 255, 255, .05)
+      background-color: rgba(255, 255, 255, 0.05)
       display: flex
       flex-direction: row
       align-items: center
@@ -66,60 +66,21 @@
         max-width: 292px
           
         &:focus {
-            outline-width: 0
-            color: #0bccf7
+          outline-width: 0
+          color: #0bccf7
         }
 
         &::placeholder {
-            color: #0bccf7
+          color: #0bccf7
         }
       }
 
       .text {
-          margin-right: 12px
-          font-size: 16px
-          margin-left: auto
-          color: #ffffff
+        margin-right: 12px
+        font-size: 16px
+        margin-left: auto
+        color: #ffffff
       }
-    }
-
-    .fee {
-      display: flex
-      flex-direction: row
-      margin-top: 20px
-      align-self: flex-start
-      
-      .title {
-        opacity: 0.5
-        font-size: 12px
-        color: #fff
-      }
-
-      .value {
-        font-size: 14px
-        font-weight: 500
-        color: #0bccf7
-        margin-left: 10px
-      }
-    }
-
-    .info {
-      margin-top: 30px
-      opacity: 0.7
-      font-size: 14px
-      font-style: italic
-      color: #fff
-    }
-
-    .controls {
-      margin-top: 30px
-      display: flex
-      flex-direction: row
-    }
-
-    .disabled {
-      opacity: 0.3
-      cursor: auto !important
     }
   }
 </style>

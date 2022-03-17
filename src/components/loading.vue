@@ -7,13 +7,13 @@
 
 <style lang="stylus" scoped>
 .app-loading {
-    text-align: center
-    margin: 0 auto
-    margin-top: 50px
+  text-align: center
+  margin: 0 auto
+  margin-top: 50px
 
-    .title {
-        font-size: 25px
-        font-weight: 400
-    }
+  .title {
+    font-size: 25px
+    font-weight: 400
+  }
 }
 </style>

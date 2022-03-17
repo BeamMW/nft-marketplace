@@ -70,7 +70,7 @@
       font-weight: bold
       letter-spacing: 3.1px
     }
-
+    
     /*
      *  TABLE HEAD
      */ 
@@ -81,10 +81,10 @@
       font-size: 14px
       color: rgba(255, 255, 255, 0.5)
       display: flex
-      
+
       & > div {
-         padding: 9px 0px 12px 0px
-         text-align: center
+        padding: 9px 0px 12px 0px
+        text-align: center
 
         &.sorted {
           color: #fff
@@ -241,7 +241,7 @@
             margin-top: 8px
 
             & > span {
-              color: #00F6D2
+              color: #00f6d2
               margin-left: 4px
             }
           }
