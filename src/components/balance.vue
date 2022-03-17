@@ -6,10 +6,18 @@
       <div class="value">
         {{ balance_beam }} BEAM
       </div>
-      <div v-if="balance_beam" class="withdraw" @click="onWithdraw">
+      <!-- <div v-if="balance_beam" class="withdraw" @click="onWithdraw">
         <img class="icon" src="~assets/icon-receive.svg"/>
         <span class="text">withdraw</span>
-      </div>
+      </div> -->
+      <artButton v-if="balance_beam" 
+                 class="withdraw" 
+                 text="withdraw"
+                 text_color="blue"
+                 transparent
+                 icon="./assets/icon-receive.svg"
+                 @click="onWithdraw"
+      />
     </div>
     <div class="user" @click="onShowKey">
       <div v-if="my_artist_name" class="name">
@@ -114,10 +122,12 @@
 <script>
 import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
+import artButton from './button.vue'
 
 export default {
   components: {
-    publicKeyModal
+    publicKeyModal,
+    artButton
   },
 
   computed: {
