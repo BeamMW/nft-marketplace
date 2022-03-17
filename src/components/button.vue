@@ -9,94 +9,94 @@
 </template>
 
 <style scoped lang="stylus">
-$magenta = #da68f5;
-$blue = #0bccf7;
-$green = #00f6d2;
-$semiTransparent = rgba(255, 255, 255, 0.1);
-$darkBlue = #032e49;
-$white = #ffffff;
-$marginIcon = 8px;
+$magenta = #da68f5
+$blue = #0bccf7
+$green = #00f6d2
+$semiTransparent = rgba(255, 255, 255, 0.1)
+$darkBlue = #032e49
+$white = #ffffff
+$marginIcon = 8px
 
 .button {
-  height: 38px;
-  padding: 11px 25px;
-  border-radius: 50px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  color: $darkBlue;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
+  height: 38px
+  padding: 11px 25px
+  border-radius: 50px
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  color: $darkBlue
+  font-size: 14px
+  font-weight: bold
+  cursor: pointer
+  border: none
 
   &:not(.disabled):hover {
-    box-shadow: 0 0 8px white;
+    box-shadow: 0 0 8px white
   }
 
   &:focus {
-    outline: none;
+    outline: none
   }
 
   & .text {
-    line-height: 1;
+    line-height: 1
   }
 }
 
 .disabled {
-  opacity: 0.3;
-  cursor: auto !important;
+  opacity: 0.3
+  cursor: auto !important
 }
 
 .transparent {
-  height: min-content;
-  background: transparent;
-  padding: 0;
+  height: min-content
+  background: transparent
+  padding: 0
 
   &:not(.disabled):hover {
-    box-shadow: none;
+    box-shadow: none
   }
 }
 
 .semiTransparent {
-  background: $semiTransparent;
+  background: $semiTransparent
 }
 
 .leadingIcon {
   img {
-    margin-right: $marginIcon;
+    margin-right: $marginIcon
   }
 }
 
 .trailingIcon {
-  flex-direction: row-reverse;
+  flex-direction: row-reverse
 
   img {
-    margin-left: $marginIcon;
+    margin-left: $marginIcon
   }
 }
 
 .singleIcon {
   img {
-    margin: 0;
+    margin: 0
   }
 }
 
 .magenta {
-  background-color: $magenta;
+  background-color: $magenta
 }
 
 .blue {
-  background-color: $blue;
+  background-color: $blue
 }
 
 .green {
-  background-color: $green;
+  background-color: $green
 }
 
 .black {
-  background-color: $black;
-  color: #fff;
+  background-color: $black
+  color: #fff
 }
 </style>
 

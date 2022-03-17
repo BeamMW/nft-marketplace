@@ -39,43 +39,38 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
-    display: flex
-    line-height: 2
-    flex-wrap: wrap
-    align-items: center
-    width: 100%
+.container {
+  display: flex
+  line-height: 2
+  flex-wrap: wrap
+  align-items: center
+  width: 100%
 
-    & .amount
-    & .curr {
-      margin-left: 5px
-      font-size: 18px
-      font-weight: bold
-      color: #fff
-    }
+  & .amount
+  & .curr {
+    margin-left: 5px
+    font-size: 18px
+    font-weight: bold
+    color: #fff
+  }
 
-    & .dots {
-      margin-left: auto
-      cursor: pointer
-      margin-right: -4px
-    }
-
-    & .button {
-      margin-left: auto
-    }
+  & .dots {
+    margin-left: auto
+    cursor: pointer
+    margin-right: -4px
   }
 
   & .button {
-    margin-left: auto;
+    margin-left: auto
   }
 }
 
 .not-for-sale {
-  margin-left: auto;
-  opacity: 0.5;
-  font-size: 14px;
-  font-style: italic;
-  color: #fff;
+  margin-left: auto
+  opacity: 0.5
+  font-size: 14px
+  font-style: italic
+  color: #fff
 }
 </style>
 

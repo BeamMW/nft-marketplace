@@ -3,12 +3,13 @@ import artwork from './artwork.js'
 import balance from './balance.vue'
 import headless from './headless.vue'
 import artworksControls from './artworks-controls.vue'
-import { common } from '../utils/consts.js'
+import {common} from '../utils/consts.js'
 import pricePopup from './price-dialog.vue'
 import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
 
-import PRESENTATION from './button-presentation.vue'
+// uncomment to see an example button
+// import PRESENTATION from './button-presentation.vue'
 
 export default {
   computed: {

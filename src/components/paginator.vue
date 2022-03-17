@@ -80,7 +80,7 @@ export default {
       type: Number,
       default: 0
     },
-    pageRange: {
+    page_range: {
       type: Number,
       default: 2
     }
@@ -104,11 +104,11 @@ export default {
       return this.current < this.total
     },
     rangeStart () {
-      var start = this.current + this.pageRange <= this.total ? this.current - this.pageRange : this.total - this.pageRange
+      var start = this.current + this.page_range <= this.total ? this.current - this.page_range : this.total - this.page_range
       return (start > 0) ? start : 1
     },
     rangeEnd () {
-      var end = this.rangeStart + (this.current > this.pageRange ? this.pageRange * 2 : this.pageRange)
+      var end = this.rangeStart + (this.current > this.page_range ? this.page_range * 2 : this.page_range)
       return (end < this.total) ? end : this.total
     },
     pages () {
