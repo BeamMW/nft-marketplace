@@ -17,79 +17,79 @@
 
 <style scoped lang="stylus">
   .selector-container {
-      margin-left: auto
+    margin-left: auto
+    display: flex
+    justify-content: center
+
+    .title {
+      align-self: center
+      color: #fff
+      opacity: 0.5
+      padding-bottom: 3px
+    }
+
+    .custom-select {
+      position: relative
       display: flex
-      justify-content: center
+      text-align: left
+      outline: none
+      height: 47px
+      line-height: 47px
+      min-width: 0px
+      margin-left: auto
 
-      .title {
-          align-self: center
+      .selected {
+        color: #fff
+        padding-left: 1em
+        cursor: pointer
+        user-select: none
+        opacity: 0.7
+        font-size: 14px
+        font-weight: bold
+        letter-spacing: 0.47px
+
+        &.open {
+          border: none
+        }
+      }
+
+      .arrow {
+        width:8px
+        height:8px
+        margin-left:3px
+      }
+
+      .items {
+        color: #fff
+        position: absolute
+        border:none
+        border-radius: 4px
+        font-size: 16px
+        right: 0
+        z-index: 1
+        margin-top: 40px
+        padding: 0 20px
+          
+        div {
           color: #fff
-          opacity: 0.5
-          padding-bottom: 3px
+          padding: 15px 0 15px 0
+          white-space: nowrap
+          line-height: 1
+          cursor: pointer
+          user-select: none
+          
+          &:hover {
+            color: #00f6d2
+          }
+        }
+  
+        .highlight {
+          font-size: 14px
+          font-weight: bold
+          color: #00f6d2
+        }
       }
-
-      .custom-select {
-          position: relative
-          display: flex
-          text-align: left
-          outline: none
-          height: 47px
-          line-height: 47px
-          min-width: 0px
-          margin-left: auto
-    
-          .selected {
-              color: #fff
-              padding-left: 1em
-              cursor: pointer
-              user-select: none
-              opacity: 0.7
-              font-size: 14px
-              font-weight: bold
-              letter-spacing: 0.47px
-
-              &.open {
-                  border: none
-              }
-          }
-
-          .arrow {
-              width:8px
-              height:8px
-              margin-left:3px
-          }
-
-          .items {
-              color: #fff
-              position: absolute
-              border:none
-              border-radius: 4px
-              font-size: 16px
-              right: 0
-              z-index: 1
-              margin-top: 40px
-              padding: 0 20px
-              
-              div {
-                color: #fff
-                padding: 15px 0 15px 0
-                white-space: nowrap
-                line-height: 1
-                cursor: pointer
-                user-select: none
-                
-                &:hover {
-                    color: #00f6d2
-                }
-              }  
-
-              .highlight{
-                font-size: 14px;
-                font-weight: bold
-                color: #00f6d2
-              }
-          }
-      }
+    }
   }    
 </style>
 

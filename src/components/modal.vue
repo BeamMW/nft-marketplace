@@ -10,21 +10,21 @@
 
 <style lang="stylus" scoped>
 .modal-dialog {
-    width: 100%
-    height: 100%
-    overflow: hidden
-    position: fixed
-    top: 0px
-    display: flex
-    justify-content: center
-    align-items: center
-    z-index: 100
-    background-color: transparent
+  width: 100%
+  height: 100%
+  overflow: hidden
+  position: fixed
+  top: 0px
+  display: flex
+  justify-content: center
+  align-items: center
+  z-index: 100
+  background-color: transparent
     
-    .modal-content {
-        padding: 40px
-        border-radius: 10px
-    }
+  .modal-content {
+    padding: 40px
+    border-radius: 10px
+  }
 }
 </style>
 

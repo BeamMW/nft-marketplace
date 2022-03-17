@@ -28,27 +28,28 @@
 </template>
 
 <style lang="stylus" scoped>
-.admin-column {
+  .admin-column {
     display: flex
     flex-direction: column
     margin-bottom: 10px
+    margin-top: 5px
 
     select.upload_artist {
-        font-size: 0.95em
+      font-size: 0.95em
     }
-    
+
     .admin-row {
-        display:         flex
-        align-items:     center
-        justify-content: center
+      display:         flex
+      align-items:     center
+      justify-content: center
 
-        & > *:not(first) {
-            margin-top: 20px
-        }
+      &:not(:first-child) {
+        margin-top: 15px
+      }
 
-        & > input {
-            margin-right: 20px
-        }
+      & > input {
+        margin-right: 20px
+      }
     }
 }
 </style>

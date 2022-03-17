@@ -16,6 +16,11 @@
     "source.fixAll.eslint": true
   },
   "eslint.validate": [
-    "javascript"
+    "javascript",
+    "vue"
   ],
+  "editor.formatOnSave": true,
+  "stylelint.validate": [
+    "vue"
+  ]
 }
