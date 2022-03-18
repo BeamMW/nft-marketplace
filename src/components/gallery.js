@@ -1,8 +1,8 @@
 import adminui from  './admin-ui.vue'
-import artwork from  './artwork.js'
+import artwork from  './artwork.vue'
 import balance from  './balance.vue'
 import headless from './headless.vue'
-import artworksControls from './artworks-controls.vue'
+import artctrls from './artworks-controls.vue'
 import {common} from '../utils/consts.js'
 import pricePopup from './price-dialog.vue'
 import paginator from './paginator.vue'
@@ -52,7 +52,7 @@ export default {
   },
 
   components: {
-    artwork, adminui, balance, artworksControls, headless, paginator, adetails, pricePopup
+    artwork, adminui, balance, artctrls, headless, paginator, adetails, pricePopup
   },
 
   template: `
@@ -61,7 +61,7 @@ export default {
             <headless v-if="is_headless"></headless>
             <balance v-else></balance>
             <adminui v-if="is_admin"/>
-            <artworksControls v-if="details_id == -1"></artworksControls>
+            <artctrls v-if="details_id == -1"/>
             <adetails v-if="details_id != -1"
                 v-on:back="onDetailsBack"
                 v-bind:artwork="details"
