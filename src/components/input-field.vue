@@ -5,6 +5,7 @@
       <img :src="`../assets/${imgName}.svg`" alt="icon"/>
     </i>
     <input v-bind="$attrs"
+           :id="id"
            :value="modelValue"
            :placeholder="placeholder"
            :style="style"
@@ -94,16 +95,6 @@ export default {
       default:'',
       required: false,
     },
-    paddingLeft: {
-      type: String,
-      default:'',
-      required: false
-    },
-    width: {
-      type: String,
-      default:'',
-      required: false
-    },
     height: {
       type: String,
       default:'',
@@ -115,7 +106,7 @@ export default {
   computed: {
     style() {
       return {
-        'padding-left': this.paddingLeft + 'px',
+        'padding-left': this.id === 'name' ? '15px' : '44px',
         width: this.width + 'px',
         height: this.height + 'px'
       }

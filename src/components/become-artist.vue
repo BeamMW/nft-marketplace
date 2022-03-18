@@ -11,7 +11,6 @@
                     v-model="name"
                     label="Artist Name*"
                     placeholder=""
-                    padding-left="15"        
                     :is-valid="error.name"
                     type="text"
                     style="margin-bottom:44px;margin-top:0"
@@ -21,7 +20,6 @@
                     label="Website"
                     placeholder="https://website.name/"
                     img-name="glob"
-                    padding-left="44"
                     :is-valid="error.website"
                     type="text"
         />
@@ -30,7 +28,6 @@
                     label="Twitter"
                     placeholder="@twitter"
                     img-name="twitter"
-                    padding-left="44"
                     :is-valid="error.twitter"
                     type="text"
         />
@@ -39,7 +36,6 @@
                     label="Instagram"
                     placeholder="@instagram"
                     img-name="instagram"
-                    padding-left="44"
                     :is-valid="error.instagram"
                     type="text"
         />
