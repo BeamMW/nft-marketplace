@@ -6,15 +6,11 @@
       <div class="value">
         {{ balance_beam }} BEAM
       </div>
-      <!-- <div v-if="balance_beam" class="withdraw" @click="onWithdraw">
-        <img class="icon" src="~assets/icon-receive.svg"/>
-        <span class="text">withdraw</span>
-      </div> -->
       <artButton v-if="balance_beam" 
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 transparent
+                 :transparent="true"
                  icon="./assets/icon-receive.svg"
                  @click="onWithdraw"
       />
@@ -24,10 +20,13 @@
         <img class="icon" src="~assets/icon-user.svg"/>
         <span class="text">{{ my_artist_name }}</span>
       </div>
-      <div class="key">
-        <img class="icon" src="~assets/icon-key.svg"/>
-        <span class="text">Show my public key</span>
-      </div>
+      <artButton class="key"
+                 icon="./assets/icon-key.svg"
+                 text="Show my public key"
+                 text_color="green"
+                 :semi_transparent="true"
+                 :hover="false"
+      />
     </div>
   </div>
 </template>
@@ -60,9 +59,6 @@
 
     .withdraw {
       margin-left: auto
-      display: flex
-      align-items: center
-      cursor: pointer
     }
 
     .text {
@@ -97,19 +93,11 @@
     }
 
     .key {
+      height: 48px 
       padding: 14px
       border-radius: 10px
-      background-color: rgba(255, 255, 255, 0.1)
-      display: flex
-      align-items: center
-      cursor: pointer
-
-      .text {
-        font-size: 16px
-        color: #00f6d2
-        margin-left: 10px
-      }
-
+      font-size: 16px !important
+      
       .connect {
         font-size: 16px
         color: #00f6d2

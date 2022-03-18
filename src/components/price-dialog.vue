@@ -26,7 +26,7 @@
       <div class="controls">
         <artButton text="cancel"
                    text_color="white"
-                   semi_transparent
+                   :semi_transparent="true"
                    icon="./assets/icon-cancel.svg"
                    @click="close"
         />
@@ -34,7 +34,7 @@
                    text="proceed"
                    color="blue"
                    icon="./assets/icon-receive-proceed.svg"
-                   margin_left_default
+                   :margin_left="true"
                    :class="{disabled: !price_valid}" 
                    @click="onProceed"
         />

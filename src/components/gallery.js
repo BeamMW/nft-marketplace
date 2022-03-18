@@ -9,7 +9,7 @@ import paginator from './paginator.vue'
 import adetails from './artwork-details.vue'
 
 // uncomment to see an example button
-// import PRESENTATION from './button-presentation.vue'
+import PRESENTATION from './button-presentation.vue'
 
 export default {
   computed: {
@@ -63,6 +63,8 @@ export default {
     paginator,
     adetails,
     pricePopup,
+    // uncomment to see an example button
+    PRESENTATION
   },
 
   template: `
@@ -93,7 +95,7 @@ export default {
                 />
 
                 <!---- uncomment the line below to see an example button ----->
-                <!---- <PRESENTATION/> ---->
+                <PRESENTATION/> 
                 
             </template>
             <div class="empty-gallery" v-else>

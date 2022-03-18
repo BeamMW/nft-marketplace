@@ -4,11 +4,13 @@
       <div class="title">Public key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <img class="copy-icon" src="~assets/icon-copy.svg" @click="onClose"/>
+        <artButton/>
+        <!-- <artButton icon="./assets/icon-copy.svg"/> -->
+        <!-- <img class="copy-icon" src="~assets/icon-copy.svg" @click="onClose"/> -->
       </div>
       <div class="controls">
         <artButton text="close" 
-                   semi_transparent
+                   :semi_transparent="true"
                    text_color="white"
                    icon="./assets/icon-cancel.svg"
                    @click="close"
@@ -17,7 +19,7 @@
                    text="copy and close"
                    color="green"
                    icon="./assets/icon-copy-blue.svg"
-                   margin_left
+                   :margin_left="true"
                    @click="onCopy"
         />
       </div>
