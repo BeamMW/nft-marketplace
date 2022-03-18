@@ -21,7 +21,7 @@
         <span class="value">0.011 BEAM</span>
       </div>
       <div class="info">
-        Small transaction fee must be paid {{ price_valid }}
+        Small transaction fee must be paid
       </div>
       <div class="controls">
         <artButton type="cancel" @click="close"/>
