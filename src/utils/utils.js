@@ -5,7 +5,7 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let headlessNode = "eu-node01.masternet.beam.mw:8200"
+let headlessNode = "eu-node01.mainnet.beam.mw:8200"
 let InitParams   = undefined
 
 export default class Utils {

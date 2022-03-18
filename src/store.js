@@ -319,13 +319,8 @@ export const store = {
         let mykeys = this.state.my_artist_keys
 
         for (let awork of res.items) {
-            if (awork.sales) {
-                alert(JSON.stringify(awork.sales))
-            }
-
-            if (awork.id == 2) {
-                let a = 0;
-                a++
+            if (!this.state.is_admin && awork.id >= 227 && awork.id <= 252) {
+                continue
             }
 
             let oawork = null

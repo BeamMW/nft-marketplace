@@ -10,7 +10,7 @@ export default {
         }
     },
 
-    emits: ['delete', 'details'],
+    emits: ['like', 'unlike', 'delete', 'details'],
 
     components: {
         loading,
