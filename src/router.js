@@ -1,4 +1,4 @@
-import gallery from './components/gallery.js'
+import gallery from './components/gallery.vue'
 import details from './components/artwork-details.vue'
 import {createRouter, createWebHashHistory} from 'vue-router'
 
