@@ -69,7 +69,7 @@ export default {
                 v-on:back="onDetailsBack"
                 v-bind:artwork="details"
             />
-            <template v-else-if="artworks.length > 0">
+            <template v-else-if="artworks.length > 0 && !isBecomeArtist">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
                         v-bind:artwork="artwork"

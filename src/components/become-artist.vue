@@ -11,18 +11,17 @@
                     v-model="name"
                     label="Artist Name*"
                     placeholder=""
-                    padding-left="5"        
-                    width="424"
+                    padding-left="15"        
                     :is-valid="error.name"
                     type="text"
+                    style="margin-bottom:44px;margin-top:0"
         />
         <inputField id="website"
                     v-model="website"
                     label="Website"
                     placeholder="https://website.name/"
                     img-name="glob"
-                    padding-left="50"
-                    width="374"
+                    padding-left="44"
                     :is-valid="error.website"
                     type="text"
         />
@@ -31,8 +30,7 @@
                     label="Twitter"
                     placeholder="@twitter"
                     img-name="twitter"
-                    padding-left="50"
-                    width="374"
+                    padding-left="44"
                     :is-valid="error.twitter"
                     type="text"
         />
@@ -41,15 +39,21 @@
                     label="Instagram"
                     placeholder="@instagram"
                     img-name="instagram"
-                    padding-left="50"
-                    width="374"
+                    padding-left="44"
                     :is-valid="error.instagram"
                     type="text"
         />
       </div>
-      <!-- <div>
-        here will be About me
-      </div> -->
+      <div class="col-second">
+        <textAreaField id="aboutMe"
+                       v-model="aboutMe"
+                       label="About me"
+                       placeholder=""
+                       :is-valid="error.aboutMe"
+                       max-length="150"
+                       type="text"
+        />
+      </div>
     </div>
   </div>
   <div class="actions">
@@ -67,6 +71,8 @@
 
 <style scoped lang="stylus">
   .container {
+    padding: 0 30px
+
     .title {
       font-weight: 700
       font-size: 14px
@@ -88,7 +94,11 @@
       display: flex
 
       .col-first {
-        margin-right: 30px
+        flex-basis: 50%
+      }
+      .col-second {
+        flex-basis: 50%
+        margin-left: 30px
       }
     }
   }
@@ -128,11 +138,12 @@
 
 <script>
 import inputField from './input-field.vue'
+import textAreaField from './textarea-field.vue'
 
 export default {
   
   components: {
-    inputField
+    inputField, textAreaField
   },
   emits:['close-become-artist'],
   data () {
