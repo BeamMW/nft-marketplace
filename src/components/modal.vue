@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="#modals">
     <div v-if="show" class="modal-dialog">
       <div class="modal-content" :style="style">
         <slot/>
@@ -43,6 +43,10 @@ export default {
       return {
         'background-color': utils.getStyles().background_popup,
       }
+    },
+
+    id () {
+      return Math.random()
     }
   },
 

@@ -34,7 +34,7 @@
       </div>
     </div>  
     <div v-if="sales != undefined && sales.length" class="table-body">
-      <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${index}`" class="row">
+      <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${sales.length - index}`" class="row">
         <div>
           <img src="~assets/icon-beam.svg"/>
           <span class="curr">BEAM</span>
