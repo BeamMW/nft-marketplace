@@ -1,7 +1,7 @@
 # Button component has the following properties:
   * [color](#color)
   * [transparent](#transparent)
-  * [semi_transparent](#semi`_`transparent)
+  * [semi_transparent](#semi_transparent)
   * [icon](#icon)
   * [icon_right](#icon_right)
   * [text](#text)
