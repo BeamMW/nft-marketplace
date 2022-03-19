@@ -1,7 +1,15 @@
 <template>
-  <img v-if="image" :src="image">
+  <img v-if="image" class="preview" :src="image">
   <loading v-else :error="error"/>
 </template>
+
+<style scoped lang="stylus">
+  .preview {
+    max-width: 100%
+    max-height: 100%
+    object-fit: contain
+  }
+</style>
 
 <script>
 import loading from './item-loading.vue'

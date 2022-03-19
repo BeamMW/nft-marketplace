@@ -19,14 +19,39 @@
                  @page-changed="onPageChanged"
       />
     </template>
-    <div v-else class="empty-gallery">
-      <img class="empty-gallery__icon" src="~assets/icon-empty-gallery.svg"/>
-      <div class="empty-gallery__text">There are no artworks at the moment.</div>
+    <div v-else class="empty">
+      <img src="~assets/icon-empty-gallery.svg"/>
+      <div class="text">There are no artworks at the moment</div>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
+  #container {
+    .artworks {
+      display: flex
+      flex-wrap: wrap
+      overflow-y: auto
+      overflow-x: hidden
+      margin-top: 20px
+    }
+
+    .empty {
+      margin: 100px auto 0 auto
+      display: flex
+      align-items: center
+      flex-direction: column
+
+      & > .text {
+        margin-top: 30px
+        opacity: 0.5
+        font-size: 14px
+        line-height: 1.43
+        text-align: center
+        color: #fff
+      }
+    }
+  }
 </style>
 
 <script>

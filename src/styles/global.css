@@ -1,22 +1,11 @@
-/* common start */
-
 html, body {
   font-family: 'SFProDisplay', sans-serif;
   font-weight: normal;
   height:      100%;
+  width:       100%;
   overflow:    hidden;
   margin:      0;
   color:       white;
-}
-
-html {
-  width:       100%;
-}
-
-.show-key {
-  font-size: 16px;
-  color: #00f6d2;
-  margin-right: 10px;
 }
 
 .vertical-container {
@@ -30,123 +19,8 @@ html {
   height: 85%;
 }
 
-.artworks {
-  display:   flex;
-  flex-wrap: wrap;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 20px;
-}
-
-.artworks > .artwork {
-  margin-right: 16px;
-  margin-bottom:  16px;
-
-  display: flex;
-  flex-direction: column;
-  width:   284px;
-  border:  none;
-  background-color: rgba(240, 205, 205, 0.05);
-  border-radius: 10px;
-
-  position:relative;
-}
-
-.artwork-delete {
-  position: absolute;
-  left: 263px;
-  top: 5px;
-  width: 15px;
+.pointer-cursor {
   cursor: pointer;
-}
-
-.artwork-title {
-  font-size: 16px;
-  color: #fff;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-top: 20px;
-  flex: 1
-}
-
-.artwork-likes {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  box-sizing: border-box;
-  padding-top: 20px;
-}
-
-.artwork-likes__text {
-  padding-left: 5px;
-}
-
-.artwork-author {
-  font-size: 12px;
-  color: rgba(255, 255, 255, .5);
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artwork .preview-container {
-  height: 360px;
-  background-color: rgba(240, 205, 205, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  cursor: pointer;
-}
-
-.artwork img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.artwork > .info-row {
-  box-sizing: border-box;
-  padding: 0 14px 0px 14px;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  margin-bottom: 3px;
-  overflow: hidden;
-}
-
-.artwork-price-row {
-  min-height: 41px;
-  margin: 10px 0 20px 0;
-  padding: 0 12px 0 14px;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
-
-.artwork .like {
-  color: #00f6d2;
-  margin-left: 10px;
-}
-
-.empty-gallery {
-  margin: 100px auto 0 auto;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.empty-gallery__text {
-  margin-top: 30px;
-  opacity: 0.5;
-  font-size: 14px;
-  line-height: 1.43;
-  text-align: center;
-  color: #fff;
 }
 
 ::-webkit-scrollbar {
@@ -169,51 +43,17 @@ html {
   display: none;
 }
 
-.dot {
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 6px;
-}
-
-.green {
-  background-color: limegreen;
-}
-
-.red {
-  background-color: crimson;
-}
-
 .darker {
   opacity: 0.5
-}
-
-.small {
-  font-size: 0.85em;
-}
-
-.normal {
-  font-size: 0.9em;
-  opacity: 0.9;
-}
-
-.bolder {
-  font-weight: 500;
-}
-
-.bold {
-  font-weight: 600;
 }
 
 .hidden {
   display: none;
 }
 
-.ml-hem {
-  margin-left: 0.5em;
-}
-
+/*
+ * TODO remove
+ */
 .button {
   padding: 11px 25px;
   border-radius: 50px;
@@ -260,40 +100,8 @@ html {
   box-shadow: 0 0 8px white;
 }
 
-.mine {
-  padding: 0px 8px 4px 8px;
-  line-height: 1;
-  border-radius: 3px;
-  background-color: rgba(0, 246, 210, .3);
-  color: #fff;
-  font-size: 12px;
-  margin-left: 10px;
-}
-
-.selectHide {
-  display: none;
-}
-
-.pointer-cursor {
-  cursor: pointer;
-}
-
 *[disabled="true"] {
   cursor: default !important;
   opacity: 0.5;
 }
 
-.artwork-can-buy__dots {
-  margin-left: auto;
-  cursor: pointer;
-  margin-right: -4px;
-}
-  
-.show {
-  display: flex;
-  margin-left: 200px; 
-}
-  
-.hide {
-  display: none;
-}
