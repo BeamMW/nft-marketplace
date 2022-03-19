@@ -119,31 +119,27 @@ export default {
       type: Boolean,
       default: false,
     },
-    // magenta, blue, green, semiTransparent, darkBlue
-    color: {
+    color: {  // magenta, blue, green, semiTransparent, darkBlue
       type: String,
-      default: String,
+      default: undefined,
     },
-    // icon source
-    icon: {
+    icon: { // icon source
       type: String,
-      default: String,
+      default: undefined,
     },
-    // left, right
-    icon_right: {
+    icon_right: { // to put the icon to the right of the text
       type: Boolean,
       default: false,
     },
     text: {
       type: String,
-      default: String,
+      default: undefined,
     },
-    // available colors from data.text_colors
-    text_color: {
+    text_color: { // available colors from data.text_colors
       type: String,
-      default: String,
+      default: undefined,
     },
-    margin_left: {
+    margin_left: { // button's left margin
       type: [Number, Boolean],
       default: false
     },
@@ -157,7 +153,7 @@ export default {
     },
     gap: {
       type: Number,
-      default: Number
+      default: undefined
     }
   },
 
@@ -172,8 +168,8 @@ export default {
         white: '#ffffff',
       },
       styles: {
-        default_gap: '50',
-        default_margin: '30'
+        default_gap: '5',
+        default_margin: '30',
       }
     }
   },
@@ -188,7 +184,7 @@ export default {
         return 'trailingIcon'
       }
 
-      return ''
+      return undefined
     },
     transparency() {
       if (this.transparent === true) {
@@ -199,7 +195,7 @@ export default {
         return 'semiTransparent'
       }
 
-      return ''
+      return undefined
     },
     color_text() {
       if (this.text && this.text_color) {
@@ -208,17 +204,17 @@ export default {
         }
       }
 
-      return ''
+      return undefined
     },
     disabled_button() {
       if (this.disabled) {
         return 'disabled'
       }
 
-      return ''
+      return undefined
     },
     gap_inner() {
-      if (this.gap) {
+      if (typeof this.gap === 'number') {
         return {'width': `${this.gap}px`}
       }
 
@@ -226,7 +222,7 @@ export default {
         return {'width': `${this.styles.default_gap}px`}
       }
 
-      return ''
+      return undefined
     },
     left_margin() {
       if (this.margin_left === true) {
@@ -237,14 +233,14 @@ export default {
         return {'margin-left': `${this.margin_left}px`}
       }
 
-      return ''
+      return undefined
     },
     hover_effect() {
       if (this.hover === false) {
         return 'hoverDisabled'
       }
 
-      return ''
+      return undefined
     }
   },
 }

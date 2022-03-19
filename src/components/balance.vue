@@ -10,8 +10,8 @@
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 :transparent="true"
                  icon="./assets/icon-receive.svg"
+                 :transparent="true"
                  @click="onWithdraw"
       />
     </div>
