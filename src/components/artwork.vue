@@ -6,7 +6,7 @@
     </div>
 
     <!---- Delete Artwork Button ---->
-    <img v-if="is_admin" class="artwork-delete" src="~assets/icon-delete.svg" @:click="onDelete"/>
+    <img v-if="is_admin" class="artwork-delete" src="~assets/icon-delete.svg" @click="onDelete"/>
 
     <!---- First info row ---->
     <div class="info-row">
@@ -135,7 +135,7 @@ export default {
     },
 
     onDetails(ev) {
-      this.$emit('details', this.id)
+      this.$store.showDetails(this.id)
     }
   }
 }

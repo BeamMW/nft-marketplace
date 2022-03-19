@@ -3,20 +3,15 @@
     <headless v-if="is_headless"></headless>
     <balance v-else></balance>
     <adminui v-if="is_admin"/>
-    <artctrls v-if="details_id == -1"/>
-    <adetails v-if="details_id != -1"
-              :artwork="details"
-              @back="onDetailsBack"
-    />
-    <template v-else-if="artworks.length > 0">
-      <div ref="artslist" class="artworks">
+    <artctrls/>
+    <template v-if="artworks.length > 0">
+      <div ref="artslist" class="artworks" @scroll="onScrollArtwork">
         <artwork v-for="artwork in artworks"
                  :key="artwork.id"
                  :artwork="artwork"
                  @like="onLikeArtwork"
                  @unlike="onUnlikeArtwork"
                  @delete="onDeleteArtwork"
-                 @details="onDetails"
         />
       </div>
       <paginator :current="current_page"
@@ -41,7 +36,6 @@ import balance   from './balance.vue'
 import headless  from './headless.vue'
 import artctrls  from './artworks-controls.vue'
 import paginator from './paginator.vue'
-import adetails  from './artwork-details.vue'
 import {common}  from '../utils/consts.js'
 
 export default {
@@ -52,13 +46,6 @@ export default {
     artctrls, 
     headless, 
     paginator, 
-    adetails
-  },
-
-  data () {
-    return {
-      details_id: -1,
-    }
   },
 
   computed: {
@@ -86,14 +73,12 @@ export default {
     },
     total_pages () {
       return this.$state.total_pages
-    },
-    details () {
-      for (let artwork of this.artworks) {
-        if (artwork.id == this.details_id) {
-          return artwork
-        }
-      }
-      return undefined
+    }
+  },
+
+  mounted() {
+    if(this.$route.hash) {
+      this.$refs.artslist.scrollTop = this.$route.hash.substr(1)
     }
   },
 
@@ -115,12 +100,9 @@ export default {
       this.$refs.artslist.scrollTop = 0
     },
 
-    onDetails (id) {
-      this.details_id = id
-    },
-
-    onDetailsBack() {
-      this.details_id = -1
+    onScrollArtwork(ev) {
+      let pos = ev.target.scrollTop
+      this.$router.replace({name: this.$route.name, hash: `#${pos}`})
     }
   }
 }

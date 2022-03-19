@@ -849,6 +849,11 @@ export const store = {
   },
 
   showDetails(id) {
-    router.push({name: 'details'})
+    router.push({
+      name: 'details',
+      params: {
+        id
+      }
+    })
   }
 }
