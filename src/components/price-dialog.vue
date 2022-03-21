@@ -24,8 +24,20 @@
         Small transaction fee must be paid
       </div>
       <div class="controls">
-        <artButton type="cancel" @click="close"/>
-        <artButton id="proceed" :class="{disabled: !price_valid}" type="proceed" @click="onProceed"/>
+        <artButton text="cancel"
+                   text_color="white"
+                   :semi_transparent="true"
+                   icon="./assets/icon-cancel.svg"
+                   @click="close"
+        />
+        <artButton id="proceed"
+                   text="proceed"
+                   color="blue"
+                   icon="./assets/icon-receive-proceed.svg"
+                   :margin_left="true"
+                   :class="{disabled: !price_valid}" 
+                   @click="onProceed"
+        />
       </div>
     </div>
   </modal>
@@ -126,7 +138,7 @@
 
 <script>
 import modal from './modal.vue'
-import artButton from './art-button.js'
+import artButton from './button.vue'
 import utils from '../utils/utils.js'
 import {common} from '../utils/consts.js'
 

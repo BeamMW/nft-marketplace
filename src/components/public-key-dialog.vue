@@ -4,11 +4,26 @@
       <div class="title">Public key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <img class="copy-icon" src="~assets/icon-copy.svg" @click="onClose"/>
+        <artButton icon="./assets/icon-copy.svg"
+                   :transparent="true"
+                   :margin_left="5"
+                   @click="onClose"
+        />
       </div>
       <div class="controls">
-        <artButton type="close" @click="close"/>
-        <artButton data="artist_key" type="copy" @click="onCopy"/>
+        <artButton text="close" 
+                   :semi_transparent="true"
+                   text_color="white"
+                   icon="./assets/icon-cancel.svg"
+                   @click="close"
+        />
+        <artButton data="artist_key" 
+                   text="copy and close"
+                   color="green"
+                   icon="./assets/icon-copy-blue.svg"
+                   :margin_left="true"
+                   @click="onCopy"
+        />
       </div>
     </div>
   </modal>
@@ -48,7 +63,7 @@
 
 <script>
 import modal from './modal.vue'
-import artButton from './art-button.js'
+import artButton from './button.vue'
 
 export default {
   components: { 

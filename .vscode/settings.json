@@ -19,7 +19,6 @@
     "javascript",
     "vue"
   ],
-  "editor.formatOnSave": true,
   "stylelint.validate": [
     "vue"
   ]

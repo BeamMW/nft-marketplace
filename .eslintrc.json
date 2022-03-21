@@ -90,6 +90,10 @@
         "default": "v-slot",
         "named": "longform"
       }
+    ],
+    "vue/prop-name-casing": [
+      "error",
+      "snake_case"
     ]
   }
 }
