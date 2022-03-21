@@ -24,20 +24,18 @@
         Small transaction fee must be paid
       </div>
       <div class="controls">
-        <artButton text="cancel"
-                   text_color="white"
-                   :semi_transparent="true"
-                   icon="~assets/icon-cancel.svg"
-                   @click="close"
-        />
+        <artButton text="cancel" text_color="white" :semi_transparent="true" @click="close">
+          <img src="~assets/icon-cancel.svg"/>
+        </artButton>
         <artButton id="proceed"
                    text="proceed"
                    color="blue"
-                   icon="~assets/icon-receive-proceed.svg"
                    :margin_left="true"
                    :class="{disabled: !price_valid}" 
                    @click="onProceed"
-        />
+        >
+          <img src="~assets/icon-receive-proceed.svg"/>
+        </artButton>
       </div>
     </div>
   </modal>
