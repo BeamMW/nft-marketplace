@@ -25,7 +25,7 @@
     <span class="curr">BEAM</span>
     <artButton text="buy" 
                color="magenta"
-               icon="./assets/icon-button.svg"
+               icon="~assets/icon-button.svg"
                @click="onBuy"
     />
   </span>
@@ -34,7 +34,7 @@
   <span v-if="!price && owned" class="container">
     <artButton text="sell" 
                color="blue"
-               icon="./assets/icon-button.svg"
+               icon="~assets/icon-button.svg"
                @click="onSell"
     />
   </span>
