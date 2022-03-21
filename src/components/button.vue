@@ -4,7 +4,7 @@
           :style="left_margin"
           :disabled="disabled"
   >
-    <img v-if="icon" :src="icon"/>
+    <slot></slot>
     <span :style="gap_inner"></span>
     <span class="text" :style="color_text">{{ text }}</span>
   </button>
@@ -175,8 +175,11 @@ export default {
   },
 
   computed: {
+    has_icon () {
+      return !!this.$slots.default
+    },
     icon_position() {
-      if (this.icon && !this.text) {
+      if (this.has_icon && !this.text) {
         return 'singleIcon'
       }
       
@@ -218,7 +221,7 @@ export default {
         return {'width': `${this.gap}px`}
       }
 
-      if (this.icon && this.text) {
+      if (this.has_icon && this.text) {
         return {'width': `${this.styles.default_gap}px`}
       }
 

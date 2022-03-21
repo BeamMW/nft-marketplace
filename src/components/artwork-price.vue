@@ -25,18 +25,20 @@
     <span class="curr">BEAM</span>
     <artButton text="buy" 
                color="magenta"
-               icon="~assets/icon-button.svg"
                @click="onBuy"
-    />
+    >
+      <img src="~assets/icon-button.svg">
+    </artButton>
   </span>
 
   <!---- doesn't have price & owned, can sell ---->
   <span v-if="!price && owned" class="container">
     <artButton text="sell" 
                color="blue"
-               icon="~assets/icon-button.svg"
                @click="onSell"
-    />
+    >
+      <img src="~assets/icon-button.svg">
+    </artButton>
   </span>
 
   <!---- doesn't have price & not owned, 

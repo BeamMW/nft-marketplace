@@ -10,10 +10,11 @@
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 icon="~assets/icon-receive.svg"
                  :transparent="true"
                  @click="onWithdraw"
-      />
+      >
+        <img src="~assets/icon-receive.svg">
+      </artButton>
     </div>
     <div class="user" @click="onShowKey">
       <div v-if="my_artist_name" class="name">
@@ -21,12 +22,13 @@
         <span class="text">{{ my_artist_name }}</span>
       </div>
       <artButton class="key"
-                 icon="~assets/icon-key.svg"
                  text="Show my public key"
                  text_color="green"
                  :semi_transparent="true"
                  :hover="false"
-      />
+      >
+        <img src="~assets/icon-key.svg">
+      </artButton>
     </div>
   </div>
 </template>
