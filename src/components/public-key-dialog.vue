@@ -4,24 +4,17 @@
       <div class="title">Public key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <btn :transparent="true" :margin_left="5" @click="onClose">
+        <btn :transparent="true" @click="onClose">
           <img src="~assets/icon-copy.svg"/>
         </btn>
       </div>
       <div class="controls">
-        <btn text="close" 
-             :semi_transparent="true"
-             text_color="white"
-             icon="~assets/icon-cancel.svg"
-             @click="close"
-        />
-        <btn data="artist_key" 
-             text="copy and close"
-             color="green"
-             icon="~assets/icon-copy-blue.svg"
-             :margin_left="true"
-             @click="onCopy"
-        />
+        <btn text="close" semi_transparent text_color="white" @click="close">
+          <img src="~assets/icon-cancel.svg"/>
+        </btn>
+        <btn text="copy and close" color="green" @click="onCopy">
+          <img src="~assets/icon-copy-blue.svg"/>
+        </btn>  
       </div>
     </div>
   </modal>
@@ -55,6 +48,10 @@
       margin-top: 30px
       display: flex
       flex-direction: row
+
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
     }
   }
 </style>

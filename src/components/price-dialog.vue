@@ -30,7 +30,6 @@
         <artButton id="proceed"
                    text="proceed"
                    color="blue"
-                   :margin_left="true"
                    :class="{disabled: !price_valid}" 
                    @click="onProceed"
         >
@@ -125,6 +124,10 @@
       margin-top: 30px
       display: flex
       flex-direction: row
+
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
     }
 
     .disabled {

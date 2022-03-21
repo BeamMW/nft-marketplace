@@ -1,7 +1,6 @@
 <template>
   <button class="button"
           :class="[transparency, color, icon_position, disabled_button, hover_effect]"
-          :style="left_margin"
           :disabled="disabled"
   >
     <slot></slot>
@@ -169,7 +168,6 @@ export default {
       },
       styles: {
         default_gap: '5',
-        default_margin: '30',
       }
     }
   },
@@ -227,22 +225,10 @@ export default {
 
       return undefined
     },
-    left_margin() {
-      if (this.margin_left === true) {
-        return {'margin-left': `${this.styles.default_margin}px`}
-      }
-
-      if (this.margin_left) {
-        return {'margin-left': `${this.margin_left}px`}
-      }
-
-      return undefined
-    },
     hover_effect() {
       if (this.hover === false) {
         return 'hoverDisabled'
       }
-
       return undefined
     }
   },

@@ -10,7 +10,7 @@
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 :transparent="true"
+                 transparent
                  @click="onWithdraw"
       >
         <img src="~assets/icon-receive.svg">
@@ -24,7 +24,7 @@
       <artButton class="key"
                  text="Show my public key"
                  text_color="green"
-                 :semi_transparent="true"
+                 semi_transparent
                  :hover="false"
       >
         <img src="~assets/icon-key.svg">
