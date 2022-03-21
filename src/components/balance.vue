@@ -10,7 +10,7 @@
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 icon="./assets/icon-receive.svg"
+                 icon="~assets/icon-receive.svg"
                  :transparent="true"
                  @click="onWithdraw"
       />
@@ -21,7 +21,7 @@
         <span class="text">{{ my_artist_name }}</span>
       </div>
       <artButton class="key"
-                 icon="./assets/icon-key.svg"
+                 icon="~assets/icon-key.svg"
                  text="Show my public key"
                  text_color="green"
                  :semi_transparent="true"
