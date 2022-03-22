@@ -198,7 +198,9 @@ export default {
       catch(_) {
         return false
       }
-      return value.length <= 250 && (url.protocol === 'http:' || url.protocol === 'https:')
+      return value.length <= 250 && 
+             (url.protocol === 'http:' || url.protocol === 'https:') &&
+             (url.toString() === value || url.toString() === value + '/')
     },
     twitter_valid() {
       // TODO: real validation, not all chars are allowed
@@ -220,11 +222,7 @@ export default {
     //   - for avatar, ame at the right of avatar
   },
 
-  methods: {
-    close() {
-      this.$emit('close-become-artist')
-    },
-    
+  methods: {    
     loadImage(e, cback) {
       let file = e.target.files[0]
       let reader = new FileReader()
