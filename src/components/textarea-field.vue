@@ -2,14 +2,14 @@
   <div :class="['area-container', id === 'name' ? 'name_input' : '']">
     <label v-if="label" class="label_elem">{{ label }}</label>
     <textarea v-bind="$attrs"
-              :value="modelvalue"
+              :value="modelValue"
               :placeholder="placeholder"
               :class="['input_elem', valid ? '' : 'error_elem']"
               @input="$emit('update:modelValue', $event.target.value)"
     >
   </textarea>
     <div class="info">
-      <span class="text">{{ }} characters max</span> 
+      <span class="text">{{ maxlen }} characters max</span> 
       <span>{{ modelValue.length }} / {{ maxlen }} </span>
     </div>
   </div>
