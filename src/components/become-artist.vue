@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="title">Become an Artist</h1>
+    <pageTitle title="Become an Artist"/>
     <p class="description">
       To become a publisher you need to set up a username.<br>
       Registration will allow you to publish and manage your NFTs.
@@ -88,21 +88,12 @@
   .container {
     padding: 0 30px
 
-    .title {
-      font-weight: 700
+    .description {
       font-size: 14px
       line-height: 17px
       text-align: center
-      text-transform: uppercase
-      color: #FFFFFF
-    }
-
-    .description {
-    font-size: 14px
-    line-height: 17px
-    text-align: center
-    color: #FFFFFF
-    margin: 30px 0px
+      color: #fff
+      margin: 30px 0px
     }
 
     .fields {
@@ -144,12 +135,12 @@
 
     .text {
       width: 100%
-      height: 100%;
+      height: 100%
       display: flex
       justify-content: center
       align-items: center
       font-size: 14px
-      color: #1AF6D6
+      color: #1af6d6
       cursor: pointer
     }
   }
@@ -190,13 +181,18 @@
 <script>
 import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
+import pageTitle from './page-title.vue'
 
 export default {
   
   components: {
-    inputField, textAreaField
+    inputField, 
+    textAreaField, 
+    pageTitle
   },
+
   emits:['close-become-artist'],
+  
   data () {
     return {
       name: '',

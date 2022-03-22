@@ -103,7 +103,7 @@ export default {
     },
     gap: {
       type: Number,
-      default: 5
+      default: 9
     },
     padding: {
       type: String,
