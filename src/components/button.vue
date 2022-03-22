@@ -19,12 +19,10 @@
   font-family: 'SFProDisplay', sans-serif
   min-height: 38px
   min-width:  min-content
-  padding: 11px 22px
+  padding: 11px 22px 11px 22px
   border-radius: 50px
   display: flex
-  flex-wrap: wrap
   align-items: center
-  color: $darkBlue
   font-size: 14px
   font-weight: bold
   border: none
@@ -64,6 +62,10 @@
 
   &.no-hover:hover {
     box-shadow: none
+  }
+
+  & > span {
+    padding-bottom: 1px
   }
 }
 </style>

@@ -5,7 +5,7 @@
     <adminui v-if="is_admin"/>
     <artctrls/>
     <!---- uncomment the line below to see an example button ----->
-    <PRESENTATION/>
+    <!---- <PRESENTATION/> ---->
     <template v-if="artworks.length > 0">
       <div ref="artslist" class="artworks" @scroll="onScrollArtwork">
         <artwork v-for="artwork in artworks"
@@ -66,7 +66,7 @@ import paginator from './paginator.vue'
 import {common}  from '../utils/consts.js'
 
 // uncomment to see an example button
-import PRESENTATION from './button-presentation.vue'
+// import PRESENTATION from './button-presentation.vue'
 
 export default {
   components: {
@@ -77,7 +77,7 @@ export default {
     headless, 
     paginator,
     // uncomment to see an example button
-    PRESENTATION 
+    // PRESENTATION 
   },
 
   computed: {

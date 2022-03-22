@@ -23,22 +23,16 @@
     <img src="~assets/icon-beam.svg"/>
     <span class="amount">{{ amount }}</span>
     <span class="curr">BEAM</span>
-    <artButton text="buy" 
-               color="magenta"
-               @click="onBuy"
-    >
+    <btn text="buy" color="magenta" @click="onBuy">
       <img src="~assets/icon-button.svg">
-    </artButton>
+    </btn>
   </span>
 
   <!---- doesn't have price & owned, can sell ---->
   <span v-if="!price && owned" class="container">
-    <artButton text="sell" 
-               color="blue"
-               @click="onSell"
-    >
+    <btn text="sell" color="blue" @click="onSell">
       <img src="~assets/icon-button.svg">
-    </artButton>
+    </btn>
   </span>
 
   <!---- doesn't have price & not owned, 
@@ -86,13 +80,13 @@
 
 <script>
 import utils from '../utils/utils.js'
-import artButton from './button.vue'
+import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
 import artworkPriceModal from './price-dialog.vue'
 
 export default {
   components: {
-    artButton,
+    btn,
     popupMenu,
     artworkPriceModal,
   },
