@@ -36,7 +36,7 @@
 
       & > img {
         position: absolute
-        padding: 17px 15px
+        padding: 15px 15px
 
         &.error {
           filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
@@ -52,7 +52,7 @@
       font-size: 14px
       color: white
       border-radius: 10px
-      padding: 14px 8px
+      padding: 12px 8px
       width: 100%
 
       &:not(.error):focus {
