@@ -25,6 +25,9 @@
                   @selected="onSortBy"
         />
       </div>
+      <btn @click="onMyPage">
+        <img src="~assets/icon-user.svg">
+      </btn>
     </div>
   </div>
 </template>
@@ -84,10 +87,12 @@
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
+import btn from './button.vue'
 
 export default {
   components: {
-    selector
+    selector,
+    btn
   },
 
   data() {
@@ -163,6 +168,9 @@ export default {
       if (this.$parent.$refs.artslist) {
         this.$parent.$refs.artslist.scrollTop = 0
       }
+    },
+    onMyPage() {
+      this.$store.toMyPage()
     }
   }
 }
