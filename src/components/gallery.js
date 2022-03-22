@@ -69,7 +69,7 @@ export default {
                 v-on:back="onDetailsBack"
                 v-bind:artwork="details"
             />
-            <template v-else-if="artworks.length > 0 && !isBecomeArtist">
+            <template v-if="details_id == -1 && artworks.length > 0 && !isBecomeArtist">
                 <div class="artworks" ref="artslist">
                     <artwork v-for="artwork in artworks"
                         v-bind:artwork="artwork"
@@ -85,7 +85,7 @@ export default {
                     v-on:page-changed="onPageChanged"
                 />
             </template>
-            <div class="empty-gallery" v-else>
+            <div class="empty-gallery" v-if="details_id != -1 && artworks.length <= 0 && isBecomeArtist">
                 <img class="empty-gallery__icon" src="./assets/icon-empty-gallery.svg"/>
                 <div class="empty-gallery__text">There are no artworks at the moment.</div>
             </div>

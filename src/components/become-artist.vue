@@ -13,7 +13,7 @@
                     placeholder=""
                     :is-valid="error.name"
                     type="text"
-                    style="margin-bottom:44px;margin-top:0"
+                    style="margin-bottom:30px;margin-top:0"
         />
         <inputField id="website"
                     v-model="website"
@@ -46,9 +46,28 @@
                        label="About me"
                        placeholder=""
                        :is-valid="error.aboutMe"
-                       max-length="150"
+                       :max-length="150"
                        type="text"
         />
+
+        <div class="banner" :style="bannerStyles">
+          <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
+          <input id="banner"
+                 type="file"
+                 accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                 class="files"
+                 @change="onUploadbanner"
+          />
+        </div>
+        <div class="image" :style="avatarStyles">
+          <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
+          <input id="avatar"
+                 type="file"
+                 accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                 class="files"
+                 @change="onUploadAvatar"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -83,7 +102,7 @@
     line-height: 17px
     text-align: center
     color: #FFFFFF
-    margin-top: 30px
+    margin: 30px 0px
     }
 
     .fields {
@@ -95,14 +114,50 @@
       .col-second {
         flex-basis: 50%
         margin-left: 30px
+        
+        .files {
+          visibility:hidden
+          width: 0
+        }
       }
+    }
+    .banner {
+      display: flex
+      align-items: center
+      justify-content: center
+      height: 135px
+      margin-top: 33px
+      margin-bottom: 20px
+      background-color: rgba(26, 246, 214, 0.1)
+      background-repeat: no-repeat
+      border-radius: 10px
+    }
+    .image {
+      display: flex
+      align-items: center
+      justify-content: center
+      height: 120px
+      width: 120px
+      background-color: rgba(26, 246, 214, 0.1)
+      border-radius: 9999px
+    }
+
+    .text {
+      width: 100%
+      height: 100%;
+      display: flex
+      justify-content: center
+      align-items: center
+      font-size: 14px
+      color: #1AF6D6
+      cursor: pointer
     }
   }
 
   .actions {
     display:flex
     justify-content: center
-    margin-top: 50px
+    margin-top: 15px
 
     .button {
       padding: 11px 25px
@@ -126,9 +181,9 @@
     }
 
     .close {
-    background-color: rgba(255, 255, 255, 0.1)
-    color: #fff
-}
+      background-color: rgba(255, 255, 255, 0.1)
+      color: #fff
+    }
   }
 </style>
 
@@ -149,12 +204,28 @@ export default {
       twitter: '',
       instagram: '',
       aboutMe: '',
+      banner:'',
+      avatar:'',
       error: {
         name: false,
         website: false,
         twitter: false,
         instagram: false,
         aboutMe: false,
+      }
+    }
+  },
+  computed: {
+    avatarStyles() {
+      return {
+        'background': this.avatar ? `url(${this.avatar}) no-repeat center` : '',
+        'border' :  this.avatar ? '' : '1px dashed #1AF6D6',
+      }
+    },
+    bannerStyles() {
+      return {
+        'background': this.banner ? `url(${this.banner}) no-repeat center` : '',
+        'border' :  this.banner ? '' : '1px dashed #1AF6D6',
       }
     }
   },
@@ -213,6 +284,24 @@ export default {
 
     validateAboutMe(value) {
       return this.error.aboutMe =  value.length < 150
+    },
+
+    onUploadbanner(e) {
+      let file = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (e) => {
+        this.banner = e.target.result
+      }
+    },
+
+    onUploadAvatar(e) {
+      let file = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (e) => {
+        this.avatar = e.target.result
+      }
     }
   }
 

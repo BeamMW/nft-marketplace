@@ -19,7 +19,7 @@
   .input-container {
      margin-top: 20px
      width: 100%
-     box-sizing: border-box;
+     box-sizing: border-box
 
     .label_elem {
        display: block
@@ -107,7 +107,6 @@ export default {
     style() {
       return {
         'padding-left': this.id === 'name' ? '15px' : '44px',
-        width: this.width + 'px',
         height: this.height + 'px'
       }
     }

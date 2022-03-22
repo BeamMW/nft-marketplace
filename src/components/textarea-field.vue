@@ -1,13 +1,9 @@
 <template>
   <div :class="['area-container', id === 'name' ? 'name_input' : '']">
     <label v-if="label" class="label_elem">{{ label }}</label>
-    <i v-if="imgName" class="icon">
-      <img :src="`../assets/${imgName}.svg`" alt="icon"/>
-    </i>
-    <textArea v-bind="$attrs"
+    <textarea v-bind="$attrs"
               :value="modelValue"
               :placeholder="placeholder"
-              :style="style"
               :class="['input_elem', isValid ? '' : 'error_elem']"
               @input="$emit('update:modelValue', $event.target.value)"
     >
@@ -34,6 +30,7 @@
     }
 
     .input_elem {
+      box-sizing: border-box
       background-color: rgba(255, 255, 255, .05)
       border: none
       font-size: 24px
