@@ -24,6 +24,7 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
+        <button @click="becomeArtist">Become an artist</button>
       </div>
     </div>
   </div>
@@ -84,11 +85,11 @@
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
-
 export default {
   components: {
-    selector
+    selector,
   },
+  emits: ['become-artist'],
 
   data() {
     return {
@@ -146,6 +147,9 @@ export default {
   },
 
   methods: {
+    becomeArtist() {
+      this.$emit('become-artist')
+    },
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)
