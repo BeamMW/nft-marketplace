@@ -1,62 +1,81 @@
 <template>
-  <div class="input-container">
-    <label v-if="label" class="label_elem">{{ label }}</label>
-    <i v-if="img" class="icon">
-      <img :src="`../assets/${img}.svg`" alt="icon"/>
-    </i>
-    <input v-bind="$attrs"
-           :id="id"
-           :value="modelvalue"
-           :placeholder="placeholder"
-           :style="style"
-           :class="['input_elem', valid ? '' : 'error_elem']"
-           @input="$emit('update:modelvalue', $event.target.value)"
-    >
+  <div class="container">
+    <label v-if="label" class="label" :class="{'error': !valid}">
+      {{ label }}
+    </label>
+    <div class="input-container">
+      <img v-if="img" :src="`../assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
+      <input :value="modelValue"
+             :placeholder="placeholder"
+             :style="style"
+             :class="{'input': true, 'error': !valid}"
+             @input="$emit('update:modelValue', $event.target.value)"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .input-container {
-    margin-top: 20px
-    width: 100%
+  .container {
     box-sizing: border-box
 
-    .label_elem {
+    .label {
       display: block
       margin-bottom:10px
+      color: rgba(255, 255, 255, 0.6)
+      font-family: 'SFProDisplay', sans-serif
+      font-size: 14px
+
+      &.error {
+        color: rgba(255, 98, 92, 0.7)
+      }
     }
 
-    i {
-      position: absolute
+    .input-container {
+      display: flex
+
+      & > img {
+        position: absolute
+        padding: 17px 15px
+
+        &.error {
+          filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
+        }
+      }
     }
 
-    .icon {
-      padding: 15px
-    }
-    
-    .error_elem {
-      color:red!important
-    }
-
-    .input_elem {
+    .input {
+      font-family: 'SFProDisplay', sans-serif
       background-color: rgba(255, 255, 255, 0.05)
       border: none
-      font-size: 24px
-      color: #0bccf7
-      height: 100%
-      padding: 0
+      outline-width: 0
+      font-size: 14px
+      color: white
       border-radius: 10px
-      padding: 8px
-      box-sizing: border-box
+      padding: 14px 8px
       width: 100%
 
-      &:focus {
-        outline-width: 0
+      &:not(.error):focus {
+        background-color: rgba(255, 255, 255, 0.1)
       }
 
-      &::placeholder {
+      &.error:focus {
+        background-color: rgba(255, 98, 92, 0.12)
+      }
+
+      &.error {
+        color: rgba(255, 98, 92, 1)
+        background-color: rgba(255, 98, 92, 0.07)
+      }
+
+      &:not(.error)::placeholder {
         font-size: 14px
         color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.error::placeholder {
+        font-size: 14px
+        color: rgba(255, 98, 92, 0.4)
       }
     }
   }
@@ -75,41 +94,32 @@ export default {
       default: '',
       required: false
     },
-    modelvalue: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: String,
       default: '',
       required: true
     },
-    id:{
-      type: String,
-      default: '',
-      required: true
-    },
-    valid:{
+    valid: {
       type: Boolean,
-      required: true
+      default: true,
+      required: false
     },
     img: {
       type: String,
       default:'',
       required: false,
-    },
-    height: {
-      type: String,
-      default:'',
-      required: false
     }
   },
 
-  emits: {
-    'update:modelvalue': null
-  },
+  emits: [
+    'update:modelValue'
+  ],
 
   computed: {
     style() {
       return {
-        'padding-left': this.id === 'name' ? '15px' : '44px',
-        height: this.height + 'px'
+        'padding-left': this.img.length ? '38px' : '15px'
       }
     }
   },

@@ -5,12 +5,12 @@
               :value="modelvalue"
               :placeholder="placeholder"
               :class="['input_elem', valid ? '' : 'error_elem']"
-              @input="$emit('update:modelvalue', $event.target.value)"
+              @input="$emit('update:modelValue', $event.target.value)"
     >
   </textarea>
     <div class="info">
       <span class="text">{{ }} characters max</span> 
-      <span>{{ modelvalue.length }} / {{ maxlen }} </span>
+      <span>{{ modelValue.length }} / {{ maxlen }} </span>
     </div>
   </div>
 </template>
@@ -77,7 +77,8 @@ export default {
       default: '',
       required: false
     },
-    modelvalue: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: String,
       default: '',
       required: true
@@ -97,6 +98,9 @@ export default {
       required: true
     }
   },
-  emits: {'update:modelvalue': null},
+  
+  emits: [
+    'update:modelValue'
+  ],
 }
 </script>

@@ -7,56 +7,43 @@
     </p>
     <div class="fields">
       <div class="col-first">
-        <inputField id="name"
-                    v-model="name"
+        <inputField v-model="name"
                     label="Artist Name*"
-                    placeholder=""
-                    :is-valid="error.name"
-                    type="text"
+                    :valid="name_valid"
                     style="margin-bottom:30px;margin-top:0"
         />
-        <inputField id="website"
-                    v-model="website"
+        <inputField v-model="website"
                     label="Website"
                     placeholder="https://website.name/"
-                    img-name="glob"
-                    :is-valid="error.website"
-                    type="text"
+                    img="glob"
+                    :valid="website_valid"
         />
-        <inputField id="twitter"
-                    v-model="twitter"
+        <inputField v-model="twitter"
                     label="Twitter"
                     placeholder="@twitter"
-                    img-name="twitter"
-                    :is-valid="error.twitter"
-                    type="text"
+                    img="twitter"
+                    :valid="twitter_valid"
         />
-        <inputField id="instagram"
-                    v-model="instagram"
+        <inputField v-model="instagram"
                     label="Instagram"
                     placeholder="@instagram"
-                    img-name="instagram"
-                    :is-valid="error.instagram"
-                    type="text"
+                    img="instagram"
+                    :valid="instagram_valid"
         />
       </div>
       <div class="col-second">
-        <textAreaField id="aboutMe"
-                       v-model="aboutMe"
+        <textAreaField v-model="about"
                        label="About me"
-                       placeholder=""
-                       :is-valid="error.aboutMe"
+                       :valid="about_valid"
                        :max-length="150"
-                       type="text"
         />
-
         <div class="banner" :style="bannerStyles">
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
                  type="file"
                  accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
                  class="files"
-                 @change="onUploadbanner"
+                 @change="onUploadBanner"
           />
         </div>
         <div class="image" :style="avatarStyles">
@@ -76,7 +63,6 @@
       <img src="~assets/icon-cancel.svg"/>
       <span class="text">cancel</span>
     </div>
-
     <div class="button create">
       <img src="~assets/icon-create.svg"/>
       <span class="text">create account</span>
@@ -86,22 +72,26 @@
 
 <style scoped lang="stylus">
   .container {
-    padding: 0 30px
-
     .description {
       font-size: 14px
-      line-height: 17px
       text-align: center
       color: #fff
       margin: 30px 0px
+      font-family: 'SFProDisplay', sans-serif
     }
 
     .fields {
+      padding: 0 30px
       display: flex
 
       .col-first {
         flex-basis: 50%
+
+        & > * {
+          margin-bottom: 20px
+        }
       }
+
       .col-second {
         flex-basis: 50%
         margin-left: 30px
@@ -112,6 +102,7 @@
         }
       }
     }
+
     .banner {
       display: flex
       align-items: center
@@ -123,6 +114,7 @@
       background-repeat: no-repeat
       border-radius: 10px
     }
+
     .image {
       display: flex
       align-items: center
@@ -199,18 +191,12 @@ export default {
       website: '',
       twitter: '',
       instagram: '',
-      aboutMe: '',
+      about: '',
       banner:'',
-      avatar:'',
-      error: {
-        name: false,
-        website: false,
-        twitter: false,
-        instagram: false,
-        aboutMe: false,
-      }
+      avatar:''
     }
   },
+
   computed: {
     avatarStyles() {
       return {
@@ -223,83 +209,66 @@ export default {
         'background': this.banner ? `url(${this.banner}) no-repeat center` : '',
         'border' :  this.banner ? '' : '1px dashed #1AF6D6',
       }
-    }
-  },
-  watch: {
-    name(value){
-      this.name = value
-      this.validateName(value)
     },
-
-    website(value){
-      this.website = value
-      this.validdateURL(value)
+    name_valid() {
+      let value = this.name
+      return !value || value.length <= 120
     },
-
-    twitter(value){
-      this.twitter = value
-      this.validateTwitterNickname(value)
-    },
-
-    instagram(value){
-      this.instagram = value
-      this.validateInstagramickname(value)
-    },
-
-    aboutMe(value){
-      this.aboutMe = value
-      this.validateAboutMe(value)
-    }
-  },
-  methods: {
-    close() {
-      this.$emit('close-become-artist')
-    },
-    validateName(value) {
-      return this.error.name = value.length > 0 
-    },
-
-    validdateURL(str) {
+    website_valid() {
       let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
         '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
         '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
         '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
         '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
         '(\\#[-a-z\\d_]*)?$','i') // fragment locator
-      this.error.website =!!pattern.test(str)
-      return this.error.website
+      let value = this.website
+      return !value || !!pattern.test(value)
     },
-
-    validateTwitterNickname(value) {
-      return this.error.twitter = value.startsWith('@') && value.length < 16
+    twitter_valid() {
+      // TODO: real validation, not all chars are allowed
+      let value = this.twitter
+      return !value || (value.startsWith('@') && value.length < 16)
     },
-
-    validateInstagramickname(value) {
-      return this.error.instagram = value.startsWith('@') && value.length < 15
+    instagram_valid() {
+      // TODO: real validation, not all chars are allowed
+      let value = this.instagram
+      return !value || (value.startsWith('@') && value.length <= 30)
     },
+    about_valid() {
+      let value = this.about
+      return !value || value.length <= 150
+    }
+    // TODO: add images validation, not more than 250kb
+    // if image is larger that 250kb, apply red filter to image and
+    //   - for banner just write on banner itself 'image cannot be larger than 250kb'
+    //   - for avatar, ame at the right of avatar
+  },
 
-    validateAboutMe(value) {
-      return this.error.aboutMe =  value.length < 150
+  methods: {
+    close() {
+      this.$emit('close-become-artist')
     },
-
-    onUploadbanner(e) {
+    
+    loadImage(e, cback) {
       let file = e.target.files[0]
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
-        this.banner = e.target.result
+        cback(e.target.result)
       }
+    },
+
+    onUploadBanner(e) {
+      this.loadImage(e, banner => {
+        this.banner = banner
+      })
     },
 
     onUploadAvatar(e) {
-      let file = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (e) => {
-        this.avatar = e.target.result
-      }
+      this.loadImage(e, avatar => {
+        this.avatar = avatar
+      })
     }
   }
-
 }
 </script>
