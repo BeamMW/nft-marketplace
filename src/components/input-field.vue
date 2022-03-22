@@ -1,45 +1,45 @@
 <template>
   <div class="input-container">
     <label v-if="label" class="label_elem">{{ label }}</label>
-    <i v-if="imgName" class="icon">
-      <img :src="`../assets/${imgName}.svg`" alt="icon"/>
+    <i v-if="img" class="icon">
+      <img :src="`../assets/${img}.svg`" alt="icon"/>
     </i>
     <input v-bind="$attrs"
            :id="id"
-           :value="modelValue"
+           :value="modelvalue"
            :placeholder="placeholder"
            :style="style"
-           :class="['input_elem', isValid ? '' : 'error_elem']"
-           @input="$emit('update:modelValue', $event.target.value)"
+           :class="['input_elem', valid ? '' : 'error_elem']"
+           @input="$emit('update:modelvalue', $event.target.value)"
     >
   </div>
 </template>
 
 <style scoped lang="stylus">
   .input-container {
-     margin-top: 20px
-     width: 100%
-     box-sizing: border-box
+    margin-top: 20px
+    width: 100%
+    box-sizing: border-box
 
     .label_elem {
-       display: block
-       margin-bottom:10px
+      display: block
+      margin-bottom:10px
     }
 
     i {
-       position: absolute;
+      position: absolute
     }
 
     .icon {
-       padding: 15px;
+      padding: 15px
     }
     
     .error_elem {
-      color:red!important;
+      color:red!important
     }
 
     .input_elem {
-      background-color: rgba(255, 255, 255, .05)
+      background-color: rgba(255, 255, 255, 0.05)
       border: none
       font-size: 24px
       color: #0bccf7
@@ -47,23 +47,22 @@
       padding: 0
       border-radius: 10px
       padding: 8px
-      box-sizing: border-box;
-      width: 100%;
+      box-sizing: border-box
+      width: 100%
 
       &:focus {
-          outline-width: 0
+        outline-width: 0
       }
 
       &::placeholder {
-          font-size: 14px
-          color: rgba(255, 255, 255, 0.3)
+        font-size: 14px
+        color: rgba(255, 255, 255, 0.3)
       }
     }
   }
 </style>
 
 <script>
-
 export default {
   props: {
     label: {
@@ -76,7 +75,7 @@ export default {
       default: '',
       required: false
     },
-    modelValue: {
+    modelvalue: {
       type: String,
       default: '',
       required: true
@@ -86,11 +85,11 @@ export default {
       default: '',
       required: true
     },
-    isValid:{
+    valid:{
       type: Boolean,
       required: true
     },
-    imgName: {
+    img: {
       type: String,
       default:'',
       required: false,
@@ -101,7 +100,10 @@ export default {
       required: false
     }
   },
-  emits: {'update:modelValue': null},
+
+  emits: {
+    'update:modelvalue': null
+  },
 
   computed: {
     style() {
@@ -111,6 +113,5 @@ export default {
       }
     }
   },
-
 }
 </script>

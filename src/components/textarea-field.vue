@@ -2,23 +2,23 @@
   <div :class="['area-container', id === 'name' ? 'name_input' : '']">
     <label v-if="label" class="label_elem">{{ label }}</label>
     <textarea v-bind="$attrs"
-              :value="modelValue"
+              :value="modelvalue"
               :placeholder="placeholder"
-              :class="['input_elem', isValid ? '' : 'error_elem']"
-              @input="$emit('update:modelValue', $event.target.value)"
+              :class="['input_elem', valid ? '' : 'error_elem']"
+              @input="$emit('update:modelvalue', $event.target.value)"
     >
   </textarea>
     <div class="info">
-      <span class="text">{{ maxLength }} characters max</span> 
-      <span>{{ modelValue.length }} / {{ maxLength }} </span>
+      <span class="text">{{ }} characters max</span> 
+      <span>{{ modelvalue.length }} / {{ maxlen }} </span>
     </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
   .area-container {
-     width: 100%
-     box-sizing: border-box
+    width: 100%
+    box-sizing: border-box
 
     .label_elem {
       display: block
@@ -26,12 +26,12 @@
     }
 
     .error_elem {
-     color:red!important;
+      color:red!important
     }
 
     .input_elem {
       box-sizing: border-box
-      background-color: rgba(255, 255, 255, .05)
+      background-color: rgba(255, 255, 255, 0.05)
       border: none
       font-size: 24px
       color: #0bccf7
@@ -59,7 +59,7 @@
       font-style: italic
       font-weight: 400
       font-size: 12px
-      }
+    }
 }
 </style>
 
@@ -77,7 +77,7 @@ export default {
       default: '',
       required: false
     },
-    modelValue: {
+    modelvalue: {
       type: String,
       default: '',
       required: true
@@ -87,16 +87,16 @@ export default {
       default: '',
       required: true
     },
-    isValid:{
+    valid:{
       type: Boolean,
       required: true
     },
-    maxLength:{
+    maxlen:{
       type: Number,
       default: 150,
       required: true
     }
   },
-  emits: {'update:modelValue': null},
+  emits: {'update:modelvalue': null},
 }
 </script>

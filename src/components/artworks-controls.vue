@@ -24,7 +24,9 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
-        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist"/>
+        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist">
+          <img src="~assets/add-user.svg"/>
+        </btn>
       </div>
     </div>
   </div>

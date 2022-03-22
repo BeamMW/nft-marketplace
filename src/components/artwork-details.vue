@@ -1,6 +1,6 @@
 <template>
   <div id="container" class="container">
-    <backBtn @click="$router.go(-1)"/>
+    <backBtn/>
     <div class="details-row"> 
       <div class="artwork-container">
         <div class="artwork-box">
