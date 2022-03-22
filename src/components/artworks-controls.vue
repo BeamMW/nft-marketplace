@@ -24,7 +24,7 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
-        <button @click="becomeArtist">Become an artist</button>
+        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist"/>
       </div>
     </div>
   </div>
@@ -74,9 +74,14 @@
     display: flex
     margin-left: auto
     padding-right: 2px
+    align-items: center
 
     & > div:not(:last-child) {
       margin-right: 20px
+    }
+
+    & > *:last-child {
+      margin-right: 4px
     }
   }
 }
@@ -85,11 +90,13 @@
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
+import btn from './button.vue'
+
 export default {
   components: {
     selector,
+    btn
   },
-  emits: ['become-artist'],
 
   data() {
     return {
@@ -147,8 +154,8 @@ export default {
   },
 
   methods: {
-    becomeArtist() {
-      this.$emit('become-artist')
+    onBecomeArtist() {
+      this.$store.becomeArtist()
     },
     onTabClicked(id) {
       if (this.active_tab !== id) {

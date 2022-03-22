@@ -216,7 +216,7 @@ export default {
     },
 
     onDetails(ev) {
-      this.$store.showDetails(this.id)
+      this.$store.showArtworkDetails(this.id)
     }
   }
 }
