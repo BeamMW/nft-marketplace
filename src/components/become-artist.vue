@@ -59,14 +59,12 @@
     </div>
   </div>
   <div class="actions">
-    <div class="button close" @click="close">
+    <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
-      <span class="text">cancel</span>
-    </div>
-    <div class="button create">
+    </btn>
+    <btn text="create account" color="blue" @click="onCreate">
       <img src="~assets/icon-create.svg"/>
-      <span class="text">create account</span>
-    </div>
+    </btn>
   </div>
 </template>
 
@@ -140,32 +138,10 @@
   .actions {
     display:flex
     justify-content: center
-    margin-top: 15px
+    margin-top: 50px
 
-    .button {
-      padding: 11px 25px
-      border-radius: 50px
-      display: flex
-      align-items: center
-      color: #032e49
-      font-size: 14px
-      font-weight: bold
-      cursor: pointer
-
-      .text {
-        margin-left: 5px
-        line-height: 1
-      }
-    }
-
-    .create {
-      background-color: #0bccf7
-      margin-left: 20px
-    }
-
-    .close {
-      background-color: rgba(255, 255, 255, 0.1)
-      color: #fff
+    & > *:not(:first-child) {
+      margin-left: 30px
     }
   }
 </style>
@@ -174,17 +150,15 @@
 import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
+import btn from './button.vue'
 
 export default {
-  
   components: {
     inputField, 
     textAreaField, 
-    pageTitle
+    pageTitle,
+    btn
   },
-
-  emits:['close-become-artist'],
-  
   data () {
     return {
       name: '',
@@ -212,17 +186,19 @@ export default {
     },
     name_valid() {
       let value = this.name
-      return !value || value.length <= 120
+      return !value || value.length <= 100
     },
     website_valid() {
-      let pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i') // fragment locator
       let value = this.website
-      return !value || !!pattern.test(value)
+      if (!value) return true
+      let url 
+      try {
+        url = new URL(this.website)
+      }
+      catch(_) {
+        return false
+      }
+      return value.length <= 250 && (url.protocol === 'http:' || url.protocol === 'https:')
     },
     twitter_valid() {
       // TODO: real validation, not all chars are allowed
