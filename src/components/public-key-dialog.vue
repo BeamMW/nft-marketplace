@@ -4,15 +4,15 @@
       <div class="title">Public key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <btn :transparent="true" @click="onClose">
+        <btn class="icon-copy" color="transparent" @click="onCopy">
           <img src="~assets/icon-copy.svg"/>
         </btn>
       </div>
       <div class="controls">
-        <btn text="close" semi_transparent text_color="white" @click="close">
+        <btn text="close" @click="close">
           <img src="~assets/icon-cancel.svg"/>
         </btn>
-        <btn text="copy and close" color="green" @click="onCopy">
+        <btn text="copy and close" color="green" @click="onCopyAndClose">
           <img src="~assets/icon-copy-blue.svg"/>
         </btn>  
       </div>
@@ -38,7 +38,7 @@
       flex-direction: row
       align-items: center
 
-      .copy-icon {
+      .icon-copy {
         margin-left: 10px
         cursor: pointer
       }
@@ -72,6 +72,11 @@ export default {
   },
 
   methods: {
+    onCopyAndClose() {
+      this.onCopy()
+      this.close()
+    },
+  
     onCopy() {
       var textArea = document.createElement('textarea')
       textArea.style.position = 'fixed'
@@ -79,7 +84,6 @@ export default {
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
-      this.close()
             
       try {
         return document.execCommand('copy')

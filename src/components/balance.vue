@@ -10,7 +10,7 @@
                  class="withdraw" 
                  text="withdraw"
                  text_color="blue"
-                 transparent
+                 color="transparent"
                  @click="onWithdraw"
       >
         <img src="~assets/icon-receive.svg">

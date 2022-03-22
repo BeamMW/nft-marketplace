@@ -1,29 +1,25 @@
 <template>
-  <button class="button"
-          :class="[transparency, color, icon_position, disabled_button, hover_effect]"
+  <button :class="{
+            'button': true,
+            'reverse': reverse,
+            'transparent': color == 'transparent',
+            'disabled': disabled,
+            'no-hover': !hover
+          }"         
           :disabled="disabled"
+          :style="button_style"
   >
     <slot></slot>
-    <span :style="gap_inner"></span>
-    <span class="text" :style="color_text">{{ text }}</span>
+    <span class="text" :style="text_style">{{ text }}</span>
   </button>
 </template>
 
 <style scoped lang="stylus">
-$font = 'SFProDisplay', sans-serif
-$magenta = #da68f5
-$blue = #0bccf7
-$green = #00f6d2
-$semiTransparent = rgba(255, 255, 255, 0.1)
-$darkBlue = #032e49
-$white = #ffffff
-$marginLeft = 30px
-
 .button {
-  font-family: $font
+  font-family: 'SFProDisplay', sans-serif
   min-height: 38px
-  min-width: min-content
-  padding: 11px 25px
+  min-width:  min-content
+  padding: 11px 22px
   border-radius: 50px
   display: flex
   flex-wrap: wrap
@@ -33,9 +29,15 @@ $marginLeft = 30px
   font-weight: bold
   border: none
   cursor: pointer
+  background-color: rgba(255, 255, 255, 0.1)
 
   &:not(.disabled):hover {
     box-shadow: 0 0 8px white
+  }
+
+  &.disabled {
+    opacity: 0.6
+    cursor: auto !important
   }
 
   &:focus {
@@ -43,90 +45,41 @@ $marginLeft = 30px
   }
 
   & .text {
-    line-height: 1
     font-weight: bold
-    align-self: center
   }
-}
 
-.disabled {
-  opacity: 0.3
-  cursor: auto !important
-}
+  &.reverse {
+    flex-direction: row-reverse
+  }
 
-.transparent {
-  min-height: min-content
-  border-radius: 0
-  background-color: transparent
-  padding: 0
+  &.transparent {
+    min-height: min-content
+    border-radius: 0
+    padding: 0
 
-  &:not(.disabled):hover {
+    &:not(.disabled):hover {
+      box-shadow: none
+    }
+  }
+
+  &.no-hover:hover {
     box-shadow: none
   }
-}
-
-.semiTransparent {
-  background-color: $semiTransparent
-}
-
-.trailingIcon {
-  flex-direction: row-reverse
-}
-
-.singleIcon {
-  img {
-    margin: 0
-  }
-}
-
-.marginLeft {
-  margin-left: $marginLeft
-}
-
-.hoverDisabled {
-  &:not(.disabled):hover {
-    box-shadow: none
-  }
-}
-
-.magenta {
-  background-color: $magenta
-}
-
-.blue {
-  background-color: $blue
-}
-
-.green {
-  background-color: $green
-}
-
-.black {
-  background-color: $black
-  color: #fff
 }
 </style>
 
 <script>
 export default {
   props: {
-    transparent: {
-      type: Boolean,
-      default: false,
-    },
-    semi_transparent: {
-      type: Boolean,
-      default: false,
-    },
-    color: {  // magenta, blue, green, semiTransparent, darkBlue
+    color: {  // magenta, blue, green, transparent, dark-blue
       type: String,
-      default: undefined,
+      default: undefined
     },
     icon: { // icon source
       type: String,
       default: undefined,
     },
-    icon_right: { // to put the icon to the right of the text
+    reverse: { // to put the icon to the right of the text
       type: Boolean,
       default: false,
     },
@@ -138,10 +91,6 @@ export default {
       type: String,
       default: undefined,
     },
-    margin_left: { // button's left margin
-      type: [Number, Boolean],
-      default: false
-    },
     disabled: {
       type: Boolean,
       default: false,
@@ -152,7 +101,7 @@ export default {
     },
     gap: {
       type: Number,
-      default: undefined
+      default: 5
     }
   },
 
@@ -162,12 +111,14 @@ export default {
         magenta: '#da68f5',
         blue: '#0bccf7',
         green: '#00f6d2',
-        semi_transparent: 'rgba(255, 255, 255, 0.1)',
         dark_blue: '#032e49',
         white: '#ffffff',
       },
-      styles: {
-        default_gap: '5',
+      button_colors: {
+        magenta: '#da68f5',
+        blue: '#0bccf7',
+        green: '#00f6d2',
+        transparent: 'transparent',
       }
     }
   },
@@ -176,60 +127,29 @@ export default {
     has_icon () {
       return !!this.$slots.default
     },
-    icon_position() {
-      if (this.has_icon && !this.text) {
-        return 'singleIcon'
-      }
-      
-      if (this.icon_right === true) {
-        return 'trailingIcon'
+
+    text_style() {
+      if (!this.text) {
+        return
       }
 
-      return undefined
+      let tcolor = this.text_color || (this.color == 'transparent' || this.color == undefined ? 'white' : 'dark-blue')
+      let res = {
+        'color': this.text_colors[tcolor]
+      }
+  
+      if (this.has_icon) {
+        let tgap_pos = this.reverse ? 'right' : 'left'
+        res[`margin-${tgap_pos}`] = `${this.gap}px`
+      }
+
+      return res
     },
-    transparency() {
-      if (this.transparent === true) {
-        return 'transparent'
-      }
 
-      if (this.semi_transparent === true) {
-        return 'semiTransparent'
+    button_style() {
+      return {
+        'background-color': this.button_colors[this.color]
       }
-
-      return undefined
-    },
-    color_text() {
-      if (this.text && this.text_color) {
-        return {
-          'color': this.text_colors[this.text_color],
-        }
-      }
-
-      return undefined
-    },
-    disabled_button() {
-      if (this.disabled) {
-        return 'disabled'
-      }
-
-      return undefined
-    },
-    gap_inner() {
-      if (typeof this.gap === 'number') {
-        return {'width': `${this.gap}px`}
-      }
-
-      if (this.has_icon && this.text) {
-        return {'width': `${this.styles.default_gap}px`}
-      }
-
-      return undefined
-    },
-    hover_effect() {
-      if (this.hover === false) {
-        return 'hoverDisabled'
-      }
-      return undefined
     }
   },
 }
