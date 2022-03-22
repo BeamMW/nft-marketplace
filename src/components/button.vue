@@ -24,7 +24,6 @@
   display: flex
   align-items: center
   font-size: 14px
-  font-weight: bold
   border: none
   cursor: pointer
   background-color: rgba(255, 255, 255, 0.1)
@@ -93,6 +92,10 @@ export default {
       type: String,
       default: undefined,
     },
+    text_bold: {
+      type: Boolean,
+      default: true,
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -143,6 +146,10 @@ export default {
       if (this.has_icon) {
         let tgap_pos = this.reverse ? 'right' : 'left'
         res[`margin-${tgap_pos}`] = `${this.gap}px`
+      }
+
+      if (!this.text_bold) {
+        res['font-weight'] = 'normal'
       }
 
       return res
