@@ -10,24 +10,28 @@
         <inputField v-model="name"
                     label="Artist Name*"
                     :valid="name_valid"
+                    :max_length="100"
                     style="margin-bottom:30px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
                     placeholder="https://website.name/"
                     img="glob"
+                    :max_length="250"
                     :valid="website_valid"
         />
         <inputField v-model="twitter"
                     label="Twitter"
                     placeholder="@twitter"
                     img="twitter"
+                    :max_length="15"
                     :valid="twitter_valid"
         />
         <inputField v-model="instagram"
                     label="Instagram"
                     placeholder="@instagram"
                     img="instagram"
+                    :max_length="30"
                     :valid="instagram_valid"
         />
       </div>
@@ -35,9 +39,11 @@
         <textAreaField v-model="about"
                        label="About me"
                        :valid="about_valid"
-                       :max-length="150"
+                       :max_length="150"
         />
         <div class="banner" :style="bannerStyles">
+          <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
+          <img v-if="banner" :src="banner" alt="avatar" class="image"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
                  type="file"
@@ -46,7 +52,9 @@
                  @change="onUploadBanner"
           />
         </div>
-        <div class="image" :style="avatarStyles">
+        <div class="avatar" :style="avatarStyles">
+          <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+          <img v-if="avatar" :src="avatar" alt="avatar" class="image"/>
           <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
           <input id="avatar"
                  type="file"
@@ -105,15 +113,29 @@
       display: flex
       align-items: center
       justify-content: center
+      position:relative
       height: 135px
       margin-top: 33px
       margin-bottom: 20px
       background-color: rgba(26, 246, 214, 0.1)
-      background-repeat: no-repeat
       border-radius: 10px
+
+      .remove {
+        position: absolute
+        top: 20px
+        right: 20px
+        cursor: pointer
+      }
+
+      .image {
+        width: 100%
+        height: 100%
+        object-fit: cover
+        border-radius: 10px
+      }
     }
 
-    .image {
+    .avatar {
       display: flex
       align-items: center
       justify-content: center
@@ -121,6 +143,22 @@
       width: 120px
       background-color: rgba(26, 246, 214, 0.1)
       border-radius: 9999px
+      position: relative
+
+      .remove {
+        position: absolute
+        left: 50%
+        top: 50%
+        transform: translate(-50%,-50%)
+        cursor: pointer
+      }
+    
+      .image {
+        width: 100%
+        height: 100%
+        object-fit: cover
+        border-radius: 9999px
+      }
     }
 
     .text {
@@ -174,13 +212,11 @@ export default {
   computed: {
     avatarStyles() {
       return {
-        'background': this.avatar ? `url(${this.avatar}) no-repeat center` : '',
         'border' :  this.avatar ? '' : '1px dashed #1AF6D6',
       }
     },
     bannerStyles() {
       return {
-        'background': this.banner ? `url(${this.banner}) no-repeat center` : '',
         'border' :  this.banner ? '' : '1px dashed #1AF6D6',
       }
     },
@@ -242,7 +278,13 @@ export default {
       this.loadImage(e, avatar => {
         this.avatar = avatar
       })
-    }
+    },
+    onRemoveBanner() {
+      this.banner = ''
+    },
+    onRemoveAvatar() {
+      this.avatar = ''
+    },
   }
 }
 </script>

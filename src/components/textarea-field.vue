@@ -5,13 +5,13 @@
               :value="modelValue"
               :placeholder="placeholder"
               class="input"
-              :maxlength="maxlen"
+              :maxlength="max_length"
               @input="$emit('update:modelValue', $event.target.value)"
     >
   </textarea>
     <div class="info">
-      <span class="text">{{ maxlen }} characters max</span> 
-      <span>{{ modelValue.length }} / {{ maxlen }} </span>
+      <span class="text">{{ max_length }} characters max</span> 
+      <span>{{ modelValue.length }} / {{ max_length }} </span>
     </div>
   </div>
 </template>
@@ -95,7 +95,7 @@ export default {
       type: Boolean,
       required: true
     },
-    maxlen:{
+    max_length:{
       type: Number,
       default: 150,
       required: true
