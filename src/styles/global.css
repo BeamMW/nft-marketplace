@@ -1,5 +1,5 @@
 html, body {
-  font-family: 'SFProDisplay', sans-serif;
+  font-family: 'SFProDisplay', sans-serif !important;
   font-weight: normal;
   height:      100%;
   width:       100%;

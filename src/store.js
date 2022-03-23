@@ -848,9 +848,9 @@ export const store = {
     this.setCurrentPage(1)
   },
 
-  showDetails(id) {
+  showArtworkDetails(id) {
     router.push({
-      name: 'details',
+      name: 'artwork',
       params: {
         id
       }
@@ -859,7 +859,13 @@ export const store = {
 
   toMyPage() {
     router.push({
-      name: 'my-page',
+      name: 'my-page'
+    })
+  },
+
+  becomeArtist() {
+    router.push({
+      name: 'artist'
     })
   }
 }

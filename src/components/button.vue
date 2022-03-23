@@ -17,10 +17,10 @@
 <style scoped lang="stylus">
 .button {
   font-family: 'SFProDisplay', sans-serif
-  min-height: 38px
+  height: min-content
   min-width:  min-content
-  padding: 11px 22px 11px 22px
   border-radius: 50px
+  box-sizing: border-box
   display: flex
   align-items: center
   font-size: 14px
@@ -106,7 +106,11 @@ export default {
     },
     gap: {
       type: Number,
-      default: 5
+      default: 9
+    },
+    padding: {
+      type: String,
+      default: '11px 22px'
     }
   },
 
@@ -157,7 +161,8 @@ export default {
 
     button_style() {
       return {
-        'background-color': this.button_colors[this.color]
+        'background-color': this.button_colors[this.color],
+        'padding': this.padding
       }
     }
   },

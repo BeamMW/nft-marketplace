@@ -24,6 +24,9 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
+        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist">
+          <img src="~assets/add-user.svg"/>
+        </btn>
       </div>
       <btn @click="onMyPage">
         <img src="~assets/icon-user.svg">
@@ -76,9 +79,14 @@
     display: flex
     margin-left: auto
     padding-right: 2px
+    align-items: center
 
     & > div:not(:last-child) {
       margin-right: 20px
+    }
+
+    & > *:last-child {
+      margin-right: 4px
     }
   }
 }
@@ -151,6 +159,9 @@ export default {
   },
 
   methods: {
+    onBecomeArtist() {
+      this.$store.becomeArtist()
+    },
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)
