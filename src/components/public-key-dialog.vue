@@ -4,55 +4,65 @@
       <div class="title">Public key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <img class="copy-icon" src="~assets/icon-copy.svg" @click="onClose"/>
+        <btn class="icon-copy" color="transparent" @click="onCopy">
+          <img src="~assets/icon-copy.svg"/>
+        </btn>
       </div>
       <div class="controls">
-        <artButton type="close" @click="close"/>
-        <artButton data="artist_key" type="copy" @click="onCopy"/>
+        <btn text="close" @click="close">
+          <img src="~assets/icon-cancel.svg"/>
+        </btn>
+        <btn text="copy and close" color="green" @click="onCopyAndClose">
+          <img src="~assets/icon-copy-blue.svg"/>
+        </btn>  
       </div>
     </div>
   </modal>
 </template>
 
 <style scoped lang="stylus">
-    .content {
-        display: flex
-        flex-direction: column
-        align-items: center
-        
-        .title {
-            font-size: 18px
-            font-weight: bold
-            color: #fff
-        }
-
-        .data {
-            margin-top: 30px
-            display: flex
-            flex-direction: row
-            align-items: center
-
-            .copy-icon {
-                margin-left: 10px
-                cursor: pointer
-            }
-        }
-        
-        .controls {
-            margin-top: 30px
-            display: flex
-            flex-direction: row
-        }
+  .content {
+    display: flex
+    flex-direction: column
+    align-items: center
+    
+    .title {
+      font-size: 18px
+      font-weight: bold
+      color: #fff
     }
+
+    .data {
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+      align-items: center
+
+      .icon-copy {
+        margin-left: 10px
+        cursor: pointer
+      }
+    }
+      
+    .controls {
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
+    }
+  }
 </style>
 
 <script>
 import modal from './modal.vue'
-import artButton from './art-button.js'
+import btn from './button.vue'
 
 export default {
   components: { 
-    modal, artButton
+    modal, btn
   },
 
   computed: {
@@ -62,6 +72,11 @@ export default {
   },
 
   methods: {
+    onCopyAndClose() {
+      this.onCopy()
+      this.close()
+    },
+  
     onCopy() {
       var textArea = document.createElement('textarea')
       textArea.style.position = 'fixed'
@@ -69,7 +84,6 @@ export default {
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
-      this.close()
             
       try {
         return document.execCommand('copy')

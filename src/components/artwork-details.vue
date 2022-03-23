@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <backBtn @click="$emit('back')"/>
+  <div id="container" class="container">
+    <backBtn/>
     <div class="details-row"> 
       <div class="artwork-container">
         <div class="artwork-box">
@@ -34,7 +34,7 @@
       </div>
     </div>  
     <div v-if="sales != undefined && sales.length" class="table-body">
-      <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${index}`" class="row">
+      <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${sales.length - index}`" class="row">
         <div>
           <img src="~assets/icon-beam.svg"/>
           <span class="curr">BEAM</span>
@@ -59,7 +59,8 @@
     flex-direction: column
     box-sizing: border-box
     padding-top: 15px
-    min-height: 0
+    width: 100%
+    height: 100%
 
     & .table-title {
       box-sizing: border-box
@@ -70,7 +71,7 @@
       font-weight: bold
       letter-spacing: 3.1px
     }
-
+    
     /*
      *  TABLE HEAD
      */ 
@@ -81,10 +82,10 @@
       font-size: 14px
       color: rgba(255, 255, 255, 0.5)
       display: flex
-      
+
       & > div {
-         padding: 9px 0px 12px 0px
-         text-align: center
+        padding: 9px 0px 12px 0px
+        text-align: center
 
         &.sorted {
           color: #fff
@@ -241,7 +242,7 @@
             margin-top: 8px
 
             & > span {
-              color: #00F6D2
+              color: #00f6d2
               margin-left: 4px
             }
           }
@@ -260,6 +261,7 @@ import artPrice from './artwork-price.vue'
 import backBtn from './back-btn.vue'
 import artPreview from './artwork-preview.vue'
 import utils from '../utils/utils.js'
+import {binary_search} from '../utils/search.js'
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -272,9 +274,10 @@ export default {
     artPreview,
     backBtn
   },
+
   props: {
-    artwork: {
-      type: Object,
+    id: {
+      type: Number,
       required: true
     }
   },
@@ -302,15 +305,17 @@ export default {
       return (this.artists[this.artwork.pk_author] || {}).label
     },
 
-    id () {
-      return this.artwork.id
+    artwork () {
+      let all = this.$state.artworks
+      let idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
+      return all[idx]
     },
 
     error () {
       return !!this.artwork.error
     }
   },
-
+  
   created() {
     // TODO: also update on new block
     this.$store.getSalesHistory(this.id, (sales) => {

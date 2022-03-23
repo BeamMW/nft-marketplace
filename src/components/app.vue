@@ -1,4 +1,5 @@
 <template>
+  <span id="modals"/>
   <error v-if="error" :error="error.error" :context="error.context"/>
   <loading v-else-if="loading"/>
   <router-view v-else></router-view>

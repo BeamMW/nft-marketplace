@@ -24,7 +24,9 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
-        <button @click="becomeArtist">Become an artist</button>
+        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist">
+          <img src="~assets/add-user.svg"/>
+        </btn>
       </div>
     </div>
   </div>
@@ -32,65 +34,71 @@
 
 <style scoped lang="stylus">
 .actions-container {
-    display: flex;
-    flex-direction: row;
+  display: flex
+  flex-direction: row
 
-    .artworks-controls {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        width: 100%;
+  .artworks-controls {
+    display: flex
+    flex-direction: row
+    align-items: center
+    width: 100%
         
-        .tabs {
-            display: flex;
-            flex-direction: row;
+    .tabs {
+      display: flex
+      flex-direction: row
 
-            .tab-active {
-                color: #fff;
-            }
+      .tab-active {
+        color: #fff
+      }
 
-            .tab-item {
-                color: rgba(255, 255, 255, .3);
-                font-size: 12px;
-                font-weight: bold;
-                cursor: pointer;
+      .tab-item {
+        color: rgba(255, 255, 255, 0.3)
+        font-size: 12px
+        font-weight: bold
+        cursor: pointer
 
-                .title {
-                    padding: 4px 16px;
-                    text-transform: uppercase;
-                }
-
-                .bottom-line {
-                    height: 2px;
-                    width: 100%;
-                    box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7);
-                    background-color: #00f6d2;
-                }
-            }
+        .title {
+          padding: 4px 16px
+          text-transform: uppercase
         }
-    }
-    
-    .selectors {
-        display: flex;
-        margin-left: auto;
-        padding-right: 2px;
-    
-        & > div:not(:last-child) {
-        margin-right: 20px;
+
+        .bottom-line {
+          height: 2px
+          width: 100%
+          box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7)
+          background-color: #00f6d2
         }
+      }
+    }
+  }
+    
+  .selectors {
+    display: flex
+    margin-left: auto
+    padding-right: 2px
+    align-items: center
+
+    & > div:not(:last-child) {
+      margin-right: 20px
     }
 
+    & > *:last-child {
+      margin-right: 4px
+    }
+  }
 }
 </style>
 
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
+import btn from './button.vue'
+
 export default {
   components: {
     selector,
+    btn
   },
-  emits: ['become-artist'],
 
   data() {
     return {
@@ -148,8 +156,8 @@ export default {
   },
 
   methods: {
-    becomeArtist() {
-      this.$emit('become-artist')
+    onBecomeArtist() {
+      this.$store.becomeArtist()
     },
     onTabClicked(id) {
       if (this.active_tab !== id) {

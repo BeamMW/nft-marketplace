@@ -14,58 +14,58 @@
 
 <style lang="stylus" scoped>
 .paginator {
-    display: flex
-    justify-content: center
-    align-items: center
-    margin-top: 10px
-    margin-bottom: 2px
+  display: flex
+  justify-content: center
+  align-items: center
+  margin-top: 10px
+  margin-bottom: 2px
 
-    & > .prev,
-    & > .next {
-        width: 68px !important
-        height: 22px
-        border-radius: 2px
-        background-color: rgba(255, 255, 255, .1)
-        color: rgba(255, 255, 255, .5)
-        font-size: 14px
-        text-align: center
-        user-select: none
+  & > .prev
+  & > .next {
+    width: 68px !important
+    height: 22px
+    border-radius: 2px
+    background-color: rgba(255, 255, 255, 0.1)
+    color: rgba(255, 255, 255, 0.5)
+    font-size: 14px
+    text-align: center
+    user-select: none
 
-        &[disabled="true"]{
-           color: rgba(255, 255, 255, .15)
-        }
-
-        &:hover:not([disabled="true"]) {
-           color: rgba(255, 255, 255, .9)
-           cursor: pointer
-        }
+    &[disabled="true"] {
+      color: rgba(255, 255, 255, 0.15)
     }
 
-    & > .prev {
-        margin: 0 13px 0 0
+    &:hover:not([disabled="true"]) {
+      color: rgba(255, 255, 255, 0.9)
+      cursor: pointer
+    }
+  }
+
+  & > .prev {
+    margin: 0 13px 0 0
+  }
+
+  & > .next {
+    margin: 0 0 0 16px
+  }
+  
+  & > .page {
+    margin: 3px 7px
+    font-size: 14px
+    color: rgba(255, 255, 255, 0.5)
+    cursor: pointer
+    user-select: none
+
+    &[selected="true"] {
+      cursor: auto
+      color: #00f6d2
     }
 
-    & > .next {
-        margin: 0 0 0 16px
+    &:hover:not([selected="true"]) {
+      color: rgba(255, 255, 255, 0.9)
+      cursor: pointer
     }
-    
-    & > .page {
-        margin: 3px 7px
-        font-size: 14px
-        color: rgba(255, 255, 255, 0.5)
-        cursor: pointer
-        user-select: none
-
-        &[selected="true"] {
-          cursor: auto
-          color: #00f6d2
-        }
-
-        &:hover:not([selected="true"]) {
-          color: rgba(255, 255, 255, .9)
-          cursor: pointer
-        }
-    }
+  }
 }
 </style>
 
@@ -80,7 +80,7 @@ export default {
       type: Number,
       default: 0
     },
-    pageRange: {
+    page_range: {
       type: Number,
       default: 2
     }
@@ -104,11 +104,11 @@ export default {
       return this.current < this.total
     },
     rangeStart () {
-      var start = this.current + this.pageRange <= this.total ? this.current - this.pageRange : this.total - this.pageRange
+      var start = this.current + this.page_range <= this.total ? this.current - this.page_range : this.total - this.page_range
       return (start > 0) ? start : 1
     },
     rangeEnd () {
-      var end = this.rangeStart + (this.current > this.pageRange ? this.pageRange * 2 : this.pageRange)
+      var end = this.rangeStart + (this.current > this.page_range ? this.page_range * 2 : this.page_range)
       return (end < this.total) ? end : this.total
     },
     pages () {

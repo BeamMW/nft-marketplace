@@ -1,11 +1,13 @@
-import gallery from './components/gallery.js'
-import details from './components/artwork-details.vue'
-import {createRouter, createWebHashHistory} from 'vue-router'
+import gallery from './components/gallery.vue'
+import artworkDetails from './components/artwork-details.vue'
+import artistDetails from './components/become-artist.vue'
+import {createRouter, createWebHistory} from 'vue-router'
 
 export const router = createRouter({
-  history: createWebHashHistory(),
-  routes:  [
+  history: createWebHistory(),
+  routes: [
     {path: '/', component: gallery, name: 'gallery'},
-    {path: '/details', component: details, name: 'details'},
+    {path: '/artwork/:id', component: artworkDetails, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
+    {path: '/artist', component: artistDetails, name: 'artist'}
   ]
 })

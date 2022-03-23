@@ -1,5 +1,5 @@
 <template>
-  <div class="back-btn">
+  <div class="back-btn" @click="$router.go(-1)">
     <img src="~assets/icon-back.svg"/>
     {{ text }}
   </div>
@@ -13,7 +13,7 @@
     font-size: 14px
     font-weight: bolder
     letter-spacing: 1.5px
-    opacity: 0.5
+    opacity: 0.9
 
     & img {
       margin-right: 0.25em
@@ -29,7 +29,7 @@ export default {
     text: {
       type: String,
       required: false,
-      default: 'back'
+      default: 'back to gallery'
     },
   }
 }

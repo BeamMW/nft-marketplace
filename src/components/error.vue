@@ -9,20 +9,20 @@
 
 <style scoped lang="stylus">
 .error {
-    display:         flex
-    align-items:     center
-    justify-content: center
-    height:          100%
-    width:           100%
-    overflow:        hidden
-    word-break:      break-word
-    color:           #C55B61 
+  display:         flex
+  align-items:     center
+  justify-content: center
+  height:          100%
+  width:           100%
+  overflow:        hidden
+  word-break:      break-word
+  color:           #c55b61 
 
-    & pre {
-        font-family: 'SFProDisplay', sans-serif
-        font-weight: normal
-        white-space: pre-wrap
-    }
+  & pre {
+    font-family: 'SFProDisplay', sans-serif
+    font-weight: normal
+    white-space: pre-wrap
+  }
 }
 </style>
 

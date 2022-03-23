@@ -6,17 +6,17 @@
 
 <style lang="stylus" scoped>
 .loading {
-    display:         flex
-    align-items:     center
-    justify-content: center
-    height:          100%
-    width:           100%
-    overflow:        hidden
-    word-break:      break-word   
+  display:         flex
+  align-items:     center
+  justify-content: center
+  height:          100%
+  width:           100%
+  overflow:        hidden
+  word-break:      break-word   
 
-    .darker {
-        opacity: 0.5
-    }
+  .darker {
+    opacity: 0.5
+  }
 }
 </style>
 

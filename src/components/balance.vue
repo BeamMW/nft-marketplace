@@ -6,118 +6,117 @@
       <div class="value">
         {{ balance_beam }} BEAM
       </div>
-      <div v-if="balance_beam" class="withdraw" @click="onWithdraw">
-        <img class="icon" src="~assets/icon-receive.svg"/>
-        <span class="text">withdraw</span>
-      </div>
+      <btn v-if="balance_beam" 
+           class="withdraw" 
+           text="withdraw"
+           text_color="blue"
+           color="transparent"
+           @click="onWithdraw"
+      >
+        <img src="~assets/icon-receive.svg">
+      </btn>
     </div>
     <div class="user" @click="onShowKey">
       <div v-if="my_artist_name" class="name">
         <img class="icon" src="~assets/icon-user.svg"/>
         <span class="text">{{ my_artist_name }}</span>
       </div>
-      <div class="key">
-        <img class="icon" src="~assets/icon-key.svg"/>
-        <span class="text">Show my public key</span>
-      </div>
+      <btn class="key"
+           text="Show my public key"
+           text_color="green"
+           :hover="false"
+      >
+        <img src="~assets/icon-key.svg">
+      </btn>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
 .balance-container {
+  display: flex
+  flex-direction: row
+  justify-content: space-between
+  align-content: center
+  margin-bottom: 10px
+
+  .balance {
+    width: 442px
+    height: 78px
+    border-radius: 10px
+    background-color: rgba(255,255,255,0.1)
     display: flex
     flex-direction: row
-    justify-content: space-between
-    align-content: center
-    margin-bottom: 10px
+    align-items: center
+    padding: 0 20px
+    padding-left: 20px
 
-    .balance {
-        width: 442px
-        height: 78px
-        border-radius: 10px
-        background-color: rgba(255,255,255,0.1)
-        display: flex
-        flex-direction: row
-        align-items: center
-        padding: 0 20px
-        padding-left: 20px
-
-        .value {
-            margin-left: 10px
-            font-size: 20px
-            font-weight: bold
-            color: #fff
-        }
-
-        .withdraw {
-            margin-left: auto
-            display: flex
-            align-items: center
-            cursor: pointer
-        }
-
-        .text {
-            margin-left: 8px
-            font-size: 14px
-            font-weight: bold
-            color: #0bccf7
-        }
+    .value {
+      margin-left: 10px
+      font-size: 20px
+      font-weight: bold
+      color: #fff
     }
 
-    .user {
-        display: flex
-        flex-direction: column
-        align-items: center
-
-        .icon {
-            width: 16px
-            height: 16px
-        }
-
-        .name {
-            padding-bottom: 12px
-            display: flex
-            align-items: center
-            
-            .text {
-                font-size: 18px
-                font-weight: bold
-                color: #fff
-                margin-left: 7px
-            }
-        }
-
-        .key {
-            padding: 14px
-            border-radius: 10px
-            background-color: rgba(255, 255, 255, .1)
-            display: flex
-            align-items: center
-            cursor: pointer
-
-            .text {
-                font-size: 16px
-                color: #00f6d2
-                margin-left: 10px
-            }
-
-            .connect {
-                font-size: 16px
-                color: #00f6d2
-            }
-        }
+    .withdraw {
+      margin-left: auto
     }
+
+    .text {
+      margin-left: 8px
+      font-size: 14px
+      font-weight: bold
+      color: #0bccf7
+    }
+  }
+
+  .user {
+    display: flex
+    flex-direction: column
+    align-items: center
+
+    .icon {
+      width: 16px
+      height: 16px
+    }
+
+    .name {
+      padding-bottom: 12px
+      display: flex
+      align-items: center
+      
+      .text {
+        font-size: 18px
+        font-weight: bold
+        color: #fff
+        margin-left: 7px
+      }
+    }
+
+    .key {
+      height: 48px 
+      padding: 14px
+      border-radius: 10px
+      font-size: 16px !important
+      
+      .connect {
+        font-size: 16px
+        color: #00f6d2
+      }
+    }
+  }
 }
 </style>
 
 <script>
 import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
+import btn from './button.vue'
 
 export default {
   components: {
-    publicKeyModal
+    publicKeyModal,
+    btn
   },
 
   computed: {

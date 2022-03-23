@@ -848,7 +848,18 @@ export const store = {
     this.setCurrentPage(1)
   },
 
-  showDetails(id) {
-    router.push({name: 'details'})
+  showArtworkDetails(id) {
+    router.push({
+      name: 'artwork',
+      params: {
+        id
+      }
+    })
   },
+
+  becomeArtist() {
+    router.push({
+      name: 'artist'
+    })
+  }
 }
