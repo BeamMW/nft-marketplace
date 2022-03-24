@@ -28,6 +28,9 @@
           <img src="~assets/add-user.svg"/>
         </btn>
       </div>
+      <btn @click="onMyPage">
+        <img src="~assets/icon-user.svg">
+      </btn>
     </div>
   </div>
 </template>
@@ -176,6 +179,9 @@ export default {
       if (this.$parent.$refs.artslist) {
         this.$parent.$refs.artslist.scrollTop = 0
       }
+    },
+    onMyPage() {
+      this.$store.toMyPage()
     }
   }
 }

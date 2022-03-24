@@ -14,7 +14,7 @@
         </btn>
         <btn text="copy and close" color="green" @click="onCopyAndClose">
           <img src="~assets/icon-copy-blue.svg"/>
-        </btn>  
+        </btn>
       </div>
     </div>
   </modal>
