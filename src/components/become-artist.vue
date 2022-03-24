@@ -310,7 +310,7 @@ export default {
     twitter_valid() {
       // TODO: real validation, not all chars are allowed
       let value = this.twitter
-      return !value || (value.startsWith('@') && value.length < 16)
+      return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
     },
     instagram_valid() {
       // TODO: real validation, not all chars are allowed
