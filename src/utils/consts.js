@@ -1,6 +1,7 @@
 export const common = { 
   GROTHS_IN_BEAM: 100000000,
-  ITEMS_PER_PAGE: 30
+  ITEMS_PER_PAGE: 30,
+  MAX_IMAGE_SIZE: 250 * 1024
 }
 
 export const tabs = {

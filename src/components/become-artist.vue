@@ -43,7 +43,7 @@
         />
         <div class="banner" :style="bannerStyles">
           <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
-          <img v-if="banner" :src="banner" alt="avatar" class="image" :class="{'error': !isBannerSizeValid}"/>
+          <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
                  type="file"
@@ -52,13 +52,13 @@
                  @change="onUploadBanner"
           />
         </div>
-        <div v-if="!isBannerSizeValid && banner" class="error_msg">
+        <div v-if="!banner_valid" class="error_msg">
           <p class="error">image cannot be larger than 250kb</p>
         </div>
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles">
             <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
-            <img v-if="avatar" :src="avatar" alt="avatar" class="image" :class="{'error': !isAvatarSizeValid}"/>
+            <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
             <input id="avatar"
                    type="file"
@@ -67,7 +67,7 @@
                    @change="onUploadAvatar"
             />
           </div>
-          <div v-if="!isAvatarSizeValid && avatar" class="error_msg">
+          <div v-if="!avatar_valid" class="error_msg">
             <p class="error">image cannot be larger than 250kb</p>
           </div>
         </div>
@@ -78,7 +78,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" @click="onCreate">
+    <btn text="create account" color="blue" :disabled="!can_submit" @click="onCreate">
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -234,6 +234,7 @@ import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
+import {common} from '../utils/consts.js'
 
 export default {
   components: {
@@ -249,10 +250,8 @@ export default {
       twitter: '',
       instagram: '',
       about: '',
-      banner:'',
-      avatar:'',
-      isBannerSizeValid: true,
-      isAvatarSizeValid: true,
+      banner: undefined,
+      avatar: undefined
     }
   },
 
@@ -299,10 +298,25 @@ export default {
       let value = this.about
       return !value || value.length <= 150
     },
+    banner_valid() {
+      return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
+    },
+    avatar_valid() {
+      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
+    },
     // TODO: add images validation, not more than 250kb
     // if image is larger that 250kb, apply red filter to image and
     //   - for banner just write on banner itself 'image cannot be larger than 250kb'
     //   - for avatar, ame at the right of avatar
+    can_submit () {
+      return this.name && this.name_valid &&
+             this.website_valid &&
+             this.twitter_valid &&
+             this.instagram_valid &&
+             this.about_valid &&
+             this.banner_valid &&
+             this.avatar_valid
+    }
   },
 
   methods: {    
@@ -311,31 +325,28 @@ export default {
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
-        cback(e.target.result)
-      }
-      if(Math.floor(file.size / 1024) > 250 && e.target.id === 'banner' ) {
-        this.isBannerSizeValid = false
-      } else {
-        this.isAvatarSizeValid = false
+        cback(e.target.result, file.size)
       }
     },
 
     onUploadBanner(e) {
-      this.loadImage(e, banner => {
-        this.banner = banner
+      this.loadImage(e, (data, size) => {
+        this.banner = {data, size}
       })
     },
 
     onUploadAvatar(e) {
-      this.loadImage(e, avatar => {
-        this.avatar = avatar
+      this.loadImage(e, (data, size) => {
+        this.avatar = {data: size}
       })
     },
+
     onRemoveBanner() {
-      this.banner = ''
+      this.banner = undefined
     },
+    
     onRemoveAvatar() {
-      this.avatar = ''
+      this.avatar = undefined
     },
   }
 }
