@@ -337,7 +337,7 @@ export default {
 
     onUploadAvatar(e) {
       this.loadImage(e, (data, size) => {
-        this.avatar = {data: size}
+        this.avatar = {data, size}
       })
     },
 
