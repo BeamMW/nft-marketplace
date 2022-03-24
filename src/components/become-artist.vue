@@ -308,14 +308,12 @@ export default {
              (url.toString() === value || url.toString() === value + '/')
     },
     twitter_valid() {
-      // TODO: real validation, not all chars are allowed
       let value = this.twitter
       return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
     },
     instagram_valid() {
-      // TODO: real validation, not all chars are allowed
       let value = this.instagram
-      return !value || (value.startsWith('@') && value.length <= 30)
+      return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
     },
     about_valid() {
       let value = this.about
