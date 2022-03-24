@@ -42,7 +42,9 @@
                        :max_length="150"
         />
         <div class="banner" :style="bannerStyles">
-          <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
+          <div v-if="banner" class="remove-container">
+            <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
+          </div>
           <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
@@ -57,7 +59,9 @@
         </div>
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles">
-            <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            <div v-if="avatar" class="remove-container">
+              <img src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            </div>
             <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
             <input id="avatar"
@@ -125,12 +129,19 @@
           background-color: rgba(26, 246, 214, 0.1)
           border-radius: 10px
 
-          .remove {
+          .remove-container {
+            background-color: rgba(0, 0, 0, 0.7)
             position: absolute
+            z-index: 2
             top: 20px
             right: 20px
-            cursor: pointer
-            z-index:3
+            border-radius: 9999px
+            padding: 7px 7px 3px 7px
+
+            .remove {
+              cursor: pointer
+              z-index: 3
+            }
           }
 
           .image {
@@ -182,13 +193,19 @@
             border-radius: 9999px
             position: relative
 
-            .remove {
+            .remove-container {
+              background-color: rgba(0, 0, 0, 0.7)
               position: absolute
               left: 50%
               top: 50%
               transform: translate(-50%,-50%)
-              cursor: pointer
-              z-index: 3
+              z-index: 2
+              border-radius: 9999px
+              padding: 7px 7px 3px 7px
+
+              .remove {
+                cursor: pointer
+              }
             }
 
             .files {
