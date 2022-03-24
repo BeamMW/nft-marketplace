@@ -111,7 +111,7 @@
         margin-left: 30px
 
         .error_msg {
-          margin-top: -10px
+          margin-top: -18px
         }
 
         .banner {
@@ -138,6 +138,7 @@
             height: 100%
             object-fit: cover
             border-radius: 10px
+            border: 1px dashed transparent
 
             &.error {
               filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
@@ -151,8 +152,10 @@
         }
 
         .error {
-          text-align: right
+          font-size: 12px
+          font-weight: 400
           font-style: italic
+          text-align: right
         }
 
         .container-avatar {
@@ -165,6 +168,8 @@
 
           .error {
             font-style: italic
+            font-size: 12px
+            font-weight: 400
           }
           
           .avatar {
@@ -196,6 +201,7 @@
               height: 100%
               object-fit: cover
               border-radius: 9999px
+              border: 1px dashed transparent
 
               &.error {
                 filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
@@ -258,12 +264,12 @@ export default {
   computed: {
     avatarStyles() {
       return {
-        'border' :  this.avatar ? '' : '1px dashed #1AF6D6',
+        'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
     bannerStyles() {
       return {
-        'border' :  this.banner ? '' : '1px dashed #1AF6D6',
+        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
     name_valid() {

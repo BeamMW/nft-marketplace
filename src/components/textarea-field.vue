@@ -36,11 +36,11 @@
       border: none
       outline-width: 0
       font-size: 14px
-      color: #0bccf7
+      color: white
       height: 100%
       padding: 0
       border-radius: 10px
-      padding: 12px 8px
+      padding: 12px 15px 
       width: 100%
       resize: none
       min-height: 79px
