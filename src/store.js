@@ -434,7 +434,7 @@ export const store = {
   },
 
   loadArtwork(tab, idx, id) {
-    console.log(`Load Artwork: idx ${idx}, id ${id}`)
+    // console.log(`Load Artwork: idx ${idx}, id ${id}`)
     this.state.pending_artworks++
     utils.invokeContract(
       `role=user,action=download,cid=${this.state.cid},id=${id}`, 
@@ -854,6 +854,12 @@ export const store = {
       params: {
         id
       }
+    })
+  },
+
+  toMyPage() {
+    router.push({
+      name: 'my-page'
     })
   },
 

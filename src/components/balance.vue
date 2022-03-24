@@ -24,6 +24,7 @@
       <btn class="key"
            text="Show my public key"
            text_color="green"
+           :text_bold="false"
            :hover="false"
       >
         <img src="~assets/icon-key.svg">
@@ -97,7 +98,7 @@
       height: 48px 
       padding: 14px
       border-radius: 10px
-      font-size: 16px !important
+      font-size: 16px
       
       .connect {
         font-size: 16px
