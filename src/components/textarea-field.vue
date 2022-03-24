@@ -1,55 +1,58 @@
 <template>
-  <div :class="['area-container', id === 'name' ? 'name_input' : '']">
-    <label v-if="label" class="label_elem">{{ label }}</label>
+  <div class="container">
+    <label v-if="label" class="label">{{ label }}</label>
     <textarea v-bind="$attrs"
               :value="modelValue"
               :placeholder="placeholder"
-              :class="['input_elem', valid ? '' : 'error_elem']"
+              class="input"
+              :maxlength="max_length"
               @input="$emit('update:modelValue', $event.target.value)"
     >
   </textarea>
     <div class="info">
-      <span class="text">{{ maxlen }} characters max</span> 
-      <span>{{ modelValue.length }} / {{ maxlen }} </span>
+      <span class="text">{{ max_length }} characters max</span> 
+      <span>{{ modelValue.length }} / {{ max_length }} </span>
     </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .area-container {
+  .container {
     width: 100%
     box-sizing: border-box
 
-    .label_elem {
+    .label {
       display: block
       margin-bottom:10px
+      color: rgba(255, 255, 255, 0.6)
+      font-family: 'SFProDisplay', sans-serif
+      font-size: 14px
     }
 
-    .error_elem {
-      color:red!important
-    }
-
-    .input_elem {
+    .input {
       box-sizing: border-box
+      font-family: 'SFProDisplay', sans-serif
       background-color: rgba(255, 255, 255, 0.05)
       border: none
-      font-size: 24px
+      outline-width: 0
+      font-size: 14px
       color: #0bccf7
       height: 100%
       padding: 0
       border-radius: 10px
-      padding: 8px
+      padding: 12px 8px
       width: 100%
       resize: none
       min-height: 79px
 
-      &:focus {
-        outline-width: 0
-      }
-
       &::placeholder {
         font-size: 14px
         color: rgba(255, 255, 255, 0.3)
+      }
+
+      &:focus {
+        background-color: rgba(255, 255, 255, 0.1)
+        outline-width: 0
       }
     }
 
@@ -83,16 +86,11 @@ export default {
       default: '',
       required: true
     },
-    id:{
-      type: String,
-      default: '',
-      required: true
-    },
     valid:{
       type: Boolean,
       required: true
     },
-    maxlen:{
+    max_length:{
       type: Number,
       default: 150,
       required: true

@@ -8,6 +8,7 @@
       <input :value="modelValue"
              :placeholder="placeholder"
              :style="style"
+             :maxlength="max_length"
              :class="{'input': true, 'error': !valid}"
              @input="$emit('update:modelValue', $event.target.value)"
       />
@@ -109,6 +110,11 @@ export default {
       type: String,
       default:'',
       required: false,
+    },
+    max_length:{
+      type: Number,
+      default: 10,
+      required: true
     }
   },
 
