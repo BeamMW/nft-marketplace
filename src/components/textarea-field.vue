@@ -86,11 +86,6 @@ export default {
       default: '',
       required: true
     },
-    id:{
-      type: String,
-      default: '',
-      required: true
-    },
     valid:{
       type: Boolean,
       required: true

@@ -43,7 +43,7 @@
         />
         <div class="banner" :style="bannerStyles">
           <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
-          <img v-if="banner" :src="banner" alt="avatar" class="image"/>
+          <img v-if="banner" :src="banner" alt="avatar" class="image" :class="{'error': !isBannerSizeValid}"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
                  type="file"
@@ -52,16 +52,24 @@
                  @change="onUploadBanner"
           />
         </div>
-        <div class="avatar" :style="avatarStyles">
-          <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
-          <img v-if="avatar" :src="avatar" alt="avatar" class="image"/>
-          <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
-          <input id="avatar"
-                 type="file"
-                 accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-                 class="files"
-                 @change="onUploadAvatar"
-          />
+        <div v-if="!isBannerSizeValid && banner" class="error_msg">
+          <p class="error">image cannot be larger than 250kb</p>
+        </div>
+        <div class="container-avatar">
+          <div class="avatar" :style="avatarStyles">
+            <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            <img v-if="avatar" :src="avatar" alt="avatar" class="image" :class="{'error': !isAvatarSizeValid}"/>
+            <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
+            <input id="avatar"
+                   type="file"
+                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                   class="files"
+                   @change="onUploadAvatar"
+            />
+          </div>
+          <div v-if="!isAvatarSizeValid && avatar" class="error_msg">
+            <p class="error">image cannot be larger than 250kb</p>
+          </div>
         </div>
       </div>
     </div>
@@ -101,63 +109,100 @@
       .col-second {
         flex-basis: 50%
         margin-left: 30px
-        
-        .files {
-          visibility:hidden
-          width: 0
+
+        .error_msg {
+          margin-top: -10px
         }
-      }
-    }
 
-    .banner {
-      display: flex
-      align-items: center
-      justify-content: center
-      position:relative
-      height: 135px
-      margin-top: 33px
-      margin-bottom: 20px
-      background-color: rgba(26, 246, 214, 0.1)
-      border-radius: 10px
+        .banner {
+          display: flex
+          align-items: center
+          justify-content: center
+          position:relative
+          height: 135px
+          margin-top: 33px
+          margin-bottom: 20px
+          background-color: rgba(26, 246, 214, 0.1)
+          border-radius: 10px
 
-      .remove {
-        position: absolute
-        top: 20px
-        right: 20px
-        cursor: pointer
-      }
+          .remove {
+            position: absolute
+            top: 20px
+            right: 20px
+            cursor: pointer
+            z-index:3
+          }
 
-      .image {
-        width: 100%
-        height: 100%
-        object-fit: cover
-        border-radius: 10px
-      }
-    }
+          .image {
+            width: 100%
+            height: 100%
+            object-fit: cover
+            border-radius: 10px
 
-    .avatar {
-      display: flex
-      align-items: center
-      justify-content: center
-      height: 120px
-      width: 120px
-      background-color: rgba(26, 246, 214, 0.1)
-      border-radius: 9999px
-      position: relative
+            &.error {
+              filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
+            }
+          }
+          
+          .files {
+            visibility:hidden
+            width: 0
+          }
+        }
 
-      .remove {
-        position: absolute
-        left: 50%
-        top: 50%
-        transform: translate(-50%,-50%)
-        cursor: pointer
-      }
-    
-      .image {
-        width: 100%
-        height: 100%
-        object-fit: cover
-        border-radius: 9999px
+        .error {
+          text-align: right
+          font-style: italic
+        }
+
+        .container-avatar {
+          display: flex
+          
+          .error_msg {
+            align-self: center
+            margin-left: 10px
+          }
+
+          .error {
+            font-style: italic
+          }
+          
+          .avatar {
+            display: flex
+            align-items: center
+            justify-content: center
+            height: 120px
+            width: 120px
+            background-color: rgba(26, 246, 214, 0.1)
+            border-radius: 9999px
+            position: relative
+
+            .remove {
+              position: absolute
+              left: 50%
+              top: 50%
+              transform: translate(-50%,-50%)
+              cursor: pointer
+              z-index: 3
+            }
+
+            .files {
+              visibility:hidden
+              width: 0
+            }
+          
+            .image {
+              width: 100%
+              height: 100%
+              object-fit: cover
+              border-radius: 9999px
+
+              &.error {
+                filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
+              }
+            }
+          }
+        }
       }
     }
 
@@ -205,7 +250,9 @@ export default {
       instagram: '',
       about: '',
       banner:'',
-      avatar:''
+      avatar:'',
+      isBannerSizeValid: true,
+      isAvatarSizeValid: true,
     }
   },
 
@@ -251,7 +298,7 @@ export default {
     about_valid() {
       let value = this.about
       return !value || value.length <= 150
-    }
+    },
     // TODO: add images validation, not more than 250kb
     // if image is larger that 250kb, apply red filter to image and
     //   - for banner just write on banner itself 'image cannot be larger than 250kb'
@@ -265,6 +312,11 @@ export default {
       reader.readAsDataURL(file)
       reader.onload = (e) => {
         cback(e.target.result)
+      }
+      if(Math.floor(file.size / 1024) > 250 && e.target.id === 'banner' ) {
+        this.isBannerSizeValid = false
+      } else {
+        this.isAvatarSizeValid = false
       }
     },
 
