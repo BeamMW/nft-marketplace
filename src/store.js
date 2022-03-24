@@ -863,6 +863,12 @@ export const store = {
     })
   },
 
+  toMyBalance() {
+    router.push({
+      name: 'my-balance'
+    })
+  },
+
   becomeArtist() {
     router.push({
       name: 'artist'

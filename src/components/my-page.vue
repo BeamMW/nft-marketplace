@@ -1,13 +1,13 @@
 <template>
   <publicKeyModal ref="keyModal"/>
   <div class="header">
-    <backBtn @click="$router.go(-1)"/>
+    <backBtn/>
     <h1 class="title">MY PAGE</h1>
     <div class="options">
       <btn :hover="false">
         <img src="~assets/icon-heart.svg">
       </btn>
-      <btn :hover="false">
+      <btn :hover="false" @click="onWalletClick">
         <img src="~assets/icon-eye-crossed.svg">
       </btn>
       <btn :hover="false" @click="onShowKeyClick">
@@ -19,6 +19,7 @@
 
 <style scoped lang="stylus">
 .header {
+  height: 36px
   display: flex
   flex-direction: row
   align-items: center
@@ -30,21 +31,23 @@
     flex-basis: 0
   }
 
-  & > .title {
+  .title {
     font-size: 14px
     letter-spacing: 3.11px
     text-align: center
   }
 
-  & > .options {
+  .options {
     height: 36px
     display: flex
     justify-content: flex-end
 
     & > button {
-      width: 36px
+      max-width: 36px
+      height: 36px
       border-radius: 10px
-      padding: 5px 12px
+      display: flex
+      justify-content: center
       margin-left: 20px
     }
   }
@@ -63,9 +66,12 @@ export default {
     publicKeyModal
   },
   methods: {
-    onShowKeyClick () {
+    onShowKeyClick() {
       this.$refs.keyModal.open()
     },
+    onWalletClick() {
+      this.$store.toMyBalance()
+    }
   },
 }
 </script>
