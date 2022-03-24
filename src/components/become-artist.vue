@@ -325,10 +325,6 @@ export default {
     avatar_valid() {
       return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
     },
-    // TODO: add images validation, not more than 250kb
-    // if image is larger that 250kb, apply red filter to image and
-    //   - for banner just write on banner itself 'image cannot be larger than 250kb'
-    //   - for avatar, ame at the right of avatar
     can_submit () {
       return this.name && this.name_valid &&
              this.website_valid &&
