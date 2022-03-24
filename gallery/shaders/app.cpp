@@ -948,12 +948,7 @@ ON_METHOD(user, buy)
     fc.m_Amount = m.m_Price.m_Amount;
     fc.m_Aid = m.m_Price.m_Aid;
 
-    Height h = Env::get_Height();
-    PubKey empty_pk;
-    Secp_scalar_data empty_ssd;
-    Env::GenerateKernelAdvanced(
-            &cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Gallery buy item", 0,
-            h + 1, h + 5, empty_pk, empty_pk, empty_ssd, 0, 0, nullptr);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Gallery buy item", 0);
 }
 
 struct BalanceWalkerOwner
