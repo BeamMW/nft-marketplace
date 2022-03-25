@@ -24,11 +24,15 @@
                   title="Sort by"
                   @selected="onSortBy"
         />
-        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist">
-          <img src="~assets/add-user.svg"/>
-        </btn>
       </div>
-      <btn @click="onMyPage">
+
+      <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+        <img src="~assets/add-user.svg"/>
+      </btn>
+
+      <btnWallet @click="onBalanceClick"/>
+      
+      <btn class="user" width="34px" height="34px" padding="0" :hover="false" @click="onMyPage">
         <img src="~assets/icon-user.svg">
       </btn>
     </div>
@@ -73,6 +77,14 @@
         }
       }
     }
+
+    & button {
+      margin-left: 20px
+    }
+    
+    & .user {
+      border-radius: 10px
+    }
   }
     
   .selectors {
@@ -90,17 +102,20 @@
     }
   }
 }
+
 </style>
 
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
 import btn from './button.vue'
+import btnWallet from './button-wallet.vue'
 
 export default {
   components: {
     selector,
-    btn
+    btn,
+    btnWallet
   },
 
   data() {
@@ -182,6 +197,9 @@ export default {
     },
     onMyPage() {
       this.$store.toMyPage()
+    },
+    onBalanceClick() {
+      this.$store.toBalance()
     }
   }
 }

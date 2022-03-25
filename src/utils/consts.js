@@ -3,6 +3,12 @@ export const common = {
   ITEMS_PER_PAGE: 30
 }
 
+export const styles = {
+  HEIGHT: '34px',
+  WIDTH: '34px',
+  PADDING: '0'
+}
+
 export const tabs = {
   ALL: 0,
   MINE: 1,

@@ -863,9 +863,9 @@ export const store = {
     })
   },
 
-  toMyBalance() {
+  toBalance() {
     router.push({
-      name: 'my-balance'
+      name: 'balance'
     })
   },
 
