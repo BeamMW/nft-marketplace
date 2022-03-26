@@ -17,52 +17,52 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
-    width: 100%
+.container {
+  width: 100%
+  box-sizing: border-box
+
+  .label {
+    display: block
+    margin-bottom:10px
+    color: rgba(255, 255, 255, 0.6)
+    font-family: 'SFProDisplay', sans-serif
+    font-size: 14px
+  }
+
+  .input {
     box-sizing: border-box
+    font-family: 'SFProDisplay', sans-serif
+    background-color: rgba(255, 255, 255, 0.05)
+    border: none
+    outline-width: 0
+    font-size: 14px
+    color: white
+    height: 100%
+    padding: 0
+    border-radius: 10px
+    padding: 12px 15px 
+    width: 100%
+    resize: none
+    min-height: 79px
 
-    .label {
-      display: block
-      margin-bottom:10px
-      color: rgba(255, 255, 255, 0.6)
-      font-family: 'SFProDisplay', sans-serif
+    &::placeholder {
       font-size: 14px
+      color: rgba(255, 255, 255, 0.3)
     }
 
-    .input {
-      box-sizing: border-box
-      font-family: 'SFProDisplay', sans-serif
-      background-color: rgba(255, 255, 255, 0.05)
-      border: none
+    &:focus {
+      background-color: rgba(255, 255, 255, 0.1)
       outline-width: 0
-      font-size: 14px
-      color: #0bccf7
-      height: 100%
-      padding: 0
-      border-radius: 10px
-      padding: 12px 8px
-      width: 100%
-      resize: none
-      min-height: 79px
-
-      &::placeholder {
-        font-size: 14px
-        color: rgba(255, 255, 255, 0.3)
-      }
-
-      &:focus {
-        background-color: rgba(255, 255, 255, 0.1)
-        outline-width: 0
-      }
     }
+  }
 
-    .info {
-      display: flex
-      justify-content: space-between
-      font-style: italic
-      font-weight: 400
-      font-size: 12px
-    }
+  .info {
+    display: flex
+    justify-content: space-between
+    font-style: italic
+    font-weight: 400
+    font-size: 12px
+  }
 }
 </style>
 

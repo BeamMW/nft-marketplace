@@ -42,7 +42,9 @@
                        :max_length="150"
         />
         <div class="banner" :style="bannerStyles">
-          <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
+          <div v-if="banner" class="remove-container">
+            <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
+          </div>
           <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
@@ -57,7 +59,9 @@
         </div>
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles">
-            <img v-if="avatar" src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            <div v-if="avatar" class="remove-container">
+              <img src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            </div>
             <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
             <input id="avatar"
@@ -111,7 +115,7 @@
         margin-left: 30px
 
         .error_msg {
-          margin-top: -10px
+          margin-top: -18px
         }
 
         .banner {
@@ -125,12 +129,19 @@
           background-color: rgba(26, 246, 214, 0.1)
           border-radius: 10px
 
-          .remove {
+          .remove-container {
+            background-color: rgba(0, 0, 0, 0.7)
             position: absolute
+            z-index: 2
             top: 20px
             right: 20px
-            cursor: pointer
-            z-index:3
+            border-radius: 9999px
+            padding: 7px 7px 3px 7px
+
+            .remove {
+              cursor: pointer
+              z-index: 3
+            }
           }
 
           .image {
@@ -138,6 +149,7 @@
             height: 100%
             object-fit: cover
             border-radius: 10px
+            border: 1px dashed transparent
 
             &.error {
               filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
@@ -151,8 +163,10 @@
         }
 
         .error {
-          text-align: right
+          font-size: 12px
+          font-weight: 400
           font-style: italic
+          text-align: right
         }
 
         .container-avatar {
@@ -165,6 +179,8 @@
 
           .error {
             font-style: italic
+            font-size: 12px
+            font-weight: 400
           }
           
           .avatar {
@@ -177,13 +193,19 @@
             border-radius: 9999px
             position: relative
 
-            .remove {
+            .remove-container {
+              background-color: rgba(0, 0, 0, 0.7)
               position: absolute
               left: 50%
               top: 50%
               transform: translate(-50%,-50%)
-              cursor: pointer
-              z-index: 3
+              z-index: 2
+              border-radius: 9999px
+              padding: 7px 7px 3px 7px
+
+              .remove {
+                cursor: pointer
+              }
             }
 
             .files {
@@ -196,6 +218,7 @@
               height: 100%
               object-fit: cover
               border-radius: 9999px
+              border: 1px dashed transparent
 
               &.error {
                 filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
@@ -258,12 +281,12 @@ export default {
   computed: {
     avatarStyles() {
       return {
-        'border' :  this.avatar ? '' : '1px dashed #1AF6D6',
+        'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
     bannerStyles() {
       return {
-        'border' :  this.banner ? '' : '1px dashed #1AF6D6',
+        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
     name_valid() {
@@ -285,14 +308,12 @@ export default {
              (url.toString() === value || url.toString() === value + '/')
     },
     twitter_valid() {
-      // TODO: real validation, not all chars are allowed
       let value = this.twitter
-      return !value || (value.startsWith('@') && value.length < 16)
+      return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
     },
     instagram_valid() {
-      // TODO: real validation, not all chars are allowed
       let value = this.instagram
-      return !value || (value.startsWith('@') && value.length <= 30)
+      return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
     },
     about_valid() {
       let value = this.about
@@ -304,10 +325,6 @@ export default {
     avatar_valid() {
       return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
     },
-    // TODO: add images validation, not more than 250kb
-    // if image is larger that 250kb, apply red filter to image and
-    //   - for banner just write on banner itself 'image cannot be larger than 250kb'
-    //   - for avatar, ame at the right of avatar
     can_submit () {
       return this.name && this.name_valid &&
              this.website_valid &&
