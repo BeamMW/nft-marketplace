@@ -5,12 +5,11 @@
     <div class="balance">
       <div>
         <div class="description">Current balance</div>
-        <amount/>
+        <amount :amount="balance"/>
       </div>
 
-      <div class="withdraw">
-        <btn v-if="balance_beam" 
-             text="withdraw"
+      <div v-if="balance" class="withdraw">
+        <btn text="withdraw"
              text_color="blue"
              color="transparent"
              height="20px"
@@ -61,14 +60,13 @@
       align-self: end
       display: flex
       justify-content: flex-end
-      padding-bottom: 3px
+      padding-bottom: 10px
     }
   }
 }
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
 import btn from './button.vue'
 import pageTitle from './page-title.vue'
@@ -90,9 +88,10 @@ export default {
   },
 
   computed: {
-    balance_beam () {
-      return this.$state.balance_beam / common.GROTHS_IN_BEAM
+    balance () {
+      return this.$state.balance
     },
+
     my_artist_name () {
       let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
                          this.$state.artists[this.$state.my_artist_keys[1]]

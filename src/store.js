@@ -32,7 +32,8 @@ function defaultState() {
     pending_artworks: 0,
     is_headless: false,
     current_page: 1,
-    use_ipfs: true
+    use_ipfs: true,
+    gallery_tab: tabs.COLLECTIONS
   }
 }
 
@@ -848,6 +849,10 @@ export const store = {
     this.setCurrentPage(1)
   },
 
+  setGalleryTab(id) {
+    this.state.gallery_tab = id
+  },
+
   showArtworkDetails(id) {
     router.push({
       name: 'artwork',
@@ -869,7 +874,7 @@ export const store = {
     })
   },
 
-  becomeArtist() {
+  toBecomeArtist() {
     router.push({
       name: 'artist'
     })

@@ -26,13 +26,16 @@
       />
     </div>
 
-    <btnWallet @click="onBalance"/>
+    <btnWallet v-if="!is_artist" @click="onBalance"/>
     
-    <btn class="user" width="34px" height="34px" padding="0px" radius="10px" @click="onMyPage">
+    <btn v-if="is_artist" class="user" height="34px" gap="9"
+         :text="my_artist_name"
+         @click="onMyPage"
+    >
       <img src="~assets/icon-user.svg">
     </btn>
 
-    <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+    <btn v-else text="become an artist" color="green" height="34px" @click="onBecomeArtist">
       <img src="~assets/add-user.svg"/>
     </btn>
   </div>
@@ -125,6 +128,14 @@ export default {
   },
   
   computed: {
+    is_artist () {
+      return this.$state.is_artist
+    },
+    my_artist_name () {
+      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
+                   this.$state.artists[this.$state.my_artist_keys[1]]
+      return (artist || {}).label
+    },
     active_tab () {
       return this.$state.active_tab
     },

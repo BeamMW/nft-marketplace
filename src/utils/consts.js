@@ -10,6 +10,8 @@ export const tabs = {
   SALE: 2,
   LIKED: 3,
   SOLD: 4,
+  COLLECTIONS: 5,
+  NFTS: 6,
 }
 
 export const sort = {
