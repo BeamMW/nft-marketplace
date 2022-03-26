@@ -2,13 +2,13 @@
   <publicKeyModal ref="keyModal"/>
   <pageTitle title="my page">
     <div class="options">
-      <btn :hover="false" :height="height" :width="width" :padding="padding">
+      <btn :height="height" :width="width" padding="0px" radius="10px">
         <img src="~assets/icon-pencil.svg">
       </btn>
 
       <btnWallet @click="onBalanceClick"/>
       
-      <btn :hover="false" :height="height" :width="width" :padding="padding" @click="onShowKeyClick">
+      <btn :height="height" :width="width" radius="10px" padding="0px" @click="onShowKeyClick">
         <img src="~assets/icon-key.svg">
       </btn>
     </div>
@@ -24,6 +24,11 @@
   & > button {
     border-radius: 10px
     margin-left: 20px
+    margin-top: 7px
+
+    &:last-child {
+      margin-right: 7px
+    }
   }
 }
 </style>
@@ -33,8 +38,6 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
 import publicKeyModal from './public-key-dialog.vue'
-
-import {styles} from '../utils/consts'
 
 export default {
   components: {
@@ -46,9 +49,8 @@ export default {
 
   data() {
     return {
-      width: styles.WIDTH,
-      height: styles.HEIGHT,
-      padding: styles.PADDING
+      width: '34px',
+      height: '34px'
     }
   },
 

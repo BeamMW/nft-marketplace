@@ -18,7 +18,6 @@
 .button {
   font-family: 'SFProDisplay', sans-serif
   white-space: nowrap
-  border-radius: 50px
   box-sizing: border-box
   display: flex
   align-items: center
@@ -39,10 +38,6 @@
 
   &:focus {
     outline: none
-  }
-
-  & .text {
-    font-weight: bold
   }
 
   &.reverse {
@@ -90,9 +85,9 @@ export default {
       type: String,
       default: undefined,
     },
-    text_normal: {
+    text_bold: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     disabled: {
       type: Boolean,
@@ -117,6 +112,10 @@ export default {
     width: {
       type: String,
       default: 'fit-content'
+    },
+    radius: {
+      type: String,
+      default: '50px'
     }
   },
 
@@ -150,16 +149,13 @@ export default {
 
       let tcolor = this.text_color || (this.color == 'transparent' || this.color == undefined ? 'white' : 'dark-blue')
       let res = {
-        'color': this.text_colors[tcolor]
+        'color': this.text_colors[tcolor],
+        'font-weight': this.text_bold ? 'bold' : 'normal'
       }
   
       if (this.has_icon) {
         let tgap_pos = this.reverse ? 'right' : 'left'
         res[`margin-${tgap_pos}`] = `${this.gap}px`
-      }
-
-      if (this.text_normal) {
-        res['font-weight'] = 'normal'
       }
 
       return res
@@ -170,7 +166,8 @@ export default {
         'background-color': this.button_colors[this.color],
         'padding': this.padding,
         'height': this.height,
-        'width': this.width
+        'width': this.width,
+        'border-radius': this.radius
       }
     }
   },

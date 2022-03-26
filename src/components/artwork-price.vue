@@ -2,9 +2,7 @@
   <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork"/>
   <!---- has price & owned, display change price / remove from sale options ---->
   <span v-if="price && owned" class="container">
-    <img src="~assets/icon-beam.svg"/>
-    <span class="amount">{{ amount }}</span>
-    <span class="curr">BEAM</span>
+    <amount :amount="price.amount"/>
     <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu"/>
     <popupMenu ref="saleMenu">
       <div class="item" @click="onChangePrice">
@@ -20,9 +18,7 @@
 
   <!---- has price but not owned, can buy ---->
   <span v-if="price && !owned" class="container">
-    <img src="~assets/icon-beam.svg"/>
-    <span class="amount">{{ amount }}</span>
-    <span class="curr">BEAM</span>
+    <amount :amount="price.amount"/>
     <btn text="buy" color="magenta" @click="onBuy">
       <img src="~assets/icon-button.svg">
     </btn>
@@ -79,16 +75,17 @@
 </style>
 
 <script>
-import utils from '../utils/utils.js'
 import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
 import artworkPriceModal from './price-dialog.vue'
+import amount from './amount.vue'
 
 export default {
   components: {
     btn,
     popupMenu,
     artworkPriceModal,
+    amount
   },
 
   props: {
@@ -113,14 +110,7 @@ export default {
 
     price() {
       return this.artwork.price
-    },
-
-    amount() {
-      if (this.price) {
-        return utils.formatAmount(this.price.amount)
-      }
-      return undefined
-    },
+    }
   },
 
   methods: {

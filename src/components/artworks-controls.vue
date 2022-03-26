@@ -1,93 +1,74 @@
 <template>
   <div class="actions-container">
-    <div class="artworks-controls">
-      <div class="tabs">
-        <span v-for="(tab) of tabs_sort_by"
-              :key="tab.id"
-              :class="[ active_tab === tab.id ? 'tab-active' : '','tab-item']" 
-              @click="onTabClicked(tab.id)"
-        >
-          <div class="title">{{ tab.name }}</div>
-          <div v-if="active_tab === tab.id" class="bottom-line"></div>
-        </span>
-      </div>
-      <div class="selectors">
-        <!-- <selector
-                v-on:selected="onAuthor"
-                :options="artist_options"
-                :selected="active_filter_by_artist"
-                title="Author"
-                v-if="artist_options.length"
-            /> -->
-        <selector :options="selector_options"
-                  :selected="active_sort_by"
-                  title="Sort by"
-                  @selected="onSortBy"
-        />
-      </div>
-
-      <btnWallet @click="onBalanceClick"/>
-      
-      <btn class="user" width="34px" height="34px" padding="0" @click="onMyPage">
-        <img src="~assets/icon-user.svg">
-      </btn>
-
-      <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
-        <img src="~assets/add-user.svg"/>
-      </btn>
+    <div class="tabs">
+      <span v-for="(tab) of tabs_sort_by"
+            :key="tab.id"
+            :class="[ active_tab === tab.id ? 'tab-active' : '','tab-item']" 
+            @click="onTabClicked(tab.id)"
+      >
+        <div class="title">{{ tab.name }}</div>
+        <div v-if="active_tab === tab.id" class="bottom-line"></div>
+      </span>
     </div>
+
+    <div class="selectors">
+      <!-- <selector
+              v-on:selected="onAuthor"
+              :options="artist_options"
+              :selected="active_filter_by_artist"
+              title="Author"
+              v-if="artist_options.length"
+          /> -->
+      <selector :options="selector_options"
+                :selected="active_sort_by"
+                title="Sort by"
+                @selected="onSortBy"
+      />
+    </div>
+
+    <btnWallet @click="onBalance"/>
+    
+    <btn class="user" width="34px" height="34px" padding="0px" radius="10px" @click="onMyPage">
+      <img src="~assets/icon-user.svg">
+    </btn>
+
+    <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+      <img src="~assets/add-user.svg"/>
+    </btn>
   </div>
 </template>
 
 <style scoped lang="stylus">
 .actions-container {
   display: flex
-  flex-direction: row
-
-  .artworks-controls {
+  align-items: center
+  width: 100%
+        
+  .tabs {
     display: flex
     flex-direction: row
-    align-items: center
-    width: 100%
-        
-    .tabs {
-      display: flex
-      flex-direction: row
 
-      .tab-active {
-        color: #fff
-      }
-
-      .tab-item {
-        color: rgba(255, 255, 255, 0.3)
-        font-size: 12px
-        font-weight: bold
-        cursor: pointer
-
-        .title {
-          padding: 4px 16px
-          text-transform: uppercase
-        }
-
-        .bottom-line {
-          height: 2px
-          width: 100%
-          box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7)
-          background-color: #00f6d2
-        }
-      }
+    .tab-active {
+      color: #fff
     }
 
-    & button {
-      margin-left: 12px
+    .tab-item {
+      color: rgba(255, 255, 255, 0.3)
+      font-size: 12px
+      font-weight: bold
+      cursor: pointer
 
-      &:last-child {
-        margin-right: 6px
+      .title {
+        padding: 4px 16px
+        text-transform: uppercase
       }
-    }
-    
-    & .user {
-      border-radius: 10px
+
+      .bottom-line {
+        height: 2px
+        width: 100%
+        box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7)
+        background-color: #00f6d2
+      }
     }
   }
     
@@ -103,6 +84,14 @@
 
     & > *:last-child {
       margin-right: 4px
+    }
+  }
+
+  & button {
+    margin-left: 12px
+
+    &:last-child {
+      margin-right: 6px
     }
   }
 }
@@ -202,7 +191,7 @@ export default {
     onMyPage() {
       this.$store.toMyPage()
     },
-    onBalanceClick() {
+    onBalance() {
       this.$store.toBalance()
     }
   }

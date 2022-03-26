@@ -2,20 +2,19 @@
   <publicKeyModal ref="keyModal"/>
   <pageTitle title="balance"/>
   <div class="balance-container">
-    <div :class="[show_balance ? '' : 'hidden', 'balance']">
-      <div class="balance__amount">
-        <span class="balance__description">Current balance</span>
+    <div class="balance">
+      <div>
+        <div class="description">Current balance</div>
         <amount/>
       </div>
 
-      <div class="balance__options">
+      <div class="withdraw">
         <btn v-if="balance_beam" 
-             class="withdraw" 
              text="withdraw"
              text_color="blue"
              color="transparent"
              height="20px"
-             padding="0"
+             padding="0px"
              @click="onWithdrawClick"
         >
           <img src="~assets/icon-receive.svg">
@@ -23,15 +22,15 @@
       </div>
     </div>
 
-    <div :class="[show_balance ? '' : 'hidden', 'balance']">
-      <div class="balance__amount">
-        <span class="balance__description">Total sold NFT amount</span>
+    <div class="balance">
+      <div>
+        <div class="description">Total sold NFT amount</div>
         <amount/>
       </div>
 
-      <div class="balance__amount">
-        <span class="balance__description">NFT sold</span>
-        <span class="balance__amount-sold">{{ nft_sold }}</span>
+      <div>
+        <div class="description">NFT sold</div>
+        <div>{{ nft_sold }}</div>
       </div>
     </div>
   </div>
@@ -50,37 +49,21 @@
     display: grid
     grid-template-columns: auto auto
     border-radius: 10px
-    padding: 20px 20px
-    
-    &__amount {
-      display: flex
-      flex-grow: 1
-      flex-direction: column
-    }
+    padding: 20px
 
-    &__description {
+    & .description {
       font-size: 12px
       color: rgba(255, 255, 255, 0.5)
+      margin-bottom: 7px
     }
     
-    &__options {
+    & .withdraw {
+      align-self: end
       display: flex
       justify-content: flex-end
-      align-items: flex-end
-    }
-
-    &__amount-sold {
-      display: flex
-      flex-grow: 1
-      align-items: center
-      margin-top: 6px
+      padding-bottom: 3px
     }
   }
-}
-
-.withdraw {
-  margin-bottom: 3px
-  margin-left: 30px
 }
 </style>
 
@@ -114,9 +97,6 @@ export default {
       let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
                          this.$state.artists[this.$state.my_artist_keys[1]]
       return (artist || {}).label
-    },
-    show_balance () {
-      return this.$state.is_artist || this.$state.balance_beam
     }
   },
 

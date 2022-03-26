@@ -1,41 +1,38 @@
 <template>
-  <div class="amount">
+  <div class="amount-container">
     <img src="~assets/icon-beam.svg"/>
-    <div class="value">
-      <span>{{ balance_beam }}</span>
-      <span>BEAM</span>
-    </div>
+    <div>{{ value }} BEAM</div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
-.amount {
-  height: 26px
+.amount-container {
   display: flex
-  align-items: center
-  margin-top: 6px
+  font-size: 18px
+  font-family: 'SFProDisplay', sans-serif
+  font-weight: bolder
 
-  & .value {
-    display: flex
-    font-size: 20px
-    padding: 0 0 2px 0
-    font-weight: bold
-    color: #fff
-
-    & > * {
-      margin-left: 6px
-    }
+  & > *:not(:first-child) {
+    margin-left: 8px
   }
 }
 </style>
 
 <script>
-import {common} from '../utils/consts'
+import utils from '../utils/utils.js'
 
 export default {
+  props: {
+    amount: {
+      type: Number,
+      required: true,
+      default: 0
+    }
+  },
+
   computed: {
-    balance_beam() {
-      return this.$state.balance_beam / common.GROTHS_IN_BEAM
+    value () {
+      return utils.formatAmount(this.amount)
     }
   }
 }
