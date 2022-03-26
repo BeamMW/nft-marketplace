@@ -1,111 +1,86 @@
 <template>
   <publicKeyModal ref="keyModal"/>
+  <pageTitle title="balance"/>
   <div class="balance-container">
     <div :class="[show_balance ? '' : 'hidden', 'balance']">
-      <img src="~assets/icon-beam.svg"/>
-      <div class="value">
-        {{ balance_beam }} BEAM
+      <div class="balance__amount">
+        <span class="balance__description">Current balance</span>
+        <amount/>
       </div>
-      <btn v-if="balance_beam" 
-           class="withdraw" 
-           text="withdraw"
-           text_color="blue"
-           color="transparent"
-           @click="onWithdraw"
-      >
-        <img src="~assets/icon-receive.svg">
-      </btn>
+
+      <div class="balance__options">
+        <btn v-if="balance_beam" 
+             class="withdraw" 
+             text="withdraw"
+             text_color="blue"
+             color="transparent"
+             height="20px"
+             padding="0"
+             @click="onWithdrawClick"
+        >
+          <img src="~assets/icon-receive.svg">
+        </btn>
+      </div>
     </div>
-    <div class="user" @click="onShowKey">
-      <div v-if="my_artist_name" class="name">
-        <img class="icon" src="~assets/icon-user.svg"/>
-        <span class="text">{{ my_artist_name }}</span>
+
+    <div :class="[show_balance ? '' : 'hidden', 'balance']">
+      <div class="balance__amount">
+        <span class="balance__description">Total sold NFT amount</span>
+        <amount/>
       </div>
-      <btn class="key"
-           text="Show my public key"
-           text_color="green"
-           :text_bold="false"
-           :hover="false"
-      >
-        <img src="~assets/icon-key.svg">
-      </btn>
+
+      <div class="balance__amount">
+        <span class="balance__description">NFT sold</span>
+        <span class="balance__amount-sold">{{ nft_sold }}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
 .balance-container {
-  display: flex
-  flex-direction: row
-  justify-content: space-between
-  align-content: center
+  display: grid
+  grid-template-columns: 1fr 1fr
+  column-gap: 20px
   margin-bottom: 10px
+  margin-top: 5px
 
   .balance {
-    width: 442px
-    height: 78px
+    background-color: rgba(255, 255, 255, 0.1)
+    display: grid
+    grid-template-columns: auto auto
     border-radius: 10px
-    background-color: rgba(255,255,255,0.1)
-    display: flex
-    flex-direction: row
-    align-items: center
-    padding: 0 20px
-    padding-left: 20px
-
-    .value {
-      margin-left: 10px
-      font-size: 20px
-      font-weight: bold
-      color: #fff
-    }
-
-    .withdraw {
-      margin-left: auto
-    }
-
-    .text {
-      margin-left: 8px
-      font-size: 14px
-      font-weight: bold
-      color: #0bccf7
-    }
-  }
-
-  .user {
-    display: flex
-    flex-direction: column
-    align-items: center
-
-    .icon {
-      width: 16px
-      height: 16px
-    }
-
-    .name {
-      padding-bottom: 12px
+    padding: 20px 20px
+    
+    &__amount {
       display: flex
-      align-items: center
-      
-      .text {
-        font-size: 18px
-        font-weight: bold
-        color: #fff
-        margin-left: 7px
-      }
+      flex-grow: 1
+      flex-direction: column
     }
 
-    .key {
-      height: 48px 
-      padding: 14px
-      border-radius: 10px
-      font-size: 16px
-      
-      .connect {
-        font-size: 16px
-        color: #00f6d2
-      }
+    &__description {
+      font-size: 12px
+      color: rgba(255, 255, 255, 0.5)
+    }
+    
+    &__options {
+      display: flex
+      justify-content: flex-end
+      align-items: flex-end
+    }
+
+    &__amount-sold {
+      display: flex
+      flex-grow: 1
+      align-items: center
+      margin-top: 6px
     }
   }
+}
+
+.withdraw {
+  margin-bottom: 3px
+  margin-left: 30px
 }
 </style>
 
@@ -113,11 +88,22 @@
 import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
 import btn from './button.vue'
+import pageTitle from './page-title.vue'
+import amount from './amount.vue'
 
 export default {
   components: {
     publicKeyModal,
-    btn
+    btn,
+    pageTitle,
+    amount
+  },
+
+  props: {
+    nft_sold: {
+      type: Number,
+      default: 14 // for example
+    }
   },
 
   computed: {
@@ -139,7 +125,7 @@ export default {
       this.$refs.keyModal.open()
     },
 
-    onWithdraw () {
+    onWithdrawClick () {
       this.$store.withdrawBEAM()
     }
   }

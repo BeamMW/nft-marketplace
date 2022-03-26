@@ -1,71 +1,64 @@
 <template>
   <publicKeyModal ref="keyModal"/>
-  <div class="header">
-    <backBtn @click="$router.go(-1)"/>
-    <h1 class="title">MY PAGE</h1>
+  <pageTitle title="my page">
     <div class="options">
-      <btn :hover="false">
-        <img src="~assets/icon-heart.svg">
+      <btn :hover="false" :height="height" :width="width" :padding="padding">
+        <img src="~assets/icon-pencil.svg">
       </btn>
-      <btn :hover="false">
-        <img src="~assets/icon-eye-crossed.svg">
-      </btn>
-      <btn :hover="false" @click="onShowKeyClick">
+
+      <btnWallet @click="onBalanceClick"/>
+      
+      <btn :hover="false" :height="height" :width="width" :padding="padding" @click="onShowKeyClick">
         <img src="~assets/icon-key.svg">
       </btn>
     </div>
-  </div>
+  </pageTitle>
 </template>
 
 <style scoped lang="stylus">
-.header {
+.options {
   display: flex
-  flex-direction: row
+  justify-content: flex-end
   align-items: center
-  justify-content: space-between
-  justify-items: center
 
-  & > * {
-    flex-grow: 1
-    flex-basis: 0
-  }
-
-  & > .title {
-    font-size: 14px
-    letter-spacing: 3.11px
-    text-align: center
-  }
-
-  & > .options {
-    height: 36px
-    display: flex
-    justify-content: flex-end
-
-    & > button {
-      width: 36px
-      border-radius: 10px
-      padding: 5px 12px
-      margin-left: 20px
-    }
+  & > button {
+    border-radius: 10px
+    margin-left: 20px
   }
 }
 </style>
 
 <script>
-import backBtn from './back-btn.vue'
+import pageTitle from './page-title.vue'
 import btn from './button.vue'
+import btnWallet from './button-wallet.vue'
 import publicKeyModal from './public-key-dialog.vue'
+
+import {styles} from '../utils/consts'
 
 export default {
   components: {
-    backBtn,
+    pageTitle,
     btn,
+    btnWallet,
     publicKeyModal
   },
+
+  data() {
+    return {
+      width: styles.WIDTH,
+      height: styles.HEIGHT,
+      padding: styles.PADDING
+    }
+  },
+
   methods: {
-    onShowKeyClick () {
+    onShowKeyClick() {
       this.$refs.keyModal.open()
     },
+    onBalanceClick() {
+      this.$store.toBalance()
+    }
   },
 }
 </script>

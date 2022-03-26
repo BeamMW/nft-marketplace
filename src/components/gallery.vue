@@ -1,11 +1,10 @@
 <template>
   <div id="container" class="vertical-container">
     <headless v-if="is_headless"></headless>
-    <!-- <balance v-else></balance> -->
     <adminui v-if="is_admin"/>
     <artctrls/>
     <!---- uncomment the line below to see an example button ----->
-    <!---- <PRESENTATION/> ---->
+    <!-- <PRESENTATION/> -->
     <template v-if="artworks.length > 0">
       <div ref="artslist" class="artworks" @scroll="onScrollArtwork">
         <artwork v-for="artwork in artworks"
@@ -59,7 +58,6 @@
 <script>
 import adminui   from './admin-ui.vue'
 import artwork   from './artwork.vue'
-// import balance   from './balance.vue'
 import headless  from './headless.vue'
 import artctrls  from './artworks-controls.vue'
 import paginator from './paginator.vue'
@@ -72,7 +70,6 @@ export default {
   components: {
     artwork, 
     adminui, 
-    // balance, 
     artctrls, 
     headless, 
     paginator,

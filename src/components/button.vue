@@ -17,12 +17,12 @@
 <style scoped lang="stylus">
 .button {
   font-family: 'SFProDisplay', sans-serif
-  height: min-content
-  min-width:  min-content
+  white-space: nowrap
   border-radius: 50px
   box-sizing: border-box
   display: flex
   align-items: center
+  justify-content: center
   font-size: 14px
   border: none
   cursor: pointer
@@ -50,9 +50,7 @@
   }
 
   &.transparent {
-    min-height: min-content
     border-radius: 0
-    padding: 0
 
     &:not(.disabled):hover {
       box-shadow: none
@@ -92,9 +90,9 @@ export default {
       type: String,
       default: undefined,
     },
-    text_bold: {
+    text_normal: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     disabled: {
       type: Boolean,
@@ -111,6 +109,14 @@ export default {
     padding: {
       type: String,
       default: '11px 22px'
+    },
+    height: {
+      type: String,
+      default: '38px'
+    },
+    width: {
+      type: String,
+      default: 'fit-content'
     }
   },
 
@@ -152,7 +158,7 @@ export default {
         res[`margin-${tgap_pos}`] = `${this.gap}px`
       }
 
-      if (!this.text_bold) {
+      if (this.text_normal) {
         res['font-weight'] = 'normal'
       }
 
@@ -162,7 +168,9 @@ export default {
     button_style() {
       return {
         'background-color': this.button_colors[this.color],
-        'padding': this.padding
+        'padding': this.padding,
+        'height': this.height,
+        'width': this.width
       }
     }
   },
