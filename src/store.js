@@ -33,7 +33,9 @@ function defaultState() {
     is_headless: false,
     current_page: 1,
     use_ipfs: true,
-    gallery_tab: tabs.COLLECTIONS
+
+    gallery_tab: tabs.COLLECTIONS,
+    gallery_page: 1,
   }
 }
 
@@ -853,7 +855,7 @@ export const store = {
     this.state.gallery_tab = id
   },
 
-  showArtworkDetails(id) {
+  toArtworkDetails(id) {
     router.push({
       name: 'artwork',
       params: {

@@ -19,6 +19,7 @@
   .selector-container {
     display: flex
     align-items: center
+    user-select: none
 
     .title {
       align-self: center

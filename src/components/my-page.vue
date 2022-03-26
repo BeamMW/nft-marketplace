@@ -2,7 +2,13 @@
   <publicKeyModal ref="keyModal"/>
   <pageTitle title="my page">
     <div class="options">
-      <btn :height="height" :width="width" padding="0px" radius="10px">
+      <btn v-if="is_artist" 
+           :height="height" 
+           :width="width" 
+           padding="0px" 
+           radius="10px" 
+           @click="$store.toBecomeArtist"
+      >
         <img src="~assets/icon-pencil.svg">
       </btn>
 
@@ -10,6 +16,10 @@
       
       <btn :height="height" :width="width" radius="10px" padding="0px" @click="onShowKeyClick">
         <img src="~assets/icon-key.svg">
+      </btn>
+
+      <btn v-if="!is_artist" text="become an artist" color="green" height="34px" @click="$store.toBecomeArtist">
+        <img src="~assets/add-user.svg"/>
       </btn>
     </div>
   </pageTitle>
@@ -51,6 +61,12 @@ export default {
     return {
       width: '34px',
       height: '34px'
+    }
+  },
+
+  computed: {
+    is_artist() {
+      return this.$store.state.is_artist
     }
   },
 

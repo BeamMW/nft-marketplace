@@ -20,6 +20,7 @@
     flex-direction: row
     align-items: center
     width: 100%
+    user-select: none
 
     .slot {
       margin-left: auto

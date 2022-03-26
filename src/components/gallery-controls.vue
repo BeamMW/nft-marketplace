@@ -15,17 +15,11 @@
         />
       </div>
 
-      <btnWallet v-if="!is_artist" @click="$store.toBalance"/>
-
-      <btn v-if="is_artist" class="user" height="34px" gap="9"
+      <btn class="user" height="34px" gap="9"
            :text="my_artist_name"
            @click="$store.toMyPage"
       >
         <img src="~assets/icon-user.svg">
-      </btn>
-
-      <btn v-else text="become an artist" color="green" height="34px" @click="$store.toBecomeArtist">
-        <img src="~assets/add-user.svg"/>
       </btn>
     </tabsctrl>
   </div>
@@ -55,7 +49,6 @@
 <script>
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
-import btnWallet from './button-wallet.vue'
 import selector from './selector.vue'
 import {tabs, sort} from '../utils/consts.js'
 
@@ -64,7 +57,6 @@ export default {
   components: {
     tabsctrl,
     selector,
-    btnWallet,
     btn
   },
 
@@ -111,9 +103,12 @@ export default {
       return this.$state.is_artist
     },
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
+      if (this.is_artist) {
+        let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
                    this.$state.artists[this.$state.my_artist_keys[1]]
-      return (artist || {}).label
+        return (artist || {}).label
+      }
+      return ''
     }
   }
 }

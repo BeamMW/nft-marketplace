@@ -26,6 +26,7 @@
   border: none
   cursor: pointer
   background-color: rgba(255, 255, 255, 0.1)
+  user-select: none
 
   &:not(.disabled):hover {
     box-shadow: 0 0 8px white

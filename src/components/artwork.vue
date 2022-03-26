@@ -139,13 +139,6 @@ export default {
     }
   },
 
-  emits: [
-    'like', 
-    'unlike', 
-    'delete', 
-    'details'
-  ],
-
   computed: {
     is_admin () {
       return this.$state.is_admin
@@ -193,30 +186,32 @@ export default {
   },
 
   methods: {
-    onLike (ev) {
-      if (this.is_headless) 
-      {
-        this.$store.switchToHeaded()  
+    onLike () {
+      if (this.is_headless) {
+        return this.$store.switchToHeaded()  
       } 
-      else {
-        if (this.can_vote) {
-          this.$emit('like', this.id)
-        }
-      }
-    },
 
-    onUnlike (ev) {
       if (this.can_vote) {
-        this.$emit('unlike', this.id)
+        this.$store.likeArtwork(this.id)
       }
     },
 
-    onDelete (ev) {
-      this.$emit('delete', this.id)
+    onUnlike () {
+      if (this.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+
+      if (this.can_vote) {
+        this.$store.unlikeArtwork(this.id)
+      }
+    },
+
+    onDelete (id) {
+      this.$store.deleteArtwork(this.id)
     },
 
     onDetails(ev) {
-      this.$store.showArtworkDetails(this.id)
+      this.$store.toArtworkDetails(this.id)
     }
   }
 }
