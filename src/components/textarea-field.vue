@@ -40,7 +40,7 @@
     height: 100%
     padding: 0
     border-radius: 10px
-    padding: 12px 15px 
+    padding: 12px 13px 
     width: 100%
     resize: none
     min-height: 79px

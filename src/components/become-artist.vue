@@ -24,14 +24,14 @@
                     label="Twitter"
                     placeholder="@twitter"
                     img="twitter"
-                    :max_length="15"
+                    :max_length="16"
                     :valid="twitter_valid"
         />
         <inputField v-model="instagram"
                     label="Instagram"
                     placeholder="@instagram"
                     img="instagram"
-                    :max_length="30"
+                    :max_length="31"
                     :valid="instagram_valid"
         />
       </div>
@@ -48,6 +48,7 @@
           <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
           <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
           <input id="banner"
+                 ref="banner"
                  type="file"
                  accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
                  class="files"
@@ -65,6 +66,7 @@
             <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
             <input id="avatar"
+                   ref="avatar"
                    type="file"
                    accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
                    class="files"
@@ -360,10 +362,12 @@ export default {
 
     onRemoveBanner() {
       this.banner = undefined
+      this.$refs.banner.value = ''
     },
     
     onRemoveAvatar() {
       this.avatar = undefined
+      this.$refs.avatar.value = ''
     },
   }
 }
