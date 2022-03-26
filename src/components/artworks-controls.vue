@@ -26,14 +26,14 @@
         />
       </div>
 
-      <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
-        <img src="~assets/add-user.svg"/>
-      </btn>
-
       <btnWallet @click="onBalanceClick"/>
       
-      <btn class="user" width="34px" height="34px" padding="0" :hover="false" @click="onMyPage">
+      <btn class="user" width="34px" height="34px" padding="0" @click="onMyPage">
         <img src="~assets/icon-user.svg">
+      </btn>
+
+      <btn text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+        <img src="~assets/add-user.svg"/>
       </btn>
     </div>
   </div>
@@ -79,7 +79,11 @@
     }
 
     & button {
-      margin-left: 20px
+      margin-left: 12px
+
+      &:last-child {
+        margin-right: 6px
+      }
     }
     
     & .user {

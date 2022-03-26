@@ -3,7 +3,6 @@
        height="34px" 
        width="34px" 
        padding="0" 
-       :hover="false" 
   >
     <img src="~assets/icon-wallet.svg">
   </btn>
