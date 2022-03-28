@@ -1,14 +1,13 @@
 <template>
   <div class="container">
-    <pageTitle title="Become an Artist"/>
+    <pageTitle title="add new collection"/>
     <p class="description">
-      To become a publisher you need to set up a username.<br>
-      Registration will allow you to publish and manage your NFTs.
+      Before you can add any NFT you need to create a Collection
     </p>
     <div class="fields">
       <div class="col-first">
         <inputField v-model="name"
-                    label="Artist Name*"
+                    label="Gallery Name*"
                     :valid="name_valid"
                     :max_length="100"
                     style="margin-bottom:30px;margin-top:0"
@@ -36,31 +35,13 @@
         />
       </div>
       <div class="col-second">
-        <textAreaField v-model="about"
-                       label="About me"
+        <textAreaField v-model="description"
+                       label="Description"
                        :valid="about_valid"
                        :max_length="150"
-                       :show_counter="true"
+                       :show_counter="false"
         />
-        <addImage :style="bannerStyles" :banner="banner" :valid="banner_valid" title="Add an artist banner" @remove="onRemoveBanner" @upload="onUploadBanner"/>
-        <div class="container-avatar">
-          <div class="avatar" :style="avatarStyles">
-            <div v-if="avatar" class="remove">
-              <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
-            </div>
-            <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-            <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
-            <input id="avatar"
-                   type="file"
-                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-                   class="files"
-                   @change="onUploadAvatar"
-            />
-          </div>
-          <div v-if="!avatar_valid" class="error_msg">
-            <p class="error">image cannot be larger than 250kb</p>
-          </div>
-        </div>
+        <addImage :style="bannerStyles" :banner="banner" :valid="banner_valid" title="Add Gallery image" @remove="onRemoveBanner" @upload="onUploadBanner"/>
       </div>
     </div>
   </div>
@@ -99,72 +80,18 @@
       .col-second {
         flex-basis: 50%
         margin-left: 30px
-
-        .container-avatar {
-          display: flex
-          
-          .avatar {
-            display: flex
-            align-items: center
-            justify-content: center
-            height: 120px
-            width: 120px
-            background-color: rgba(26, 246, 214, 0.1)
-            border-radius: 9999px
-            position: relative
-
-            .text {
-              width: 100%
-              height: 100%
-              display: flex
-              justify-content: center
-              align-items: center
-              font-size: 14px
-              color: #1af6d6
-              cursor: pointer
-            }
-
-            .remove {
-              background-color: rgba(0, 0, 0, 0.7)
-              position: absolute
-              left: 50%
-              top: 50%
-              transform: translate(-50%,-50%)
-              z-index: 2
-              border-radius: 9999px
-              padding: 7px 7px 3px 7px
-              cursor: pointer
-            }
-
-            .files {
-              visibility:hidden
-              width: 0
-            }
-          
-            .image {
-              width: 100%
-              height: 100%
-              object-fit: cover
-              border-radius: 9999px
-              border: 1px dashed transparent
-
-              &.error {
-                filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-              }
-            }
-          }
-          .error_msg {
-            align-self: center
-            margin-left: 10px
-
-            .error {
-              font-style: italic
-              font-size: 12px
-              font-weight: 400
-            }
-          }
-        }
       }
+    }
+
+    .text {
+      width: 100%
+      height: 100%
+      display: flex
+      justify-content: center
+      align-items: center
+      font-size: 14px
+      color: #1af6d6
+      cursor: pointer
     }
   }
 
@@ -201,7 +128,7 @@ export default {
       website: '',
       twitter: '',
       instagram: '',
-      about: '',
+      description: '',
       banner: undefined,
       avatar: undefined
     }
@@ -213,11 +140,7 @@ export default {
         'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
-    bannerStyles() {
-      return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
-      }
-    },
+
     name_valid() {
       let value = this.name
       return !value || value.length <= 100
@@ -278,6 +201,7 @@ export default {
     onUploadBanner(e) {
       this.loadImage(e, (data, size) => {
         this.banner = {data, size}
+        console.log('called',this.banner)
       })
     },
 

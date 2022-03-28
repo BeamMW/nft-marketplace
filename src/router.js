@@ -3,6 +3,8 @@ import details from './components/artwork-details.vue'
 import myPage from './components/my-page.vue'
 import artworkDetails from './components/artwork-details.vue'
 import artistDetails from './components/become-artist.vue'
+import newCollection from './components/new-collection.vue'
+
 import {createRouter, createWebHistory} from 'vue-router'
 
 export const router = createRouter({
@@ -12,6 +14,8 @@ export const router = createRouter({
     {path: '/details/:id', component: details, name: 'details', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/my-page', component: myPage, name: 'my-page'},
     {path: '/artwork/:id', component: artworkDetails, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
-    {path: '/artist', component: artistDetails, name: 'artist'}
+    {path: '/artist', component: artistDetails, name: 'artist'},
+    {path: '/new-collection', component: newCollection, name: 'add-collection'}
+
   ]
 })

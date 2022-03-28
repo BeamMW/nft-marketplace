@@ -19,6 +19,10 @@
                 title="Author"
                 v-if="artist_options.length"
             /> -->
+        <div style="margin-left:1px">
+          <btn text="add collection" color="green" padding="7px 12px" @click="onAddCollection">
+          </btn>
+        </div>
         <selector :options="selector_options"
                   :selected="active_sort_by"
                   title="Sort by"
@@ -161,6 +165,10 @@ export default {
   methods: {
     onBecomeArtist() {
       this.$store.becomeArtist()
+    },
+
+    onAddCollection() {
+      this.$store.newCollection()
     },
     onTabClicked(id) {
       if (this.active_tab !== id) {

@@ -867,5 +867,11 @@ export const store = {
     router.push({
       name: 'artist'
     })
+  },
+
+  newCollection() {
+    router.push({
+      name: 'add-collection'
+    })
   }
 }
