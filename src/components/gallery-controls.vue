@@ -15,7 +15,7 @@
         />
       </div>
 
-      <btn class="user" height="34px" gap="9"
+      <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"
       >

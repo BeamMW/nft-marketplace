@@ -99,8 +99,8 @@ export default {
       default: true
     },
     gap: {
-      type: Number,
-      default: 9
+      type: String,
+      default: '9px'
     },
     padding: {
       type: String,
@@ -156,7 +156,7 @@ export default {
   
       if (this.has_icon) {
         let tgap_pos = this.reverse ? 'right' : 'left'
-        res[`margin-${tgap_pos}`] = `${this.gap}px`
+        res[`margin-${tgap_pos}`] = this.gap
       }
 
       return res

@@ -28,7 +28,7 @@
 
     <btnWallet v-if="!is_artist" @click="onBalance"/>
     
-    <btn v-if="is_artist" class="user" height="34px" gap="9"
+    <btn v-if="is_artist" class="user" height="34px"
          :text="my_artist_name"
          @click="onMyPage"
     >
