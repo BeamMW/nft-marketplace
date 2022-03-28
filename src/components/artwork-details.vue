@@ -3,9 +3,7 @@
     <backBtn/>
     <div class="details-row"> 
       <div class="artwork-container">
-        <div class="artwork-box">
-          <artPreview key="" :artwork="artwork"/>
-        </div>
+        <preview :image="artwork" height="360px" radius="0"/>
       </div>
       <div class="info-container">
         <div class="info-box">
@@ -193,22 +191,13 @@
         box-sizing: border-box
         padding-right: 10px
         max-width: 50%
-        
-        & .artwork-box {
-          background-color: rgba(255, 255, 255, 0.05)
-          border-radius: 10px
-          min-height: 360px
-          display: flex
-          align-items: center
-          justify-content: center
-          overflow: hidden
-
-          & > img {
-            max-width: 100%
-            max-height: 360px
-            object-fit: contain
-          }
-        }
+        background-color: rgba(255, 255, 255, 0.05)
+        border-radius: 10px
+        min-height: 360px
+        display: flex
+        align-items: center
+        justify-content: center
+        overflow: hidden
       }
 
       & .info-container {
@@ -259,7 +248,7 @@
 <script>
 import artPrice from './artwork-price.vue'
 import backBtn from './back-btn.vue'
-import artPreview from './artwork-preview.vue'
+import preview from './image-preview.vue'
 import utils from '../utils/utils.js'
 import {binary_search} from '../utils/search.js'
 /*
@@ -271,7 +260,7 @@ import { AgGridVue } from "ag-grid-vue3"
 export default {
   components: {
     artPrice,
-    artPreview,
+    preview,
     backBtn
   },
 

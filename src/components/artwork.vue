@@ -1,9 +1,7 @@
 <template>
   <div class="artwork">
     <!---- Preview OR Loading ---->
-    <div class="preview-container" @click="onDetails">
-      <artPreview :artwork="artwork"/>
-    </div>
+    <preview :image="item" height="360px" @click="onDetails"/>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -33,7 +31,7 @@
 
     <!---- Third info row, price/buy/sell ----->
     <div class="price-row">
-      <artPrice :artwork="artwork"/>
+      <artPrice :artwork="item"/>
     </div>
   </div>
 </template>
@@ -49,18 +47,6 @@
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
     position:relative
-
-    & .preview-container {
-      height: 360px
-      background-color: rgba(240, 205, 205, 0.1)
-      display: flex
-      align-items: center
-      justify-content: center
-      overflow: hidden
-      border-top-left-radius: 10px
-      border-top-right-radius: 10px
-      cursor: pointer
-    }
 
     & > .delete {
       position: absolute
@@ -124,16 +110,16 @@
 
 <script>
 import artPrice from './artwork-price.vue'
-import artPreview from './artwork-preview.vue'
+import preview from './image-preview.vue'
 
 export default {
   components: {
     artPrice,
-    artPreview
+    preview
   },
 
   props: {
-    artwork: {
+    item: {
       type: Object,
       required: true,
     }
@@ -149,19 +135,19 @@ export default {
     },
 
     id () {
-      return this.artwork.id
+      return this.item.id
     },
 
     title () {
-      return this.artwork.title
+      return this.item.title
     },
         
     likes_cnt () {
-      return this.artwork.impressions
+      return this.item.impressions
     },
 
     liked () {
-      return !!this.artwork.my_impression
+      return !!this.item.my_impression
     },
         
     can_vote () {
@@ -169,7 +155,7 @@ export default {
     },
 
     loading () {
-      return this.artwork.loading
+      return this.item.loading
     },
 
     artists () {
@@ -177,11 +163,11 @@ export default {
     },
 
     author () {
-      return (this.artists[this.artwork.pk_author] || {}).label
+      return (this.artists[this.item.pk_author] || {}).label
     },
 
     error () {
-      return !!this.artwork.error
+      return !!this.item.error
     }
   },
 

@@ -5,6 +5,8 @@ import utils from './utils/utils.js'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import './styles/fonts.css'
 import './styles/global.css'
+import artwork from './components/artwork.vue'
+import collection from './components/collection.vue'
 
 utils.initialize(
   {
@@ -17,6 +19,8 @@ utils.initialize(
     const vueApp = createApp(App)
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
+    vueApp.component('artwork', artwork)
+    vueApp.component('collection', collection)
     vueApp.use(router)
     vueApp.mount('body')
 

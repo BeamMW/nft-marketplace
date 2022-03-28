@@ -94,6 +94,10 @@
     "vue/prop-name-casing": [
       "error",
       "snake_case"
+    ],
+    "vue/component-definition-name-casing": [
+      "error",
+      "kebab-case"
     ]
   }
 }

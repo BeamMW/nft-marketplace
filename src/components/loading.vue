@@ -14,6 +14,7 @@
   .title {
     font-size: 25px
     font-weight: 400
+    user-select: none
   }
 }
 </style>
