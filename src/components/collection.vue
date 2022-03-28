@@ -1,8 +1,14 @@
 <template>
   <div class="collection">
     <preview class="preview" :image="item.cover_image" height="140px"/>
-    <div class="info-row">
-      <div class="artist">
+    <div class="info-row">  
+      <div class="avatar">
+        <preview :image="item.author_image" 
+                 :show_loading="false"
+                 width="72px" 
+                 height="72px" 
+                 radius="36px 36px"
+        />
       </div>
       <div class="text">
         <div class="label">{{ item.label }}</div>
@@ -30,6 +36,10 @@
       display: flex
       flex-direction: row
       padding: 16px 16px 20px 20px
+
+      & > .avatar {
+        margin-right: 16px
+      }
 
       & > .text {
         font-family: 'SFProDisplay', sans-serif

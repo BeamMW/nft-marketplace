@@ -1,7 +1,7 @@
 <template>
   <div class="preview-container" :style="style">
     <img v-if="src" :src="src">
-    <loading v-else :error="error"/>
+    <loading v-if="!src && show_loading" :error="error"/>
   </div>  
 </template>
 
@@ -16,7 +16,7 @@
     & > img {
       max-width: 100%
       max-height: 100%
-      object-fit: contain
+      object-fit: cover
     }
   }
 </style>
@@ -39,10 +39,19 @@ export default {
       required: false,
       default: ''
     },
+    width: {
+      type: String,
+      required: false,
+      default: ''
+    },
     radius: {
       type: String,
       required: false,
       default: '10px 10px 0 0'
+    },
+    show_loading: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -70,6 +79,10 @@ export default {
 
       if (this.height) {
         res['height'] = this.height
+      }
+
+      if (this.width) {
+        res['width'] = this.width
       }
 
       if (this.$attrs && this.$attrs['onClick']) {

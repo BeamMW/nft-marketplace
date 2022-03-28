@@ -45,7 +45,7 @@ function defaultState() {
       id: i,
       label: `Collection ${i}`,
       author: `Artist ${i}`,
-      author_image: '/assets/test-author.svg',
+      author_image: '/assets/test-author.png',
       cover_image: '/assets/test-collection-cover.png',
       description: [desc, desc, desc].join(' ')
     })
