@@ -33,7 +33,7 @@
 
   & > button {
     border-radius: 10px
-    margin-left: 20px
+    margin-left: 12px
     margin-top: 7px
 
     &:last-child {
