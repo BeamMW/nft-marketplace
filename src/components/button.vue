@@ -104,7 +104,7 @@ export default {
     },
     padding: {
       type: String,
-      default: '11px 22px'
+      default: ''
     },
     height: {
       type: String,
@@ -163,9 +163,14 @@ export default {
     },
 
     button_style() {
+      let padding = this.padding
+      if (!padding) {
+        padding = this.color === 'transparent' ? '2px 2px' : '11px 22px'
+      }
+      
       return {
         'background-color': this.button_colors[this.color],
-        'padding': this.padding,
+        'padding': padding,
         'height': this.height,
         'width': this.width,
         'border-radius': this.radius
