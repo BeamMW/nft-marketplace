@@ -47,7 +47,7 @@ function defaultState() {
       author: `Artist ${i}`,
       author_image: '/assets/test-author.png',
       cover_image: '/assets/test-collection-cover.png',
-      description: [desc, desc, desc].join(' ')
+      description: [desc, desc, desc].join(' '),
     })
   }
   
