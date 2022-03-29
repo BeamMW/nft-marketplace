@@ -282,7 +282,7 @@ export const store = {
       let mykeys = this.state.my_artist_keys
       for (let artist of res.artists) {
         if (mykeys.indexOf(artist.key) != -1) {
-          this.state.is_artist = true
+          this.state.is_artist = false //true
         }
         this.state.artists[artist.key] = artist
       }

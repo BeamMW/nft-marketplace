@@ -20,8 +20,15 @@
     </template>
 
     <!---- has price but not owned, can buy ---->
-    <template v-if="!owned && mode != 'compact'">
-      <btn text="buy" color="magenta" @click="onBuy">
+    <template v-if="!owned">
+      <btn v-if="compact" 
+           text="buy" 
+           color="transparent" 
+           padding="2px 7px 5px 7px"
+           text_color="magenta"
+           @click="onBuy"
+      />
+      <btn v-else text="buy" color="magenta" @click="onBuy">
         <img src="~assets/icon-button.svg">
       </btn>
     </template>  
@@ -29,8 +36,15 @@
 
   <span v-if="!price" class="container">
     <!---- doesn't have price & owned, can sell ---->
-    <template v-if="owned && mode != 'compact'">
-      <btn text="sell" color="blue" @click="onSell">
+    <template v-if="owned">
+      <btn v-if="compact" 
+           text="sell" 
+           color="transparent" 
+           padding="2px 7px 5px 7px"
+           text_color="blue"
+           @click="onSell"
+      />
+      <btn v-else text="sell" color="blue" @click="onSell">
         <img src="~assets/icon-button.svg">
       </btn>
     </template>
@@ -119,6 +133,10 @@ export default {
 
     price() {
       return this.artwork.price
+    },
+
+    compact() {
+      return this.mode == 'compact'
     }
   },
 
