@@ -4,17 +4,19 @@
 #include "Shaders/upgradable2/contract.h"
 #include "Shaders/upgradable2/app_common_impl.h"
 
+#include <string_view>
+
 #define Gallery_manager_view(macro)
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
 #define Gallery_manager_view_artists(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
 
-#define Gallery_manager_view_artist(macro) \
+//#define Gallery_manager_view_artist(macro) \
     macro(ContractID, cid) \
     macro(PubKey, pkArtist)
 
-#define Gallery_manager_manage_artist(macro) \
+//#define Gallery_manager_manage_artist(macro) \
     macro(ContractID, cid) \
     macro(PubKey, pkArtist) \
     macro(uint32_t, bEnable)
@@ -37,16 +39,19 @@
     macro(manager, view) \
     macro(manager, view_params) \
     macro(manager, view_artists) \
-    macro(manager, view_artist) \
-    macro(manager, manage_artist) \
     macro(manager, view_balance) \
     macro(manager, add_rewards) \
     macro(manager, my_admin_key) \
     macro(manager, explicit_upgrade) \
     macro(manager, admin_delete) \
+    //macro(manager, view_artist) \
+    //macro(manager, manage_artist) \
 
 #define Gallery_artist_view(macro) macro(ContractID, cid)
 #define Gallery_artist_get_key(macro) macro(ContractID, cid)
+
+#define Gallery_artist_set_artist(macro) \
+    macro(ContractID, cid) \
 
 #define Gallery_artist_upload(macro) \
     macro(ContractID, cid) \
@@ -55,6 +60,7 @@
     macro(artist, view) \
     macro(artist, get_key) \
     macro(artist, upload) \
+    macro(artist, set_artist) \
 
 #define Gallery_user_view_item(macro) \
     macro(ContractID, cid) \
@@ -95,21 +101,16 @@
     macro(Gallery::Masterpiece::ID, id) \
     macro(uint32_t, val) \
 
-#define Gallery_user_become_artist(macro) \
-    macro(ContractID, cid) \
-
 #define GalleryRole_user(macro) \
     macro(user, view_item) \
     macro(user, view_items) \
     macro(user, download) \
     macro(user, set_price) \
-    macro(user, become_artist) \
     macro(user, transfer) \
     macro(user, buy) \
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
-
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
@@ -197,6 +198,13 @@ ON_METHOD(manager, view)
         Gallery::s_SID_6,
         Gallery::s_SID_7,
         Gallery::s_SID_8,
+        Gallery::s_SID_9,
+        Gallery::s_SID_10,
+        Gallery::s_SID_11,
+        Gallery::s_SID_12,
+        Gallery::s_SID_13,
+        Gallery::s_SID_14,
+        Gallery::s_SID_15,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -251,13 +259,33 @@ ON_METHOD(manager, view_params)
 struct MyArtist
     :public Gallery::Artist
 {
-    char m_szLabel[s_LabelMaxLen + 1];
+    char m_szLabelData[s_TotalMaxLen + 2];
 
     void Print()
     {
-        Env::DocAddText("label", m_szLabel);
+        // DocAddText prints char[] until it meets \0 symbol, but
+        // m_szLabelData contains label + data without \0 symbol between them
+        char label[label_len + 1];
+        char data[data_len + 1];
+        label[label_len] = 0;
+        data[data_len] = 0;
+        Env::Memcpy(label, m_szLabelData, label_len);
+        Env::Memcpy(data, m_szLabelData + label_len, data_len);
+
+        Env::DocAddText("label", label);
+        Env::DocAddText("data", data);
         Env::DocAddNum("hReg", m_hRegistered);
         Env::DocAddNum32("isApproved", is_approved);
+    }
+
+    std::string_view GetData()
+    {
+        return std::string_view(m_szLabelData + label_len, data_len);
+    }
+
+    std::string_view GetLabel()
+    {
+        return std::string_view(m_szLabelData, label_len);
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artist::SecondStageKey>& key)
@@ -272,7 +300,7 @@ struct MyArtist
                 continue;
 
             nVal -= sizeof(Gallery::Artist);
-            m_szLabel[std::min(nVal, s_LabelMaxLen)] = 0;
+            m_szLabelData[std::min(nVal, s_TotalMaxLen)] = 0;
             break;
         }
 
@@ -280,6 +308,30 @@ struct MyArtist
     }
 };
 #pragma pack (pop)
+
+bool artist_label_exists(const ContractID& cid, const std::string_view& label)
+{
+    Env::Key_T<Gallery::Artist::SecondStageKey> k0, k1;
+    _POD_(k0.m_Prefix.m_Cid) = cid;
+    _POD_(k1.m_Prefix.m_Cid) = cid;
+
+    _POD_(k0.m_KeyInContract.m_pkUser).SetZero();
+    _POD_(k1.m_KeyInContract.m_pkUser).SetObject(0xff);
+
+    k0.m_KeyInContract.h_last_updated = 0;
+    k1.m_KeyInContract.h_last_updated = static_cast<Height>(-1);
+
+    Env::VarReader r(k0, k1);
+    MyArtist a;
+    while (true) {
+        if (!a.ReadNext(r, k0))
+            break;
+
+        if (a.GetLabel() == label)
+            return true;
+    }
+    return false;
+}
 
 bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool bFindAll, bool bMustFind)
 {
@@ -317,6 +369,9 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
                 OnError("not found");
             return false;
         }
+        Env::DocGroup gr1("");
+        Env::DocAddBlob_T("key", k0.m_KeyInContract.m_pkUser);
+        Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
         a.Print();
     }
 
@@ -325,10 +380,40 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
 
 ON_METHOD(manager, view_artists)
 {
-    PrintArtists(cid, PubKey{}, h0, true, false);
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(PubKey)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    buf[buf_len - 1] = ';';
+
+    if (!h0 && !buf_len) {
+        PrintArtists(cid, PubKey{}, h0, true, false);
+    } else if (buf_len) {
+        std::string_view ids(buf);
+        int cur_pos = 0;
+        int next_pos;
+        Env::DocArray gr0("artists");
+        while ((next_pos = ids.find(';', cur_pos)) != ids.npos) {
+            union {
+                PubKey pk;
+                uint8_t a[33];
+            } blob; 
+
+            Env::Memset(blob.a, 0, 33);
+
+            for (int i = cur_pos; i < next_pos; ++i) {
+                if (ids[i] >= '0' && ids[i] <= '9') {
+                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - '0') << (4 * !((i - cur_pos) & 1)));
+                } else {
+                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - 'a' + 10) << (4 * !((i - cur_pos) & 1)));
+                }
+            }
+            cur_pos = next_pos + 1;
+            PrintArtists(cid, blob.pk, 0, false, false);
+        }
+    }
 }
 
-ON_METHOD(manager, view_artist)
+/*ON_METHOD(manager, view_artist)
 {
     PrintArtists(cid, pkArtist, 0, false, true);
 }
@@ -344,10 +429,12 @@ ON_METHOD(manager, manage_artist)
         Gallery::Method::ManageArtist::RequestType::DISABLE;
 
     args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
+    args.role = Gallery::Role::MANAGER;
 
     KeyMaterial::MyAdminKey kid;
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery manage artist", 120000);
 }
+*/
 
 ON_METHOD(artist, upload)
 {
@@ -546,11 +633,11 @@ ON_METHOD(manager, view_balance)
     wlk.PrintTotals();
 }
 
-ON_METHOD(user, become_artist)
+ON_METHOD(artist, set_artist)
 {
     struct {
         Gallery::Method::ManageArtist args;
-        char m_szLabel[Gallery::Artist::s_LabelMaxLen + 1];
+        char m_szLabelData[Gallery::Artist::s_TotalMaxLen + 2];
     } d;
 
     KeyMaterial::Owner km;
@@ -559,31 +646,44 @@ ON_METHOD(user, become_artist)
     km.Get(pkArtist);
 
     d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageArtist::RequestType::CREATE;
+    d.args.req = Gallery::Method::ManageArtist::RequestType::SET;
+    d.args.role = Gallery::Role::ARTIST;
 
     uint32_t nArgSize = sizeof(d.args);
 
-    uint32_t nSize = Env::DocGetText("label", d.m_szLabel, _countof(d.m_szLabel)); // including 0-term
-    if (nSize <= 1)
+    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artist::s_LabelMaxLen + 1); // including 0-term
+
+    if (nLabelSize > Gallery::Artist::s_LabelMaxLen + 1) // plus \0
     {
-        OnError("label required");
+        OnError("label is too long");
         return;
     }
 
-    if (nSize > _countof(d.m_szLabel))
-    {
-        OnError("label too long");
+    d.args.m_LabelLen = (nLabelSize ? nLabelSize : 0);
+
+    if (artist_label_exists(cid, d.m_szLabelData)) {
+        OnError("label already exists");
         return;
     }
 
-    d.args.m_LabelLen = nSize - 1;
     nArgSize += d.args.m_LabelLen;
+
+    uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.m_LabelLen, Gallery::Artist::s_DataMaxLen + 1); // including 0-term
+
+    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1)
+    {
+        OnError("data too long");
+        return;
+    }
+
+    d.args.m_DataLen = (nDataSize ? nDataSize - 1 : 0);
+    nArgSize += d.args.m_DataLen;
 
     SigRequest sig;
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Gallery set artist", 0);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set artist", 122964);
 }
 
 ON_METHOD(user, download)

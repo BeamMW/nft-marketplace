@@ -2,6 +2,8 @@
 #include "Shaders/Math.h"
 #include "contract.h"
 
+#include <algorithm>
+
 struct MyState
     :public Gallery::State
 {
@@ -98,48 +100,77 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
     _POD_(fsak.m_pkUser) = r.m_pkArtist;
 
     struct ArtistPlus : public Gallery::Artist {
-        char m_szLabel[s_LabelMaxLen];
+        char m_szLabelData[s_TotalMaxLen];
     } a;
 
     Gallery::Artist::SecondStageKey ssak;
 
-    // call from user:become_artist
-    if (r.m_LabelLen <= Gallery::Artist::s_LabelMaxLen)
-    {
-        Env::Halt_if(r.req != ArtistReqType::CREATE);
-        a.is_approved = false;
-        a.m_hRegistered = Env::get_Height();
-        Env::Memcpy(a.m_szLabel, &r + 1, r.m_LabelLen);
+    switch (r.req) {
+    case ArtistReqType::SET: {
+        bool artist_exists = Env::LoadVar_T(fsak, ssak);
 
-        Gallery::Artist::SecondStageKey ssak;
-        _POD_(ssak.m_pkUser) = r.m_pkArtist;
-        ssak.h_last_updated = Utils::FromBE(a.m_hRegistered);
-
-        Env::Halt_if(Env::SaveVar_T(fsak, ssak));
-        Env::SaveVar(&ssak, sizeof(ssak), &a, sizeof(Gallery::Artist) + r.m_LabelLen, KeyTag::Internal); // will fail if already exists
-        Env::AddSig(r.m_pkArtist);
-    } else { // call from manager:manage_artist
-        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
-        switch (r.req) {
-        case ArtistReqType::ENABLE:
-        case ArtistReqType::DISABLE: {
-            uint32_t artist_size = Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
-            Env::Halt_if(!artist_size);
+        if (artist_exists) {
+            Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
             Env::DelVar_T(ssak);
 
-            a.is_approved = (r.req == ArtistReqType::ENABLE);
-            ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+            uint32_t old_data_len = a.data_len;
+            uint32_t old_label_len = a.label_len;
+            uint8_t old_data[old_data_len];
+            if (r.m_LabelLen) {
+                Env::Memcpy(old_data, a.m_szLabelData + old_label_len, old_data_len);
+                a.label_len = r.m_LabelLen;
+                Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen);
+            }
 
-            Env::SaveVar_T(fsak, ssak);
-            Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
-            break;
-        }
-        default:
-            Env::Halt();
-        }
+            if (r.m_DataLen) {
+                a.data_len = r.m_DataLen;
+                Env::Memcpy(a.m_szLabelData + a.label_len, reinterpret_cast<const uint8_t *>(&r + 1) + r.m_LabelLen, a.data_len);
+            } else {
+                Env::Memcpy(a.m_szLabelData + a.label_len, old_data, old_data_len);
+            }
+        } else {
+            // if artist doesn't exist, then label is required
+            Env::Halt_if(!r.m_LabelLen); 
 
+            // will be uncommented in future (with moderation adding)
+            //a.is_approved = false;
+            a.is_approved = true;
+
+            a.m_hRegistered = Env::get_Height();
+            a.label_len = r.m_LabelLen;
+            a.data_len = r.m_DataLen;
+            Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+
+            _POD_(ssak.m_pkUser) = r.m_pkArtist;
+        }
+        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+
+        Env::SaveVar_T(fsak, ssak);
+        Env::SaveVar(&ssak, sizeof(ssak), &a, sizeof(Gallery::Artist) + a.label_len + a.data_len, KeyTag::Internal);
+
+        Env::AddSig(r.m_pkArtist);
+        break;
+    }
+    case ArtistReqType::ENABLE:
+    case ArtistReqType::DISABLE: {
+                                     /*
+        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
+        uint32_t artist_size = Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
+        Env::Halt_if(!artist_size);
+        Env::DelVar_T(ssak);
+
+        a.is_approved = (r.req == ArtistReqType::ENABLE);
+        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+
+        Env::SaveVar_T(fsak, ssak);
+        Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
         MyState s;
         s.AddSigAdmin();
+        */
+        break;
+    }
+    default:
+        Env::Halt();
     }
 }
 
@@ -171,7 +202,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
         Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
 
         struct ArtistPlus : public Gallery::Artist {
-            char m_szLabel[s_LabelMaxLen];
+            char m_szLabelData[s_TotalMaxLen];
         } a;
 
         Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);

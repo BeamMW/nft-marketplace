@@ -103,6 +103,13 @@ ON_METHOD(manager, view)
         Gallery::s_SID_6,
         Gallery::s_SID_7,
         Gallery::s_SID_8,
+        Gallery::s_SID_9,
+        Gallery::s_SID_10,
+        Gallery::s_SID_11,
+        Gallery::s_SID_12,
+        Gallery::s_SID_13,
+        Gallery::s_SID_14,
+        Gallery::s_SID_15,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
