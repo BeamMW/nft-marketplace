@@ -7,7 +7,7 @@
 
 <style scoped lang="stylus">
   .preview-container {
-    background-color: rgba(240, 205, 205, 0.1)
+    background-color: rgba(240, 205, 205, 0.07)
     display: flex
     align-items: center
     justify-content: center

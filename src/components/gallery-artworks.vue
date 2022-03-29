@@ -2,6 +2,7 @@
   <list v-model:page="page"
         emptymsg="There are no NFTs at the moment"
         component="artwork"
+        gap="16px"
         :items="items"
   />  
 </template>

@@ -1,7 +1,7 @@
 <template>
   <div class="artwork">
     <!---- Preview OR Loading ---->
-    <preview :image="item" height="360px" @click="onDetails"/>
+    <preview :image="item" height="200px" @click="onDetails"/>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -10,14 +10,14 @@
     <div class="info-row">
       <!---- Title ---->
       <div v-if="loading" class="title">Loading...</div>
-      <div v-else-if="error" class="title">Failed to load artwork</div>
-      <div v-else class="title">{{ title }}</div>
+      <div v-else-if="error" class="title">Failed to load</div>
+      <div v-else class="title">{{ title + title + title + title }}</div>
       
       <!---- Likes ----->
-      <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+      <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
         <span>{{ likes_cnt }}</span>
-      </div>
+      </div-->
     </div>
 
     <!---- Second info row, author ---->
@@ -31,18 +31,16 @@
 
     <!---- Third info row, price/buy/sell ----->
     <div class="price-row">
-      <artPrice :artwork="item"/>
+      <price :artwork="item" mode="compact"/>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
   .artwork {
-    margin-right: 16px
-    margin-bottom: 16px
     display: flex
     flex-direction: column
-    width: 284px
+    width: 213px
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
@@ -50,7 +48,7 @@
 
     & > .delete {
       position: absolute
-      left: 263px
+      left: 190px
       top: 5px
       width: 15px
       cursor: pointer
@@ -58,20 +56,19 @@
 
     & > .info-row {
       box-sizing: border-box
-      padding: 0 14px 0px 14px
+      padding: 0 12px 3px 12px
       display: flex
       align-items: center
       flex-direction: row
-      margin-bottom: 3px
       overflow: hidden
 
       & .title {
-        font-size: 16px
+        font-size: 14px
         color: #fff
         white-space: nowrap
         text-overflow: ellipsis
         overflow: hidden
-        padding-top: 20px
+        padding-top: 14px
         flex: 1
       }
 
@@ -98,8 +95,8 @@
     }
 
     & .price-row {
-      min-height: 41px
-      margin: 10px 0 20px 0
+      min-height: 31px
+      margin: 3px 0 7px 0
       padding: 0 12px 0 14px
       display: flex
       align-items: center
@@ -109,12 +106,12 @@
 </style>
 
 <script>
-import artPrice from './artwork-price.vue'
+import price from './artwork-price.vue'
 import preview from './image-preview.vue'
 
 export default {
   components: {
-    artPrice,
+    price,
     preview
   },
 

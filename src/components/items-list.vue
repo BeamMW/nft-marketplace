@@ -1,14 +1,13 @@
 <template>
   <div class="list-container">
     <template v-if="items.length > 0">
-      <div ref="itemslist" class="list" @scroll="onScroll">
+      <div ref="itemslist" class="list" :style="style" @scroll="onScroll">
         <component :is="component" v-for="item in visible_items" 
                    :key="item.id"
                    :item="item"
         />
       </div>
-      <paginator v-if="pages > 1"
-                 :current="page"
+      <paginator :current="page"
                  :total="pages"
                  @page-changed="onPage"
       />
@@ -31,6 +30,7 @@
       flex-wrap: wrap
       overflow-y: auto
       overflow-x: hidden
+      gap: 16px
     }
 
     .empty {
@@ -78,6 +78,10 @@ export default {
     page: {
       type: Number,
       default: 1
+    },
+    gap: {
+      type: String,
+      default: '16px'
     }
   },
 
@@ -99,6 +103,11 @@ export default {
     pages() {
       let total = this.items.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+    },
+    style () {
+      return {
+        'gap': this.gap
+      }
     }
   },
 
