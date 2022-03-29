@@ -880,5 +880,11 @@ export const store = {
     router.push({
       name: 'artist'
     })
+  },
+  
+  toCollectionDetails() {
+    router.push({
+      name: 'collection-details'
+    })
   }
 }

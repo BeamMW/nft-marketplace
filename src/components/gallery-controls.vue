@@ -15,6 +15,9 @@
         />
       </div>
 
+      <!-- for testing purposes -->
+      <btn text="collection details" color="blue" @click="$store.toCollectionDetails"/>
+
       <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"
