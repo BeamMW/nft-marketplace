@@ -4,7 +4,7 @@ import utils from './utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
 function defaultState() {
-  return {
+  let state = {
     loading: true,
     error: undefined,
     shader: undefined,
@@ -31,12 +31,27 @@ function defaultState() {
     filter_by_artist: 0,
     pending_artworks: 0,
     is_headless: false,
-    current_page: 1,
     use_ipfs: true,
 
     gallery_tab: tabs.COLLECTIONS,
-    gallery_page: 1,
+    gallery_artworks_page: 1,
+    gallery_collections_page: 1,
+    collections: []
   }
+
+  let desc = 'Blah blah blah, blah blah blah. Blah blah blah, blah blah blah! Blah blah blah, blah blah blah? Blah blah blah, blah blah blah.'
+  for(let i = 0; i < 30; ++i) {
+    state.collections.push({
+      id: i,
+      label: `Collection ${i}`,
+      author: `Artist ${i}`,
+      author_image: '/assets/test-author.png',
+      cover_image: '/assets/test-collection-cover.png',
+      description: [desc, desc, desc].join(' '),
+    })
+  }
+  
+  return state
 }
 
 function appstate() {
@@ -75,14 +90,14 @@ export const store = {
 
   setSortBy(val) {
     this.state.sort_by = val
-    this.state.current_page = 1
+    this.state.gallery_artworks_page = 1
     this.applySortAndFilters()
     this.loadCurrentArtworks()
   },
 
   setFilterByArtist(val) {
     this.state.filter_by_artist = val
-    this.state.current_page = 1
+    this.state.gallery_artworks_page = 1
     this.applySortAndFilters()
     this.loadCurrentArtworks()
   },
@@ -361,8 +376,8 @@ export const store = {
       this.applySortAndFilters()
     } 
 
-    let currPage = this.state.current_page > this.state.total_pages ? this.state.total_pages : this.state.current_page
-    this.setCurrentPage(currPage)
+    let currPage = this.state.gallery_artworks_page > this.state.total_pages ? this.state.total_pages : this.state.gallery_artworks_page
+    this.setGalleryArtworksPage(currPage)
 
     // Finally we have something to display
     this.state.loading = false
@@ -540,7 +555,7 @@ export const store = {
         this.state.all_artworks[tabs.SOLD].push(artwork)
         if (this.state.active_tab == tabs.SOLD) {
           this.applySortAndFilters()
-          this.setCurrentPage(this.state.current_page)
+          this.setGalleryArtworksPage(this.state.gallery_artworks_page)
         }
       }
     } 
@@ -829,13 +844,13 @@ export const store = {
     }
   },
 
-  setCurrentPage(page) {
-    this.state.current_page = page
+  setGalleryArtworksPage(page) {
+    this.state.gallery_artworks_page = page
     this.loadCurrentArtworks()
   },
 
   loadCurrentArtworks () {
-    let start = (this.state.current_page - 1) * common.ITEMS_PER_PAGE
+    let start = (this.state.gallery_artworks_page - 1) * common.ITEMS_PER_PAGE
     let end = Math.min(start + common.ITEMS_PER_PAGE, this.state.artworks.length)
     for (let idx = start; idx < end; ++idx) {
       let art = this.state.artworks[idx]
@@ -848,11 +863,15 @@ export const store = {
   setActiveTab(id) {
     this.state.active_tab = id
     this.applySortAndFilters()
-    this.setCurrentPage(1)
+    this.setGalleryArtworksPage(1)
   },
 
   setGalleryTab(id) {
     this.state.gallery_tab = id
+  },
+
+  setGalleryCollectionsPage (page) {
+    this.state.gallery_collections_page = page
   },
 
   toArtworkDetails(id) {

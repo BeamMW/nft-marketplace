@@ -1,12 +1,8 @@
 <template>
   <div class="gallery-container">
     <controls/>
-    <div v-if="show_collections">
-    </div>
-    <artworks v-else v-model:page="page"
-              class="artworks"
-              :artworks="artworks"
-    />
+    <collections v-if="show_collections" class="list"/>
+    <artworks v-else class="list"/>
   </div>
 </template>
 
@@ -17,7 +13,7 @@
     width: 100%
     height: 100%
 
-    .artworks {
+    & > .list {
       margin-top: 20px
       flex: 1
     }
@@ -27,31 +23,20 @@
 <script>
 // TODO: headless
 import controls from './gallery-controls.vue'
-import artworks from './artworks-list.vue'
+import artworks from './gallery-artworks.vue'
+import collections from './gallery-collections.vue'
 import {tabs} from '../utils/consts.js'
 
 export default {
   components: {
     controls,
-    artworks
+    artworks,
+    collections
   },
 
   computed: {
     show_collections () {
       return this.$state.gallery_tab == tabs.COLLECTIONS
-    },
-
-    artworks () {
-      return this.$state.artworks
-    },
-
-    page: {
-      get() {
-        return this.$state.current_page
-      },
-      set (value) {
-        this.$store.setCurrentPage(value)
-      }
     }
   }
 }

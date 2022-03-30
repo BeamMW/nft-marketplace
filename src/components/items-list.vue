@@ -1,31 +1,32 @@
 <template>
-  <div class="artworks-container">
-    <template v-if="artworks.length > 0">
-      <div ref="artslist" class="artworks" @scroll="onScroll">
-        <artwork v-for="artwork in visible_artworks"
-                 :key="artwork.id"
-                 :artwork="artwork"
+  <div class="list-container">
+    <template v-if="items.length > 0">
+      <div ref="itemslist" class="list" @scroll="onScroll">
+        <component :is="component" v-for="item in visible_items" 
+                   :key="item.id"
+                   :item="item"
         />
       </div>
-      <paginator :current="page"
+      <paginator v-if="pages > 1"
+                 :current="page"
                  :total="pages"
                  @page-changed="onPage"
       />
     </template>
     <div v-else class="empty">
       <img src="~assets/icon-empty-gallery.svg"/>
-      <div class="text">There are no NFTs at the moment</div>
+      <div class="text">{{ emptymsg }}</div>
     </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .artworks-container {
+  .list-container {
     display: flex
     flex-direction: column
     min-height: 0
 
-    .artworks {
+    & > .list {
       display: flex
       flex-wrap: wrap
       overflow-y: auto
@@ -53,19 +54,26 @@
 
 <script>
 import {common} from '../utils/consts.js'
-import artwork from './artwork.vue'
 import paginator from './paginator.vue'
 
 export default {
   components: {
-    artwork,
     paginator
   },
 
   props: {
-    artworks: {
+    items: {
       type: Array,
       default: () => []
+    },
+    emptymsg: {
+      type: String,
+      default: ''
+    },
+    component: {
+      type: String,
+      required: true,
+      default: undefined
     },
     page: {
       type: Number,
@@ -78,8 +86,8 @@ export default {
   ],
 
   computed: {
-    visible_artworks () {
-      let all = this.artworks
+    visible_items () {
+      let all = this.items
       let result  = []
       let start = (this.page - 1) * common.ITEMS_PER_PAGE
       let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
@@ -89,17 +97,17 @@ export default {
       return result
     },
     pages() {
-      let total = this.artworks.length
+      let total = this.items.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
     }
   },
 
   mounted() {
-    if(this.$route.hash) {
-      this.$refs.artslist.scrollTop = this.$route.hash.substr(1)
+    if(this.items.length && this.$route.hash) {
+      this.$refs.itemslist.scrollTop = this.$route.hash.substr(1)
     }
   },
-  
+
   methods: {
     onScroll(ev) {
       let pos = ev.target.scrollTop
@@ -108,7 +116,7 @@ export default {
 
     onPage(page) {
       this.$emit('update:page', page)
-      this.$refs.artslist.scrollTop = 0
+      this.$refs.itemslist.scrollTop = 0
     } 
   }
 }
