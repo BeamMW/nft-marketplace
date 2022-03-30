@@ -2,12 +2,15 @@
   <hdr title="collection name"/>
   <div class="container__collection">
     <img class="banner" :src="banner">
-    
+
     <div class="info-block">
       <div class="left">
         <!-- artist info -->
         <div class="artist">
-          <img :src="author_image">
+          <div class="image">
+            <imagePreview :image="author_image" radius="36px 36px"/>
+          </div>
+          <!-- <img :src="author_image"> -->
           <div class="artist__info">
             <span class="artist__name">{{ author }}</span>
             <span class="artist__description">{{ author_description }}</span>
@@ -95,8 +98,10 @@
 
 .banner {
   min-height: 200px
-  width: 100%
+  max-height: 300px
+  min-width: 100%
   grid-column: 1 / 3
+  object-fit: cover
 }
 
 .info-block {
@@ -113,8 +118,12 @@
       display: flex
       margin-bottom: 20px
 
-      img {
+      .image {
         margin-right: 16px
+        min-width: 72px
+        min-height: 72px
+        max-width: 72px
+        max-height: 72px
       }
 
       &__info {
@@ -239,13 +248,15 @@
 <script>
 import hdr from './page-title.vue'
 import btn from './button.vue'
+import imagePreview from './image-preview.vue'
 
 import {binary_search} from '../utils/search.js'
 
 export default {
   components: {
     hdr,
-    btn
+    btn,
+    imagePreview
   },
 
   props: {
