@@ -53,20 +53,20 @@
 #define Gallery_artist_set_artist(macro) \
     macro(ContractID, cid) \
 
-#define Gallery_artist_upload(macro) \
+#define Gallery_artist_set_artwork(macro) \
     macro(ContractID, cid) \
 
 #define GalleryRole_artist(macro) \
     macro(artist, view) \
     macro(artist, get_key) \
-    macro(artist, upload) \
+    macro(artist, set_artwork) \
     macro(artist, set_artist) \
 
-#define Gallery_user_view_item(macro) \
+//#define Gallery_user_view_item(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Masterpiece::ID, id)
 
-#define Gallery_user_view_items(macro) \
+#define Gallery_user_view_artworks(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(Amount, count)
@@ -102,8 +102,7 @@
     macro(uint32_t, val) \
 
 #define GalleryRole_user(macro) \
-    macro(user, view_item) \
-    macro(user, view_items) \
+    macro(user, view_artworks) \
     macro(user, download) \
     macro(user, set_price) \
     macro(user, transfer) \
@@ -111,6 +110,7 @@
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
+    //macro(user, view_item) \
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
@@ -436,7 +436,7 @@ ON_METHOD(manager, manage_artist)
 }
 */
 
-ON_METHOD(artist, upload)
+ON_METHOD(artist, set_artwork)
 {
     KeyMaterial::Owner km;
     km.SetCid(cid);
@@ -509,7 +509,6 @@ ON_METHOD(manager, admin_delete)
 
     KeyMaterial::MyAdminKey kid;
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery delete masterpiece", 0);
-
 }
 
 ON_METHOD(manager, add_rewards)
@@ -855,7 +854,7 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::ID id, Impre
 
     if (!_POD_(m.m_pkOwner).IsZero())
     {
-        Env::DocAddBlob_T("pk", m.m_pkOwner);
+        Env::DocAddBlob_T("pk_owner", m.m_pkOwner);
         Env::DocAddNum("owned", (uint32_t) !!oi.DeduceOwner(cid, id, m));
 
         if (m.m_Price.m_Amount)
@@ -907,7 +906,7 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::ID id, Impre
         Env::DocAddNum("my_impression", nMyImpression);
 }
 
-ON_METHOD(user, view_item)
+/*ON_METHOD(user, view_item)
 {
     auto id_ = Utils::FromBE(id);
 
@@ -940,8 +939,9 @@ ON_METHOD(user, view_item)
     }
 
 }
+*/
 
-ON_METHOD(user, view_items)
+ON_METHOD(user, view_artworks)
 {
     Env::Key_T<Gallery::Masterpiece::SecondStageKey> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
