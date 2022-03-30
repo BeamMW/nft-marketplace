@@ -1,5 +1,5 @@
 import App from './components/app.vue'
-import {store} from './store.js'
+import store from './store/store.js'
 import {router} from './router.js'
 import utils from './utils/utils.js'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'

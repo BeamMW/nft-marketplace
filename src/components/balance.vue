@@ -93,8 +93,7 @@ export default {
     },
 
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
-                         this.$state.artists[this.$state.my_artist_keys[1]]
+      let artist = this.$state.artists[this.$state.my_artist_key]
       return (artist || {}).label
     }
   },

@@ -128,7 +128,7 @@ export default {
     },
 
     author () {
-      return this.$state.my_artist_keys.indexOf(this.artwork.pk_author) > -1
+      return this.$state.my_artist_key === this.artwork.pk_author
     },
 
     price() {

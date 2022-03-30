@@ -84,7 +84,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit" @click="onCreate">
+    <btn text="create account" color="blue" :disabled="!can_submit" @click="onSetArtist">
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -369,6 +369,19 @@ export default {
       this.avatar = undefined
       this.$refs.avatar.value = ''
     },
+
+    onSetArtist() {
+      this.$store.setArtist(this.name,  {
+        website:   this.website,
+        twitter:   this.twitter,
+        instagram: this.instagram,
+        about:     this.about,
+        avatar:    '',
+        banner:    ''
+      }, (res) => {
+        alert('Artist created: ' + JSON.stringify(res))
+      })
+    }
   }
 }
 </script>

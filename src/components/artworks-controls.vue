@@ -132,8 +132,7 @@ export default {
       return this.$state.is_artist
     },
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
-                   this.$state.artists[this.$state.my_artist_keys[1]]
+      let artist = this.$state.artists[this.$state.my_artist_key]
       return (artist || {}).label
     },
     active_tab () {

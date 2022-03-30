@@ -1,7 +1,9 @@
-import {router} from './router.js'
-import {tabs, common, contract,sort} from './utils/consts.js'
-import utils from './utils/utils.js'
+import {router} from '../router.js'
+import {tabs, common, contract, sort} from '../utils/consts.js'
+import utils from '../utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
+import formats from './store-formats.js'
+import aformat from './store-artist.js'
 
 function defaultState() {
   let state = {
@@ -10,7 +12,7 @@ function defaultState() {
     shader: undefined,
     cid: contract.cid,
     cid_checked: false,
-    my_artist_keys: [],
+    my_artist_key: '',
     is_artist: false,
     is_admin: false,
     artworks: [],
@@ -65,7 +67,7 @@ function appstate() {
   return state
 }
 
-export const store = {
+const store = {
   state: appstate(),
 
   //
@@ -115,7 +117,7 @@ export const store = {
         if (err) return this.setError(err, 'Failed to download shader')
         this.state.shader = bytes
 
-        //utils.invokeContract("", (...args) => this.onShowMethods(...args), this.state.shader)
+        //utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
         utils.callApi('ev_subunsub', {ev_system_state: true}, (err) => this.checkError(err))
         utils.invokeContract('role=manager,action=view', (...args) => this.onCheckCID(...args), this.state.shader)
       })
@@ -146,6 +148,7 @@ export const store = {
       return this.setError(err, 'Failed to verify cid')     
     }
 
+    console.log(this.state.cid)
     if (!res.contracts.some(el => el.cid == this.state.cid)) {
       throw `CID not found '${this.state.cid}'`
     }
@@ -168,21 +171,8 @@ export const store = {
     }
         
     utils.ensureField(res, 'key', 'string')
-    this.state.my_artist_keys.push(res.key)
+    this.state.my_artist_key = res.key
         
-    utils.invokeContract(
-      'role=artist,action=get_key', 
-      (...args) => this.onGetArtistKeyNoCID(...args), this.shader
-    )
-  },
-
-  onGetArtistKeyNoCID(err, res) {
-    if (err) {
-      return this.setError(err, 'Failed to get artist key')     
-    }
-        
-    utils.ensureField(res, 'key', 'string')
-    this.state.my_artist_keys.push(res.key)
     utils.invokeContract(
       `role=manager,action=view_params,cid=${this.state.cid}`, 
       (...args) => this.onLoadParams(...args)
@@ -243,6 +233,7 @@ export const store = {
   // Artists
   //
   loadArtists () {
+    console.log('loadArtists')
     utils.invokeContract(
       `role=manager,action=view_artists,cid=${this.state.cid}`, 
       (...args) => this.onLoadArtists(...args)
@@ -255,7 +246,9 @@ export const store = {
     }
 
     utils.ensureField(res, 'artists', 'array')
-    res.artists.sort( (a,b) => a.label > b.label ? 1 : -1)
+    // TODO:TEST
+    let artists = res.artists.slice(2).map(el => aformat.fromContract(el))
+    artists.sort((a,b) => a.label > b.label ? 1 : -1)
 
     //
     // OPTIMIZE: 
@@ -270,42 +263,34 @@ export const store = {
     //          this.state.artists[artist.key] = artist
     //       }
     //
-    if (this.state.artists_count != res.artists.length) {
+    if (this.state.artists_count != artists.length) {
       if (!this.state.selected_artist) {
         // choose first artist for admin if nobody is selected
         this.state.selected_artist = {
-          key: res.artists[0].key,
-          label: res.artists[0].label
+          key: artists[0].key,
+          label: artists[0].label
         }
       }
 
-      let mykeys = this.state.my_artist_keys
-      for (let artist of res.artists) {
-        if (mykeys.indexOf(artist.key) != -1) {
-          this.state.is_artist = false //true
+      let mykey = this.state.my_artist_key
+      for (let artist of artists) {
+        if (mykey === artist.key) {
+          this.state.is_artist = true
         }
         this.state.artists[artist.key] = artist
       }
     } 
     // END OF NOT OPTIMIZED
-    this.state.artists_count = res.artists.length
+    this.state.artists_count = artists.length
     this.loadArtworks() 
   },
 
   //
   // Artworks
   //
-  hexEncodeU8A (arr) {
-    return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
-  },
-
-  hexDecodeU8A (str) {
-    return new Uint8Array(str.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
-  },
-
   loadArtworks () {
     utils.invokeContract(
-      `role=user,action=view_all,cid=${this.state.cid}`, 
+      `role=user,action=view_items,cid=${this.state.cid}`, 
       (...args) => this.onLoadArtworks(...args)
     )    
   },
@@ -319,13 +304,9 @@ export const store = {
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
-    let mykeys = this.state.my_artist_keys
+    let mykey = this.state.my_artist_ke
 
     for (let awork of res.items) {
-      if (awork.sales) {
-        alert(JSON.stringify(awork.sales))
-      }
-
       let oawork = null
       for (let idx = oldstart; idx < oartworks.length; ++idx) {
         if (oartworks[idx].id == awork.id) {
@@ -360,7 +341,7 @@ export const store = {
       if (awork.owned) mine.push(awork) // MINE is what I own
       if (awork.owned && awork.price) sale.push(awork) // SALE is what OWN && what has price set
       if (awork.my_impression) liked.push(awork) // awork.my_impression
-      if (mykeys.indexOf(awork.pk_author) != -1 && !awork.owned) sold.push(awork) // SOLD - I'm an author but I do not own
+      if (awork.pk_author === mykey && !awork.owned) sold.push(awork) // SOLD - I'm an author but I do not own
     }    
 
     this.state.all_artworks = {
@@ -478,7 +459,7 @@ export const store = {
       let pk_author = res.artist
 
       utils.ensureField(res, 'data', 'string')
-      var data = this.hexDecodeU8A(res.data)
+      var data = formats.u8arrToHex(res.data)
 
       // check version
       let version = data[0]
@@ -550,8 +531,8 @@ export const store = {
       }
 
       // We receive author only now, so add what's missing to SOLD
-      let mykeys = this.state.my_artist_keys
-      if (mykeys.indexOf(artwork.pk_author) != -1 && !artwork.owned) {
+      let mykey = this.state.my_artist_key
+      if (artwork.pk_author === mykey && !artwork.owned) {
         this.state.all_artworks[tabs.SOLD].push(artwork)
         if (this.state.active_tab == tabs.SOLD) {
           this.applySortAndFilters()
@@ -661,10 +642,10 @@ export const store = {
         let aname = (new TextEncoder()).encode(name)
         let asep  = Uint8Array.from([0, 0])
         let aimg  = new Uint8Array(reader.result)
-        let hex   = [this.hexEncodeU8A(aver), 
-          this.hexEncodeU8A(aname), 
-          this.hexEncodeU8A(asep), 
-          this.hexEncodeU8A(aimg)
+        let hex   = [formats.u8arrToHex(aver), 
+          formats.u8arrToHex(aname), 
+          formats.u8arrToHex(asep), 
+          formats.u8arrToHex(aimg)
         ].join('')
                         
         utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
@@ -693,7 +674,7 @@ export const store = {
           }
 
           utils.ensureField(res, 'hash', 'string')
-          alert(`new ipfs hash: ${res.hash}`)
+          // alert(`new ipfs hash: ${res.hash}`)
                     
           // Form what we write on blockchain
           // 2 (version) then meta
@@ -704,7 +685,7 @@ export const store = {
             mime_type: file.type
           })
           let ameta = (new TextEncoder()).encode(meta)
-          let hex = [this.hexEncodeU8A(aver), this.hexEncodeU8A(ameta)].join('')
+          let hex = [formats.u8arrToHex(aver), formats.u8arrToHex(ameta)].join('')
 
           // Register our NFT
           utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
@@ -874,6 +855,14 @@ export const store = {
     this.state.gallery_collections_page = page
   },
 
+  setArtist(label, data, cback) {
+    let cdata  = aformat.toContract(label, data)
+    // TODO: make invokeContract accept an object with props
+    utils.invokeContract(`role=artist,action=set_artist,cid=${this.state.cid},label=${cdata.label},data=${cdata.data}`, 
+      (...args) => this.onMakeTx(...args)
+    )
+  },
+
   toArtworkDetails(id) {
     router.push({
       name: 'artwork',
@@ -899,5 +888,13 @@ export const store = {
     router.push({
       name: 'artist'
     })
+  },
+
+  toEditArtist() {
+    router.push({
+      name: 'artist'
+    })
   }
 }
+
+export default store
