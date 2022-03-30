@@ -1,22 +1,22 @@
 <template>
   <hdr title="collection name"/>
   <div class="container__collection">
-    <img class="banner" src="~assets/collection-banner.svg">
+    <img class="banner" :src="banner">
     
     <div class="info-block">
       <div class="left">
         <!-- artist info -->
         <div class="artist">
-          <img src="~assets/artist-image.svg">
+          <img :src="author_image">
           <div class="artist__info">
-            <span class="artist__name">Master_Splinter</span>
-            <span class="artist__description">NFT creator since 1898</span>
+            <span class="artist__name">{{ author }}</span>
+            <span class="artist__description">{{ author_description }}</span>
           </div>
         </div>
 
-        <!-- collection desctiption -->
+        <!-- collection description -->
         <div class="collection__description">
-          <span ref="desc" :class="!full_text ? 'desc' : ''">{{ text }}</span>
+          <span ref="desc" :class="!full_text ? 'desc' : ''">{{ description }}</span>
           <span v-if="!full_text && is_long_text" class="button-more" @click="full_text = true">See more</span>
         </div>
       </div>
@@ -24,15 +24,15 @@
       <div class="right">
         <!-- "social" block -->
         <div class="social">
-          <btn color="transparent" height="20px">
+          <btn v-if="website" color="transparent" height="20px">
             <img src="~assets/glob-green.svg">
           </btn>
 
-          <btn color="transparent" height="20px">
+          <btn v-if="twitter" color="transparent" height="20px">
             <img src="~assets/twitter-green.svg">
           </btn>
 
-          <btn color="transparent" height="20px">
+          <btn v-if="instagram" color="transparent" height="20px">
             <img src="~assets/instagram-green.svg">
           </btn>
 
@@ -75,7 +75,8 @@
       <div v-if="full_text" class="footer">
         <btn text="Show less"
              height="20px"
-             color="transparent" 
+             color="transparent"
+             :text_bold="false"
              @click="full_text = false"
         />
       </div>
@@ -94,6 +95,7 @@
 
 .banner {
   min-height: 200px
+  width: 100%
   grid-column: 1 / 3
 }
 
@@ -119,6 +121,18 @@
         display: flex
         flex-direction: column
         justify-content: center
+        padding-right: 20px
+
+        & > * {
+          overflow: hidden
+          text-overflow: ellipsis
+          display: -moz-box
+          -moz-box-orient: vertical
+          display: -webkit-box
+          -webkit-line-clamp: 1
+          -webkit-box-orient: vertical
+          line-clamp: 1
+        }
       }
 
       &__name {
@@ -135,6 +149,8 @@
     .collection__description {
       color: #8897a8
       font-size: 14px
+      display: flex
+      flex-direction: column
 
       .desc {
         overflow: hidden
@@ -150,7 +166,7 @@
       .button-more {
         cursor: pointer
         color: #00f6d2
-        right: 0
+        align-self: flex-end
       }
     }
   }
@@ -224,37 +240,74 @@
 import hdr from './page-title.vue'
 import btn from './button.vue'
 
+import {binary_search} from '../utils/search.js'
+
 export default {
   components: {
     hdr,
     btn
   },
 
+  props: {
+    id: {
+      type: Number,
+      required: true
+    },
+  },
+
   data() {
     return {
-      items: 66,
-      owners: 4,
-      price: 3.2,
-      volume_traded: 1.3,
-      text: `Brian NFT collection by Braindom Games is a limited collection of 
-          5,000 unique 3D NFTs with hundreds of unique attributes captured on 
-          Ethereum blockchain. Brian NFT collection is inspired by one of the 
-          most popular puzzle and brain teaser games ever - Braindom. The 1336 Coach Pop Collection 
-          commemorates the new all-time winningest coach in NBA History. 
-          Each NFT will highlight a hand-drawn play with a digital signature from Coach Pop’s arsenal, 
-          featured against a backdrop of the different courts Spurs teams have played on during his tenure. 
-          Continuing the long-standing partnership between the Spurs & San Antonio Food Bank, 100% of 
-          the proceeds from this historic and unique collection will directly benefit the fight against hunger 
-          and feeding hope to the San Antonio and Southwest Texas community.`,
       full_text: false,
       is_long_text: false
     }
   },
 
-  mounted() {
-    console.log(this.$refs.desc.offsetHeight)
-    console.log(this.$refs.desc.scrollHeight)
+  computed: {
+    collection() {
+      let all = this.$state.collections
+      let idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
 
+      return all[idx]
+    },
+    author() {
+      return this.collection.author
+    },
+    author_description() {
+      return this.collection.author_description
+    },
+    author_image() {
+      return this.collection.author_image
+    },
+    banner() {
+      return this.collection.cover_image
+    },
+    description() {
+      return this.collection.description
+    },
+    items() {
+      return this.collection.items
+    },
+    owners() {
+      return this.collection.owners
+    },
+    price() {
+      return this.collection.price
+    },
+    volume_traded() {
+      return this.collection.volume_traded
+    },
+    website() {
+      return this.collection.website
+    },
+    twitter() {
+      return this.collection.twitter
+    },
+    instagram() {
+      return this.collection.instagram
+    }
+  },
+
+  mounted() {
     const scrollHeight = this.$refs.desc.scrollHeight
     const offsetHeight = this.$refs.desc.offsetHeight
 
@@ -265,8 +318,8 @@ export default {
 
   methods: {
     toggleVisibleText() {
-      this.full_text === false ? this.full_text = true : this.full_text = false
+      !this.full_text ? this.full_text : !this.full_text
     },
-  }
+  },
 }
 </script>

@@ -3,6 +3,9 @@ import {tabs, common, contract,sort} from './utils/consts.js'
 import utils from './utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
+// for testing purposes
+import COLLECTIONS from './utils/collection-testing.js'
+
 function defaultState() {
   let state = {
     loading: true,
@@ -38,18 +41,22 @@ function defaultState() {
     gallery_collections_page: 1,
     collections: []
   }
+  //////////////////////////////
+  //// for testing purposes ////
+  //////////////////////////////
+  COLLECTIONS.forEach(x => state.collections.push(x))
 
-  let desc = 'Blah blah blah, blah blah blah. Blah blah blah, blah blah blah! Blah blah blah, blah blah blah? Blah blah blah, blah blah blah.'
-  for(let i = 0; i < 30; ++i) {
-    state.collections.push({
-      id: i,
-      label: `Collection ${i}`,
-      author: `Artist ${i}`,
-      author_image: '/assets/test-author.png',
-      cover_image: '/assets/test-collection-cover.png',
-      description: [desc, desc, desc].join(' '),
-    })
-  }
+  // let desc = 'Blah blah blah, blah blah blah. Blah blah blah, blah blah blah! Blah blah blah, blah blah blah? Blah blah blah, blah blah blah.'
+  // for(let i = 0; i < 30; ++i) {
+  //   state.collections.push({
+  //     id: i,
+  //     label: `Collection ${i}`,
+  //     author: `Artist ${i}`,
+  //     author_image: '/assets/test-author.png',
+  //     cover_image: '/assets/test-collection-cover.png',
+  //     description: [desc, desc, desc].join(' '),
+  //   })
+  // }
   
   return state
 }
@@ -901,9 +908,12 @@ export const store = {
     })
   },
   
-  toCollectionDetails() {
+  toCollectionDetails(id) {
     router.push({
-      name: 'collection-details'
+      name: 'collection-details',
+      params: {
+        id
+      }
     })
   }
 }

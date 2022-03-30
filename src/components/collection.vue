@@ -1,5 +1,5 @@
 <template>
-  <div class="collection">
+  <div class="collection" @click="$store.toCollectionDetails(item.id)">
     <preview class="preview" :image="item.cover_image" height="140px"/>
     <div class="info-row">  
       <div class="avatar">

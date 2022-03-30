@@ -14,6 +14,8 @@ export const router = createRouter({
     {path: '/balance', component: balance, name: 'balance'},
     {path: '/artwork/:id', component: artworkDetails, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/artist', component: artistDetails, name: 'artist'},
-    {path: '/collection-details', component: collectionDetails, name: 'collection-details'}
+    {path: '/collection-details/:id', component: collectionDetails, name: 'collection-details', 
+      props: (route) => {return {id: Number(route.params.id)}}
+    }
   ]
 })
