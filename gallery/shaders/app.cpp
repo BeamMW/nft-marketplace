@@ -495,7 +495,7 @@ ON_METHOD(artist, set_artwork)
     if (nDataLen)
         nCharge += Env::Cost::Log_For(nDataLen) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, pArgs->s_iMethod, pArgs, nSizeArgs, nullptr, 0, &sig, 1, "Gallery upload masterpiece", nCharge);
+    Env::GenerateKernel(&cid, pArgs->s_iMethod, pArgs, nSizeArgs, nullptr, 0, &sig, 1, "Set artwork", nCharge);
 
     Env::Heap_Free(pArgs);
 }
@@ -508,7 +508,7 @@ ON_METHOD(manager, admin_delete)
     args.m_ID = id_;
 
     KeyMaterial::MyAdminKey kid;
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery delete masterpiece", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Delete artwork", 0);
 }
 
 ON_METHOD(manager, add_rewards)
@@ -531,7 +531,7 @@ ON_METHOD(manager, add_rewards)
     fc.m_Amount = args.m_Amount;
     fc.m_Consume = 1;
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Gallery add voting rewards", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Add voting rewards", 0);
 }
 
 ON_METHOD(manager, my_admin_key)
@@ -995,8 +995,10 @@ ON_METHOD(user, set_price)
     sig.m_pID = &oi.m_km;
     sig.m_nID = sizeof(oi.m_km);
 
+    const char* comment = args.m_Price.m_Amount ? "Set item price" : "Remove from sale";
+
     // TODO: replace hardcoded charge
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Gallery set item price", 138184);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 138184);
 }
 
 ON_METHOD(user, transfer)
@@ -1048,7 +1050,7 @@ ON_METHOD(user, buy)
     fc.m_Amount = m.m_Price.m_Amount;
     fc.m_Aid = m.m_Price.m_Aid;
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Gallery buy item", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Buy item", 0);
 }
 
 struct BalanceWalkerOwner
@@ -1111,7 +1113,7 @@ ON_METHOD(user, withdraw)
         sig.m_pID = &wlk.m_Oi.m_km;
         sig.m_nID = sizeof(wlk.m_Oi.m_km);
 
-        Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, nCount ? "" : "Gallery withdraw", 0);
+        Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, nCount ? "" : "Withdraw", 0);
 
         if (nMaxCount == ++nCount)
             break;
@@ -1154,7 +1156,7 @@ ON_METHOD(user, vote)
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, "Gallery vote", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, "Vote", 0);
 }
 
 #undef ON_METHOD
