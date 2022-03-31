@@ -205,6 +205,7 @@ ON_METHOD(manager, view)
         Gallery::s_SID_13,
         Gallery::s_SID_14,
         Gallery::s_SID_15,
+        Gallery::s_SID_16,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -323,9 +324,18 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label)
 
     Env::VarReader r(k0, k1);
     MyArtist a;
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey my_key;
+    km.Get(my_key);
+
     while (true) {
         if (!a.ReadNext(r, k0))
             break;
+
+        if (!Env::Memcmp(&k0.m_KeyInContract.m_pkUser, &my_key, sizeof(PubKey)))
+            continue;
 
         if (a.GetLabel() == label)
             return true;
@@ -495,7 +505,7 @@ ON_METHOD(artist, set_artwork)
     if (nDataLen)
         nCharge += Env::Cost::Log_For(nDataLen) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, pArgs->s_iMethod, pArgs, nSizeArgs, nullptr, 0, &sig, 1, "Set artwork", nCharge);
+    Env::GenerateKernel(&cid, pArgs->s_iMethod, pArgs, nSizeArgs, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 25000);
 
     Env::Heap_Free(pArgs);
 }
@@ -658,7 +668,7 @@ ON_METHOD(artist, set_artist)
         return;
     }
 
-    d.args.m_LabelLen = (nLabelSize ? nLabelSize : 0);
+    d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
 
     if (artist_label_exists(cid, d.m_szLabelData)) {
         OnError("label already exists");
@@ -682,7 +692,7 @@ ON_METHOD(artist, set_artist)
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set artist", 122964);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set artist", 250000);
 }
 
 ON_METHOD(user, download)
@@ -997,8 +1007,7 @@ ON_METHOD(user, set_price)
 
     const char* comment = args.m_Price.m_Amount ? "Set item price" : "Remove from sale";
 
-    // TODO: replace hardcoded charge
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 138184);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 200000);
 }
 
 ON_METHOD(user, transfer)
@@ -1018,7 +1027,7 @@ ON_METHOD(user, transfer)
     sig.m_pID = &oi.m_km;
     sig.m_nID = sizeof(oi.m_km);
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Gallery transfer item", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Transfer item", 0);
 }
 
 ON_METHOD(user, buy)

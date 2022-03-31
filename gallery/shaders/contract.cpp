@@ -164,9 +164,9 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 
         Env::SaveVar_T(fsak, ssak);
         Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
+        */
         MyState s;
         s.AddSigAdmin();
-        */
         break;
     }
     default:
