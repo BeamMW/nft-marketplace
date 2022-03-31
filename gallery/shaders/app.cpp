@@ -53,7 +53,7 @@
     //macro(manager, manage_artist) \
 
 #define Gallery_artist_view(macro) macro(ContractID, cid)
-#define Gallery_artist_get_key(macro) macro(ContractID, cid)
+#define Gallery_artist_get_id(macro) macro(ContractID, cid)
 
 #define Gallery_artist_set_artist(macro) \
     macro(ContractID, cid) \
@@ -68,7 +68,7 @@
 
 #define GalleryRole_artist(macro) \
     macro(artist, view) \
-    macro(artist, get_key) \
+    macro(artist, get_id) \
     macro(artist, set_artwork) \
     macro(artist, set_artist) \
     macro(artist, set_collection) \
@@ -289,7 +289,7 @@ struct MyArtist
         Env::DocAddText("label", label);
         Env::DocAddText("data", data);
         Env::DocAddNum("hReg", m_hRegistered);
-        Env::DocAddNum32("isApproved", is_approved);
+        Env::DocAddNum32("approved", is_approved);
     }
 
     std::string_view GetData()
@@ -444,8 +444,8 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
                 break;
 
             Env::DocGroup gr1("");
-            Env::DocAddBlob_T("key", k0.m_KeyInContract.m_pkUser);
-            Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+            Env::DocAddBlob_T("id", k0.m_KeyInContract.m_pkUser);
+            Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
             a.Print();
         }
     } else {
@@ -455,8 +455,8 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
             return false;
         }
         Env::DocGroup gr1("");
-        Env::DocAddBlob_T("key", k0.m_KeyInContract.m_pkUser);
-        Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+        Env::DocAddBlob_T("id", k0.m_KeyInContract.m_pkUser);
+        Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
         a.Print();
     }
 
@@ -498,7 +498,7 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
 
             Env::DocGroup gr1("");
             Env::DocAddNum32("id", k0.m_KeyInContract.m_ID);
-            Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+            Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
 
             Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
             _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -531,7 +531,7 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
         }
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", k0.m_KeyInContract.m_ID);
-        Env::DocAddNum32("last_updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+        Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
 
         Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
         _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -1004,14 +1004,14 @@ ON_METHOD(artist, view)
 
 }
 
-ON_METHOD(artist, get_key)
+ON_METHOD(artist, get_id)
 {
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey pk;
     km.Get(pk);
 
-    Env::DocAddBlob_T("key", pk);
+    Env::DocAddBlob_T("id", pk);
 }
 
 bool ReadItem(const ContractID& cid, Gallery::Masterpiece::ID id, Gallery::Masterpiece& m)
