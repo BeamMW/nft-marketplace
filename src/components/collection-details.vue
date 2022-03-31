@@ -60,7 +60,7 @@
           <div>
             <div>
               <img src="~assets/icon-beam.svg">
-              <span class="value">{{ price }} k</span>
+              <span class="value">{{ price }}</span>
             </div>
             <span>price</span>
           </div>
@@ -68,7 +68,7 @@
           <div>
             <div>
               <img src="~assets/icon-beam.svg">
-              <span class="value">{{ volume_traded }} k</span>
+              <span class="value">{{ volume_traded }}</span>
             </div>
             <span>volume traded</span>
           </div>
@@ -77,7 +77,7 @@
 
       <!-- footer button -->
       <div v-if="full_text" class="footer">
-        <btn text="Show less"
+        <btn text="See¶ less"
              height="20px"
              color="transparent"
              :text_bold="false"
@@ -109,7 +109,7 @@
   display: grid
   grid-template-columns: 1fr 1fr
   grid-template-rows: 1fr
-  column-gap: 30px
+  column-gap: 10px
   padding: 20px
   background-color: rgba(255, 255, 255, 0.05)
 }
@@ -184,6 +184,7 @@
     cursor: pointer
     color: #00f6d2
     align-self: flex-end
+    margin-right: 20px
   }
 }
 
@@ -219,7 +220,7 @@
       display: flex
       
       & img {
-        margin-right: 10px
+        margin-right: 5px
       }
     }
     
@@ -255,6 +256,7 @@ import btn from './button.vue'
 import imagePreview from './image-preview.vue'
 
 import {binary_search} from '../utils/search.js'
+import formatter from '../utils/formatter.js'
 
 export default {
   components: {
@@ -306,10 +308,11 @@ export default {
       return this.collection.owners
     },
     price() {
-      return this.collection.price
+      return formatter(this.collection.price)
+      // return this.formatNumber(this.collection.price)
     },
     volume_traded() {
-      return this.collection.volume_traded
+      return formatter(this.collection.volume_traded)
     },
     website() {
       return this.collection.website
@@ -319,7 +322,7 @@ export default {
     },
     instagram() {
       return this.collection.instagram
-    }
+    },
   },
 
   mounted() {
@@ -335,6 +338,14 @@ export default {
     toggleVisibleText() {
       !this.full_text ? this.full_text : !this.full_text
     },
+
+    formatNumber(num) {
+      if (num < 0.01) {
+        return '< 0.01'
+      }
+
+      return num.toFixed(3)
+    }
   },
 }
 </script>
