@@ -42,7 +42,7 @@
                        :show_counter="false"
         />
         <div class="banner">
-          <addImage :banner="banner"
+          <addImage :banner="banner.data"
                     :valid="banner_valid"
                     title="Add Gallery image"
                     :accepts="inputAccepts"
@@ -143,8 +143,10 @@ export default {
       twitter: '',
       instagram: '',
       description: '',
-      banner: undefined,
-      avatar: undefined,
+      banner: {
+        data:'',
+        size:0
+      },
       inputAccepts: ['image/apng', 'image/avif', 'image/gif', 'image/jpeg','image/png','image/svg+xml', 'image/webp']
     }
   },
@@ -188,10 +190,6 @@ export default {
     banner_valid() {
       return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
     },
-
-    avatar_valid() {
-      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
-    },
     
     can_submit () {
       return this.name && this.name_valid &&
@@ -199,8 +197,7 @@ export default {
              this.twitter_valid &&
              this.instagram_valid &&
              this.description_valid &&
-             this.banner_valid &&
-             this.avatar_valid
+             this.banner_valid
     }
   },
 
@@ -221,18 +218,11 @@ export default {
       })
     },
 
-    onUploadAvatar(e) {
-      this.loadImage(e, (data, size) => {
-        this.avatar = {data, size}
-      })
-    },
-
     onRemoveBanner() {
-      this.banner = undefined
-    },
-    
-    onRemoveAvatar() {
-      this.avatar = undefined
+      this.banner = {
+        data: '',
+        size: 0
+      }
     },
   }
 }

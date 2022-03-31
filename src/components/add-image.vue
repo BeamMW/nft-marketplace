@@ -3,12 +3,14 @@
     <div v-if="banner" class="remove">
       <img src="~/assets/remove.svg" alt="remove banner" @click="onRemoveBanner"/>
     </div>
-    <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !valid}"/>
+    <img v-if="banner" :src="banner" alt="avatar" class="image" :class="{'error': !valid}"/>
     <label v-if="!banner" class="text" for="banner">{{ title }}</label>
     <input id="banner"
+           ref="imageUploader"
            type="file"
            :accept="accepts"
            class="files"
+           @click="resetImageUploader"
            @change="onUploadBanner"
     />
   </div>
@@ -84,7 +86,7 @@
 export default {
   props: {
     banner: {
-      type: Object,
+      type: String,
       required: true
     },
     valid: {
@@ -115,6 +117,9 @@ export default {
     },
   },
   methods: {
+    resetImageUploader() {
+      this.$refs.imageUploader.value = ''
+    },
     onRemoveBanner () {
       this.$emit('remove')
     },

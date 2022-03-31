@@ -19,13 +19,16 @@
             Collection
           </label>
         </div>
-        <div class="input-container">
-          <img src="~assets/icon-down.svg" alt="icon"/>
-          <select v-model="selected" class="custom-select">
-            <option v-for="option in selector_options" :key="option.name" :value="option.name">
-              {{ option.name }}
-            </option>
-          </select>
+        <div class="custom-select" @blur="show = false">
+          <div class="selected" :class="{ open: show }" @click="open">
+            {{ selector_options[selected].name }}
+            <img src="~assets/icon-down.svg" class="arrow"/>
+          </div>
+          <div v-show="show" class="items" :style="style">
+            <div v-for="(option, i) of selector_options" :key="i" @click="selectedValue(i)">
+              <span>{{ option.name }}</span>
+            </div>
+          </div>
         </div>
         <priceInput v-model="price" color="#fff" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
         <span class="price">{{ price }} USD</span>
@@ -39,7 +42,7 @@
       </div>
       <div class="col-second">
         <div class="banner">
-          <addImage :banner="banner"
+          <addImage :banner="banner.data"
                     :valid="banner_valid"
                     title="Add NFT here"
                     :accepts="inputAccepts"
@@ -48,7 +51,7 @@
           >
           </addimage>
           <div class="accept">
-            <span v-if="banner" class="accept_text">({{ inputAccepts[0] }} or {{ inputAccepts[1] }}) </span> 
+            <span v-if="!banner" class="accept_text">({{ inputAccepts[0] }} or {{ inputAccepts[1] }}) </span> 
           </div>
         </div>
       </div>
@@ -93,31 +96,68 @@
           }
         }
 
-        .input-container {
-          display: flex
+        .custom-select {
           position: relative
+          display: flex
+          outline: none
+          background: rgba(255,255,255,0.05)
+          border-radius: 10px
+          padding: 12px 8px
 
-          & > img {
-            position: absolute
+          .selected {
+            color: #fff
+            padding-left: 1em
+            cursor: pointer
+            user-select: none
+            opacity: 0.7
+            font-size: 14px
+            font-weight: bold
+            letter-spacing: 0.47px
+
+            &.open {
+              border: none
+            }
+          }
+
+          .arrow {
             width: 9px
             height: 5px
-            right:20px
+            position: absolute
+            right: 20px 
             top:50%
           }
 
-          .custom-select {
-            -moz-appearance:none
-            -webkit-appearance:none
-            appearance:none
-            font-family: 'SFProDisplay', sans-serif
-            background-color: rgba(255, 255, 255, 0.05)
-            border: none
-            outline-width: 0
-            font-size: 14px
-            color: white
-            border-radius: 10px
-            padding: 12px 8px
+          .items {
+            color: #fff
+            position: absolute
+            border:none
+            border-radius: 4px
+            font-size: 16px
+            right: 0
+            z-index: 1
+            margin-top: 40px
             width: 100%
+            height: 300px
+            overflow-y: scroll
+
+            div {
+              color: #fff
+              padding: 15px 0px 15px 15px
+              white-space: nowrap
+              line-height: 1
+              cursor: pointer
+              user-select: none
+              
+              &:hover {
+                color: #00f6d2
+              }
+            }
+      
+            .highlight {
+              font-size: 14px
+              font-weight: bold
+              color: #00f6d2
+            }
           }
         }
 
@@ -273,19 +313,28 @@ export default {
       twitter: '',
       instagram: '',
       description: '',
-      banner: undefined,
-      avatar: undefined,
       price: '',
-      inputAccepts: ['.gif', '.jpeg', '.jpg'],
       show: false,
       selected: 0,
+      banner: {
+        data:'',
+        size:0
+      },
+      inputAccepts: ['.gif', '.jpeg', '.jpg'],
       selector_options: [
         {name: 'Collection 1'},
         {name: 'Collection 2'},
         {name: 'Collection 3'},
         {name: 'Collection 4'},
         {name: 'Collection 5'},
-        {name: 'Collection 6'}
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+        {name: 'Collection 6'},
+
       ],
     }
   },
@@ -339,10 +388,6 @@ export default {
     banner_valid() {
       return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
     },
-
-    avatar_valid() {
-      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
-    },
     
     can_submit () {
       return this.name && this.name_valid &&
@@ -350,12 +395,16 @@ export default {
              this.twitter_valid &&
              this.instagram_valid &&
              this.description_valid &&
-             this.banner_valid &&
-             this.avatar_valid
+             this.banner_valid 
     }
   },
 
   methods: {    
+    selectedValue(i) {
+      console.log('called')
+      this.selected = i
+      this.show = false
+    },
 
     loadImage(e, cback) {
       let file = e.target.files[0]
@@ -372,19 +421,13 @@ export default {
       })
     },
 
-    onUploadAvatar(e) {
-      this.loadImage(e, (data, size) => {
-        this.avatar = {data, size}
-      })
+    onRemoveBanner() {
+      this.banner = {
+        data: '',
+        size: 0
+      }
     },
 
-    onRemoveBanner() {
-      this.banner = undefined
-    },
-    
-    onRemoveAvatar() {
-      this.avatar = undefined
-    },
     onKey(ev) {
       if (ev.isComposing || ev.keyCode === 229 || ev.ctrlKey || ev.altKey || ev.metaKey) {
         return
@@ -423,28 +466,13 @@ export default {
     open(ev) {
       this.show = true
       nextTick(() => {
-        let downAway = (evc) => {
-          if (!this.$el.contains(evc.target)) {
-            document.removeEventListener('mousedown', downAway, true)
-            this.close()
-          }
-        }
-        
         let clickAway = (evc) => {
           if (ev != evc) {
             document.removeEventListener('click', clickAway, true)
             this.close()
           }
         }
-        
-        let scrollAway = (evc) => {
-          document.removeEventListener('scroll', scrollAway, scroll)
-          this.close()
-        }
-        
-        document.addEventListener('mousedown', downAway, true)
         document.addEventListener('click', clickAway, true)
-        document.addEventListener('scroll', scrollAway, true)
       })
     },
   }

@@ -43,7 +43,7 @@
                        :show_counter="true"
         />
         <div class="banner">
-          <addImage :banner="banner"
+          <addImage :banner="banner.data"
                     :valid="banner_valid"
                     title="Add an artist banner"
                     :accepts="inputAccepts"
@@ -59,9 +59,11 @@
             <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
             <input id="avatar"
-                   type="file"
-                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                   ref="avatarUploader"
+                   type="file"      
+                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"
                    class="files"
+                   @click="resetImageUploader"
                    @change="onUploadAvatar"
             />
           </div>
@@ -216,8 +218,11 @@ export default {
       twitter: '',
       instagram: '',
       about: '',
-      banner: undefined,
       avatar: undefined,
+      banner: {
+        data:'',
+        size:0
+      },
       inputAccepts: ['image/apng', 'image/avif', 'image/gif', 'image/jpeg','image/png','image/svg+xml', 'image/webp']
     }
   },
@@ -306,11 +311,18 @@ export default {
     },
 
     onRemoveBanner() {
-      this.banner = undefined
+      this.banner = {
+        data: '',
+        size: 0
+      }
     },
     
     onRemoveAvatar() {
       this.avatar = undefined
+    },
+
+    resetImageUploader() {
+      this.$refs.avatarUploader.value = ''
     },
   }
 }
