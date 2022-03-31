@@ -6,7 +6,7 @@ import formats from './store-formats.js'
 import aformat from './store-artist.js'
 
 // for testing purposes
-import COLLECTIONS from './utils/collection-testing.js'
+import COLLECTIONS from '../utils/collection-testing.js'
 
 function defaultState() {
   let state = {
