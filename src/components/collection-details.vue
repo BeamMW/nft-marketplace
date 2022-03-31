@@ -77,7 +77,7 @@
 
       <!-- footer button -->
       <div v-if="full_text" class="footer">
-        <btn text="See¶ less"
+        <btn text="See less"
              height="20px"
              color="transparent"
              :text_bold="false"
@@ -309,7 +309,6 @@ export default {
     },
     price() {
       return formatter(this.collection.price)
-      // return this.formatNumber(this.collection.price)
     },
     volume_traded() {
       return formatter(this.collection.volume_traded)
