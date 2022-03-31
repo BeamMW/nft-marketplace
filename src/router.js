@@ -2,8 +2,8 @@ import gallery from './components/gallery.vue'
 import myPage from './components/my-page.vue'
 import balance from './components/balance.vue'
 import artworkDetails from './components/artwork-details.vue'
-import artistDetails from './components/become-artist.vue'
 import collectionDetails from './components/collection-details.vue'
+import artistDetails from './components/artist-details.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 export const router = createRouter({

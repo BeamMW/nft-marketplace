@@ -66,7 +66,7 @@ export default {
 
   computed: {
     artist_key () {
-      return this.$state.my_artist_keys[0]
+      return this.$state.my_artist_key
     },
   },
 

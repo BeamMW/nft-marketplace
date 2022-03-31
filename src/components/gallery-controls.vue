@@ -103,12 +103,8 @@ export default {
       return this.$state.is_artist
     },
     my_artist_name () {
-      if (this.is_artist) {
-        let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
-                   this.$state.artists[this.$state.my_artist_keys[1]]
-        return (artist || {}).label
-      }
-      return ''
+      let artist = this.$state.artists[this.$state.my_artist_key] 
+      return (artist || {}).label
     }
   }
 }

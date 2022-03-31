@@ -21,9 +21,7 @@
     
 <style scoped lang="stylus">
   .collection {
-    margin-right: 20px
-    margin-bottom: 20px
-    width: 431px
+    width: 442px
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px

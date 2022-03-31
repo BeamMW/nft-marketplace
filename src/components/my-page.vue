@@ -7,7 +7,7 @@
            :width="width" 
            padding="0px" 
            radius="10px" 
-           @click="$store.toBecomeArtist"
+           @click="$store.toEditArtist"
       >
         <img src="~assets/icon-pencil.svg">
       </btn>

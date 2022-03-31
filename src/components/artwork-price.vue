@@ -1,41 +1,64 @@
 <template>
   <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork"/>
-  <!---- has price & owned, display change price / remove from sale options ---->
-  <span v-if="price && owned" class="container">
-    <amount :amount="price.amount"/>
-    <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu"/>
-    <popupMenu ref="saleMenu">
-      <div class="item" @click="onChangePrice">
-        <img src="~assets/icon-change.svg"/>
-        update the price
-      </div>
-      <div class="item" @click="onRemoveFromSale">
-        <img src="~assets/icon-eye-crossed.svg"/>
-        remove from sale
-      </div>
-    </popupMenu>
+  <!--- has price, so display it --->
+  <span v-if="price" class="container">
+    <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
+    
+    <!--- has price and owned, display change price / remove from sale options --->
+    <template v-if="owned">
+      <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu"/>
+      <popupMenu ref="saleMenu">
+        <div class="item" @click="onChangePrice">
+          <img src="~assets/icon-change.svg"/>
+          update the price
+        </div>
+        <div class="item" @click="onRemoveFromSale">
+          <img src="~assets/icon-eye-crossed.svg"/>
+          remove from sale
+        </div>
+      </popupMenu>
+    </template>
+
+    <!---- has price but not owned, can buy ---->
+    <template v-if="!owned">
+      <btn v-if="compact" 
+           text="buy" 
+           color="transparent" 
+           padding="2px 7px 5px 7px"
+           text_color="magenta"
+           @click="onBuy"
+      />
+      <btn v-else text="buy" color="magenta" @click="onBuy">
+        <img src="~assets/icon-button.svg">
+      </btn>
+    </template>  
   </span>
 
-  <!---- has price but not owned, can buy ---->
-  <span v-if="price && !owned" class="container">
-    <amount :amount="price.amount"/>
-    <btn text="buy" color="magenta" @click="onBuy">
-      <img src="~assets/icon-button.svg">
-    </btn>
-  </span>
+  <span v-if="!price" class="container">
+    <!---- doesn't have price & owned, can sell ---->
+    <template v-if="owned">
+      <btn v-if="compact" 
+           text="sell" 
+           color="transparent" 
+           padding="2px 7px 5px 7px"
+           text_color="blue"
+           @click="onSell"
+      />
+      <btn v-else text="sell" color="blue" @click="onSell">
+        <img src="~assets/icon-button.svg">
+      </btn>
+    </template>
 
-  <!---- doesn't have price & owned, can sell ---->
-  <span v-if="!price && owned" class="container">
-    <btn text="sell" color="blue" @click="onSell">
-      <img src="~assets/icon-button.svg">
-    </btn>
-  </span>
+    <!---- doesn't have price & not owned & author, means sold ----> 
+    <!-- TODO: take into account moderation / ban -->
+    <span v-if="!owned && author" class="not-for-sale">Sold</span>
 
-  <!---- doesn't have price & not owned, 
-         can be anything - not approved yet, not sold by
-         owner &c. Just dispaly that it is not on sale
-  ---->
-  <span v-if="!price && !owned" class="not-for-sale"> Not for sale </span>
+    <!---- doesn't have price & not owned & author,     
+           can be anything - not approved yet, not sold by
+           owner &c. Just dispaly that it is not on sale
+    ---->
+    <span v-if="!owned && !author" class="not-for-sale">Not for sale</span>
+  </span>
 </template>
 
 <style scoped lang="stylus">
@@ -45,14 +68,6 @@
   flex-wrap: wrap
   align-items: center
   width: 100%
-
-  & .amount
-  & .curr {
-    margin-left: 5px
-    font-size: 18px
-    font-weight: bold
-    color: #fff
-  }
 
   & .dots {
     margin-left: auto
@@ -93,6 +108,10 @@ export default {
       type: Object,
       required: true,
     },
+    mode: {
+      type: String,
+      default: 'normal'
+    }
   },
 
   computed: {
@@ -108,8 +127,16 @@ export default {
       return this.artwork.owned
     },
 
+    author () {
+      return this.$state.my_artist_key === this.artwork.pk_author
+    },
+
     price() {
       return this.artwork.price
+    },
+
+    compact() {
+      return this.mode == 'compact'
     }
   },
 
