@@ -247,7 +247,16 @@ const store = {
 
     utils.ensureField(res, 'artists', 'array')
     // TODO:TEST
-    let artists = res.artists.slice(2).map(el => aformat.fromContract(el))
+    let artists = [] 
+    for (let artist of res.artists) {
+      if (artist.key == '613d0836c28840d083cdda8a6b9b0c089c58461c93d5626103be9d942dc74fb701') {
+        continue
+      }
+      if (artist.key == 'f32f404a4e0c973071175a53c02a42bba7ea5c72f72667f8d06a07f462f1f0fd01') {
+        continue
+      }
+      artists.push(aformat.fromContract(artist))
+    }
     artists.sort((a,b) => a.label > b.label ? 1 : -1)
 
     //
