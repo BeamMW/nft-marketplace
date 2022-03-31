@@ -142,6 +142,41 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
             _POD_(ssak.m_pkUser) = r.m_pkArtist;
+
+            // create default collection
+            struct CollectionPlus : public Gallery::Collection {
+                char m_szLabelData[s_TotalMaxLen];
+            } c;
+
+            MyState s;
+            c.m_ID = ++s.m_Collections;
+            s.Save();
+
+            c.is_default = true;
+
+            // will be uncommented in future (with moderation adding)
+            //a.is_approved = false;
+            c.is_approved = true;
+
+            c.label_len = a.label_len;
+            c.data_len = 0;
+            _POD_(c.m_pkAuthor) = r.m_pkArtist;
+            Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen);
+
+            Gallery::ArtistCollectionKey ack;
+            _POD_(ack.pkArtist) = c.m_pkAuthor;
+            ack.collection_id = c.m_ID;
+            Env::SaveVar_T(ack, true);
+
+            Gallery::Collection::FirstStageKey fsck;
+            Gallery::Collection::SecondStageKey ssck;
+
+            fsck.m_ID = c.m_ID;
+            ssck.m_ID = c.m_ID;
+            ssck.h_last_updated = Utils::FromBE(Env::get_Height());
+
+            Env::SaveVar_T(fsck, ssck);
+            Env::SaveVar(&ssck, sizeof(ssck), &c, sizeof(Gallery::Collection) + c.label_len + c.data_len, KeyTag::Internal);
         }
         ssak.h_last_updated = Utils::FromBE(Env::get_Height());
 
@@ -174,6 +209,99 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
     }
 }
 
+BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
+{
+    using CollectionReqType = Gallery::Method::ManageCollection::RequestType;
+
+    Gallery::Collection::FirstStageKey fsck;
+    fsck.m_ID = r.collection_id;
+
+    struct CollectionPlus : public Gallery::Collection {
+        char m_szLabelData[s_TotalMaxLen];
+    } c;
+
+    Gallery::Collection::SecondStageKey ssck;
+
+    switch (r.req) {
+    case CollectionReqType::SET: {
+        bool collection_exists = r.collection_id > 0 && Env::LoadVar_T(fsck, ssck);
+
+        if (collection_exists) {
+            Env::LoadVar(&ssck, sizeof(ssck), &c, sizeof(c), KeyTag::Internal);
+            Env::DelVar_T(ssck);
+
+            uint32_t old_data_len = c.data_len;
+            uint32_t old_label_len = c.label_len;
+            uint8_t old_data[old_data_len];
+            if (r.m_LabelLen) {
+                Env::Memcpy(old_data, c.m_szLabelData + old_label_len, old_data_len);
+                c.label_len = r.m_LabelLen;
+                Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen);
+            }
+
+            if (r.m_DataLen) {
+                c.data_len = r.m_DataLen;
+                Env::Memcpy(c.m_szLabelData + c.label_len, reinterpret_cast<const uint8_t *>(&r + 1) + r.m_LabelLen, c.data_len);
+            } else {
+                Env::Memcpy(c.m_szLabelData + c.label_len, old_data, old_data_len);
+            }
+        } else {
+            // if collection doesn't exist, then label is required
+            Env::Halt_if(!r.m_LabelLen); 
+
+            MyState s;
+            c.m_ID = ++s.m_Collections;
+            s.Save();
+
+            // will be uncommented in future (with moderation adding)
+            //c.is_approved = false;
+            c.is_approved = true;
+
+            c.is_default = false;
+
+            c.label_len = r.m_LabelLen;
+            c.data_len = r.m_DataLen;
+            _POD_(c.m_pkAuthor) = r.m_pkArtist;
+            Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+
+            Gallery::ArtistCollectionKey ack;
+            _POD_(ack.pkArtist) = c.m_pkAuthor;
+            ack.collection_id = c.m_ID;
+            Env::SaveVar_T(ack, true);
+        }
+        fsck.m_ID = c.m_ID;
+        ssck.m_ID = c.m_ID;
+        ssck.h_last_updated = Utils::FromBE(Env::get_Height());
+
+        Env::SaveVar_T(fsck, ssck);
+        Env::SaveVar(&ssck, sizeof(ssck), &c, sizeof(Gallery::Collection) + c.label_len + c.data_len, KeyTag::Internal);
+
+        Env::AddSig(r.m_pkArtist);
+        break;
+    }
+    case CollectionReqType::ENABLE:
+    case CollectionReqType::DISABLE: {
+                                     /*
+        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
+        uint32_t artist_size = Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
+        Env::Halt_if(!artist_size);
+        Env::DelVar_T(ssak);
+
+        a.is_approved = (r.req == ArtistReqType::ENABLE);
+        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+
+        Env::SaveVar_T(fsak, ssak);
+        Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
+        MyState s;
+        s.AddSigAdmin();
+        */
+        break;
+    }
+    default:
+        Env::Halt();
+    }
+}
+
 BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 {
     MyState s;
@@ -189,6 +317,18 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     _POD_(m).SetZero();
     _POD_(m.m_pkOwner) = r.m_pkArtist;
     _POD_(m.m_pkAuthor) = r.m_pkArtist;
+    m.collection_id = r.collection_id;
+
+    Gallery::ArtistCollectionKey ack;
+    ack.collection_id = r.collection_id;
+    _POD_(ack.pkArtist) = r.m_pkArtist;
+    bool exists;
+    Env::Halt_if(!Env::LoadVar_T(ack, exists));
+    
+    Gallery::CollectionArtworkKey cak;
+    cak.collection_id = r.collection_id;
+    cak.artwork_id = fsmk.m_ID;
+    Env::SaveVar_T(cak, true);
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1);
     uint32_t nData = r.m_Size;

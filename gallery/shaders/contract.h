@@ -19,6 +19,8 @@ namespace Gallery
     static const ShaderID s_SID_14 = {0x7f,0x24,0x14,0x96,0x9e,0x21,0xfe,0x18,0xbe,0xf9,0x2c,0x8f,0xf7,0xb2,0xe7,0x15,0x52,0x5e,0x18,0x24,0x2a,0xf9,0xd6,0x34,0x13,0xb4,0x52,0x4e,0xa7,0xf5,0x2f,0xb1};
     static const ShaderID s_SID_15 = {0x95,0x33,0xc3,0x67,0xe6,0xa2,0xbf,0xe2,0xab,0xab,0x8a,0x40,0x67,0x77,0xb0,0xe9,0xcb,0xa2,0x9f,0x9e,0xea,0x35,0x43,0x8e,0xbb,0xf9,0x39,0x09,0x01,0x1a,0xba,0x20};
     static const ShaderID s_SID_16 = {0x28,0x28,0x6c,0x4a,0x98,0x77,0x5c,0x3b,0x9f,0x7b,0xa0,0x95,0xb4,0xde,0x31,0xdc,0xfd,0x82,0x6b,0x3c,0x15,0x93,0x2f,0x06,0x3c,0x65,0x43,0xca,0x79,0xbc,0x98,0x9d};
+    static const ShaderID s_SID_17 = {0x9b,0xee,0xba,0x72,0x2e,0x06,0x09,0xc4,0xfd,0x72,0x3f,0x95,0x17,0x3a,0x8a,0xbb,0x4e,0xef,0xc3,0x96,0x5b,0xdc,0xbe,0xdd,0xfb,0xd7,0x28,0x87,0xab,0xc9,0xf6,0x87};
+    static const ShaderID s_SID_18 = {0x3e,0xeb,0x78,0xea,0x39,0x2b,0x77,0x78,0xe8,0xf3,0xa4,0x0b,0xaa,0x9d,0x02,0x8c,0x20,0x20,0x91,0x04,0xfc,0x0f,0x9f,0xa4,0x72,0x87,0xaf,0xc0,0xd6,0x9f,0xaa,0x05};
 #pragma pack (push, 1)
 
     struct Tags
@@ -29,12 +31,28 @@ namespace Gallery
         static const uint8_t s_Impression = 5;
         static const uint8_t s_MasterpieceHeight = 6;
         static const uint8_t s_ArtistHeight = 7;
+        static const uint8_t s_CollectionHeight = 8;
+        static const uint8_t s_Collection = 9;
+        static const uint8_t s_ArtistCollection = 10;
+        static const uint8_t s_CollectionArtwork = 11;
     };
 
     enum class Role {
         MANAGER,
         ARTIST,
         USER,
+    };
+
+    struct ArtistCollectionKey {
+        uint8_t m_Tag = Tags::s_ArtistCollection;
+        PubKey pkArtist;
+        uint32_t collection_id;
+    };
+
+    struct CollectionArtworkKey {
+        uint8_t m_Tag = Tags::s_CollectionArtwork;
+        uint32_t collection_id;
+        uint32_t artwork_id;
     };
 
     struct Artist
@@ -54,6 +72,33 @@ namespace Gallery
         bool is_approved;
         uint32_t data_len;
         uint32_t label_len;
+
+        // followed by label and data without delimiter
+        static const uint32_t s_LabelMaxLen = 120;
+        static const uint32_t s_DataMaxLen = 1024;
+        static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
+    };
+
+    struct Collection
+    {
+        using ID = uint32_t;
+        struct FirstStageKey {
+            uint8_t m_Tag = Tags::s_CollectionHeight;
+            ID m_ID;
+        };
+
+        struct SecondStageKey {
+            uint8_t m_Tag = Tags::s_Collection;
+            Height h_last_updated;
+            ID m_ID;
+        };
+
+        bool is_approved;
+        bool is_default;
+        uint32_t data_len;
+        uint32_t label_len;
+        PubKey m_pkAuthor;
+        ID m_ID;
 
         // followed by label and data without delimiter
         static const uint32_t s_LabelMaxLen = 120;
@@ -87,6 +132,7 @@ namespace Gallery
         PubKey m_pkAuthor;
         PubKey m_pkOwner;
         AssetID m_Aid; // set when it's taken out of gallery
+        Collection::ID collection_id;
 
         AmountWithAsset m_Price;
     };
@@ -132,6 +178,7 @@ namespace Gallery
 
         Config m_Config;
         Masterpiece::ID m_Exhibits;
+        Collection::ID m_Collections;
         Amount m_VoteBalance;
     };
 
@@ -177,12 +224,26 @@ namespace Gallery
             // followed by label and data without delimiter
         };
 
+        struct ManageCollection
+        {
+            static const uint32_t s_iMethod = 15;
+
+            enum class RequestType { SET, DISABLE, ENABLE } req;
+            Gallery::Role role;
+            PubKey m_pkArtist;
+            Collection::ID collection_id;
+            uint32_t m_LabelLen;
+            uint32_t m_DataLen;
+            // followed by label and data without delimiter
+        };
+
         struct AddExhibit
         {
             static const uint32_t s_iMethod = 3;
 
             PubKey m_pkArtist;
             uint32_t m_Size;
+            uint32_t collection_id;
             // followed by the data
         };
 
