@@ -873,5 +873,11 @@ export const store = {
     router.push({
       name: 'add-collection'
     })
+  },
+
+  newNFT() {
+    router.push({
+      name: 'add-nft'
+    })
   }
 }

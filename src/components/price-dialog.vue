@@ -4,18 +4,8 @@
       <div class="title">
         Set the price
       </div>
-      <div class="input">
-        <input id="sell-input" 
-               ref="input"
-               v-model="price"
-               type="text" 
-               class="elem"
-               placeholder="0"
-               @keydown="onKey"
-               @paste="onPaste"
-        />
-        <span class="text">BEAM</span>
-      </div>
+      <priceInput v-model="price" color="#0bccf7" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
+
       <div class="fee">
         <span class="title">Fee</span>
         <span class="value">0.011 BEAM</span>
@@ -140,12 +130,13 @@
 <script>
 import modal from './modal.vue'
 import btn from './button.vue'
+import priceInput from './price-input.vue'
 import utils from '../utils/utils.js'
 import {common} from '../utils/consts.js'
 
 export default {
   components: { 
-    modal, btn
+    modal, btn, priceInput
   }, 
   
   emits:[
@@ -179,9 +170,9 @@ export default {
         return
       }
 
-      const current = this.$refs.input.value
+      const current = this.price
       const next = current.concat(ev.key)
-
+      console.log(next)
       if (!utils.handleString(next)) {
         ev.preventDefault()
       }

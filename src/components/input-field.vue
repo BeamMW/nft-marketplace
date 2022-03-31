@@ -23,7 +23,7 @@
   .label {
     display: block
     margin-bottom:10px
-    color: rgba(255, 255, 255, 0.6)
+    color: #8da1ad
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
 
@@ -43,40 +43,40 @@
         filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
       }
     }
-  }
 
-  .input {
-    font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.05)
-    border: none
-    outline-width: 0
-    font-size: 14px
-    color: white
-    border-radius: 10px
-    padding: 12px 8px
-    width: 100%
-
-    &:not(.error):focus {
-      background-color: rgba(255, 255, 255, 0.1)
-    }
-
-    &.error:focus {
-      background-color: rgba(255, 98, 92, 0.12)
-    }
-
-    &.error {
-      color: rgba(255, 98, 92, 1)
-      background-color: rgba(255, 98, 92, 0.07)
-    }
-
-    &:not(.error)::placeholder {
+    .input {
+      font-family: 'SFProDisplay', sans-serif
+      background-color: rgba(255, 255, 255, 0.05)
+      border: none
+      outline-width: 0
       font-size: 14px
-      color: rgba(255, 255, 255, 0.3)
-    }
+      color: white
+      border-radius: 10px
+      padding: 12px 8px
+      width: 100%
 
-    &.error::placeholder {
-      font-size: 14px
-      color: rgba(255, 98, 92, 0.4)
+      &:not(.error):focus {
+        background-color: rgba(255, 255, 255, 0.1)
+      }
+
+      &.error:focus {
+        background-color: rgba(255, 98, 92, 0.12)
+      }
+
+      &.error {
+        color: rgba(255, 98, 92, 1)
+        background-color: rgba(255, 98, 92, 0.07)
+      }
+
+      &:not(.error)::placeholder {
+        font-size: 14px
+        color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.error::placeholder {
+        font-size: 14px
+        color: rgba(255, 98, 92, 0.4)
+      }
     }
   }
 }

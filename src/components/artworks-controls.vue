@@ -19,8 +19,10 @@
                 title="Author"
                 v-if="artist_options.length"
             /> -->
+        <btn text="nft" color="green" padding="7px 12px" @click="onAddNft">
+        </btn>
         <div style="margin-left:1px">
-          <btn text="add collection" color="green" padding="7px 12px" @click="onAddCollection">
+          <btn text="collection" color="green" padding="7px 12px" @click="onAddCollection">
           </btn>
         </div>
         <selector :options="selector_options"
@@ -170,6 +172,11 @@ export default {
     onAddCollection() {
       this.$store.newCollection()
     },
+
+    onAddNft() {
+      this.$store.newNFT()
+    },
+
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)

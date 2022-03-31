@@ -7,7 +7,7 @@
     <label v-if="!banner" class="text" for="banner">{{ title }}</label>
     <input id="banner"
            type="file"
-           accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+           :accept="accepts"
            class="files"
            @change="onUploadBanner"
     />
@@ -23,9 +23,7 @@
     align-items: center
     justify-content: center
     position:relative
-    height: 135px
-    margin-top: 33px
-    margin-bottom: 20px
+    height: 100%
     background-color: rgba(26, 246, 214, 0.1)
     border-radius: 10px
     cursor: pointer
@@ -98,12 +96,17 @@ export default {
       type: String,
       default: '',
       required: true
+    },
+    accepts: {
+      type: Array,
+      required: true
     }
   },
 
   emits: [
     'remove', 'upload'
   ],
+
   computed: {
     bannerStyles() {
       return {

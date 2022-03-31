@@ -11,7 +11,7 @@
                     label="Artist Name*"
                     :valid="name_valid"
                     :max_length="100"
-                    style="margin-bottom:30px;margin-top:0"
+                    style="margin-bottom:60px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -42,7 +42,15 @@
                        :max_length="150"
                        :show_counter="true"
         />
-        <addImage :style="bannerStyles" :banner="banner" :valid="banner_valid" title="Add an artist banner" @remove="onRemoveBanner" @upload="onUploadBanner"/>
+        <div class="banner">
+          <addImage :banner="banner"
+                    :valid="banner_valid"
+                    title="Add an artist banner"
+                    :accepts="inputAccepts"
+                    @remove="onRemoveBanner"
+                    @upload="onUploadBanner"
+          />
+        </div>
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles">
             <div v-if="avatar" class="remove">
@@ -99,6 +107,12 @@
       .col-second {
         flex-basis: 50%
         margin-left: 30px
+
+        .banner {
+          height: 135px
+          margin-top: 33px
+          margin-bottom: 20px
+        }
 
         .container-avatar {
           display: flex
@@ -203,7 +217,8 @@ export default {
       instagram: '',
       about: '',
       banner: undefined,
-      avatar: undefined
+      avatar: undefined,
+      inputAccepts: ['image/apng', 'image/avif', 'image/gif', 'image/jpeg','image/png','image/svg+xml', 'image/webp']
     }
   },
 
@@ -213,15 +228,12 @@ export default {
         'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
-    bannerStyles() {
-      return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
-      }
-    },
+
     name_valid() {
       let value = this.name
       return !value || value.length <= 100
     },
+
     website_valid() {
       let value = this.website
       if (!value) return true
@@ -236,24 +248,30 @@ export default {
              (url.protocol === 'http:' || url.protocol === 'https:') &&
              (url.toString() === value || url.toString() === value + '/')
     },
+
     twitter_valid() {
       let value = this.twitter
       return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
     },
+
     instagram_valid() {
       let value = this.instagram
       return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
     },
+
     about_valid() {
       let value = this.about
       return !value || value.length <= 150
     },
+
     banner_valid() {
       return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
     },
+    
     avatar_valid() {
       return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
     },
+
     can_submit () {
       return this.name && this.name_valid &&
              this.website_valid &&
