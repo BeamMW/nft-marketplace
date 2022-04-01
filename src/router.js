@@ -4,6 +4,7 @@ import balance from './components/balance.vue'
 import artworkDetails from './components/artwork-details.vue'
 import collectionDetails from './components/collection-details.vue'
 import artistDetails from './components/artist-details.vue'
+import table from './components/table.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 export const router = createRouter({
@@ -16,6 +17,7 @@ export const router = createRouter({
     {path: '/artist', component: artistDetails, name: 'artist'},
     {path: '/collection-details/:id', component: collectionDetails, name: 'collection-details', 
       props: (route) => {return {id: Number(route.params.id)}}
-    }
+    },
+    {path: '/table', component: table, name: 'table'}
   ]
 })

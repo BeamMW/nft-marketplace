@@ -15,8 +15,15 @@
         />
       </div>
 
-      <btn class="user" height="34px"
-           :text="my_artist_name"
+      <!-- for testing purposes -->
+      <btn height="34px"
+           text="table"
+           color="blue"
+           @click="$store.toTable"
+      />
+
+      <btn class="user" 
+           height="34px"
            @click="$store.toMyPage"
       >
         <img src="~assets/icon-user.svg">

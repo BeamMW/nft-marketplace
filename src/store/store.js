@@ -919,6 +919,13 @@ const store = {
         id
       }
     })
+  },
+
+  // for testing purposes
+  toTable() {
+    router.push({
+      name: 'table'
+    })
   }
 }
 
