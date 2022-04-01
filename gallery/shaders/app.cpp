@@ -12,13 +12,18 @@
     macro(ContractID, cid) \
     macro(Height, h0) \
 
+#define Gallery_manager_view_artists_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_manager_view_collections_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_manager_view_artworks_stats(macro) \
+    macro(ContractID, cid) \
+
 #define Gallery_manager_view_collections(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
-
-//#define Gallery_manager_view_artist(macro) \
-    macro(ContractID, cid) \
-    macro(PubKey, pkArtist)
 
 //#define Gallery_manager_manage_artist(macro) \
     macro(ContractID, cid) \
@@ -43,13 +48,15 @@
     macro(manager, view) \
     macro(manager, view_params) \
     macro(manager, view_artists) \
+    macro(manager, view_artists_stats) \
+    macro(manager, view_collections_stats) \
+    macro(manager, view_artworks_stats) \
     macro(manager, view_collections) \
     macro(manager, view_balance) \
     macro(manager, add_rewards) \
     macro(manager, my_admin_key) \
     macro(manager, explicit_upgrade) \
     macro(manager, admin_delete) \
-    //macro(manager, view_artist) \
     //macro(manager, manage_artist) \
 
 #define Gallery_artist_view(macro) macro(ContractID, cid)
@@ -219,6 +226,7 @@ ON_METHOD(manager, view)
         Gallery::s_SID_16,
         Gallery::s_SID_17,
         Gallery::s_SID_18,
+        Gallery::s_SID_19,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -263,7 +271,7 @@ ON_METHOD(manager, view_params)
     uint32_t bIsAdmin = (_POD_(s.m_Config.m_pkAdmin) == pk);
 
     Env::DocAddNum("Admin", bIsAdmin);
-    Env::DocAddNum("Exhibits", s.m_Exhibits);
+    Env::DocAddNum("Exhibits", s.artworks_stats.total);
     Env::DocAddNum("voteReward.aid", s.m_Config.m_VoteReward.m_Aid);
     Env::DocAddNum("voteReward.amount", s.m_Config.m_VoteReward.m_Amount);
     Env::DocAddNum("voteReward_balance", s.m_VoteBalance);
@@ -560,6 +568,30 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
     return true;
 }
 
+ON_METHOD(manager, view_artists_stats)
+{
+    Gallery::State s;
+    Env::VarReader::Read_T(s.s_Key, s);
+    Env::DocGroup gr0("artists_stats");
+    Env::DocAddNum32("total", s.artists_stats.total);
+}
+
+ON_METHOD(manager, view_collections_stats)
+{
+    Gallery::State s;
+    Env::VarReader::Read_T(s.s_Key, s);
+    Env::DocGroup gr0("collections_stats");
+    Env::DocAddNum32("total", s.collections_stats.total);
+}
+
+ON_METHOD(manager, view_artworks_stats)
+{
+    Gallery::State s;
+    Env::VarReader::Read_T(s.s_Key, s);
+    Env::DocGroup gr0("artworks_stats");
+    Env::DocAddNum32("total", s.artworks_stats.total);
+}
+
 ON_METHOD(manager, view_artists)
 {
     const size_t MAX_IDS = 128;
@@ -623,11 +655,7 @@ ON_METHOD(manager, view_collections)
     }
 }
 
-/*ON_METHOD(manager, view_artist)
-{
-    PrintArtists(cid, pkArtist, 0, false, true);
-}
-
+/*
 ON_METHOD(manager, manage_artist)
 {
     Gallery::Method::ManageArtist args;
