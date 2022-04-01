@@ -58,17 +58,19 @@
           </div>
 
           <div>
+            <span class="tooltip">{{ price }}</span>
             <div>
               <img src="~assets/icon-beam.svg">
-              <span class="value">{{ price }}</span>
+              <span class="value">{{ formatted_price }}</span>
             </div>
             <span>price</span>
           </div>
 
           <div>
+            <span class="tooltip">{{ volume_traded }}</span>
             <div>
               <img src="~assets/icon-beam.svg">
-              <span class="value">{{ volume_traded }}</span>
+              <span class="value">{{ formatted_volume_traded }}</span>
             </div>
             <span>volume traded</span>
           </div>
@@ -215,6 +217,7 @@
     grid-template-rows: 1fr 1fr
     align-items: center
     justify-items: center
+    position: relative
     
     & > div {
       display: flex
@@ -231,6 +234,31 @@
     & .value {
       display: flex
       font-size: 16px
+    }
+
+    &:hover .tooltip {
+      visibility: visible
+    }
+
+    & .tooltip {
+      position: absolute
+      width: max-content
+      padding: 7px 21px
+      border-radius: 10px
+      bottom: 120%
+      color: black
+      background-color: #0bccf7
+      visibility: hidden
+    }
+
+    & .tooltip::after {
+      content: ""
+      position: absolute
+      top: 100%
+      left: 45%
+      border-width: 5px
+      border-style: solid
+      border-color: #0bccf7 transparent transparent transparent
     }
   }
 
@@ -308,9 +336,15 @@ export default {
       return this.collection.owners
     },
     price() {
-      return formatter(this.collection.price)
+      return this.collection.price
     },
     volume_traded() {
+      return this.collection.volume_traded
+    },
+    formatted_price() {
+      return formatter(this.collection.price)
+    },
+    formatted_volume_traded() {
       return formatter(this.collection.volume_traded)
     },
     website() {
