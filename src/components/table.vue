@@ -1,4 +1,5 @@
 <template>
+  <hdr/>
   <h1 class="title">nft traiding history</h1>
   <table class="table">
     <thead>
@@ -43,6 +44,7 @@ table {
   letter-spacing: 3.1px
   color: rgba(255, 255, 255, 0.5)
   padding-bottom: 20px
+  margin: 0
 }
 
 .table {
@@ -88,9 +90,15 @@ table {
 </style>
 
 <script>
+import hdr from './page-title.vue'
+
 import DATA from '../utils/mock-data.js'
 
 export default {
+  components: {
+    hdr
+  },
+  
   data() {
     return {
       headers: ['Author', 'Book', 'Year', 'sadfas', 'asdfasdf', 'asdfasdfasd', 'asdfasdf', 'asdfasdf', 'asdfasdf']
