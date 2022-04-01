@@ -32,7 +32,7 @@
   .input {
     box-sizing: border-box
     font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.05)
+    background-color: rgba(255, 255, 255, 0.08)
     border: none
     outline-width: 0
     font-size: 14px
@@ -51,7 +51,7 @@
     }
 
     &:focus {
-      background-color: rgba(255, 255, 255, 0.1)
+      background-color: rgba(255, 255, 255, 0.12)
       outline-width: 0
     }
   }

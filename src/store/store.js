@@ -249,10 +249,7 @@ const store = {
     // TODO:TEST
     let artists = [] 
     for (let artist of res.artists) {
-      if (artist.key == '613d0836c28840d083cdda8a6b9b0c089c58461c93d5626103be9d942dc74fb701') {
-        continue
-      }
-      if (artist.key == 'f32f404a4e0c973071175a53c02a42bba7ea5c72f72667f8d06a07f462f1f0fd01') {
+      if (artist.key == '27db54db176900d0bf933490b9ecf5c784ddd39c0af5112d2ce60bdc084336f701') {
         continue
       }
       artists.push(aformat.fromContract(artist))
@@ -313,7 +310,7 @@ const store = {
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
-    let mykey = this.state.my_artist_ke
+    let mykey = this.state.my_artist_key
 
     for (let awork of res.items) {
       let oawork = null
@@ -864,12 +861,17 @@ const store = {
     this.state.gallery_collections_page = page
   },
 
-  setArtist(label, data, cback) {
-    let cdata  = aformat.toContract(label, data)
+  setArtist(label, data) {
     // TODO: make invokeContract accept an object with props
-    utils.invokeContract(`role=artist,action=set_artist,cid=${this.state.cid},label=${cdata.label},data=${cdata.data}`, 
+    ({label, data} = aformat.toContract(label, data))
+    utils.invokeContract(`role=artist,action=set_artist,cid=${this.state.cid},label=${label},data=${data}`, 
       (...args) => this.onMakeTx(...args)
     )
+  },
+
+  getArtist(id) {
+    // TODO if no artist then retreive from contract?
+    return this.state.artists[id]
   },
 
   toArtworkDetails(id) {
@@ -894,14 +896,23 @@ const store = {
   },
 
   toBecomeArtist() {
+    if (this.state.is_artist) {
+      throw new Error('Unexpected BecomeArtist, already an artist')
+    }
     router.push({
       name: 'artist'
     })
   },
 
   toEditArtist() {
+    if (!this.state.is_artist) {
+      throw new Error('Unexpected EditArtist, not an artist yet')
+    }
     router.push({
-      name: 'artist'
+      name: 'artist',
+      params: {
+        id: this.state.my_artist_key
+      }
     })
   }
 }

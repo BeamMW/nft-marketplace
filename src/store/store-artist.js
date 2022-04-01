@@ -32,7 +32,7 @@ export default class {
       }
 
       artist.label = label
-      artist.data = data
+      Object.assign(artist, data)
     }
   
     return artist

@@ -12,6 +12,6 @@ export const router = createRouter({
     {path: '/my-page', component: myPage, name: 'my-page'},
     {path: '/balance', component: balance, name: 'balance'},
     {path: '/artwork/:id', component: artworkDetails, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
-    {path: '/artist', component: artistDetails, name: 'artist'}
+    {path: '/artist/:id?', component: artistDetails, name: 'artist', props: true}
   ]
 })

@@ -1,16 +1,26 @@
 <template>
   <div class="container">
-    <pageTitle title="Become an Artist"/>
-    <p class="description">
-      To become a publisher you need to set up a username.<br>
-      Registration will allow you to publish and manage your NFTs.
-    </p>
+    <template v-if="edit_self">
+      <pageTitle title="Edit your Artist Info"/>
+      <p class="description">
+        After your artist information is changed it would not be visible<br>
+        until reviewed by moderator. NFTs would still appear in gallery.<br>
+      </p>
+    </template>
+    <template v-else>
+      <pageTitle title="Become an Artist"/>
+      <p class="description">
+        To become a publisher you need to set up a username.<br>
+        Registration will allow you to publish and manage your NFTs.
+      </p>
+    </template>
     <div class="fields">
       <div class="col-first">
-        <inputField v-model="name"
+        <inputField v-model="label"
                     label="Artist Name*"
-                    :valid="name_valid"
+                    :valid="label_valid"
                     :max_length="100"
+                    :readonly="edit_self"
                     style="margin-bottom:30px;margin-top:0"
         />
         <inputField v-model="website"
@@ -84,7 +94,10 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit" @click="onSetArtist">
+    <btn :text="edit_self ? 'update info' : 'create account'" 
+         color="blue" 
+         :disabled="!can_submit" @click="onSetArtist"
+    >
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -96,7 +109,7 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 30px 0px
+      margin: 10px 0px 30px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -268,9 +281,18 @@ export default {
     pageTitle,
     btn
   },
+
+  props: {
+    id: {
+      type: String,
+      required: false,
+      default: ''
+    }
+  },
+
   data () {
     return {
-      name: '',
+      label: '',
       website: '',
       twitter: '',
       instagram: '',
@@ -281,6 +303,9 @@ export default {
   },
 
   computed: {
+    edit_self () {
+      return !!(this.id && this.id.length && this.id === this.$state.my_artist_key)
+    },
     avatarStyles() {
       return {
         'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
@@ -291,8 +316,8 @@ export default {
         'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
-    name_valid() {
-      let value = this.name
+    label_valid() {
+      let value = this.label
       return !value || value.length <= 100
     },
     website_valid() {
@@ -328,13 +353,26 @@ export default {
       return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
     },
     can_submit () {
-      return this.name && this.name_valid &&
+      return this.label && this.label_valid &&
              this.website_valid &&
              this.twitter_valid &&
              this.instagram_valid &&
              this.about_valid &&
              this.banner_valid &&
              this.avatar_valid
+    }
+  },
+
+  mounted () {
+    if (this.id) {
+      let artist = this.$store.getArtist(this.id)
+      this.label     = artist.label
+      this.website   = artist.website
+      this.twitter   = artist.twitter
+      this.instagram = artist.instagram
+      this.about     = artist.about
+      this.banner    = artist.banner
+      this.avatar    = artist.avatar
     }
   },
 
@@ -371,15 +409,13 @@ export default {
     },
 
     onSetArtist() {
-      this.$store.setArtist(this.name,  {
+      this.$store.setArtist(this.label, {
         website:   this.website,
         twitter:   this.twitter,
         instagram: this.instagram,
         about:     this.about,
         avatar:    '',
         banner:    ''
-      }, (res) => {
-        alert('Artist created: ' + JSON.stringify(res))
       })
     }
   }
