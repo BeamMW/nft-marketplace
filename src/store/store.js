@@ -7,6 +7,10 @@ import aformat from './store-artist.js'
 
 function defaultState() {
   let state = {
+    // Refactored
+    set_artist_tx: '',
+    
+    /// OLD
     loading: true,
     error: undefined,
     shader: undefined,
@@ -62,6 +66,11 @@ function appstate() {
     total_pages: computed(() => {
       let total = state.artworks.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+    }),
+    artist: computed(() => id => {
+      let artist = state.artists[id]
+      if (!id) throw new Error(`No artist with id ${id}`)
+      return artist
     })
   })
   return state
@@ -252,7 +261,20 @@ const store = {
       if (artist.key == '27db54db176900d0bf933490b9ecf5c784ddd39c0af5112d2ce60bdc084336f701') {
         continue
       }
-      artists.push(aformat.fromContract(artist))
+
+      artist = aformat.fromContract(artist)
+      console.log('artist', JSON.stringify(artist))
+      this.loadImageAsync(artist.banner).then((image) => {
+        //let stateArtist = this.state.artists[artist.id]
+        //if (stateArtist) {
+        //  stateArtist.banner = artist.banner
+        //}
+      })
+
+      console.log('load avatar')
+      this.loadImageAsync(artist.avatar)
+      console.log('after load avatar')
+      artists.push(artist)
     }
     artists.sort((a,b) => a.label > b.label ? 1 : -1)
 
@@ -269,24 +291,22 @@ const store = {
     //          this.state.artists[artist.key] = artist
     //       }
     //
-    if (this.state.artists_count != artists.length) {
-      if (!this.state.selected_artist) {
-        // choose first artist for admin if nobody is selected
-        this.state.selected_artist = {
-          key: artists[0].key,
-          label: artists[0].label
-        }
-      }
 
-      let mykey = this.state.my_artist_key
-      for (let artist of artists) {
-        if (mykey === artist.key) {
-          this.state.is_artist = true
-        }
-        this.state.artists[artist.key] = artist
+    // choose first artist for admin if nobody is selected
+    // TODO: keep only id
+    if (!this.state.selected_artist) {  
+      this.state.selected_artist = {
+        key: artists[0].key,
+        label: artists[0].label
       }
+    }
+
+    let mykey = this.state.my_artist_key
+    for (let artist of artists) {
+      if (mykey === artist.key) this.state.is_artist = true
+      this.state.artists[artist.key] = artist
     } 
-    // END OF NOT OPTIMIZED
+
     this.state.artists_count = artists.length
     this.loadArtworks() 
   },
@@ -861,17 +881,105 @@ const store = {
     this.state.gallery_collections_page = page
   },
 
-  setArtist(label, data) {
-    // TODO: make invokeContract accept an object with props
-    ({label, data} = aformat.toContract(label, data))
-    utils.invokeContract(`role=artist,action=set_artist,cid=${this.state.cid},label=${label},data=${data}`, 
-      (...args) => this.onMakeTx(...args)
-    )
+  async invokeContractAsyncAndMakeTx (args) {
+    let {full} = await utils.invokeContractAsync(args)
+    utils.ensureField(full.result, 'raw_data', 'array')
+
+    try {
+      let {res} = await utils.callApiAsync('process_invoke_data', {data: full.result.raw_data})
+      utils.ensureField(res, 'txid', 'string')
+      return res.txid
+    }
+    catch(err) {
+      if (utils.isUserCancelled(err)) {
+        return undefined
+      }
+      throw err
+    }
   },
 
-  getArtist(id) {
-    // TODO if no artist then retreive from contract?
-    return this.state.artists[id]
+  async readFileAsync(file) {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader()
+      reader.onload = () => {
+        resolve(reader.result)
+      }
+      reader.onerror = reject
+      reader.readAsArrayBuffer(file)
+    })
+  },
+
+  async uploadImageAsync (file) {
+    let buffer = await this.readFileAsync(file)
+    let array = Array.from(new Uint8Array(buffer))
+    let {res} = await utils.callApiAsync('ipfs_add', {data: array})
+    return {
+      ipfs_hash: res.hash,
+      mime_type: file.type
+    }
+  },
+
+  async loadImageAsync (image, context) {
+    if (!image) {
+      return
+    } 
+
+    try {
+      let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
+      utils.ensureField(res, 'data', 'array')
+      
+      // TODO: can skip u8arr here?
+      let u8arr = new Uint8Array(res.data)
+      let blob = new Blob([u8arr], {type: image.mime_type})
+      image.object = URL.createObjectURL(blob, {oneTimeOnly: true})
+      
+      return image
+    }
+    catch(err) {
+      if (err) {
+        context = context || 'loading image from IPFS, hash ' + image.ipfs_hash
+        image.error = {err, context}
+      }
+    }
+  },
+
+  async setArtist(label, data) {
+    if(data.avatar instanceof File) {
+      data.avatar = await this.uploadImageAsync(data.avatar)  
+    }
+
+    if (data.banner instanceof File) {
+      data.banner = await this.uploadImageAsync(data.banner)
+    }
+
+    ({label, data} = aformat.toContract(label, data))
+    let txid = await this.invokeContractAsyncAndMakeTx({
+      role: 'artist',
+      action: 'set_artist',
+      cid: this.state.cid,
+      label,
+      data
+    })
+
+    if (!txid) {
+      return
+    }
+
+    this.state.set_artist_tx = txid
+    let interval = setInterval(async () => {
+      try {
+        let {res} = await utils.callApiAsync('tx_status', {txId: this.state.set_artist_tx})
+        console.log(res.status)
+        if ([0, 1, 5].indexOf(res.status) == -1) {
+          clearInterval(interval)
+          this.state.set_artist_tx = ''
+        }
+      }
+      catch(err) {
+        this.setError(err)
+        this.state.set_artist_tx = ''
+      }
+    }, 1000)
   },
 
   toArtworkDetails(id) {
@@ -881,6 +989,10 @@ const store = {
         id
       }
     })
+  },
+
+  toBack () {
+    router.go(-1)
   },
 
   toMyPage() {

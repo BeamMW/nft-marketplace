@@ -61,6 +61,10 @@ export default {
         return this.image
       }
 
+      if (this.image.object) {
+        return this.image.object
+      }
+
       if (this.image.bytes) {
         return URL.createObjectURL(new Blob([this.image.bytes], {type: this.image.mime_type}))
       }

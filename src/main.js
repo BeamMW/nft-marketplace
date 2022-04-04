@@ -19,6 +19,10 @@ utils.initialize(
     const vueApp = createApp(App)
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
+    vueApp.config.errorHandler = (err, instance, info) => {
+      // TODO error context
+      store.setError(err)
+    }
     vueApp.component('artwork', artwork)
     vueApp.component('collection', collection)
     vueApp.use(router)

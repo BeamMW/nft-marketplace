@@ -59,6 +59,7 @@
 
     &:read-only {
       background-color: rgba(255, 255, 255, 0.03)
+      color: rgba(255, 255, 255, 0.3)
     }
 
     &:not(.error):not(:read-only):focus {

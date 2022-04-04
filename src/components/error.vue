@@ -15,13 +15,16 @@
   height:          100%
   width:           100%
   overflow:        hidden
-  word-break:      break-word
   color:           #c55b61 
-
-  & pre {
-    font-family: 'SFProDisplay', sans-serif
-    font-weight: normal
-    white-space: pre-wrap
+  
+  & > div {
+    width: 70%
+    
+    & > pre {
+      font-family: 'SFProDisplay', sans-serif
+      font-weight: normal
+      white-space: pre-wrap
+    }
   }
 }
 </style>
@@ -36,7 +39,7 @@ export default {
     },
     context: {
       type: String,
-      default: 'Error occured'
+      default: ''
     }
   },
 
@@ -48,6 +51,14 @@ export default {
 
   computed: {
     errtext () {
+      if (typeof this.error === 'string') {
+        return [this.context || 'Error occured', this.error].join('\n')
+      }
+
+      if (this.error instanceof Error) {
+        return this.error.stack
+      }
+      
       let err = Object.assign({}, this.error)
       // strip off some long unncessary binary stuff that might occur here
       if (err.answer && err.answer.result) {
@@ -62,7 +73,7 @@ export default {
       }
             
       let serr = utils.formatJSON(err)
-      return [this.context, serr].join('\n')
+      return [this.context || 'Error occured', serr].join('\n')
     }
   },
 

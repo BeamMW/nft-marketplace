@@ -3,7 +3,6 @@ import {versions} from './store-consts.js'
 
 export default class {
   static toContract (label, data) {
-    //alert('write label: ' + formats.toContract(label))
     return {
       // TODO: remove test code
       label: label == '1' ? label : formats.toContract(label),
@@ -23,7 +22,6 @@ export default class {
     } 
     else 
     {
-      //alert('read label: ' + artist.label)
       let [label] = formats.fromContract(artist.label)
       let [version, data] = formats.fromContract(artist.data)
 
