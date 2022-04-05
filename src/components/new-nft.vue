@@ -24,8 +24,10 @@
             </select>
           </div>
         </div>
-        <priceInput v-model="price" color="#fff" @trigger-key="onKey" @trigger-paste="onPaste"/>
-        <span class="price">{{ price }} USD</span>
+        <div class="price-container">
+          <div class="label">Price</div>
+          <priceInput v-model="price" color="#fff" @trigger-key="onKey" @trigger-paste="onPaste"/>
+        </div>
         <switchInput v-model:checked="sale"/>
       </div>
       <div class="col-second">
@@ -62,6 +64,7 @@
         }
 
         & > .collection-container {
+
           .label {
             margin-bottom:10px
             color: rgba(255, 255, 255, 0.6)
@@ -97,14 +100,14 @@
             }
           }
         }
+        .price-container {
 
-        .price {
-          display: block
-          margin-top:-14px
-          margin-bottom: 20px
-          font-size: 12px
-          color: #fff
-          opacity: 0.7
+          .label {
+            margin-bottom: -10px
+            color: rgba(255, 255, 255, 0.6)
+            font-family: 'SFProDisplay', sans-serif
+            font-size: 14px
+          }
         }
       }
 

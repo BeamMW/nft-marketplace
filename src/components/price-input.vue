@@ -12,6 +12,7 @@
     />
     <span class="text">BEAM</span>
   </div>
+  <span class="price">{{ price }} USD</span>
 </template>
 
 <style scoped lang="stylus">
@@ -53,6 +54,14 @@
     margin-left: auto
     color: var(--color)
   }
+}
+
+.price {
+  display: block
+  margin-top: 6px
+  font-size: 12px
+  color: #fff
+  opacity: 0.7
 }
 </style>
 
