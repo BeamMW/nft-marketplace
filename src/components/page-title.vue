@@ -1,23 +1,30 @@
 <template>
   <div class="container">
-    <backBtn class="left"/>
+    <backBtn/>
     <div class="title">{{ title }}</div>
+    <div>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
   .container {
+    min-height: 41px 
     display: flex
     flex-flow: row
     justify-content: center
+    align-items: center
 
-    .left {
-      position: absolute
-      top: 0
-      left: 0
+    & > * {
+      flex-grow: 1
+      flex-basis: 0
     }
 
     .title {
+      display: flex
+      justify-content: center
+      align-items: center
       font-family: 'SFProDisplay', sans-serif
       font-weight: 700
       font-size: 14px
@@ -25,7 +32,6 @@
       text-transform: uppercase
       letter-spacing: 3.1px
       color: #fff
-      padding-top: 2px
     }
   }
 </style>

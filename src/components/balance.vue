@@ -1,136 +1,100 @@
 <template>
   <publicKeyModal ref="keyModal"/>
+  <pageTitle title="balance"/>
   <div class="balance-container">
-    <div :class="[show_balance ? '' : 'hidden', 'balance']">
-      <img src="~assets/icon-beam.svg"/>
-      <div class="value">
-        {{ balance_beam }} BEAM
+    <div class="balance">
+      <div>
+        <div class="description">Current balance</div>
+        <amount :amount="balance"/>
       </div>
-      <btn v-if="balance_beam" 
-           class="withdraw" 
-           text="withdraw"
-           text_color="blue"
-           color="transparent"
-           @click="onWithdraw"
-      >
-        <img src="~assets/icon-receive.svg">
-      </btn>
+
+      <div v-if="balance" class="withdraw">
+        <btn text="withdraw"
+             text_color="blue"
+             color="transparent"
+             height="20px"
+             padding="0px"
+             @click="onWithdrawClick"
+        >
+          <img src="~assets/icon-receive.svg">
+        </btn>
+      </div>
     </div>
-    <div class="user" @click="onShowKey">
-      <div v-if="my_artist_name" class="name">
-        <img class="icon" src="~assets/icon-user.svg"/>
-        <span class="text">{{ my_artist_name }}</span>
+
+    <div class="balance">
+      <div>
+        <div class="description">Total sold NFT amount</div>
+        <amount/>
       </div>
-      <btn class="key"
-           text="Show my public key"
-           text_color="green"
-           :text_bold="false"
-           :hover="false"
-      >
-        <img src="~assets/icon-key.svg">
-      </btn>
+
+      <div>
+        <div class="description">NFT sold</div>
+        <div>{{ nft_sold }}</div>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
 .balance-container {
-  display: flex
-  flex-direction: row
-  justify-content: space-between
-  align-content: center
+  display: grid
+  grid-template-columns: 1fr 1fr
+  column-gap: 20px
   margin-bottom: 10px
+  margin-top: 5px
 
   .balance {
-    width: 442px
-    height: 78px
+    background-color: rgba(255, 255, 255, 0.1)
+    display: grid
+    grid-template-columns: auto auto
     border-radius: 10px
-    background-color: rgba(255,255,255,0.1)
-    display: flex
-    flex-direction: row
-    align-items: center
-    padding: 0 20px
-    padding-left: 20px
+    padding: 20px
 
-    .value {
-      margin-left: 10px
-      font-size: 20px
-      font-weight: bold
-      color: #fff
+    & .description {
+      font-size: 12px
+      color: rgba(255, 255, 255, 0.5)
+      margin-bottom: 7px
     }
-
-    .withdraw {
-      margin-left: auto
-    }
-
-    .text {
-      margin-left: 8px
-      font-size: 14px
-      font-weight: bold
-      color: #0bccf7
-    }
-  }
-
-  .user {
-    display: flex
-    flex-direction: column
-    align-items: center
-
-    .icon {
-      width: 16px
-      height: 16px
-    }
-
-    .name {
-      padding-bottom: 12px
+    
+    & .withdraw {
+      align-self: end
       display: flex
-      align-items: center
-      
-      .text {
-        font-size: 18px
-        font-weight: bold
-        color: #fff
-        margin-left: 7px
-      }
-    }
-
-    .key {
-      height: 48px 
-      padding: 14px
-      border-radius: 10px
-      font-size: 16px
-      
-      .connect {
-        font-size: 16px
-        color: #00f6d2
-      }
+      justify-content: flex-end
+      padding-bottom: 10px
     }
   }
 }
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
 import publicKeyModal from './public-key-dialog.vue'
 import btn from './button.vue'
+import pageTitle from './page-title.vue'
+import amount from './amount.vue'
 
 export default {
   components: {
     publicKeyModal,
-    btn
+    btn,
+    pageTitle,
+    amount
+  },
+
+  props: {
+    nft_sold: {
+      type: Number,
+      default: 14 // for example
+    }
   },
 
   computed: {
-    balance_beam () {
-      return this.$state.balance_beam / common.GROTHS_IN_BEAM
+    balance () {
+      return this.$state.balance
     },
+
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_keys[0]] ||
-                         this.$state.artists[this.$state.my_artist_keys[1]]
+      let artist = this.$state.artists[this.$state.my_artist_key]
       return (artist || {}).label
-    },
-    show_balance () {
-      return this.$state.is_artist || this.$state.balance_beam
     }
   },
 
@@ -139,7 +103,7 @@ export default {
       this.$refs.keyModal.open()
     },
 
-    onWithdraw () {
+    onWithdrawClick () {
       this.$store.withdrawBEAM()
     }
   }

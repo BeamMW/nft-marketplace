@@ -1,82 +1,76 @@
 <template>
   <div class="actions-container">
-    <div class="artworks-controls">
-      <div class="tabs">
-        <span v-for="(tab) of tabs_sort_by"
-              :key="tab.id"
-              :class="[ active_tab === tab.id ? 'tab-active' : '','tab-item']" 
-              @click="onTabClicked(tab.id)"
-        >
-          <div class="title">{{ tab.name }}</div>
-          <div v-if="active_tab === tab.id" class="bottom-line"></div>
-        </span>
-      </div>
-      <div class="selectors">
-        <!-- <selector
-                v-on:selected="onAuthor"
-                :options="artist_options"
-                :selected="active_filter_by_artist"
-                title="Author"
-                v-if="artist_options.length"
-            /> -->
-        <btn text="nft" color="green" padding="7px 12px" @click="onAddNft">
-        </btn>
-        <div style="margin-left:1px">
-          <btn text="collection" color="green" padding="7px 12px" @click="onAddCollection">
-          </btn>
-        </div>
-        <selector :options="selector_options"
-                  :selected="active_sort_by"
-                  title="Sort by"
-                  @selected="onSortBy"
-        />
-        <btn text="become an artist" color="green" padding="7px 22px" @click="onBecomeArtist">
-          <img src="~assets/add-user.svg"/>
-        </btn>
-      </div>
-      <btn @click="onMyPage">
-        <img src="~assets/icon-user.svg">
-      </btn>
+    <div class="tabs">
+      <span v-for="(tab) of tabs_sort_by"
+            :key="tab.id"
+            :class="[ active_tab === tab.id ? 'tab-active' : '','tab-item']" 
+            @click="onTabClicked(tab.id)"
+      >
+        <div class="title">{{ tab.name }}</div>
+        <div v-if="active_tab === tab.id" class="bottom-line"></div>
+      </span>
     </div>
+
+    <div class="selectors">
+      <!-- <selector
+              v-on:selected="onAuthor"
+              :options="artist_options"
+              :selected="active_filter_by_artist"
+              title="Author"
+              v-if="artist_options.length"
+          /> -->
+      <selector :options="selector_options"
+                :selected="active_sort_by"
+                title="Sort by"
+                @selected="onSortBy"
+      />
+    </div>
+
+    <btnWallet v-if="!is_artist" @click="onBalance"/>
+    
+    <btn v-if="is_artist" class="user" height="34px"
+         :text="my_artist_name"
+         @click="onMyPage"
+    >
+      <img src="~assets/icon-user.svg">
+    </btn>
+
+    <btn v-else text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+      <img src="~assets/add-user.svg"/>
+    </btn>
   </div>
 </template>
 
 <style scoped lang="stylus">
 .actions-container {
   display: flex
-  flex-direction: row
-
-  .artworks-controls {
+  align-items: center
+  width: 100%
+        
+  .tabs {
     display: flex
     flex-direction: row
-    align-items: center
-    width: 100%
-        
-    .tabs {
-      display: flex
-      flex-direction: row
 
-      .tab-active {
-        color: #fff
+    .tab-active {
+      color: #fff
+    }
+
+    .tab-item {
+      color: rgba(255, 255, 255, 0.3)
+      font-size: 12px
+      font-weight: bold
+      cursor: pointer
+
+      .title {
+        padding: 4px 16px
+        text-transform: uppercase
       }
 
-      .tab-item {
-        color: rgba(255, 255, 255, 0.3)
-        font-size: 12px
-        font-weight: bold
-        cursor: pointer
-
-        .title {
-          padding: 4px 16px
-          text-transform: uppercase
-        }
-
-        .bottom-line {
-          height: 2px
-          width: 100%
-          box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7)
-          background-color: #00f6d2
-        }
+      .bottom-line {
+        height: 2px
+        width: 100%
+        box-shadow: 0 0 5px 0 rgba(0, 246, 210, 0.7)
+        background-color: #00f6d2
       }
     }
   }
@@ -95,18 +89,29 @@
       margin-right: 4px
     }
   }
+
+  & button {
+    margin-left: 12px
+
+    &:last-child {
+      margin-right: 6px
+    }
+  }
 }
+
 </style>
 
 <script>
 import {tabs, sort} from '../utils/consts.js'
 import selector from './selector.vue'
 import btn from './button.vue'
+import btnWallet from './button-wallet.vue'
 
 export default {
   components: {
     selector,
-    btn
+    btn,
+    btnWallet
   },
 
   data() {
@@ -123,6 +128,13 @@ export default {
   },
   
   computed: {
+    is_artist () {
+      return this.$state.is_artist
+    },
+    my_artist_name () {
+      let artist = this.$state.artists[this.$state.my_artist_key]
+      return (artist || {}).label
+    },
     active_tab () {
       return this.$state.active_tab
     },
@@ -172,11 +184,6 @@ export default {
     onAddCollection() {
       this.$store.newCollection()
     },
-
-    onAddNft() {
-      this.$store.newNFT()
-    },
-
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)
@@ -197,6 +204,9 @@ export default {
     },
     onMyPage() {
       this.$store.toMyPage()
+    },
+    onBalance() {
+      this.$store.toBalance()
     }
   }
 }

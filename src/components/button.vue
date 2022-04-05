@@ -17,16 +17,16 @@
 <style scoped lang="stylus">
 .button {
   font-family: 'SFProDisplay', sans-serif
-  height: min-content
-  min-width:  min-content
-  border-radius: 50px
+  white-space: nowrap
   box-sizing: border-box
   display: flex
   align-items: center
+  justify-content: center
   font-size: 14px
   border: none
   cursor: pointer
   background-color: rgba(255, 255, 255, 0.1)
+  user-select: none
 
   &:not(.disabled):hover {
     box-shadow: 0 0 8px white
@@ -34,15 +34,15 @@
 
   &.disabled {
     opacity: 0.6
-    cursor: auto !important
+    cursor: auto
+
+    & :slotted(img) {
+      opacity: 0.35
+    }
   }
 
   &:focus {
     outline: none
-  }
-
-  & .text {
-    font-weight: bold
   }
 
   &.reverse {
@@ -50,9 +50,7 @@
   }
 
   &.transparent {
-    min-height: min-content
     border-radius: 0
-    padding: 0
 
     &:not(.disabled):hover {
       box-shadow: none
@@ -105,12 +103,24 @@ export default {
       default: true
     },
     gap: {
-      type: Number,
-      default: 9
+      type: String,
+      default: '9px'
     },
     padding: {
       type: String,
       default: '11px 22px'
+    },
+    height: {
+      type: String,
+      default: '38px'
+    },
+    width: {
+      type: String,
+      default: 'fit-content'
+    },
+    radius: {
+      type: String,
+      default: '50px'
     }
   },
 
@@ -144,16 +154,13 @@ export default {
 
       let tcolor = this.text_color || (this.color == 'transparent' || this.color == undefined ? 'white' : 'dark-blue')
       let res = {
-        'color': this.text_colors[tcolor]
+        'color': this.text_colors[tcolor],
+        'font-weight': this.text_bold ? 'bold' : 'normal'
       }
   
       if (this.has_icon) {
         let tgap_pos = this.reverse ? 'right' : 'left'
-        res[`margin-${tgap_pos}`] = `${this.gap}px`
-      }
-
-      if (!this.text_bold) {
-        res['font-weight'] = 'normal'
+        res[`margin-${tgap_pos}`] = this.gap
       }
 
       return res
@@ -162,7 +169,10 @@ export default {
     button_style() {
       return {
         'background-color': this.button_colors[this.color],
-        'padding': this.padding
+        'padding': this.padding,
+        'height': this.height,
+        'width': this.width,
+        'border-radius': this.radius
       }
     }
   },

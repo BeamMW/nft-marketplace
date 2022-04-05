@@ -1,10 +1,12 @@
 import App from './components/app.vue'
-import {store} from './store.js'
+import store from './store/store.js'
 import {router} from './router.js'
 import utils from './utils/utils.js'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import './styles/fonts.css'
 import './styles/global.css'
+import artwork from './components/artwork.vue'
+import collection from './components/collection.vue'
 
 utils.initialize(
   {
@@ -17,6 +19,12 @@ utils.initialize(
     const vueApp = createApp(App)
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
+    vueApp.config.errorHandler = (err, instance, info) => {
+      // TODO error context
+      store.setError(err)
+    }
+    vueApp.component('artwork', artwork)
+    vueApp.component('collection', collection)
     vueApp.use(router)
     vueApp.mount('body')
 

@@ -2,13 +2,13 @@
   <div class="selector-container">
     <span class="title">{{ title }}</span>
     <div class="custom-select" :tabindex="tabindex" @blur="show = false">
-      <div class="selected" :class="{ open: show }" @click="open">
+      <div ref="selected" class="selected" :class="{ open: show }" @click="open">
         {{ options[selected].name }}
         <img src="~assets/icon-down.svg" class="arrow"/>
       </div>
       <div v-show="show" class="items" :style="style">
-        <div v-for="(option, i) of options || []" :key="i" @click="onSelected(option)">
-          <span :class="{ highlight: selected === i}">{{ option.name }}</span>
+        <div v-for="option of options || []" :key="option.id" @click="onSelected(option.id)">
+          <span :class="{ highlight: selected === option.id}">{{ option.name }}</span>
         </div>
       </div>
     </div>
@@ -17,9 +17,9 @@
 
 <style scoped lang="stylus">
   .selector-container {
-    margin-left: auto
     display: flex
-    justify-content: center
+    align-items: center
+    user-select: none
 
     .title {
       align-self: center
@@ -29,14 +29,8 @@
     }
 
     .custom-select {
-      position: relative
-      display: flex
-      text-align: left
       outline: none
-      height: 47px
-      line-height: 47px
-      min-width: 0px
-      margin-left: auto
+      position: relative
 
       .selected {
         color: #fff
@@ -62,13 +56,14 @@
       .items {
         color: #fff
         position: absolute
-        border:none
+        border: none
         border-radius: 4px
         font-size: 16px
-        right: 0
+
         z-index: 1
-        margin-top: 40px
         padding: 0 20px
+        margin-top: 5px
+        right: 0
           
         div {
           color: #fff
@@ -105,8 +100,7 @@ export default {
     },
     selected: {
       type: Number,
-      required: false,
-      default: 0,
+      required: true,
     },
     tabindex: {
       type: Number,
@@ -120,7 +114,7 @@ export default {
     },
   },
 
-  emits: ['selected'],
+  emits: ['update:selected'],
 
   data() {
     return {
@@ -138,7 +132,7 @@ export default {
 
   methods: {
     onSelected(opt) {
-      this.$emit('selected',opt)
+      this.$emit('update:selected', opt)
       this.show = false
     },
     
@@ -149,7 +143,7 @@ export default {
     open(ev) {
       this.show = true
       nextTick(() => {
-        let downAway = (evc) => {
+        /*let downAway = (evc) => {
           if (!this.$el.contains(evc.target)) {
             document.removeEventListener('mousedown', downAway, true)
             this.close()
@@ -170,7 +164,7 @@ export default {
         
         document.addEventListener('mousedown', downAway, true)
         document.addEventListener('click', clickAway, true)
-        document.addEventListener('scroll', scrollAway, true)
+        document.addEventListener('scroll', scrollAway, true) */
       })
     },
   }

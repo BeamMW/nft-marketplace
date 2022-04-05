@@ -1,6 +1,6 @@
 export const common = { 
   GROTHS_IN_BEAM: 100000000,
-  ITEMS_PER_PAGE: 30,
+  ITEMS_PER_PAGE: 10,
   MAX_IMAGE_SIZE: 250 * 1024
 }
 
@@ -10,6 +10,8 @@ export const tabs = {
   SALE: 2,
   LIKED: 3,
   SOLD: 4,
+  COLLECTIONS: 5,
+  NFTS: 6,
 }
 
 export const sort = {
@@ -22,5 +24,6 @@ export const sort = {
 }
 
 export const contract = {
-  cid: 'b51efe78d3e7c83c8dbc3d59d5e06b2bd770139e645bc19e50652632cbdd47d1'
+  cid: '5001bc39bda1dc8681a4c6982fc953301b7ad2981695939acb6610b81ba83402'
 }
+

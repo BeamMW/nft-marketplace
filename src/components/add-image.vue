@@ -1,34 +1,39 @@
 <template>
-  <div class="banner" :style="bannerStyles">
-    <div v-if="banner" class="remove">
-      <img src="~/assets/remove.svg" alt="remove banner" @click="onRemoveBanner"/>
+  <div :style="ctrlStyle">
+    <div class="add-image-container" :style="borderStyle" :readonly="readonly">
+      <div v-if="image" class="remove">
+        <img src="~/assets/remove.svg" @click="onRemove"/>
+      </div>
+      <img v-if="image" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
+      <label v-if="!image" class="text" for="image" :readonly="readonly" v-html="title"/>
+      <input v-if="!readonly"
+             id="image"
+             ref="image"
+             type="file"
+             class="files"
+             :accept="accept"
+             @change="onUpload"
+      />
     </div>
-    <img v-if="banner" :src="banner" alt="avatar" class="image" :class="{'error': !valid}"/>
-    <label v-if="!banner" class="text" for="banner">{{ title }}</label>
-    <input id="banner"
-           ref="imageUploader"
-           type="file"
-           :accept="accepts"
-           class="files"
-           @click="resetImageUploader"
-           @change="onUploadBanner"
-    />
-  </div>
-  <div v-if="!valid" class="error_msg">
-    <p class="error">image cannot be larger than 250kb</p>
+    <div v-if="error" class="error-text">
+      {{ error }}
+    </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .banner {
+  .add-image-container {
     display: flex
     align-items: center
     justify-content: center
     position:relative
-    height: 100%
     background-color: rgba(26, 246, 214, 0.1)
     border-radius: 10px
-    cursor: pointer
+    height: 100%
+
+    &[readonly] {
+      opacity: 0.6
+    }
 
     .remove {
       background-color: rgba(0, 0, 0, 0.7)
@@ -38,7 +43,6 @@
       right: 20px
       border-radius: 9999px
       padding: 7px 7px 3px 7px
-      cursor: pointer
     }
 
     .image {
@@ -66,66 +70,89 @@
       align-items: center
       font-size: 14px
       color: #1af6d6
-      cursor: pointer
+
+      &:not([readonly]) {
+        cursor: pointer
+      }
     }
   }
 
-  .error_msg {
-    margin-top: -18px
-
-    .error {
-      font-size: 12px
-      font-weight: 400
-      font-style: italic
-      text-align: right
-    }
+  .error-text {
+    font-size: 12px
+    font-weight: 400
+    font-style: italic
+    text-align: right
+    padding-right: 4px
+    color: #c55b61
   }
 </style>
 
 <script>
 export default {
   props: {
-    banner: {
-      type: String,
-      required: true
+    image: {
+      type: Object,
+      required: false,
+      default: undefined
     },
-    valid: {
-      type: Boolean,
-      default: true,
-      required: false
+    height: {
+      type: String,
+      required: false,
+      default: '135px'
     },
     title: {
       type: String,
       default: '',
       required: true
     },
-    accepts: {
-      type: Array,
-      required: true
+    error: {
+      type: String,
+      default: '',
+      required: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    accept: {
+      type: String,
+      default: 'image/*',
+      required: false
     }
   },
 
   emits: [
-    'remove', 'upload'
+    'update:image'
   ],
 
   computed: {
-    bannerStyles() {
+    ctrlStyle() {
       return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'height': this.height
+      }
+    },
+    borderStyle() {
+      return {
+        'border': this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
   },
   methods: {
-    resetImageUploader() {
-      this.$refs.imageUploader.value = ''
+    onRemove () {
+      this.$emit('update:image', undefined)
+      this.$refs.image.value = ''
     },
-    onRemoveBanner () {
-      this.$emit('remove')
-    },
-    onUploadBanner(e) {
-      this.$emit('upload',e)
-
+    onUpload (e) {
+      let file = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (e) => {
+        this.$emit('update:image', {
+          object: e.target.result,
+          file
+        })
+      }
     }
   }
 }

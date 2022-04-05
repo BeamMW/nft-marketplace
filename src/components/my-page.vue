@@ -1,71 +1,88 @@
 <template>
   <publicKeyModal ref="keyModal"/>
-  <div class="header">
-    <backBtn @click="$router.go(-1)"/>
-    <h1 class="title">MY PAGE</h1>
+  <pageTitle title="my page">
     <div class="options">
-      <btn :hover="false">
-        <img src="~assets/icon-heart.svg">
+      <btn v-if="is_artist" 
+           :height="height" 
+           :width="width" 
+           padding="0px" 
+           radius="10px" 
+           @click="onEditArtist"
+      >
+        <img src="~assets/icon-pencil.svg">
       </btn>
-      <btn :hover="false">
-        <img src="~assets/icon-eye-crossed.svg">
-      </btn>
-      <btn :hover="false" @click="onShowKeyClick">
+
+      <btnWallet @click="onBalanceClick"/>
+      
+      <btn :height="height" :width="width" radius="10px" padding="0px" @click="onShowKeyClick">
         <img src="~assets/icon-key.svg">
       </btn>
+
+      <btn v-if="!is_artist" text="become an artist" color="green" height="34px" @click="onBecomeArtist">
+        <img src="~assets/add-user.svg"/>
+      </btn>
     </div>
-  </div>
+  </pageTitle>
 </template>
 
 <style scoped lang="stylus">
-.header {
+.options {
   display: flex
-  flex-direction: row
+  justify-content: flex-end
   align-items: center
-  justify-content: space-between
-  justify-items: center
 
-  & > * {
-    flex-grow: 1
-    flex-basis: 0
-  }
+  & > button {
+    border-radius: 10px
+    margin-left: 12px
+    margin-top: 7px
 
-  & > .title {
-    font-size: 14px
-    letter-spacing: 3.11px
-    text-align: center
-  }
-
-  & > .options {
-    height: 36px
-    display: flex
-    justify-content: flex-end
-
-    & > button {
-      width: 36px
-      border-radius: 10px
-      padding: 5px 12px
-      margin-left: 20px
+    &:last-child {
+      margin-right: 7px
     }
   }
 }
 </style>
 
 <script>
-import backBtn from './back-btn.vue'
+import pageTitle from './page-title.vue'
 import btn from './button.vue'
+import btnWallet from './button-wallet.vue'
 import publicKeyModal from './public-key-dialog.vue'
 
 export default {
   components: {
-    backBtn,
+    pageTitle,
     btn,
+    btnWallet,
     publicKeyModal
   },
+
+  data() {
+    return {
+      width: '34px',
+      height: '34px'
+    }
+  },
+
+  computed: {
+    is_artist() {
+      return this.$store.state.is_artist
+    }
+  },
+
   methods: {
-    onShowKeyClick () {
+    onShowKeyClick() {
       this.$refs.keyModal.open()
     },
+    onBalanceClick() {
+      this.$store.toBalance()
+    },
+    onEditArtist() {
+      this.$store.toEditArtist()
+    },
+    onBecomeArtist() {
+      this.$store.toBecomeArtist()
+    }
   },
 }
 </script>

@@ -1,9 +1,7 @@
 <template>
   <div class="artwork">
     <!---- Preview OR Loading ---->
-    <div class="preview-container" @click="onDetails">
-      <artPreview :artwork="artwork"/>
-    </div>
+    <preview :image="item" height="200px" @click="onDetails"/>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -12,14 +10,14 @@
     <div class="info-row">
       <!---- Title ---->
       <div v-if="loading" class="title">Loading...</div>
-      <div v-else-if="error" class="title">Failed to load artwork</div>
-      <div v-else class="title">{{ title }}</div>
+      <div v-else-if="error" class="title">Failed to load</div>
+      <div v-else class="title">{{ title + title + title + title }}</div>
       
       <!---- Likes ----->
-      <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+      <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
         <span>{{ likes_cnt }}</span>
-      </div>
+      </div-->
     </div>
 
     <!---- Second info row, author ---->
@@ -33,38 +31,24 @@
 
     <!---- Third info row, price/buy/sell ----->
     <div class="price-row">
-      <artPrice :artwork="artwork"/>
+      <price :artwork="item" mode="compact"/>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
   .artwork {
-    margin-right: 16px
-    margin-bottom: 16px
     display: flex
     flex-direction: column
-    width: 284px
+    width: 213px
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
     position:relative
 
-    & .preview-container {
-      height: 360px
-      background-color: rgba(240, 205, 205, 0.1)
-      display: flex
-      align-items: center
-      justify-content: center
-      overflow: hidden
-      border-top-left-radius: 10px
-      border-top-right-radius: 10px
-      cursor: pointer
-    }
-
     & > .delete {
       position: absolute
-      left: 263px
+      left: 190px
       top: 5px
       width: 15px
       cursor: pointer
@@ -72,20 +56,19 @@
 
     & > .info-row {
       box-sizing: border-box
-      padding: 0 14px 0px 14px
+      padding: 0 12px 3px 12px
       display: flex
       align-items: center
       flex-direction: row
-      margin-bottom: 3px
       overflow: hidden
 
       & .title {
-        font-size: 16px
+        font-size: 14px
         color: #fff
         white-space: nowrap
         text-overflow: ellipsis
         overflow: hidden
-        padding-top: 20px
+        padding-top: 14px
         flex: 1
       }
 
@@ -112,8 +95,8 @@
     }
 
     & .price-row {
-      min-height: 41px
-      margin: 10px 0 20px 0
+      min-height: 31px
+      margin: 3px 0 7px 0
       padding: 0 12px 0 14px
       display: flex
       align-items: center
@@ -123,28 +106,21 @@
 </style>
 
 <script>
-import artPrice from './artwork-price.vue'
-import artPreview from './artwork-preview.vue'
+import price from './artwork-price.vue'
+import preview from './image-preview.vue'
 
 export default {
   components: {
-    artPrice,
-    artPreview
+    price,
+    preview
   },
 
   props: {
-    artwork: {
+    item: {
       type: Object,
       required: true,
     }
   },
-
-  emits: [
-    'like', 
-    'unlike', 
-    'delete', 
-    'details'
-  ],
 
   computed: {
     is_admin () {
@@ -156,19 +132,19 @@ export default {
     },
 
     id () {
-      return this.artwork.id
+      return this.item.id
     },
 
     title () {
-      return this.artwork.title
+      return this.item.title
     },
         
     likes_cnt () {
-      return this.artwork.impressions
+      return this.item.impressions
     },
 
     liked () {
-      return !!this.artwork.my_impression
+      return !!this.item.my_impression
     },
         
     can_vote () {
@@ -176,7 +152,7 @@ export default {
     },
 
     loading () {
-      return this.artwork.loading
+      return this.item.loading
     },
 
     artists () {
@@ -184,39 +160,41 @@ export default {
     },
 
     author () {
-      return (this.artists[this.artwork.pk_author] || {}).label
+      return (this.artists[this.item.pk_author] || {}).label
     },
 
     error () {
-      return !!this.artwork.error
+      return !!this.item.error
     }
   },
 
   methods: {
-    onLike (ev) {
-      if (this.is_headless) 
-      {
-        this.$store.switchToHeaded()  
+    onLike () {
+      if (this.is_headless) {
+        return this.$store.switchToHeaded()  
       } 
-      else {
-        if (this.can_vote) {
-          this.$emit('like', this.id)
-        }
-      }
-    },
 
-    onUnlike (ev) {
       if (this.can_vote) {
-        this.$emit('unlike', this.id)
+        this.$store.likeArtwork(this.id)
       }
     },
 
-    onDelete (ev) {
-      this.$emit('delete', this.id)
+    onUnlike () {
+      if (this.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+
+      if (this.can_vote) {
+        this.$store.unlikeArtwork(this.id)
+      }
+    },
+
+    onDelete (id) {
+      this.$store.deleteArtwork(this.id)
     },
 
     onDetails(ev) {
-      this.$store.showArtworkDetails(this.id)
+      this.$store.toArtworkDetails(this.id)
     }
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <modal ref="modal">
     <div class="content">
-      <div class="title">Public key</div>
+      <div class="title">Artist key</div>
       <div class="data">
         <span>{{ artist_key }}</span>
-        <btn class="icon-copy" color="transparent" @click="onCopy">
+        <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
           <img src="~assets/icon-copy.svg"/>
         </btn>
       </div>
@@ -39,7 +39,6 @@
       align-items: center
 
       .icon-copy {
-        margin-left: 10px
         cursor: pointer
       }
     }
@@ -67,7 +66,7 @@ export default {
 
   computed: {
     artist_key () {
-      return this.$state.my_artist_keys[0]
+      return this.$state.my_artist_key
     },
   },
 

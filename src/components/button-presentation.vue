@@ -6,6 +6,7 @@
       <btn color="blue" text="test"/>
       <btn color="green" text="test"/>
     </div>
+
     <div>
       <h4>color and icon</h4>
       <btn color="magenta">
@@ -18,6 +19,7 @@
         <img src="~/assets/icon-button.svg"/>
       </btn>  
     </div>
+
     <div>
       <h4>color, icon, text, icon position</h4>
       <btn color="magenta" text="test">
@@ -30,6 +32,7 @@
         <img src="~/assets/icon-button.svg"/>
       </btn>
     </div>
+
     <div>
       <h4>transparent</h4>
       <btn color="transparent">
@@ -42,27 +45,37 @@
         <img src="~/assets/icon-receive.svg"/>
       </btn>
       <btn text="test" color="transparent" text_color="blue"/>
+
       <div class="block">
-        <btn color="transparent">
-          <img src="~assets/icon-receive.svg"/>
-        </btn>
         <btn color="transparent">
           <img src="~assets/icon-copy.svg"/>
         </btn>
         <btn color="transparent">
           <img src="~assets/icon-key.svg"/>
         </btn>
-        <btn color="transparent">
-          <img src="~assets/icon-change.svg"/>
-        </btn>
       </div>
     </div>
+    
     <div>
-      <h4>semi transparent / default </h4>
+      <h4>default</h4>
       <btn text="semi transparent">
         <img src="~/assets/icon-change.svg"/>
       </btn>
     </div>
+
+    <div>
+      <h4>height, width, padding</h4>
+      <btn text="heigth" height="50px">
+        <img src="~/assets/icon-change.svg"/>
+      </btn>
+      <btn text="width" width="200px">
+        <img src="~/assets/icon-change.svg"/>
+      </btn>
+      <btn text="padding & height" padding="0px 60px" height="20px">
+        <img src="~/assets/icon-change.svg"/>
+      </btn>
+    </div>
+    
     <div>
       <h4>disabled</h4>
       <btn text="DISABLED and this is a long phrase just to show that everything is alright"
@@ -78,7 +91,7 @@
 <style scoped lang="stylus">
 .presentation {
   width: 100%
-  height: 100%
+  min-height: 100%
   margin-left: 10px
   padding-top: 20px
   display: flex

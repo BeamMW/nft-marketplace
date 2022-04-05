@@ -39,13 +39,12 @@
                        label="Description"
                        :valid="description_valid"
                        :max_length="150"
-                       :show_counter="false"
         />
         <div class="banner">
-          <addImage :banner="banner.data"
+          <addImage title="Add Gallery image"
+                    accept="image/jpeg, image/png, image/svg+xml" 
+                    :banner="banner"
                     :valid="banner_valid"
-                    title="Add Gallery image"
-                    :accepts="inputAccepts"
                     @remove="onRemoveBanner"
                     @upload="onUploadBanner"
           />
@@ -69,7 +68,7 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 30px 0px
+      margin: 10px 0px 30px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -80,7 +79,7 @@
       .col-first {
         flex-basis: 50%
 
-        & > * {
+        & > *:not(:last-child) {
           margin-bottom: 20px
         }
       }
@@ -89,9 +88,7 @@
         flex-basis: 50%
         margin-left: 30px
 
-        .banner {
-          height: 135px
-          margin-top: 33px
+        & > *:not(:last-child) {
           margin-bottom: 20px
         }
       }
@@ -143,11 +140,8 @@ export default {
       twitter: '',
       instagram: '',
       description: '',
-      banner: {
-        data:'',
-        size:0
-      },
-      inputAccepts: ['image/apng', 'image/avif', 'image/gif', 'image/jpeg','image/png','image/svg+xml', 'image/webp']
+      banner: undefined,
+      avatar: undefined
     }
   },
 
@@ -190,6 +184,10 @@ export default {
     banner_valid() {
       return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
     },
+
+    avatar_valid() {
+      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
+    },
     
     can_submit () {
       return this.name && this.name_valid &&
@@ -197,7 +195,8 @@ export default {
              this.twitter_valid &&
              this.instagram_valid &&
              this.description_valid &&
-             this.banner_valid
+             this.banner_valid &&
+             this.avatar_valid
     }
   },
 
@@ -218,11 +217,18 @@ export default {
       })
     },
 
+    onUploadAvatar(e) {
+      this.loadImage(e, (data, size) => {
+        this.avatar = {data, size}
+      })
+    },
+
     onRemoveBanner() {
-      this.banner = {
-        data: '',
-        size: 0
-      }
+      this.banner = undefined
+    },
+    
+    onRemoveAvatar() {
+      this.avatar = undefined
     },
   }
 }
