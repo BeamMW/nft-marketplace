@@ -35,9 +35,9 @@ namespace Gallery
     {
         static const uint8_t s_Artist = 1;
         static const uint8_t s_Payout = 2;
-        static const uint8_t s_Masterpiece = 4;
+        static const uint8_t s_Artwork = 4;
         static const uint8_t s_Impression = 5;
-        static const uint8_t s_MasterpieceHeight = 6;
+        static const uint8_t s_ArtworkHeight = 6;
         static const uint8_t s_ArtistHeight = 7;
         static const uint8_t s_CollectionHeight = 8;
         static const uint8_t s_Collection = 9;
@@ -179,16 +179,16 @@ namespace Gallery
         AssetID m_Aid;
     };
 
-    struct Masterpiece : public GalleryObject<Masterpiece, uint32_t> {
+    struct Artwork : public GalleryObject<Artwork, uint32_t> {
         // By this key masterpiece's height with specified ID is accessed 
-        // ID ---FistStageKey---> h_updated ---SecondStageKey---> Masterpiece
+        // ID ---FistStageKey---> h_updated ---SecondStageKey---> Artwork
         // This is done in order to be able to search for masterpieces updated since specified block
-        struct FirstStageKey : public GalleryFirstStageKey<Masterpiece::Id> {
-            uint8_t m_Tag = Tags::s_MasterpieceHeight;
+        struct FirstStageKey : public GalleryFirstStageKey<Artwork::Id> {
+            uint8_t m_Tag = Tags::s_ArtworkHeight;
         };
 
-        struct SecondStageKey : public GallerySecondStageKey<Masterpiece::Id> {
-            uint8_t m_Tag = Tags::s_Masterpiece;
+        struct SecondStageKey : public GallerySecondStageKey<Artwork::Id> {
+            uint8_t m_Tag = Tags::s_Artwork;
         };
 
         PubKey m_pkAuthor;
@@ -206,7 +206,7 @@ namespace Gallery
     {
         struct ID
         {
-            Masterpiece::Id m_MasterpieceID;
+            Artwork::Id m_ArtworkID;
             PubKey m_pkUser;
         };
 
@@ -225,7 +225,7 @@ namespace Gallery
             uint8_t m_Tag = Tags::s_Payout;
             PubKey m_pkUser;
             AssetID m_Aid;
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
         };
 
         Amount m_Amount;
@@ -265,7 +265,7 @@ namespace Gallery
         struct AddArtworkData {
             struct Key {
                 uint8_t m_Prefix = 0;
-                Masterpiece::Id m_ID;
+                Artwork::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
@@ -274,7 +274,7 @@ namespace Gallery
         struct AddArtworkLabel {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Masterpiece::Id m_ID;
+                Artwork::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
@@ -283,7 +283,7 @@ namespace Gallery
         struct Sell {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Masterpiece::Id m_ID;
+                Artwork::Id m_ID;
             };
 
             AmountWithAsset m_Price;
@@ -341,7 +341,7 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 4;
 
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
             AmountWithAsset m_Price;
         };
 
@@ -349,7 +349,7 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 5;
 
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
             PubKey m_pkUser;
             uint8_t m_HasAid;
             Amount m_PayMax;
@@ -367,21 +367,21 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 7;
 
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
         };
 
         struct CheckOut
         {
             static const uint32_t s_iMethod = 8;
 
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
         };
 
         struct CheckIn
         {
             static const uint32_t s_iMethod = 9;
 
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
             PubKey m_pkUser;
         };
 
@@ -401,13 +401,13 @@ namespace Gallery
         struct AdminDelete
         {
             static const uint32_t s_iMethod = 13;
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
         };
 
         struct Transfer
         {
             static const uint32_t s_iMethod = 14;
-            Masterpiece::Id m_ID;
+            Artwork::Id m_ID;
             PubKey m_pkNewOwner;
         };
 

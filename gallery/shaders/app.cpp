@@ -43,7 +43,7 @@
 
 #define Gallery_manager_admin_delete(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id)
+    macro(Gallery::Artwork::Id, id)
 
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
@@ -83,7 +83,7 @@
 
 //#define Gallery_user_view_item(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id)
+    macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_view_artworks(macro) \
     macro(ContractID, cid) \
@@ -92,22 +92,22 @@
 
 #define Gallery_user_download(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id)
+    macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_set_price(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id) \
+    macro(Gallery::Artwork::Id, id) \
     macro(Amount, amount) \
     macro(AssetID, aid)
 
 #define Gallery_user_transfer(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id) \
+    macro(Gallery::Artwork::Id, id) \
     macro(PubKey, pkNewOwner)
 
 #define Gallery_user_buy(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id)
+    macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_view_balance(macro) macro(ContractID, cid)
 
@@ -117,7 +117,7 @@
 
 #define Gallery_user_vote(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Masterpiece::Id, id) \
+    macro(Gallery::Artwork::Id, id) \
     macro(uint32_t, val) \
 
 #define GalleryRole_user(macro) \
@@ -177,7 +177,7 @@ namespace KeyMaterial
     struct Owner
     {
         ContractID m_Cid;
-        Gallery::Masterpiece::Id m_ID;
+        Gallery::Artwork::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
         Owner()
@@ -202,7 +202,7 @@ namespace KeyMaterial
     };
 #pragma pack (pop)
 
-    const Gallery::Masterpiece::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Masterpiece::Id>(-1) >> 1) + 1); // hi bit
+    const Gallery::Artwork::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Artwork::Id>(-1) >> 1) + 1); // hi bit
 }
 
 ON_METHOD(manager, view)
@@ -531,7 +531,7 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
                 cak1.m_KeyInContract.collection_id = k0.m_KeyInContract.id;
 
                 cak0.m_KeyInContract.artwork_id = 0;
-                cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Masterpiece::Id>(-1);
+                cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Artwork::Id>(-1);
 
                 Env::VarReader rca(cak0, cak1);
                 {
@@ -566,7 +566,7 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
             cak1.m_KeyInContract.collection_id = k0.m_KeyInContract.id;
 
             cak0.m_KeyInContract.artwork_id = 0;
-            cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Masterpiece::Id>(-1);
+            cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Artwork::Id>(-1);
 
             Env::VarReader rca(cak0, cak1);
             {
@@ -711,7 +711,7 @@ ON_METHOD(artist, set_artwork)
 
     struct {
         Gallery::Method::AddExhibit args;
-        char m_szLabelData[Gallery::Masterpiece::s_TotalMaxLen + 2];
+        char m_szLabelData[Gallery::Artwork::s_TotalMaxLen + 2];
     } d;
 
     d.args.m_pkArtist = pkArtist;
@@ -720,9 +720,9 @@ ON_METHOD(artist, set_artwork)
 
     uint32_t nArgSize = sizeof(d.args);
 
-    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Masterpiece::s_LabelMaxLen + 1); // including 0-term
+    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artwork::s_LabelMaxLen + 1); // including 0-term
 
-    if (nLabelSize > Gallery::Masterpiece::s_LabelMaxLen + 1) // plus \0
+    if (nLabelSize > Gallery::Artwork::s_LabelMaxLen + 1) // plus \0
     {
         OnError("label is too long");
         return;
@@ -769,7 +769,7 @@ ON_METHOD(artist, set_artwork)
     // - Patent verification: LoadVar + SaveVar, 25K units
     // - Artist verification: LoadVar, 5K units
     // - Global state: LoadVar + SaveVar, 25K units
-    // - Masterpiece creation: SaveVar, 20K units
+    // - Artwork creation: SaveVar, 20K units
     // - AddSig by admin, 10K units
     // - event for the data. This is 100 units per byte, plus 5K units per call, which is repeated for each 8K of data
     // - add some extra for other stuff
@@ -780,7 +780,7 @@ ON_METHOD(artist, set_artwork)
         Env::Cost::SaveVar_For(sizeof(Gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(Gallery::Artist)) +
         Env::Cost::LoadVar_For(sizeof(Gallery::Artist::SecondStageKey)) +
-        Env::Cost::SaveVar_For(sizeof(Gallery::Masterpiece)) +
+        Env::Cost::SaveVar_For(sizeof(Gallery::Artwork)) +
         Env::Cost::SaveVar_For(sizeof(Height)) +
         Env::Cost::AddSig +
         Env::Cost::Cycle * 200;
@@ -1122,10 +1122,10 @@ ON_METHOD(artist, get_id)
     Env::DocAddBlob_T("id", pk);
 }
 
-bool ReadItem(const ContractID& cid, Gallery::Masterpiece::Id id, Gallery::Masterpiece& m)
+bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m)
 {
-    Env::Key_T<Gallery::Masterpiece::FirstStageKey> fskey;
-    Env::Key_T<Gallery::Masterpiece::SecondStageKey> sskey;
+    Env::Key_T<Gallery::Artwork::FirstStageKey> fskey;
+    Env::Key_T<Gallery::Artwork::SecondStageKey> sskey;
     _POD_(fskey.m_Prefix.m_Cid) = cid;
     _POD_(sskey.m_Prefix.m_Cid) = cid;
     fskey.m_KeyInContract.id = id;
@@ -1144,12 +1144,12 @@ struct OwnerInfo
 {
     KeyMaterial::Owner m_km;
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Masterpiece::Id id, const Gallery::Masterpiece& m)
+    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const Gallery::Artwork& m)
     {
         return DeduceOwner(cid, id, m.m_pkOwner);
     }
 
-    bool DeduceOwnerRaw(Gallery::Masterpiece::Id id, const PubKey& pkOwner)
+    bool DeduceOwnerRaw(Gallery::Artwork::Id id, const PubKey& pkOwner)
     {
         PubKey pk;
 
@@ -1158,7 +1158,7 @@ struct OwnerInfo
         return (_POD_(pk) == pkOwner);
     }
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Masterpiece::Id id, const PubKey& pkOwner)
+    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const PubKey& pkOwner)
     {
         m_km.SetCid(cid);
         if (DeduceOwnerRaw(id, pkOwner) || // owner
@@ -1169,7 +1169,7 @@ struct OwnerInfo
         return DeduceOwnerRaw(0, pkOwner); // artist, older key gen
     }
 
-    bool ReadOwnedItem(const ContractID& cid, Gallery::Masterpiece::Id id, Gallery::Masterpiece& m)
+    bool ReadOwnedItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m)
     {
         if (!ReadItem(cid, id, m))
             return false;
@@ -1190,19 +1190,19 @@ struct ImpressionWalker
     Gallery::Impression m_Value;
     bool m_Valid = false;
 
-    void Enum(const ContractID& cid, Gallery::Masterpiece::Id id) {
+    void Enum(const ContractID& cid, Gallery::Artwork::Id id) {
         Enum(cid, id, id);
     }
 
-    void Enum(const ContractID& cid, Gallery::Masterpiece::Id id0, Gallery::Masterpiece::Id id1)
+    void Enum(const ContractID& cid, Gallery::Artwork::Id id0, Gallery::Artwork::Id id1)
     {
         _POD_(m_Key.m_Prefix.m_Cid) = cid;
-        m_Key.m_KeyInContract.m_ID.m_MasterpieceID = id0;
+        m_Key.m_KeyInContract.m_ID.m_ArtworkID = id0;
         _POD_(m_Key.m_KeyInContract.m_ID.m_pkUser).SetZero();
 
         Env::Key_T<Gallery::Impression::Key> k1;
         _POD_(k1.m_Prefix.m_Cid) = cid;
-        k1.m_KeyInContract.m_ID.m_MasterpieceID = id1;
+        k1.m_KeyInContract.m_ID.m_ArtworkID = id1;
         _POD_(k1.m_KeyInContract.m_ID.m_pkUser).SetObject(0xff);
 
         m_Reader.Enum_T(m_Key, k1);
@@ -1215,7 +1215,7 @@ struct ImpressionWalker
     }
 };
 
-void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::Id id, ImpressionWalker& iwlk)
+void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWalker& iwlk)
 {
     const ContractID& cid = iwlk.m_Key.m_Prefix.m_Cid;
     OwnerInfo oi;
@@ -1247,7 +1247,7 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::Id id, Impre
 
     for ( ; iwlk.m_Valid; iwlk.Move())
     {
-        auto idWlk = Utils::FromBE(iwlk.m_Key.m_KeyInContract.m_ID.m_MasterpieceID);
+        auto idWlk = Utils::FromBE(iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID);
         if (idWlk < idNorm)
             continue;
         if (idWlk > idNorm)
@@ -1283,7 +1283,7 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::Id id, Impre
 {
     auto id_ = Utils::FromBE(id);
 
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     if (!ReadItem(cid, id_, m))
         return;
 
@@ -1316,12 +1316,12 @@ void PrintItem(const Gallery::Masterpiece& m, Gallery::Masterpiece::Id id, Impre
 
 ON_METHOD(user, view_artworks)
 {
-    Env::Key_T<Gallery::Masterpiece::SecondStageKey> k0, k1;
+    Env::Key_T<Gallery::Artwork::SecondStageKey> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
     _POD_(k1.m_Prefix.m_Cid) = cid;
     k0.m_KeyInContract.id = 0;
     k0.m_KeyInContract.h_updated = Utils::FromBE(h0);
-    k1.m_KeyInContract.id = static_cast<Gallery::Masterpiece::Id>(-1);
+    k1.m_KeyInContract.id = static_cast<Gallery::Artwork::Id>(-1);
     k1.m_KeyInContract.h_updated = Utils::FromBE(Env::get_Height());
 
     Env::DocArray gr0("items");
@@ -1330,7 +1330,7 @@ ON_METHOD(user, view_artworks)
     auto prev_key = k0;
     for (Env::VarReader r(k0, k1); ; ++i)
     {
-        Gallery::Masterpiece m;
+        Gallery::Artwork m;
         if (!r.MoveNext_T(k0, m))
             break;
 
@@ -1354,7 +1354,7 @@ ON_METHOD(user, set_price)
 {
     auto id_ = Utils::FromBE(id);
 
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id_, m))
         return;
@@ -1377,7 +1377,7 @@ ON_METHOD(user, transfer)
 {
     auto id_ = Utils::FromBE(id);
 
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id_, m))
         return;
@@ -1397,7 +1397,7 @@ ON_METHOD(user, buy)
 {
     auto id_ = Utils::FromBE(id);
 
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     if (!ReadItem(cid, id_, m))
         return;
 
@@ -1502,7 +1502,7 @@ ON_METHOD(user, vote)
 
     Gallery::Method::Vote args;
     args.m_Impression.m_Value = val;
-    args.m_ID.m_MasterpieceID = id_;
+    args.m_ID.m_ArtworkID = id_;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);

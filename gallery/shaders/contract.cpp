@@ -269,9 +269,9 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 {
     MyState s;
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
 
-    Gallery::Masterpiece::Id m_id = Utils::FromBE(++s.artworks_stats.free_id);
+    Gallery::Artwork::Id m_id = Utils::FromBE(++s.artworks_stats.free_id);
     s.artworks_stats.total++;
     
     s.Save();
@@ -336,7 +336,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     _POD_(m.m_Price) = r.m_Price;
@@ -348,7 +348,7 @@ BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
 
 BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     Env::Halt_if(
@@ -392,7 +392,7 @@ BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r)
 
 BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
     Env::AddSig(m.m_pkOwner);
 
@@ -405,7 +405,7 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
     else
     {
         // 1st call. Don't checkout, only prepare
-        static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Masterpiece;SN=Gall;UN=GALL;NTHUN=unique";
+        static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Artwork;SN=Gall;UN=GALL;NTHUN=unique";
         m.m_Aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
     }
 
@@ -414,7 +414,7 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
 
 BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID) || !m.m_Aid);
     Env::AddSig(m.m_pkOwner);
 
@@ -429,7 +429,7 @@ BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
 
 BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
 
     Env::FundsLock(m.m_Aid, 1);
@@ -455,7 +455,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
         Strict::Sub(s.m_VoteBalance, s.m_Config.m_VoteReward.m_Amount);
         s.Save();
 
-        Env::Halt_if(Utils::FromBE(impk.m_ID.m_MasterpieceID) > s.artworks_stats.free_id);
+        Env::Halt_if(Utils::FromBE(impk.m_ID.m_ArtworkID) > s.artworks_stats.free_id);
 
         Env::FundsUnlock(s.m_Config.m_VoteReward.m_Aid, s.m_Config.m_VoteReward.m_Amount);
     }
@@ -480,7 +480,7 @@ BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r)
 BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 {
     // ensure the masterpiece doesn't have aid
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     Env::Halt_if(m.m_Aid);
@@ -493,7 +493,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 
 BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r)
 {
-    Gallery::Masterpiece m;
+    Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     Env::AddSig(m.m_pkOwner);
