@@ -385,8 +385,10 @@ struct MyCollection
 };
 #pragma pack (pop)
 
-bool artist_label_exists(const ContractID& cid, const std::string_view& label)
+bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists)
 {
+    artist_exists = false;
+
     Env::Key_T<Gallery::Artist::SecondStageKey> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
     _POD_(k1.m_Prefix.m_Cid) = cid;
@@ -409,8 +411,9 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label)
         if (!a.ReadNext(r, k0))
             break;
 
-        if (!Env::Memcmp(&k0.m_KeyInContract.m_pkUser, &my_key, sizeof(PubKey)))
-            continue;
+        if (!Env::Memcmp(&k0.m_KeyInContract.m_pkUser, &my_key, sizeof(PubKey))) {
+            artist_exists = true;
+        }
 
         if (a.GetLabel() == label)
             return true;
@@ -929,7 +932,8 @@ ON_METHOD(artist, set_artist)
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
 
-    if (artist_label_exists(cid, d.m_szLabelData)) {
+    bool artist_exists = false;
+    if (artist_label_exists(cid, d.m_szLabelData, artist_exists)) {
         OnError("label already exists");
         return;
     }
@@ -951,7 +955,10 @@ ON_METHOD(artist, set_artist)
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set artist", 250000);
+
+    const char* comment = artist_exists ? "Updating artist's info" : "Becoming an artist";
+
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 250000);
 }
 
 ON_METHOD(artist, set_collection)
