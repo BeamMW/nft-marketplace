@@ -931,7 +931,8 @@ const store = {
       // TODO: can skip u8arr here?
       let u8arr = new Uint8Array(res.data)
       let blob = new Blob([u8arr], {type: image.mime_type})
-      image.object = URL.createObjectURL(blob, {oneTimeOnly: true})
+      // TODO: revoke object
+      image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
       
       return image
     }

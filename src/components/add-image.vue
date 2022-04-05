@@ -1,34 +1,39 @@
 <template>
-  <div class="banner" :style="bannerStyles">
-    <div v-if="banner" class="remove">
-      <img src="~/assets/remove.svg" alt="remove banner" @click="onRemoveBanner"/>
+  <div>
+    <div class="add-image-container" :style="style" :readonly="readonly">
+      <div v-if="image" class="remove">
+        <img src="~/assets/remove.svg" @click="onRemove"/>
+      </div>
+      <img v-if="image" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
+      <label v-if="!image" class="text" for="image" :readonly="readonly">{{ title }}</label>
+      <input v-if="!readonly"
+             id="image"
+             ref="image"
+             type="file"
+             accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+             class="files"
+             @change="onUpload"
+      />
     </div>
-    <img v-if="banner" :src="banner.object" alt="avatar" class="image" :class="{'error': !valid}"/>
-    <label v-if="!banner" class="text" for="banner">{{ title }}</label>
-    <input id="banner"
-           type="file"
-           accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-           class="files"
-           @change="onUploadBanner"
-    />
-  </div>
-  <div v-if="!valid" class="error_msg">
-    <p class="error">image cannot be larger than 250kb</p>
+    <div v-if="error" class="error-text">
+      {{ error }}
+    </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .banner {
+  .add-image-container {
     display: flex
     align-items: center
     justify-content: center
     position:relative
     height: 135px
-    margin-top: 33px
-    margin-bottom: 20px
     background-color: rgba(26, 246, 214, 0.1)
     border-radius: 10px
-    cursor: pointer
+
+    &[readonly] {
+      opacity: 0.6
+    }
 
     .remove {
       background-color: rgba(0, 0, 0, 0.7)
@@ -38,7 +43,6 @@
       right: 20px
       border-radius: 9999px
       padding: 7px 7px 3px 7px
-      cursor: pointer
     }
 
     .image {
@@ -66,58 +70,74 @@
       align-items: center
       font-size: 14px
       color: #1af6d6
-      cursor: pointer
+
+      &:not([readonly]) {
+        cursor: pointer
+      }
     }
   }
 
-  .error_msg {
-    margin-top: -18px
-
-    .error {
-      font-size: 12px
-      font-weight: 400
-      font-style: italic
-      text-align: right
-    }
+  .error-text {
+    font-size: 12px
+    font-weight: 400
+    font-style: italic
+    text-align: right
+    padding-right: 4px
+    color: #c55b61
   }
 </style>
 
 <script>
 export default {
   props: {
-    banner: {
+    image: {
       type: Object,
-      required: true
-    },
-    valid: {
-      type: Boolean,
-      default: true,
-      required: false
+      required: false,
+      default: undefined
     },
     title: {
       type: String,
       default: '',
       required: true
+    },
+    error: {
+      type: String,
+      default: '',
+      required: true
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
 
   emits: [
-    'remove', 'upload'
+    'update:image'
   ],
+
   computed: {
-    bannerStyles() {
+    style() {
       return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'border' :  this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
   },
   methods: {
-    onRemoveBanner () {
-      this.$emit('remove')
+    onRemove () {
+      this.$emit('update:image', undefined)
+      this.$refs.image.value = ''
     },
-    onUploadBanner(e) {
-      this.$emit('upload',e)
-
+    onUpload (e) {
+      let file = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (e) => {
+        this.$emit('update:image', {
+          object: e.target.result,
+          file
+        })
+      }
     }
   }
 }

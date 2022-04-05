@@ -56,28 +56,11 @@
                        :max_length="150"
                        :readonly="in_set_artist"
         />
-        <addImage title="Add an artist banner"
-                  :style="bannerStyles" 
-                  :banner="banner" 
-                  :valid="banner_valid"
+        <addImage v-model:image="banner"
+                  title="Add an artist banner"
                   :readonly="in_set_artist" 
-                  @remove="onRemoveBanner" 
-                  @upload="onUploadBanner"
+                  :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
         />
-        <!--div class="banner" :style="bannerStyles" :readonly="in_set_artist">
-          <div v-if="banner" class="remove-container">
-            <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
-          </div>
-          <img v-if="banner" :src="banner.object" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
-          <label v-if="!banner" class="text" :readonly="in_set_artist" for="banner">Add an artist banner</label>
-          <input v-if="!in_set_artist" id="banner"
-                 ref="banner"
-                 type="file"
-                 accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-                 class="files"
-                 @change="onUploadBanner"
-          />
-        </div-->
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
             <div v-if="avatar" class="remove">
@@ -130,19 +113,18 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 0px 0px 35px 0px
+      margin: 35px 0px 0px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
     .fields {
       padding: 0 30px
-      margin-bottom: 40px
       display: flex
 
       .col-first {
         flex-basis: 50%
 
-        & > * {
+        & > *:not(:last-child) {
           margin-bottom: 20px
         }
       }
@@ -151,79 +133,12 @@
         flex-basis: 50%
         margin-left: 30px
 
-        /*
-        .error_msg {
-          margin-top: -18px
-        }
-
-        .banner {
-          display: flex
-          align-items: center
-          justify-content: center
-          position:relative
-          height: 135px
-          margin-top: 33px
+        & > *:not(:last-child) {
           margin-bottom: 20px
-          background-color: rgba(26, 246, 214, 0.1)
-          border-radius: 10px
-
-          &[readonly] {
-            opacity: 0.6
-          }
-
-          .remove-container {
-            background-color: rgba(0, 0, 0, 0.7)
-            position: absolute
-            z-index: 2
-            top: 20px
-            right: 20px
-            border-radius: 9999px
-            padding: 7px 7px 3px 7px
-
-            .remove {
-              cursor: pointer
-              z-index: 3
-            }
-          }
-
-          .image {
-            width: 100%
-            height: 100%
-            object-fit: cover
-            border-radius: 10px
-            border: 1px dashed transparent
-
-            &.error {
-              filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-            }
-          }
-          
-          .files {
-            visibility:hidden
-            width: 0
-          }
         }
-
-        .error {
-          font-size: 12px
-          font-weight: 400
-          font-style: italic
-          text-align: right
-        } */
 
         .container-avatar {
           display: flex
-          
-          /*.error_msg {
-            align-self: center
-            margin-left: 10px
-          }
-
-          .error {
-            font-style: italic
-            font-size: 12px
-            font-weight: 400
-          }*/
           
           .avatar {
             display: flex
@@ -300,6 +215,7 @@
     .actions {
       display:flex
       justify-content: center
+      margin-top: 40px
 
       & > *:not(:first-child) {
         margin-left: 30px
@@ -355,11 +271,6 @@ export default {
     avatarStyles() {
       return {
         'border' :  this.avatar ? '1px dashed transparent' : (this.in_set_artist ? '1px dashed rgba(26, 246, 214, 0.7)' : '1px dashed #1AF6D6'),
-      }
-    },
-    bannerStyles() {
-      return {
-        'border' :  this.banner ? '1px dashed transparent' : (this.in_set_artist ? '1px dashed rgba(26, 246, 214, 0.7)' : '1px dashed #1AF6D6'),
       }
     },
     label_valid() {
@@ -495,21 +406,10 @@ export default {
       }
     },
 
-    onUploadBanner(e) {
-      this.loadImage(e, (object, file) => {
-        this.banner_ = {object, file}
-      })
-    },
-
     onUploadAvatar(e) {
       this.loadImage(e, (object, file) => {
         this.avatar_ = {object, file}
       })
-    },
-
-    onRemoveBanner() {
-      this.banner_ = null
-      this.$refs.banner.value = ''
     },
     
     onRemoveAvatar() {
