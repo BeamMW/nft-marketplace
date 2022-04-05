@@ -231,6 +231,7 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import {common} from '../utils/consts.js'
+import validators from '../utils/validators.js'
 
 export default {
   components: {
@@ -280,24 +281,17 @@ export default {
     website_valid() {
       let value = this.website
       if (!value) return true
-      let url 
-      try {
-        url = new URL(this.website)
-      }
-      catch(_) {
-        return false
-      }
-      return value.length <= 250 && 
-             (url.protocol === 'http:' || url.protocol === 'https:') &&
-             (url.toString() === value || url.toString() === value + '/')
+      return validators.url(value)
     },
+
     twitter_valid() {
       let value = this.twitter
-      return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
+      return !value || validators.twitter(value)
     },
+    
     instagram_valid() {
       let value = this.instagram
-      return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
+      return !value || validators.instagram(value)
     },
     about_valid() {
       let value = this.about

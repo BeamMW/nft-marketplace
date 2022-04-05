@@ -190,46 +190,15 @@ export default {
       let value = this.name
       return !value || value.length <= 100
     },
-
-    website_valid() {
-      let value = this.website
-      if (!value) return true
-      let url 
-      try {
-        url = new URL(this.website)
-      }
-      catch(_) {
-        return false
-      }
-      return value.length <= 250 && 
-             (url.protocol === 'http:' || url.protocol === 'https:') &&
-             (url.toString() === value || url.toString() === value + '/')
-    },
-
-    twitter_valid() {
-      let value = this.twitter
-      return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
-    },
-    
-    instagram_valid() {
-      let value = this.instagram
-      return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
-    },
-
     description_valid() {
       let value = this.description
       return !value || value.length <= 150
     },
-
     image_valid() {
       return !this.image || this.image.size <= common.MAX_IMAGE_SIZE
     },
-    
     can_submit () {
       return this.name && this.name_valid &&
-             this.website_valid &&
-             this.twitter_valid &&
-             this.instagram_valid &&
              this.description_valid &&
              this.image_valid
     }
