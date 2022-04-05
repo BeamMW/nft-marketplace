@@ -24,6 +24,7 @@
 #define Gallery_manager_view_collections(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
+    macro(uint32_t, print_artworks) \
 
 //#define Gallery_manager_manage_artist(macro) \
     macro(ContractID, cid) \
@@ -474,7 +475,7 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
     return true;
 }
 
-bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindAll, bool bMustFind)
+bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindAll, bool bMustFind, bool print_artworks)
 {
     Gallery::Collection::SecondStageKey ssck;
     if (!bFindAll) {
@@ -511,6 +512,42 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
             Env::DocAddNum32("id", k0.m_KeyInContract.m_ID);
             Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
 
+            if (print_artworks) {
+                Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
+                _POD_(cak0.m_Prefix.m_Cid) = cid;
+                _POD_(cak1.m_Prefix.m_Cid) = cid;
+
+                cak0.m_KeyInContract.collection_id = k0.m_KeyInContract.m_ID;
+                cak1.m_KeyInContract.collection_id = k0.m_KeyInContract.m_ID;
+
+                cak0.m_KeyInContract.artwork_id = 0;
+                cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Masterpiece::ID>(-1);
+
+                Env::VarReader rca(cak0, cak1);
+                {
+                    Env::DocArray gr2("artworks");
+                    while (true)
+                    {
+                        bool exists;
+                        if (!rca.MoveNext_T(cak0, exists))
+                            break;
+                        Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.artwork_id));
+                    }
+                }
+            }
+            c.Print();
+        }
+    } else {
+        if (!c.ReadNext(r, k0)) {
+            if (bMustFind)
+                OnError("not found");
+            return false;
+        }
+        Env::DocGroup gr1("");
+        Env::DocAddNum32("id", k0.m_KeyInContract.m_ID);
+        Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
+
+        if (print_artworks) {
             Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
             _POD_(cak0.m_Prefix.m_Cid) = cid;
             _POD_(cak1.m_Prefix.m_Cid) = cid;
@@ -531,38 +568,6 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
                         break;
                     Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.artwork_id));
                 }
-            }
-            c.Print();
-        }
-    } else {
-        if (!c.ReadNext(r, k0)) {
-            if (bMustFind)
-                OnError("not found");
-            return false;
-        }
-        Env::DocGroup gr1("");
-        Env::DocAddNum32("id", k0.m_KeyInContract.m_ID);
-        Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_last_updated));
-
-        Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
-        _POD_(cak0.m_Prefix.m_Cid) = cid;
-        _POD_(cak1.m_Prefix.m_Cid) = cid;
-
-        cak0.m_KeyInContract.collection_id = k0.m_KeyInContract.m_ID;
-        cak1.m_KeyInContract.collection_id = k0.m_KeyInContract.m_ID;
-
-        cak0.m_KeyInContract.artwork_id = 0;
-        cak1.m_KeyInContract.artwork_id = static_cast<Gallery::Masterpiece::ID>(-1);
-
-        Env::VarReader rca(cak0, cak1);
-        {
-            Env::DocArray gr2("artworks");
-            while (true)
-            {
-                bool exists;
-                if (!rca.MoveNext_T(cak0, exists))
-                    break;
-                Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.artwork_id));
             }
         }
         c.Print();
@@ -638,7 +643,7 @@ ON_METHOD(manager, view_collections)
     buf[buf_len - 1] = ';';
 
     if (!buf_len) {
-        PrintCollections(cid, 0, h0, true, false);
+        PrintCollections(cid, 0, h0, true, false, print_artworks);
     } else if (buf_len) {
         std::string_view ids(buf);
         int cur_pos = 0;
@@ -653,7 +658,7 @@ ON_METHOD(manager, view_collections)
                 }
             }
             cur_pos = next_pos + 1;
-            PrintCollections(cid, id, 0, false, false);
+            PrintCollections(cid, id, 0, false, false, print_artworks);
         }
     }
 }
