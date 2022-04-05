@@ -61,7 +61,7 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 30px 0px
+      margin: 10px 0px 30px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -72,7 +72,7 @@
       .col-first {
         flex-basis: 50%
 
-        & > * {
+        & > *:not(:last-child) {
           margin-bottom: 20px
         }
       }
@@ -80,6 +80,10 @@
       .col-second {
         flex-basis: 50%
         margin-left: 30px
+
+        & > *:not(:last-child) {
+          margin-bottom: 20px
+        }
       }
     }
 
