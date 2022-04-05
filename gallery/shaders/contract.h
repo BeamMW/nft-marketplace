@@ -140,6 +140,9 @@ namespace Gallery
         Collection::ID collection_id;
 
         AmountWithAsset m_Price;
+        static const uint32_t s_LabelMaxLen = 120;
+        static const uint32_t s_DataMaxLen = 1024;
+        static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
 
     struct Impression
@@ -202,9 +205,18 @@ namespace Gallery
 
     struct Events
     {
-        struct Add {
+        struct AddArtworkData {
             struct Key {
                 uint8_t m_Prefix = 0;
+                Masterpiece::ID m_ID;
+                PubKey m_pkArtist;
+            };
+            // data is the exhibit itself
+        };
+
+        struct AddArtworkLabel {
+            struct Key {
+                uint8_t m_Prefix = 1;
                 Masterpiece::ID m_ID;
                 PubKey m_pkArtist;
             };
@@ -259,10 +271,13 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 3;
 
+            enum class RequestType { SET, DISABLE, ENABLE } req;
+            Gallery::Role role;
             PubKey m_pkArtist;
-            uint32_t m_Size;
+            uint32_t data_len;
+            uint32_t label_len;
             uint32_t collection_id;
-            // followed by the data
+            // followed by the data and label
         };
 
         struct SetPrice

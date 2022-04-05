@@ -341,7 +341,10 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     Env::SaveVar_T(cak, true);
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1);
-    uint32_t nData = r.m_Size;
+    uint32_t nData = r.data_len;
+
+    auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1) + r.data_len;
+    uint32_t nLabel = r.label_len;
 
     {
         // verify artist
@@ -365,21 +368,27 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 
     Env::AddSig(r.m_pkArtist);
 
-    Gallery::Events::Add::Key eak;
-    eak.m_ID = ssmk.m_ID;
-    _POD_(eak.m_pkArtist) = m.m_pkOwner;
+    Gallery::Events::AddArtworkData::Key adk;
+    adk.m_ID = ssmk.m_ID;
+    _POD_(adk.m_pkArtist) = m.m_pkOwner;
 
     uint32_t nMaxEventSize = 0x2000; // TODO: max event size is increased to 1MB from HF4
 
     while (true)
     {
-        Env::EmitLog(&eak, sizeof(eak), pData, std::min(nData, nMaxEventSize), KeyTag::Internal);
+        Env::EmitLog(&adk, sizeof(adk), pData, std::min(nData, nMaxEventSize), KeyTag::Internal);
         if (nData <= nMaxEventSize)
             break;
 
         nData -= nMaxEventSize;
         pData += nMaxEventSize;
     }
+
+    Gallery::Events::AddArtworkLabel::Key alk;
+    alk.m_ID = ssmk.m_ID;
+    _POD_(alk.m_pkArtist) = m.m_pkOwner;
+
+    Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
 }
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)

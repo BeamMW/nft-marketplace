@@ -681,30 +681,57 @@ ON_METHOD(artist, set_artwork)
     PubKey pkArtist;
     km.Get(pkArtist);
 
-    auto nDataLen = Env::DocGetBlob("data", nullptr, 0);
-    if (!nDataLen)
+    struct {
+        Gallery::Method::AddExhibit args;
+        char m_szLabelData[Gallery::Masterpiece::s_TotalMaxLen + 2];
+    } d;
+
+    d.args.m_pkArtist = pkArtist;
+    d.args.req = Gallery::Method::AddExhibit::RequestType::SET;
+    d.args.role = Gallery::Role::ARTIST;
+
+    uint32_t nArgSize = sizeof(d.args);
+
+    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Masterpiece::s_LabelMaxLen + 1); // including 0-term
+
+    if (nLabelSize > Gallery::Masterpiece::s_LabelMaxLen + 1) // plus \0
+    {
+        OnError("label is too long");
+        return;
+    }
+
+    d.args.label_len = (nLabelSize ? nLabelSize - 1 : 0);
+
+    nArgSize += d.args.label_len;
+
+    auto nDataSize = Env::DocGetBlob("data", nullptr, 0);
+    if (!nDataSize)
     {
         OnError("data not specified");
         return;
     }
 
-    uint32_t nSizeArgs = sizeof(Gallery::Method::AddExhibit) + nDataLen;
-    auto* pArgs = (Gallery::Method::AddExhibit*) Env::Heap_Alloc(nSizeArgs);
+    if (Env::DocGetBlob("data", d.m_szLabelData + d.args.label_len, nDataSize) != nDataSize)
+    {
+        OnError("data can't be parsed");
+        return;
+    }
 
-    _POD_(pArgs->m_pkArtist) = pkArtist;
-    pArgs->m_Size = nDataLen;
-    pArgs->collection_id = collection_id;
+    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1)
+    {
+        OnError("data too long");
+        return;
+    }
+
+    d.args.data_len = nDataSize;
+    d.args.collection_id = collection_id;
 
     if (!collection_id) {
         OnError("collection_id must be specified");
         return;
     }
 
-    if (Env::DocGetBlob("data", pArgs + 1, nDataLen) != nDataLen)
-    {
-        OnError("data can't be parsed");
-        return;
-    }
+    nArgSize += d.args.data_len;
 
     SigRequest sig;
     sig.m_pID = &km;
@@ -731,17 +758,15 @@ ON_METHOD(artist, set_artwork)
         Env::Cost::Cycle * 200;
 
     const uint32_t nSizeEvt = 0x2000;
-    uint32_t nFullCycles = nDataLen / nSizeEvt;
+    uint32_t nFullCycles = nDataSize / nSizeEvt;
 
     nCharge += (Env::Cost::Log_For(nSizeEvt) + Env::Cost::Cycle * 50) * nFullCycles;
 
-    nDataLen %= nSizeEvt;
-    if (nDataLen)
-        nCharge += Env::Cost::Log_For(nDataLen) + Env::Cost::Cycle * 50;
+    nDataSize %= nSizeEvt;
+    if (nDataSize)
+        nCharge += Env::Cost::Log_For(nDataSize) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, pArgs->s_iMethod, pArgs, nSizeArgs, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 25000);
-
-    Env::Heap_Free(pArgs);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 25000);
 }
 
 ON_METHOD(manager, admin_delete)
@@ -982,33 +1007,57 @@ ON_METHOD(user, download)
 {
     auto id_ = Utils::FromBE(id);
 
-    Env::Key_T<Gallery::Events::Add::Key> k0, k1;
-    _POD_(k0.m_Prefix.m_Cid) = cid;
-    _POD_(k1.m_Prefix.m_Cid) = cid;
-    k0.m_KeyInContract.m_ID = id_;
-    k1.m_KeyInContract.m_ID = id_;
-    _POD_(k0.m_KeyInContract.m_pkArtist).SetZero();
-    _POD_(k1.m_KeyInContract.m_pkArtist).SetObject(0xff);
+    Env::Key_T<Gallery::Events::AddArtworkData::Key> adk0, adk1;
+    _POD_(adk0.m_Prefix.m_Cid) = cid;
+    _POD_(adk1.m_Prefix.m_Cid) = cid;
+    adk0.m_KeyInContract.m_ID = id_;
+    adk1.m_KeyInContract.m_ID = id_;
+    _POD_(adk0.m_KeyInContract.m_pkArtist).SetZero();
+    _POD_(adk1.m_KeyInContract.m_pkArtist).SetObject(0xff);
 
-    uint32_t nCount = 0;
+    Env::Key_T<Gallery::Events::AddArtworkLabel::Key> alk0, alk1;
+    _POD_(alk0.m_Prefix.m_Cid) = cid;
+    _POD_(alk1.m_Prefix.m_Cid) = cid;
+    alk0.m_KeyInContract.m_ID = id_;
+    alk1.m_KeyInContract.m_ID = id_;
+    _POD_(alk0.m_KeyInContract.m_pkArtist).SetZero();
+    _POD_(alk1.m_KeyInContract.m_pkArtist).SetObject(0xff);
+
+    uint32_t nDataCount = 0;
     Utils::Vector<uint8_t> vData;
 
-    Env::LogReader r(k0, k1);
-    for ( ; ; nCount++)
+    uint32_t nLabelCount = 0;
+    Utils::Vector<uint8_t> vLabel;
+
+    Env::LogReader adr(adk0, adk1);
+    for ( ; ; nDataCount++)
     {
-        uint32_t nData = 0, nKey = sizeof(k0);
-        if (!r.MoveNext(&k0, nKey, nullptr, nData, 0))
+        uint32_t nData = 0, nKey = sizeof(adk0);
+        if (!adr.MoveNext(&adk0, nKey, nullptr, nData, 0))
             break;
 
         vData.Prepare(vData.m_Count + nData);
-        r.MoveNext(&k0, nKey, vData.m_p + vData.m_Count, nData, 1);
+        adr.MoveNext(&adk0, nKey, vData.m_p + vData.m_Count, nData, 1);
         vData.m_Count += nData;
     }
 
-    if (nCount)
+    Env::LogReader alr(alk0, alk1);
+    for ( ; ; nLabelCount++)
     {
-        Env::DocAddNum("h", r.m_Pos.m_Height);
-        Env::DocAddBlob_T("artist", k0.m_KeyInContract.m_pkArtist);
+        uint32_t nData = 0, nKey = sizeof(alk0);
+        if (!alr.MoveNext(&alk0, nKey, nullptr, nData, 0))
+            break;
+
+        vLabel.Prepare(vLabel.m_Count + nData);
+        alr.MoveNext(&alk0, nKey, vLabel.m_p + vLabel.m_Count, nData, 1);
+        vLabel.m_Count += nData;
+    }
+
+    if (nDataCount)
+    {
+        Env::DocAddNum("h", alr.m_Pos.m_Height);
+        Env::DocAddBlob_T("artist", alk0.m_KeyInContract.m_pkArtist);
+        Env::DocAddBlob("label", vLabel.m_p, vLabel.m_Count);
         Env::DocAddBlob("data", vData.m_p, vData.m_Count);
     }
     else
