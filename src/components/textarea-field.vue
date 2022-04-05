@@ -108,17 +108,17 @@ export default {
     },
     valid:{
       type: Boolean,
-      required: true
+      required: false
     },
     max_length:{
       type: Number,
       default: 150,
-      required: true
+      required: false
     },
     show_counter:{
       type: Boolean,
-      default: false,
-      required: true
+      default: true,
+      required: false
     }
   },
   

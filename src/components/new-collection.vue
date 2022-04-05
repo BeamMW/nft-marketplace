@@ -39,7 +39,6 @@
                        label="Description"
                        :valid="description_valid"
                        :max_length="150"
-                       :show_counter="false"
         />
         <div class="banner">
           <addImage title="Add Gallery image"

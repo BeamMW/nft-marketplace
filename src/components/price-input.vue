@@ -66,7 +66,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: '',
+      default: '0',
       required: false
     },
     // eslint-disable-next-line vue/prop-name-casing

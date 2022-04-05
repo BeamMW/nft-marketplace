@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <div class="add-image-container" :style="style" :readonly="readonly">
+  <div :style="ctrlStyle">
+    <div class="add-image-container" :style="borderStyle" :readonly="readonly">
       <div v-if="image" class="remove">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
       <img v-if="image" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
-      <label v-if="!image" class="text" for="image" :readonly="readonly">{{ title }}</label>
+      <label v-if="!image" class="text" for="image" :readonly="readonly" v-html="title"/>
       <input v-if="!readonly"
              id="image"
              ref="image"
@@ -29,6 +29,7 @@
     position:relative
     background-color: rgba(26, 246, 214, 0.1)
     border-radius: 10px
+    height: 100%
 
     &[readonly] {
       opacity: 0.6
@@ -107,7 +108,7 @@ export default {
     error: {
       type: String,
       default: '',
-      required: true
+      required: false
     },
     readonly: {
       type: Boolean,
@@ -126,10 +127,14 @@ export default {
   ],
 
   computed: {
-    style() {
+    ctrlStyle() {
       return {
-        'border' :  this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
         'height': this.height
+      }
+    },
+    borderStyle() {
+      return {
+        'border': this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
   },

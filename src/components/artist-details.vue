@@ -51,7 +51,6 @@
       <div class="col-second">
         <textAreaField v-model="about"
                        label="About me"
-                       show_counter
                        :valid="about_valid"
                        :max_length="150"
                        :readonly="in_set_artist"

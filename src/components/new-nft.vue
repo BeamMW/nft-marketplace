@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="nft-container">
     <pageTitle title="add nft"/>
     <div class="fields">
       <div class="col-first">
@@ -12,22 +12,19 @@
                        label="Description"
                        :valid="description_valid"
                        :max_length="150"
-                       :show_counter="false"
         />
-        <div class="container">
-          <label class="label">
-            Collection
-          </label>
+        <div class="collection-container">
+          <div class="label">Collection</div>
+          <div class="select-container">
+            <img src="~assets/icon-down.svg" alt="icon"/>
+            <select v-model="selected" class="select">
+              <option v-for="option in selector_options" :key="option.name" :value="option.name">
+                {{ option.name }}
+              </option>
+            </select>
+          </div>
         </div>
-        <div class="input-container">
-          <img src="~assets/icon-down.svg" alt="icon"/>
-          <select v-model="selected" class="custom-select">
-            <option v-for="option in selector_options" :key="option.name" :value="option.name">
-              {{ option.name }}
-            </option>
-          </select>
-        </div>
-        <priceInput v-model="price" color="#fff" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
+        <priceInput v-model="price" color="#fff" @trigger-key="onKey" @trigger-paste="onPaste"/>
         <span class="price">{{ price }} USD</span>
         <div class="switch_container">
           <label class="switch">
@@ -38,18 +35,11 @@
         </div>
       </div>
       <div class="col-second">
-        <div class="banner">
-          <addImage :banner="banner"
-                    :valid="banner_valid"
-                    title="Add NFT here"
-                    @remove="onRemoveBanner"
-                    @upload="onUploadBanner"
-          >
-          </addimage>
-          <div class="accept">
-            <span v-if="banner" class="accept_text">({{ inputAccepts[0] }} or {{ inputAccepts[1] }}) </span> 
-          </div>
-        </div>
+        <addImage v-model:image="image"
+                  :valid="image_valid"
+                  title="Add NFT here<br>(.jpg, .png, .gif)"
+                  height="344px"
+        />
       </div>
     </div>
   </div>
@@ -64,59 +54,53 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
-    
+  .nft-container {
+
     .fields {
-      padding: 0 30px
+      padding: 50px 30px 0px 30px
       display: flex
-      margin-top: 77px
       
       .col-first {
         flex-basis: 50%
+
         & > *:not(:last-child) {
           margin-bottom: 20px
         }
-        .container {
-          box-sizing: border-box
 
+        & > .collection-container {
           .label {
-            display: block
             margin-bottom:10px
-            color: #8da1ad
+            color: rgba(255, 255, 255, 0.6)
             font-family: 'SFProDisplay', sans-serif
             font-size: 14px
+          }
 
-            &.error {
-              color: rgba(255, 98, 92, 0.7)
+          .select-container {
+            display: flex
+            position: relative
+
+            & > img {
+              position: absolute
+              width: 9px
+              height: 5px
+              right:20px
+              top:50%
             }
-          }
-        }
 
-        .input-container {
-          display: flex
-          position: relative
-
-          & > img {
-            position: absolute
-            width: 9px
-            height: 5px
-            right:20px
-            top:50%
-          }
-
-          .custom-select {
-            -moz-appearance:none
-            -webkit-appearance:none
-            appearance:none
-            font-family: 'SFProDisplay', sans-serif
-            background-color: rgba(255, 255, 255, 0.05)
-            border: none
-            outline-width: 0
-            font-size: 14px
-            color: white
-            border-radius: 10px
-            padding: 12px 8px
-            width: 100%
+            .select {
+              -moz-appearance:none
+              -webkit-appearance:none
+              appearance:none
+              font-family: 'SFProDisplay', sans-serif
+              background-color: rgba(255, 255, 255, 0.05)
+              border: none
+              outline-width: 0
+              font-size: 14px
+              color: white
+              border-radius: 10px
+              padding: 12px 8px
+              width: 100%
+            }
           }
         }
 
@@ -198,27 +182,6 @@
         flex-basis: 50%
         margin-left: 30px
         margin-top: 30px
-
-        .banner {
-          height: 84%
-          position: relative
-
-          .accept {
-            display: flex
-            flex-direction: row
-            justify-content: center
-            width: 100%
-            position: absolute
-            top: 55%
-            color: #1af6d6
-
-            .accept_text {
-              font-size: 14px
-              color: #1af6d6
-              cursor: pointer
-            }
-          }
-        }
       }
     }
 
@@ -272,8 +235,7 @@ export default {
       twitter: '',
       instagram: '',
       description: '',
-      banner: undefined,
-      avatar: undefined,
+      image: undefined,
       price: '',
       show: false,
       selected: 0,
@@ -289,16 +251,6 @@ export default {
   },
 
   computed: {
-    bannerStyles() {
-      return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
-      }
-    },
-    style() {
-      return {
-        'background-color': utils.getStyles().background_popup,
-      }
-    },
     name_valid() {
       let value = this.name
       return !value || value.length <= 100
@@ -334,12 +286,8 @@ export default {
       return !value || value.length <= 150
     },
 
-    banner_valid() {
-      return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
-    },
-
-    avatar_valid() {
-      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
+    image_valid() {
+      return !this.image || this.image.size <= common.MAX_IMAGE_SIZE
     },
     
     can_submit () {
@@ -348,13 +296,11 @@ export default {
              this.twitter_valid &&
              this.instagram_valid &&
              this.description_valid &&
-             this.banner_valid &&
-             this.avatar_valid
+             this.image_valid
     }
   },
 
   methods: {    
-
     loadImage(e, cback) {
       let file = e.target.files[0]
       let reader = new FileReader()
@@ -364,25 +310,6 @@ export default {
       }
     },
 
-    onUploadBanner(e) {
-      this.loadImage(e, (data, size) => {
-        this.banner = {data, size}
-      })
-    },
-
-    onUploadAvatar(e) {
-      this.loadImage(e, (data, size) => {
-        this.avatar = {data, size}
-      })
-    },
-
-    onRemoveBanner() {
-      this.banner = undefined
-    },
-    
-    onRemoveAvatar() {
-      this.avatar = undefined
-    },
     onKey(ev) {
       if (ev.isComposing || ev.keyCode === 229 || ev.ctrlKey || ev.altKey || ev.metaKey) {
         return
