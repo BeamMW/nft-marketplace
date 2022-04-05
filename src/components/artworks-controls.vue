@@ -180,6 +180,10 @@ export default {
     onBecomeArtist() {
       this.$store.becomeArtist()
     },
+
+    onAddCollection() {
+      this.$store.newCollection()
+    },
     onTabClicked(id) {
       if (this.active_tab !== id) {
         this.$store.setActiveTab(id)

@@ -1026,6 +1026,12 @@ const store = {
         id: this.state.my_artist_key
       }
     })
+  },
+  
+  toNewCollection() {
+    router.push({
+      name: 'add-collection'
+    })
   }
 }
 

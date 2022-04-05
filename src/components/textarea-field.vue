@@ -15,7 +15,7 @@
     }"
     >
       <span class="text">{{ max_length }} characters max</span> 
-      <span>{{ modelValue.length }} / {{ max_length }} </span>
+      <span v-if="show_counter">{{ modelValue.length }} / {{ max_length }} </span>
     </div>
   </div>
 </template>
@@ -111,6 +111,11 @@ export default {
     max_length:{
       type: Number,
       default: 150,
+      required: true
+    },
+    show_counter:{
+      type: Boolean,
+      default: false,
       required: true
     }
   },

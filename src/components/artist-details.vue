@@ -51,11 +51,20 @@
       <div class="col-second">
         <textAreaField v-model="about"
                        label="About me"
+                       show_counter
                        :valid="about_valid"
                        :max_length="150"
                        :readonly="in_set_artist"
         />
-        <div class="banner" :style="bannerStyles" :readonly="in_set_artist">
+        <addImage title="Add an artist banner"
+                  :style="bannerStyles" 
+                  :banner="banner" 
+                  :valid="banner_valid"
+                  :readonly="in_set_artist" 
+                  @remove="onRemoveBanner" 
+                  @upload="onUploadBanner"
+        />
+        <!--div class="banner" :style="bannerStyles" :readonly="in_set_artist">
           <div v-if="banner" class="remove-container">
             <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
           </div>
@@ -68,14 +77,11 @@
                  class="files"
                  @change="onUploadBanner"
           />
-        </div>
-        <div v-if="!banner_valid" class="error_msg">
-          <p class="error">image cannot be larger than 250kb</p>
-        </div>
+        </div-->
         <div class="container-avatar">
           <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
-            <div v-if="avatar" class="remove-container">
-              <img src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+            <div v-if="avatar" class="remove">
+              <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
             <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
@@ -145,6 +151,7 @@
         flex-basis: 50%
         margin-left: 30px
 
+        /*
         .error_msg {
           margin-top: -18px
         }
@@ -202,12 +209,12 @@
           font-weight: 400
           font-style: italic
           text-align: right
-        }
+        } */
 
         .container-avatar {
           display: flex
           
-          .error_msg {
+          /*.error_msg {
             align-self: center
             margin-left: 10px
           }
@@ -216,7 +223,7 @@
             font-style: italic
             font-size: 12px
             font-weight: 400
-          }
+          }*/
           
           .avatar {
             display: flex
@@ -228,11 +235,22 @@
             border-radius: 9999px
             position: relative
             
+            .text {
+              width: 100%
+              height: 100%
+              display: flex
+              justify-content: center
+              align-items: center
+              font-size: 14px
+              color: #1af6d6
+              cursor: pointer
+            }
+
             &[readonly] {
               opacity: 0.6
             }
 
-            .remove-container {
+            .remove {
               background-color: rgba(0, 0, 0, 0.7)
               position: absolute
               left: 50%
@@ -264,21 +282,18 @@
               }
             }
           }
+
+          .error_msg {
+            align-self: center
+            margin-left: 10px
+
+            .error {
+              font-style: italic
+              font-size: 12px
+              font-weight: 400
+            }
+          }
         }
-      }
-    }
-
-    .text {
-      width: 100%
-      height: 100%
-      display: flex
-      justify-content: center
-      align-items: center
-      font-size: 14px
-      color: #1af6d6
-
-      &:not([readonly]) {
-        cursor: pointer
       }
     }
 
@@ -298,6 +313,7 @@ import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
+import addImage from './add-image.vue'
 import {common} from '../utils/consts.js'
 
 export default {
@@ -305,6 +321,7 @@ export default {
     inputField, 
     textAreaField, 
     pageTitle,
+    addImage,
     btn
   },
 
