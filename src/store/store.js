@@ -1033,6 +1033,12 @@ const store = {
     router.push({
       name: 'add-collection'
     })
+  },
+
+  toNewNFT() {
+    router.push({
+      name: 'add-nft'
+    })
   }
 }
 

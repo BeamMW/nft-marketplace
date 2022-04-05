@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="input-container">
     <label v-if="label" class="label" :class="{'error': !valid}">
       {{ label }}
     </label>
@@ -18,7 +18,7 @@
 </template>
 
 <style scoped lang="stylus">
-.container {
+.input-container {
   box-sizing: border-box
 
   .label {

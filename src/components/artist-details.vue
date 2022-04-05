@@ -21,7 +21,7 @@
                     :valid="label_valid"
                     :max_length="100"
                     :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:30px;margin-top:0"
+                    style="margin-bottom:60px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -58,6 +58,7 @@
         />
         <addImage v-model:image="banner"
                   title="Add an artist banner"
+                  accept="image/jpeg, image/png, image/svg+xml"      
                   :readonly="in_set_artist" 
                   :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
         />

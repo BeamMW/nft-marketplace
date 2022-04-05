@@ -68,6 +68,8 @@
   .info {
     display: flex
     justify-content: space-between
+    font-family: 'SFProDisplay', sans-serif
+    opacity: 0.7
     font-style: italic
     font-weight: 400
     font-size: 12px

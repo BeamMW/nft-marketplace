@@ -14,6 +14,7 @@
                   title="Sort by"
         />
       </div>
+      <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
       <btn text="add collection" color="green" padding="7px 12px" @click="$store.toNewCollection"/>
       <btn class="user" height="34px"
            :text="my_artist_name"

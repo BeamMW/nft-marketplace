@@ -10,8 +10,8 @@
              id="image"
              ref="image"
              type="file"
-             accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
              class="files"
+             :accept="accept"
              @change="onUpload"
       />
     </div>
@@ -27,7 +27,6 @@
     align-items: center
     justify-content: center
     position:relative
-    height: 135px
     background-color: rgba(26, 246, 214, 0.1)
     border-radius: 10px
 
@@ -95,6 +94,11 @@ export default {
       required: false,
       default: undefined
     },
+    height: {
+      type: String,
+      required: false,
+      default: '135px'
+    },
     title: {
       type: String,
       default: '',
@@ -109,6 +113,11 @@ export default {
       type: Boolean,
       default: false,
       required: false
+    },
+    accept: {
+      type: String,
+      default: 'image/*',
+      required: false
     }
   },
 
@@ -120,6 +129,7 @@ export default {
     style() {
       return {
         'border' :  this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'height': this.height
       }
     },
   },
