@@ -1,14 +1,14 @@
 <template>
   <div class="input">
     <input id="sell-input" 
-           :value="modelValue"
+           :value="price"
            type="text" 
            :style="{'--color': color}"
            class="elem"
            :placeholder="placeholder"
            @keydown="onKey"
            @paste="onPaste"
-           @input="$emit('update:modelValue', $event.target.value)"
+           @input="$emit('update:price', $event.target.value)"
     />
     <span class="text">BEAM</span>
   </div>
@@ -66,6 +66,7 @@
 </style>
 
 <script>
+import utils from '../utils/utils.js'
 
 export default {
   props: {
@@ -78,26 +79,44 @@ export default {
       default: '0',
       required: false
     },
-    // eslint-disable-next-line vue/prop-name-casing
-    modelValue: {
+    price: {
       type: String,
       default: '',
       required: true
     },
   },
-
-  emits: [
-    'trigger-key', 
-    'trigger-paste', 'update:modelValue', 
-  ],
+  emits: ['update:price'],
 
   methods: {    
     onKey(ev) {
-      this.$emit('trigger-key', ev)
+      if (ev.isComposing || ev.keyCode === 229 || ev.ctrlKey || ev.altKey || ev.metaKey) {
+        return
+      }
+
+      const specialKeys = [
+        'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
+        'Control', 'Delete', 'F5'
+      ]
+
+      if (specialKeys.indexOf(ev.key) !== -1) {
+        return
+      }
+
+      const current = this.price
+      const next = current.concat(ev.key)
+      if (!utils.handleString(next)) {
+        ev.preventDefault()
+      }
     },
+
     onPaste(ev) {
-      this.$emit('trigger-paste', ev)
-    }
+      if (ev.clipboardData != undefined) {
+        const text = ev.clipboardData.getData('text')
+        if (!utils.handleString(text)) {
+          ev.preventDefault()
+        }
+      }
+    },
   }
 }
 </script>

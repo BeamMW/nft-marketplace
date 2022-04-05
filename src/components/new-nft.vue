@@ -26,7 +26,7 @@
         </div>
         <div class="price-container">
           <div class="label">Price</div>
-          <priceInput v-model="price" color="#fff" @trigger-key="onKey" @trigger-paste="onPaste"/>
+          <priceInput v-model:price="price" color="#fff"/>
         </div>
         <switchInput v-model:checked="sale"/>
       </div>
@@ -151,7 +151,6 @@ import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
 import switchInput from './switch-input.vue'
 import {common} from '../utils/consts.js'
-import utils from '../utils/utils.js'
 
 export default {
   components: {
@@ -243,37 +242,6 @@ export default {
       reader.readAsDataURL(file)
       reader.onload = (e) => {
         cback(e.target.result, file.size)
-      }
-    },
-
-    onKey(ev) {
-      if (ev.isComposing || ev.keyCode === 229 || ev.ctrlKey || ev.altKey || ev.metaKey) {
-        return
-      }
-
-      const specialKeys = [
-        'Backspace', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp',
-        'Control', 'Delete', 'F5'
-      ]
-
-      if (specialKeys.indexOf(ev.key) !== -1) {
-        return
-      }
-
-      const current = this.price
-      const next = current.concat(ev.key)
-
-      if (!utils.handleString(next)) {
-        ev.preventDefault()
-      }
-    },
-
-    onPaste(ev) {
-      if (ev.clipboardData != undefined) {
-        const text = ev.clipboardData.getData('text')
-        if (!utils.handleString(text)) {
-          ev.preventDefault()
-        }
       }
     },
     
