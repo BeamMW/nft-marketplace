@@ -22,6 +22,13 @@ namespace Gallery
     static const ShaderID s_SID_17 = {0x9b,0xee,0xba,0x72,0x2e,0x06,0x09,0xc4,0xfd,0x72,0x3f,0x95,0x17,0x3a,0x8a,0xbb,0x4e,0xef,0xc3,0x96,0x5b,0xdc,0xbe,0xdd,0xfb,0xd7,0x28,0x87,0xab,0xc9,0xf6,0x87};
     static const ShaderID s_SID_18 = {0x3e,0xeb,0x78,0xea,0x39,0x2b,0x77,0x78,0xe8,0xf3,0xa4,0x0b,0xaa,0x9d,0x02,0x8c,0x20,0x20,0x91,0x04,0xfc,0x0f,0x9f,0xa4,0x72,0x87,0xaf,0xc0,0xd6,0x9f,0xaa,0x05};
     static const ShaderID s_SID_19 = {0x72,0x14,0xe3,0xee,0x60,0x96,0xa1,0x0a,0x1c,0xe0,0x59,0x2c,0x64,0x17,0x6b,0x49,0x22,0x3d,0x08,0xbe,0xcc,0x0e,0x8c,0xca,0x36,0xc1,0xc0,0x5b,0xb8,0x71,0x77,0xbb};
+    static const ShaderID s_SID_20 = {0x33,0xb3,0x1e,0x9d,0xb2,0xa4,0xf1,0xda,0x64,0x06,0x72,0xe5,0x07,0x93,0xac,0x1a,0x04,0x4b,0xb6,0x20,0x17,0x9d,0xbe,0x19,0xa0,0x9e,0x74,0xf7,0xc1,0x5c,0xc4,0xf9};
+    static const ShaderID s_SID_21 = {0x02,0xf9,0x7d,0xa3,0x2f,0xd6,0xf4,0x32,0x0d,0xb8,0xaa,0x97,0xcc,0xd6,0x19,0x23,0x4f,0x3a,0x7f,0xc6,0x29,0x97,0xd9,0xca,0xb9,0x97,0x43,0x90,0xad,0x94,0x1a,0x1f};
+    static const ShaderID s_SID_22 = {0xd4,0xce,0xfb,0xc9,0xf6,0xe9,0x9d,0x81,0x73,0xf1,0x8a,0xc1,0xec,0xd3,0xe8,0x10,0x45,0x4f,0x77,0xcd,0x94,0xca,0xd9,0x6c,0x49,0x03,0x13,0x26,0x80,0x33,0x02,0xbd};
+    static const ShaderID s_SID_23 = {0x69,0xb7,0xbb,0x2e,0x49,0x55,0xe4,0x05,0x3d,0x5c,0xf1,0x73,0xd9,0xa9,0xfc,0x6e,0x38,0x66,0x1c,0x2d,0x4b,0xf2,0xb6,0xc5,0x38,0x42,0xb4,0x50,0xf5,0x8a,0x1e,0x37};
+    static const ShaderID s_SID_24 = {0x31,0x34,0x9d,0x76,0x79,0xc8,0x15,0x34,0x11,0x7d,0x23,0x21,0xcf,0xd3,0x8f,0xc5,0xc5,0xad,0xf6,0x12,0x4c,0x87,0x5b,0x11,0xd3,0xcb,0xfb,0x27,0xf0,0x38,0x70,0x98};
+    static const ShaderID s_SID_25 = {0x9c,0x63,0x07,0x37,0x9e,0x7a,0xa8,0xc9,0x6a,0xae,0x93,0x52,0x82,0xb0,0x3d,0x08,0x65,0xeb,0x5d,0x4d,0x38,0x04,0x0d,0xf2,0xa9,0x53,0x11,0x52,0x53,0x58,0x57,0x9d};
+    static const ShaderID s_SID_26 = {0xc3,0x58,0x22,0x28,0x40,0xf1,0xe5,0x14,0x7f,0x13,0x48,0x68,0xdc,0xae,0x59,0xda,0xd2,0x17,0xe1,0xb1,0x9a,0x11,0x5d,0xa8,0x66,0x9a,0xd3,0xeb,0x9b,0xd6,0xa2,0xe5};
 #pragma pack (push, 1)
 
     struct Tags
@@ -56,21 +63,81 @@ namespace Gallery
         uint32_t artwork_id;
     };
 
-    struct Artist
-    {
-        struct Stats {
-            uint32_t total_artists;
-        };
+    template <class ID>
+    struct GalleryFirstStageKey {
+        using Id = ID;
+        Id id;
+    };
 
-        struct FirstStageKey {
+    template <class ID>
+    struct GallerySecondStageKey {
+        using Id = ID;
+        Id id;
+        Height h_updated;
+    };
+
+    template <class T, class ID>
+    struct GalleryObject {
+        using Id = ID;
+
+        bool Load(const Id& id, size_t object_size = sizeof(T)) {
+            typename T::FirstStageKey fsk;
+            fsk.id = id; 
+            typename T::SecondStageKey ssk;
+            ssk.id = id;
+            if (!Env::LoadVar_T(fsk, ssk))
+                return false;
+            return Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
+        }
+
+        bool Save(const Id& id, Height h = Utils::FromBE(Env::get_Height()), size_t object_size = sizeof(T)) {
+            typename T::FirstStageKey fsk;
+            fsk.id = id; 
+            typename T::SecondStageKey ssk;
+            ssk.id = id;
+            ssk.h_updated = h;
+            Env::SaveVar_T(fsk, ssk);
+            return Env::SaveVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
+        }
+
+        bool TakeOut(const Id& id, size_t object_size = sizeof(T)) {
+            typename T::FirstStageKey fsk;
+            fsk.id = id; 
+            typename T::SecondStageKey ssk;
+            ssk.id = id;
+            if (!Env::LoadVar_T(fsk, ssk))
+                return false;
+            if (!Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal))
+                return false;
+            Env::DelVar_T(ssk);
+            return true;
+        }
+
+        void Delete(const Id& id) {
+            typename T::FirstStageKey fsk;
+            fsk.id = id; 
+            typename T::SecondStageKey ssk;
+            ssk.id = id;
+            Env::LoadVar_T(fsk, ssk.h_updated);
+            Env::DelVar_T(ssk);
+            Env::DelVar_T(fsk);
+        }
+
+        bool Exists(const Id& id) {
+            typename T::FirstStageKey fsk;
+            fsk.id = id; 
+            typename T::SecondStageKey ssk;
+            return Env::LoadVar_T(fsk, ssk);
+        }
+    };
+
+    struct Artist : public GalleryObject<Artist, PubKey> {
+        struct FirstStageKey : public GalleryFirstStageKey<Artist::Id> {
             uint8_t m_Tag = Tags::s_ArtistHeight;
-            PubKey m_pkUser;
         };
 
-        struct SecondStageKey {
+        struct SecondStageKey : public GallerySecondStageKey<Artist::Id> {
             uint8_t m_Tag = Tags::s_Artist;
-            Height h_last_updated;
-            PubKey m_pkUser;
         };
 
         Height m_hRegistered;
@@ -84,26 +151,22 @@ namespace Gallery
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
 
-    struct Collection
-    {
-        using ID = uint32_t;
-        struct FirstStageKey {
+    struct Collection : public GalleryObject<Collection, uint32_t> {
+        struct FirstStageKey : public GalleryFirstStageKey<Collection::Id> {
             uint8_t m_Tag = Tags::s_CollectionHeight;
-            ID m_ID;
         };
 
-        struct SecondStageKey {
+        struct SecondStageKey : public GallerySecondStageKey<Collection::Id> {
             uint8_t m_Tag = Tags::s_Collection;
-            Height h_last_updated;
-            ID m_ID;
         };
 
         bool is_approved;
         bool is_default;
+        uint32_t artworks_num;
         uint32_t data_len;
         uint32_t label_len;
         PubKey m_pkAuthor;
-        ID m_ID;
+        Id id;
 
         // followed by label and data without delimiter
         static const uint32_t s_LabelMaxLen = 120;
@@ -116,28 +179,22 @@ namespace Gallery
         AssetID m_Aid;
     };
 
-    struct Masterpiece
-    {
-        typedef uint32_t ID; // in big-endian format, for more convenient enumeration sorted by ID
-
+    struct Masterpiece : public GalleryObject<Masterpiece, uint32_t> {
         // By this key masterpiece's height with specified ID is accessed 
-        // ID ---FistStageKey---> h_last_updated ---SecondStageKey---> Masterpiece
+        // ID ---FistStageKey---> h_updated ---SecondStageKey---> Masterpiece
         // This is done in order to be able to search for masterpieces updated since specified block
-        struct FirstStageKey {
+        struct FirstStageKey : public GalleryFirstStageKey<Masterpiece::Id> {
             uint8_t m_Tag = Tags::s_MasterpieceHeight;
-            ID m_ID;
         };
 
-        struct SecondStageKey {
+        struct SecondStageKey : public GallerySecondStageKey<Masterpiece::Id> {
             uint8_t m_Tag = Tags::s_Masterpiece;
-            Height h_last_updated;
-            ID m_ID;
         };
 
         PubKey m_pkAuthor;
         PubKey m_pkOwner;
         AssetID m_Aid; // set when it's taken out of gallery
-        Collection::ID collection_id;
+        Collection::Id collection_id;
 
         AmountWithAsset m_Price;
         static const uint32_t s_LabelMaxLen = 120;
@@ -149,7 +206,7 @@ namespace Gallery
     {
         struct ID
         {
-            Masterpiece::ID m_MasterpieceID;
+            Masterpiece::Id m_MasterpieceID;
             PubKey m_pkUser;
         };
 
@@ -168,7 +225,7 @@ namespace Gallery
             uint8_t m_Tag = Tags::s_Payout;
             PubKey m_pkUser;
             AssetID m_Aid;
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
         };
 
         Amount m_Amount;
@@ -208,7 +265,7 @@ namespace Gallery
         struct AddArtworkData {
             struct Key {
                 uint8_t m_Prefix = 0;
-                Masterpiece::ID m_ID;
+                Masterpiece::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
@@ -217,7 +274,7 @@ namespace Gallery
         struct AddArtworkLabel {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Masterpiece::ID m_ID;
+                Masterpiece::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
@@ -226,7 +283,7 @@ namespace Gallery
         struct Sell {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Masterpiece::ID m_ID;
+                Masterpiece::Id m_ID;
             };
 
             AmountWithAsset m_Price;
@@ -261,7 +318,7 @@ namespace Gallery
             enum class RequestType { SET, DISABLE, ENABLE } req;
             Gallery::Role role;
             PubKey m_pkArtist;
-            Collection::ID collection_id;
+            Collection::Id collection_id;
             uint32_t m_LabelLen;
             uint32_t m_DataLen;
             // followed by label and data without delimiter
@@ -284,7 +341,7 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 4;
 
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
             AmountWithAsset m_Price;
         };
 
@@ -292,7 +349,7 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 5;
 
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
             PubKey m_pkUser;
             uint8_t m_HasAid;
             Amount m_PayMax;
@@ -310,21 +367,21 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 7;
 
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
         };
 
         struct CheckOut
         {
             static const uint32_t s_iMethod = 8;
 
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
         };
 
         struct CheckIn
         {
             static const uint32_t s_iMethod = 9;
 
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
             PubKey m_pkUser;
         };
 
@@ -344,18 +401,17 @@ namespace Gallery
         struct AdminDelete
         {
             static const uint32_t s_iMethod = 13;
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
         };
 
         struct Transfer
         {
             static const uint32_t s_iMethod = 14;
-            Masterpiece::ID m_ID;
+            Masterpiece::Id m_ID;
             PubKey m_pkNewOwner;
         };
 
     } // namespace Method
 
 #pragma pack (pop)
-
 }

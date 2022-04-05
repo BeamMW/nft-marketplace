@@ -72,7 +72,7 @@ namespace KeyMaterial
     struct Owner
     {
         ContractID m_Cid;
-        Gallery::Masterpiece::ID m_ID;
+        Gallery::Masterpiece::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
         void Set(const ContractID& cid)
@@ -88,7 +88,7 @@ namespace KeyMaterial
     };
 #pragma pack (pop)
 
-    const Gallery::Masterpiece::ID g_MskImpression = Utils::FromBE((static_cast<Gallery::Masterpiece::ID>(-1) >> 1) + 1); // hi bit
+    const Gallery::Masterpiece::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Masterpiece::Id>(-1) >> 1) + 1); // hi bit
 }
 
 ON_METHOD(manager, view)
@@ -114,6 +114,13 @@ ON_METHOD(manager, view)
         Gallery::s_SID_17,
         Gallery::s_SID_18,
         Gallery::s_SID_19,
+        Gallery::s_SID_20,
+        Gallery::s_SID_21,
+        Gallery::s_SID_22,
+        Gallery::s_SID_23,
+        Gallery::s_SID_24,
+        Gallery::s_SID_25,
+        Gallery::s_SID_26,
     };
 
     ContractID pVerCid[_countof(s_pSid)];

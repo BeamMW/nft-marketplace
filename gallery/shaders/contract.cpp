@@ -24,21 +24,6 @@ struct MyState
     }
 };
 
-bool LoadMasterpiece(const Gallery::Masterpiece::FirstStageKey& fsmk, Gallery::Masterpiece::SecondStageKey& ssmk, Gallery::Masterpiece& m) {
-    if (!Env::LoadVar_T(fsmk, ssmk.h_last_updated)) {
-        return false;
-    }
-    return Env::LoadVar_T(ssmk, m);
-}
-
-void RewriteMasterpiece(const Gallery::Masterpiece::FirstStageKey& fsmk, Gallery::Masterpiece::SecondStageKey& ssmk, const Gallery::Masterpiece& m) {
-    Env::DelVar_T(fsmk);
-    Env::DelVar_T(ssmk);
-    ssmk.h_last_updated = Utils::FromBE(Env::get_Height());
-    Env::SaveVar_T(fsmk, ssmk.h_last_updated);
-    Env::SaveVar_T(ssmk, m);
-}
-
 BEAM_EXPORT void Ctor(const Gallery::Method::Init& r)
 {
     if (Env::get_CallDepth() > 1)
@@ -101,22 +86,16 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 {
     using ArtistReqType = Gallery::Method::ManageArtist::RequestType;
 
-    Gallery::Artist::FirstStageKey fsak;
-    _POD_(fsak.m_pkUser) = r.m_pkArtist;
-
     struct ArtistPlus : public Gallery::Artist {
         char m_szLabelData[s_TotalMaxLen];
     } a;
 
-    Gallery::Artist::SecondStageKey ssak;
-
     switch (r.req) {
     case ArtistReqType::SET: {
-        bool artist_exists = Env::LoadVar_T(fsak, ssak);
+        bool artist_exists = a.Exists(r.m_pkArtist);
 
         if (artist_exists) {
-            Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
-            Env::DelVar_T(ssak);
+            a.TakeOut(r.m_pkArtist, sizeof(a));
 
             uint32_t old_data_len = a.data_len;
             uint32_t old_label_len = a.label_len;
@@ -146,15 +125,13 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             a.data_len = r.m_DataLen;
             Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
-            _POD_(ssak.m_pkUser) = r.m_pkArtist;
-
             // create default collection
             struct CollectionPlus : public Gallery::Collection {
                 char m_szLabelData[s_TotalMaxLen];
             } c;
 
             MyState s;
-            c.m_ID = ++s.collections_stats.free_id;
+            c.id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
             s.artists_stats.total++;
             s.Save();
@@ -162,7 +139,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             c.is_default = true;
 
             // will be uncommented in future (with moderation adding)
-            //a.is_approved = false;
+            //c.is_approved = false;
             c.is_approved = true;
 
             c.label_len = a.label_len;
@@ -172,23 +149,13 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
-            ack.collection_id = c.m_ID;
+            ack.collection_id = c.id;
             Env::SaveVar_T(ack, true);
 
-            Gallery::Collection::FirstStageKey fsck;
-            Gallery::Collection::SecondStageKey ssck;
-
-            fsck.m_ID = c.m_ID;
-            ssck.m_ID = c.m_ID;
-            ssck.h_last_updated = Utils::FromBE(Env::get_Height());
-
-            Env::SaveVar_T(fsck, ssck);
-            Env::SaveVar(&ssck, sizeof(ssck), &c, sizeof(Gallery::Collection) + c.label_len + c.data_len, KeyTag::Internal);
+            c.Save(c.id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
         }
-        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
 
-        Env::SaveVar_T(fsak, ssak);
-        Env::SaveVar(&ssak, sizeof(ssak), &a, sizeof(Gallery::Artist) + a.label_len + a.data_len, KeyTag::Internal);
+        a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
 
         Env::AddSig(r.m_pkArtist);
         break;
@@ -202,7 +169,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
         Env::DelVar_T(ssak);
 
         a.is_approved = (r.req == ArtistReqType::ENABLE);
-        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+        ssak.h_updated = Utils::FromBE(Env::get_Height());
 
         Env::SaveVar_T(fsak, ssak);
         Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
@@ -220,22 +187,16 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 {
     using CollectionReqType = Gallery::Method::ManageCollection::RequestType;
 
-    Gallery::Collection::FirstStageKey fsck;
-    fsck.m_ID = r.collection_id;
-
     struct CollectionPlus : public Gallery::Collection {
         char m_szLabelData[s_TotalMaxLen];
     } c;
 
-    Gallery::Collection::SecondStageKey ssck;
-
     switch (r.req) {
     case CollectionReqType::SET: {
-        bool collection_exists = r.collection_id > 0 && Env::LoadVar_T(fsck, ssck);
+        bool collection_exists = r.collection_id > 0 && c.Exists(r.collection_id);
 
         if (collection_exists) {
-            Env::LoadVar(&ssck, sizeof(ssck), &c, sizeof(c), KeyTag::Internal);
-            Env::DelVar_T(ssck);
+            c.TakeOut(r.collection_id);
 
             uint32_t old_data_len = c.data_len;
             uint32_t old_label_len = c.label_len;
@@ -257,7 +218,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             Env::Halt_if(!r.m_LabelLen); 
 
             MyState s;
-            c.m_ID = ++s.collections_stats.free_id;
+            c.id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
             s.Save();
 
@@ -274,15 +235,10 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
-            ack.collection_id = c.m_ID;
+            ack.collection_id = c.id;
             Env::SaveVar_T(ack, true);
         }
-        fsck.m_ID = c.m_ID;
-        ssck.m_ID = c.m_ID;
-        ssck.h_last_updated = Utils::FromBE(Env::get_Height());
-
-        Env::SaveVar_T(fsck, ssck);
-        Env::SaveVar(&ssck, sizeof(ssck), &c, sizeof(Gallery::Collection) + c.label_len + c.data_len, KeyTag::Internal);
+        c.Save(c.id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
         Env::AddSig(r.m_pkArtist);
         break;
@@ -296,7 +252,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
         Env::DelVar_T(ssak);
 
         a.is_approved = (r.req == ArtistReqType::ENABLE);
-        ssak.h_last_updated = Utils::FromBE(Env::get_Height());
+        ssak.h_updated = Utils::FromBE(Env::get_Height());
 
         Env::SaveVar_T(fsak, ssak);
         Env::SaveVar(&ssak, sizeof(ssak), &a, artist_size, KeyTag::Internal); // will fail if already exists
@@ -313,18 +269,13 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 {
     MyState s;
+    Gallery::Masterpiece m;
 
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    fsmk.m_ID = Utils::FromBE(++s.artworks_stats.free_id);
-
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    ssmk.m_ID = fsmk.m_ID;
-    
+    Gallery::Masterpiece::Id m_id = Utils::FromBE(++s.artworks_stats.free_id);
     s.artworks_stats.total++;
+    
     s.Save();
 
-    Gallery::Masterpiece m;
-    _POD_(m).SetZero();
     _POD_(m.m_pkOwner) = r.m_pkArtist;
     _POD_(m.m_pkAuthor) = r.m_pkArtist;
     m.collection_id = r.collection_id;
@@ -337,39 +288,31 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     
     Gallery::CollectionArtworkKey cak;
     cak.collection_id = r.collection_id;
-    cak.artwork_id = fsmk.m_ID;
+    cak.artwork_id = m_id;
     Env::SaveVar_T(cak, true);
 
-    auto pData = reinterpret_cast<const uint8_t*>(&r + 1);
+    auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
     uint32_t nData = r.data_len;
 
-    auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1) + r.data_len;
+    auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1);
     uint32_t nLabel = r.label_len;
 
     {
         // verify artist
-        Gallery::Artist::FirstStageKey fsak;
-        _POD_(fsak.m_pkUser) = r.m_pkArtist;
-
-        Gallery::Artist::SecondStageKey ssak;
-        Env::Halt_if(!Env::LoadVar_T(fsak, ssak));
-
         struct ArtistPlus : public Gallery::Artist {
             char m_szLabelData[s_TotalMaxLen];
         } a;
 
-        Env::LoadVar(&ssak, sizeof(ssak), &a, sizeof(a), KeyTag::Internal);
+        Env::Halt_if(!a.Load(r.m_pkArtist));
         Env::Halt_if(!a.is_approved);
     }
 
-    ssmk.h_last_updated = Utils::FromBE(Env::get_Height());
-    Env::SaveVar_T(ssmk, m);
-    Env::SaveVar_T(fsmk, ssmk.h_last_updated);
+    m.Save(m_id);
 
     Env::AddSig(r.m_pkArtist);
 
     Gallery::Events::AddArtworkData::Key adk;
-    adk.m_ID = ssmk.m_ID;
+    adk.m_ID = m_id;
     _POD_(adk.m_pkArtist) = m.m_pkOwner;
 
     uint32_t nMaxEventSize = 0x2000; // TODO: max event size is increased to 1MB from HF4
@@ -385,7 +328,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     }
 
     Gallery::Events::AddArtworkLabel::Key alk;
-    alk.m_ID = ssmk.m_ID;
+    alk.m_ID = m_id;
     _POD_(alk.m_pkArtist) = m.m_pkOwner;
 
     Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
@@ -393,30 +336,20 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m));
+    Env::Halt_if(!m.Load(r.m_ID));
 
     _POD_(m.m_Price) = r.m_Price;
 
-    RewriteMasterpiece(fsmk, ssmk, m);
+    m.Save(r.m_ID);
 
     Env::AddSig(m.m_pkOwner); // would fail if no current owner (i.e. checked out)
 }
 
 BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m));
+    Env::Halt_if(!m.Load(r.m_ID));
 
     Env::Halt_if(
         !m.m_Price.m_Amount || // not for sale!
@@ -446,8 +379,7 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
     _POD_(m.m_pkOwner) = r.m_pkUser;
     _POD_(m.m_Price).SetZero(); // not for sale until new owner sets the price
 
-    RewriteMasterpiece(fsmk, ssmk, m);
-
+    m.Save(r.m_ID);
     //Env::AddSig(r.m_pkUser);
 }
 
@@ -460,13 +392,8 @@ BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r)
 
 BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m));
+    Env::Halt_if(!m.Load(r.m_ID));
     Env::AddSig(m.m_pkOwner);
 
     if (m.m_Aid)
@@ -482,18 +409,13 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
         m.m_Aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
     }
 
-    RewriteMasterpiece(fsmk, ssmk, m);
+    m.Save(r.m_ID);
 }
 
 BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m) || !m.m_Aid);
+    Env::Halt_if(!m.Load(r.m_ID) || !m.m_Aid);
     Env::AddSig(m.m_pkOwner);
 
     Env::Halt_if(!Env::AssetEmit(m.m_Aid, 1, 1));
@@ -502,24 +424,19 @@ BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
     _POD_(m.m_pkOwner).SetZero();
     _POD_(m.m_Price).SetZero();
 
-    RewriteMasterpiece(fsmk, ssmk, m);
+    m.Save(r.m_ID);
 }
 
 BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m) || !_POD_(m.m_pkOwner).IsZero());
+    Env::Halt_if(!m.Load(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
 
     Env::FundsLock(m.m_Aid, 1);
     Env::Halt_if(!Env::AssetEmit(m.m_Aid, 1, 0));
 
     _POD_(m.m_pkOwner) = r.m_pkUser;
-    RewriteMasterpiece(fsmk, ssmk, m);
+    m.Save(r.m_ID);
 
     //Env::AddSig(r.m_pkUser);
 }
@@ -563,18 +480,12 @@ BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r)
 BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 {
     // ensure the masterpiece doesn't have aid
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m));
+    Env::Halt_if(!m.Load(r.m_ID));
 
     Env::Halt_if(m.m_Aid);
 
-    Env::DelVar_T(ssmk);
-    Env::DelVar_T(fsmk);
+    m.Delete(r.m_ID);
 
     MyState s;
     s.AddSigAdmin();
@@ -582,17 +493,11 @@ BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 
 BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r)
 {
-    Gallery::Masterpiece::FirstStageKey fsmk;
-    Gallery::Masterpiece::SecondStageKey ssmk;
-    fsmk.m_ID = r.m_ID;
-    ssmk.m_ID = r.m_ID;
-
     Gallery::Masterpiece m;
-    Env::Halt_if(!LoadMasterpiece(fsmk, ssmk, m));
+    Env::Halt_if(!m.Load(r.m_ID));
 
     Env::AddSig(m.m_pkOwner);
     _POD_(m.m_pkOwner) = r.m_pkNewOwner;
 
-    RewriteMasterpiece(fsmk, ssmk, m);
+    m.Save(r.m_ID);
 }
-
