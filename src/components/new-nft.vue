@@ -13,20 +13,12 @@
                        :valid="description_valid"
                        :max_length="150"
         />
-        <div class="collection-container">
-          <div class="label">Collection</div>
-          <div class="select-container">
-            <img src="~assets/icon-down.svg" alt="icon"/>
-            <select v-model="selected" class="select">
-              <option v-for="option in selector_options" :key="option.name" :value="option.name">
-                {{ option.name }}
-              </option>
-            </select>
-          </div>
-        </div>
+        <formSelect :options="selector_options"
+                    @selected="selectCollection"
+        />
         <div class="price-container">
           <div class="label">Price</div>
-          <priceInput v-model:price="price" color="#fff"/>
+          <priceInput v-model:price="price" color="rgba(255,255,255,0.7)"/>
         </div>
         <switchInput v-model:checked="sale"/>
       </div>
@@ -34,7 +26,7 @@
         <addImage v-model:image="image"
                   :valid="image_valid"
                   title="Add NFT here<br>(.jpg, .png, .gif)"
-                  height="344px"
+                  height="374px"
         />
       </div>
     </div>
@@ -63,43 +55,6 @@
           margin-bottom: 20px
         }
 
-        & > .collection-container {
-
-          .label {
-            margin-bottom:10px
-            color: rgba(255, 255, 255, 0.6)
-            font-family: 'SFProDisplay', sans-serif
-            font-size: 14px
-          }
-
-          .select-container {
-            display: flex
-            position: relative
-
-            & > img {
-              position: absolute
-              width: 9px
-              height: 5px
-              right:20px
-              top:50%
-            }
-
-            .select {
-              -moz-appearance:none
-              -webkit-appearance:none
-              appearance:none
-              font-family: 'SFProDisplay', sans-serif
-              background-color: rgba(255, 255, 255, 0.05)
-              border: none
-              outline-width: 0
-              font-size: 14px
-              color: white
-              border-radius: 10px
-              padding: 12px 8px
-              width: 100%
-            }
-          }
-        }
         .price-container {
 
           .label {
@@ -117,17 +72,6 @@
         margin-top: 30px
       }
     }
-
-    .text {
-      width: 100%
-      height: 100%
-      display: flex
-      justify-content: center
-      align-items: center
-      font-size: 14px
-      color: #1af6d6
-      cursor: pointer
-    }
   }
 
   .actions {
@@ -142,7 +86,6 @@
 </style>
 
 <script>
-import {nextTick} from 'vue'
 import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
@@ -150,6 +93,7 @@ import btn from './button.vue'
 import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
 import switchInput from './switch-input.vue'
+import formSelect from './form-select.vue'
 import {common} from '../utils/consts.js'
 
 export default {
@@ -160,7 +104,8 @@ export default {
     btn,
     addImage,
     priceInput,
-    switchInput
+    switchInput,
+    formSelect
   },
   data () {
     return {
@@ -172,15 +117,17 @@ export default {
       image: undefined,
       price: '',
       show: false,
-      selected: 0,
-      sale: null,
+      sale: false,
       selector_options: [
-        {name: 'Collection 1'},
-        {name: 'Collection 2'},
-        {name: 'Collection 3'},
-        {name: 'Collection 4'},
-        {name: 'Collection 5'},
-        {name: 'Collection 6'}
+        {name: 'Collection 0', id: 0},
+        {name: 'Collection 1', id: 1},
+        {name: 'Collection 2', id: 2},
+        {name: 'Collection 3', id: 3},
+        {name: 'Collection 4', id: 4},
+        {name: 'Collection 5', id: 5},
+        {name: 'Collection 6', id: 6},
+        {name: 'Collection 7', id: 7}
+
       ],
     }
   },
@@ -201,7 +148,7 @@ export default {
       return this.name && this.name_valid &&
              this.description_valid &&
              this.image_valid
-    }
+    },
   },
 
   methods: {    
@@ -213,37 +160,8 @@ export default {
         cback(e.target.result, file.size)
       }
     },
-    
-    close() {
-      this.show = false
-    },
-
-    open(ev) {
-      this.show = true
-      nextTick(() => {
-        let downAway = (evc) => {
-          if (!this.$el.contains(evc.target)) {
-            document.removeEventListener('mousedown', downAway, true)
-            this.close()
-          }
-        }
-        
-        let clickAway = (evc) => {
-          if (ev != evc) {
-            document.removeEventListener('click', clickAway, true)
-            this.close()
-          }
-        }
-        
-        let scrollAway = (evc) => {
-          document.removeEventListener('scroll', scrollAway, scroll)
-          this.close()
-        }
-        
-        document.addEventListener('mousedown', downAway, true)
-        document.addEventListener('click', clickAway, true)
-        document.addEventListener('scroll', scrollAway, true)
-      })
+    selectCollection(opt) {
+      console.log(opt)
     },
   }
 }

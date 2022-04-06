@@ -1,5 +1,5 @@
 <template>
-  <div class="switch_container">
+  <div class="switch-container">
     <label class="switch">
       <input type="checkbox"
              :checked="checked"
@@ -12,7 +12,7 @@
 </template>
 
 <style scoped lang="stylus">
-.switch_container {
+.switch-container {
   display: flex
   align-items: flex-end
 

@@ -1,18 +1,19 @@
 <template>
-  <div class="input">
-    <input id="sell-input" 
-           :value="price"
-           type="text" 
-           :style="{'--color': color}"
-           class="elem"
-           :placeholder="placeholder"
-           @keydown="onKey"
-           @paste="onPaste"
-           @input="$emit('update:price', $event.target.value)"
-    />
-    <span class="text">BEAM</span>
+  <div :style="{'--color': color}">
+    <div class="input">
+      <input id="sell-input" 
+             :value="price"
+             type="text" 
+             class="elem"
+             :placeholder="placeholder"
+             @keydown="onKey"
+             @paste="onPaste"
+             @input="$emit('update:price', $event.target.value)"
+      />
+      <span class="text">BEAM</span>
+    </div>
+    <span class="price">{{ price }} USD</span>
   </div>
-  <span class="price">{{ price }} USD</span>
 </template>
 
 <style scoped lang="stylus">
@@ -35,9 +36,9 @@
     height: 100%
     padding: 0
     border-radius: 10px
-    padding: 8px
+    padding: 8px 8px 8px 20px
     max-width: 292px
-      
+
     &:focus {
       outline-width: 0
       color: var(--color)
@@ -60,8 +61,7 @@
   display: block
   margin-top: 6px
   font-size: 12px
-  color: #fff
-  opacity: 0.7
+  color: var(--color)
 }
 </style>
 

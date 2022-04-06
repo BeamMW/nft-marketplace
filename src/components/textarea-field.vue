@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="textarea-container">
     <label v-if="label" class="label">{{ label }}</label>
     <textarea v-bind="$attrs" class="input"
               :value="modelValue"
@@ -21,14 +21,14 @@
 </template>
 
 <style scoped lang="stylus">
-.container {
+.textarea-container {
   width: 100%
   box-sizing: border-box
 
   .label {
     display: block
     margin-bottom: 10px
-    color: #8da1ad
+    color: rgba(255,255,255,0.6)
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
   }
