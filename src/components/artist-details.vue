@@ -21,7 +21,7 @@
                     :valid="label_valid"
                     :max_length="100"
                     :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:60px;margin-top:0"
+                    style="margin-bottom:46px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -56,8 +56,7 @@
                        :readonly="in_set_artist"
         />
         <addImage v-model:image="banner"
-                  title="Add an artist banner"
-                  accept="image/jpeg, image/png, image/svg+xml"      
+                  title="Add an artist banner"      
                   :readonly="in_set_artist" 
                   :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
         />
@@ -67,11 +66,11 @@
               <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
             <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-            <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
+            <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist<br>image</label>
             <input v-if="!in_set_artist" id="avatar"
                    ref="avatar"
                    type="file"
-                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                   accept="image/*"      
                    class="files"
                    @change="onUploadAvatar"
             />
@@ -90,7 +89,7 @@
         <img src="~assets/icon-cancel.svg"/>
       </btn>
       <btn :text="edit_self ? 'update info' : 'create account'" 
-           color="blue" 
+           color="green" 
            :disabled="!can_submit || in_set_artist" @click="onSetArtist"
       >
         <img src="~assets/icon-create.svg"/>
@@ -113,7 +112,7 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 35px 0px 0px 0px
+      margin: 40px 0px 0px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -159,6 +158,7 @@
               font-size: 14px
               color: #1af6d6
               cursor: pointer
+              text-align: center
             }
 
             &[readonly] {
@@ -174,10 +174,7 @@
               z-index: 2
               border-radius: 9999px
               padding: 7px 7px 3px 7px
-
-              .remove {
-                cursor: pointer
-              }
+              cursor: pointer
             }
 
             .files {
@@ -355,7 +352,7 @@ export default {
     },
     about: {
       get () {
-        console.log('about get', JSON.stringify(this.artist))
+        console.log('about get for', JSON.stringify(this.artist))
         return this.about_ || this.artist.about
       },
       set (val) {

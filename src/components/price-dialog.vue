@@ -172,7 +172,6 @@ export default {
 
       const current = this.price
       const next = current.concat(ev.key)
-
       if (!utils.handleString(next)) {
         ev.preventDefault()
       }

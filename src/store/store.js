@@ -140,6 +140,7 @@ const store = {
 
   onApiResult(err, res, full) {
     if (err) {
+      // TODO: wrap in new Error
       return this.setError(err,  'API handling error')
     }
 
@@ -157,7 +158,6 @@ const store = {
       return this.setError(err, 'Failed to verify cid')     
     }
 
-    console.log(this.state.cid)
     if (!res.contracts.some(el => el.cid == this.state.cid)) {
       throw `CID not found '${this.state.cid}'`
     }
@@ -263,17 +263,6 @@ const store = {
       }
 
       artist = aformat.fromContract(artist)
-      console.log('artist', JSON.stringify(artist))
-      this.loadImageAsync(artist.banner).then((image) => {
-        //let stateArtist = this.state.artists[artist.id]
-        //if (stateArtist) {
-        //  stateArtist.banner = artist.banner
-        //}
-      })
-
-      console.log('load avatar')
-      this.loadImageAsync(artist.avatar)
-      console.log('after load avatar')
       artists.push(artist)
     }
     artists.sort((a,b) => a.label > b.label ? 1 : -1)
@@ -300,11 +289,23 @@ const store = {
         label: artists[0].label
       }
     }
-
-    let mykey = this.state.my_artist_key
+    
     for (let artist of artists) {
-      if (mykey === artist.key) this.state.is_artist = true
+      if (this.state.my_artist_key === artist.key) {
+        this.state.is_artist = true
+      }
+
+      let oldArtist = this.state.artists[artist.key]
       this.state.artists[artist.key] = artist
+
+      if (oldArtist) {
+        if (!this.copyImage(this.state.artists[artist.key].banner, oldArtist.banner)) {
+          this.loadImageAsync(this.state.artists[artist.key].banner)
+        }
+        if (!this.copyImage(this.state.artists[artist.key].avatar, oldArtist.avatar)) {
+          this.loadImageAsync(this.state.artists[artist.key].avatar)
+        }
+      }
     } 
 
     this.state.artists_count = artists.length
@@ -919,6 +920,19 @@ const store = {
     }
   },
 
+  copyImage(newimg, oldimg) {
+    if (!newimg || !oldimg) {
+      return false
+    }
+
+    if (oldimg.ipfs_hash != newimg.ipfs_hash) {
+      return false
+    }
+
+    newimg.object = oldimg.object
+    return !!newimg.object
+  },
+
   async loadImageAsync (image, context) {
     if (!image) {
       return
@@ -932,6 +946,7 @@ const store = {
       let u8arr = new Uint8Array(res.data)
       let blob = new Blob([u8arr], {type: image.mime_type})
       // TODO: revoke object
+      console.log('URLOBJ for', image.ipfs_hash)
       image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
       
       return image

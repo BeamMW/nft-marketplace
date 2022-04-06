@@ -213,7 +213,6 @@ export default {
     onUploadBanner(e) {
       this.loadImage(e, (data, size) => {
         this.banner = {data, size}
-        console.log('called',this.banner)
       })
     },
 

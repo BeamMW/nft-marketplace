@@ -46,29 +46,29 @@
     }
   }
 
-  .input {
-    font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.08)
-    border: none
-    outline-width: 0
-    font-size: 14px
-    color: white
-    border-radius: 10px
-    padding: 12px 8px
-    width: 100%
+    .input {
+      font-family: 'SFProDisplay', sans-serif
+      background-color: rgba(255, 255, 255, 0.08)
+      border: none
+      outline-width: 0
+      font-size: 14px
+      color: white
+      border-radius: 10px
+      padding: 12px 8px
+      width: 100%
 
-    &:read-only {
-      background-color: rgba(255, 255, 255, 0.03)
-      color: rgba(255, 255, 255, 0.3)
-    }
+      &:read-only {
+        background-color: rgba(255, 255, 255, 0.03)
+        color: rgba(255, 255, 255, 0.3)
+      }
 
-    &:not(.error):not(:read-only):focus {
-      background-color: rgba(255, 255, 255, 0.12)
-    }
+      &:not(.error):not(:read-only):focus {
+        background-color: rgba(255, 255, 255, 0.12)
+      }
 
-    &.error:focus {
-      background-color: rgba(255, 98, 92, 0.12)
-    }
+      &.error:focus {
+        background-color: rgba(255, 98, 92, 0.12)
+      }
 
     &.error {
       color: rgba(255, 98, 92, 1)

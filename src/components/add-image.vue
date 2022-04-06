@@ -43,6 +43,7 @@
       right: 20px
       border-radius: 9999px
       padding: 7px 7px 3px 7px
+      cursor: pointer
     }
 
     .image {
@@ -140,8 +141,8 @@ export default {
   },
   methods: {
     onRemove () {
-      this.$emit('update:image', undefined)
       this.$refs.image.value = ''
+      this.$emit('update:image', null)
     },
     onUpload (e) {
       let file = e.target.files[0]
