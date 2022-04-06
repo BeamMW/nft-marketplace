@@ -495,7 +495,7 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
     return true;
 }
 
-bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindAll, bool bMustFind, uint32_t print_artworks)
+bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindAll, bool bMustFind, uint32_t print_artworks, uint32_t count)
 {
     Gallery::Collection::SecondStageKey ssck;
     if (!bFindAll) {
@@ -521,11 +521,15 @@ bool PrintCollections(const ContractID& cid, uint32_t id, Height h0, bool bFindA
 
     Env::VarReader r(k0, k1);
     MyCollection c;
+    int cur_cnt = 0;
     if (bFindAll) {
         Env::DocArray gr0("collections");
 
         while (true) {
             if (!c.ReadNext(r, k0))
+                break;
+
+            if (count && cur_cnt++ > count)
                 break;
 
             Env::DocGroup gr1("");
@@ -701,7 +705,7 @@ ON_METHOD(manager, view_collections)
 
     if (count) {
         if (h0) {
-            // to be done
+            PrintCollections(cid, 0, h0, true, false, print_artworks, count);
         } else {
             Env::Key_T<Gallery::Collection::FirstStageKey> k0, k1;
             _POD_(k0.m_Prefix.m_Cid) = cid;
@@ -728,7 +732,7 @@ ON_METHOD(manager, view_collections)
                     if (!exists) continue;
                 }
                 if (cur_idx >= idx0) {
-                    PrintCollections(cid, k0.m_KeyInContract.id, 0, false, false, print_artworks);
+                    PrintCollections(cid, k0.m_KeyInContract.id, 0, false, false, print_artworks, 0);
                     ++cur_cnt;
                 }
                 ++cur_idx;
@@ -748,10 +752,10 @@ ON_METHOD(manager, view_collections)
                 }
             }
             cur_pos = next_pos + 1;
-            PrintCollections(cid, id, 0, false, false, print_artworks);
+            PrintCollections(cid, id, 0, false, false, print_artworks, 0);
         }
     } else {
-        PrintCollections(cid, 0, h0, true, false, print_artworks);
+        PrintCollections(cid, 0, h0, true, false, print_artworks, 0);
     }
 }
 
