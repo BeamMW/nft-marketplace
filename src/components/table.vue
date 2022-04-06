@@ -1,20 +1,23 @@
 <template>
-  <hdr/>
-  <h1 class="title">nft traiding history</h1>
+  <hdr title=""/>
+  <!-- title to props -->
+  <h1 class="title">nft traiding history</h1> 
   <table class="table">
     <thead>
       <tr>
-        <th v-for="header in headers" :key="header">
-          {{ header }}
+        <th v-for="(header, cellIdx) in headers" :key="cellIdx + header">
+          <img src="~assets/icon-beam.svg">
+          <span>{{ header_cell(header, cellIdx, 1) }}</span>
+          <!-- <span>{{ header }}</span> -->
           <img src="~assets/sort-arrows.svg">
         </th>
       </tr>
     </thead>
 
     <tbody>
-      <tr v-for="item in mock_data" :key="item">
-        <td v-for="value in item" :key="value">
-          {{ value }}
+      <tr v-for="(item, rowIdx) in mock_data" :key="rowIdx + item">
+        <td v-for="(value, cellIdx) in item" :key="rowIdx + cellIdx + value">
+          <span>{{ value }}</span>
         </td>
       </tr>
     </tbody>
@@ -48,6 +51,7 @@ table {
 }
 
 .table {
+  width: 100%
   border-radius: 10px 10px 0 0
   font-size: 14px
   font-family: 'SFProDisplay', sans-serif
@@ -96,12 +100,12 @@ import DATA from '../utils/mock-data.js'
 
 export default {
   components: {
-    hdr
+    hdr,
   },
   
   data() {
     return {
-      headers: ['Author', 'Book', 'Year', 'sadfas', 'asdfasdf', 'asdfasdfasd', 'asdfasdf', 'asdfasdf', 'asdfasdf']
+      headers: ['Author', 'Book', 'Year']
     }
   },
   // props: {
@@ -121,7 +125,18 @@ export default {
     mock_data() {
       return DATA
     }
+  },
+
+  methods: {
+    header_cell(value, idx, param) {
+      if (idx === param) {
+        return 'TEST'
+      }
+
+      return value
+    }
   }
+
 }
 </script>
 
