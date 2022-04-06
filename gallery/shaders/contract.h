@@ -63,19 +63,6 @@ namespace Gallery
         uint32_t artwork_id;
     };
 
-    template <class ID>
-    struct GalleryFirstStageKey {
-        using Id = ID;
-        Id id;
-    };
-
-    template <class ID>
-    struct GallerySecondStageKey {
-        using Id = ID;
-        Id id;
-        Height h_updated;
-    };
-
     template <class T, class ID>
     struct GalleryObject {
         using Id = ID;
@@ -132,12 +119,15 @@ namespace Gallery
     };
 
     struct Artist : public GalleryObject<Artist, PubKey> {
-        struct FirstStageKey : public GalleryFirstStageKey<Artist::Id> {
+        struct FirstStageKey {
             uint8_t m_Tag = Tags::s_ArtistHeight;
+            Id id;
         };
 
-        struct SecondStageKey : public GallerySecondStageKey<Artist::Id> {
+        struct SecondStageKey {
             uint8_t m_Tag = Tags::s_Artist;
+            Id id;
+            Height h_updated;
         };
 
         Height m_hRegistered;
@@ -152,12 +142,15 @@ namespace Gallery
     };
 
     struct Collection : public GalleryObject<Collection, uint32_t> {
-        struct FirstStageKey : public GalleryFirstStageKey<Collection::Id> {
+        struct FirstStageKey {
             uint8_t m_Tag = Tags::s_CollectionHeight;
+            Id id;
         };
 
-        struct SecondStageKey : public GallerySecondStageKey<Collection::Id> {
+        struct SecondStageKey {
             uint8_t m_Tag = Tags::s_Collection;
+            Id id;
+            Height h_updated;
         };
 
         bool is_approved;
@@ -183,12 +176,15 @@ namespace Gallery
         // By this key masterpiece's height with specified ID is accessed 
         // ID ---FistStageKey---> h_updated ---SecondStageKey---> Artwork
         // This is done in order to be able to search for masterpieces updated since specified block
-        struct FirstStageKey : public GalleryFirstStageKey<Artwork::Id> {
+        struct FirstStageKey {
             uint8_t m_Tag = Tags::s_ArtworkHeight;
+            Id id;
         };
 
-        struct SecondStageKey : public GallerySecondStageKey<Artwork::Id> {
+        struct SecondStageKey {
             uint8_t m_Tag = Tags::s_Artwork;
+            Id id;
+            Height h_updated;
         };
 
         PubKey m_pkAuthor;
