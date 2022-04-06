@@ -34,7 +34,11 @@
 
   &.disabled {
     opacity: 0.6
-    cursor: auto !important
+    cursor: auto
+
+    & :slotted(img) {
+      opacity: 0.35
+    }
   }
 
   &:focus {

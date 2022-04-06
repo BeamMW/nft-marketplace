@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="input-container">
     <label v-if="label" class="label" :class="{'error': !valid}">
       {{ label }}
     </label>
@@ -10,6 +10,7 @@
              :style="style"
              :maxlength="max_length"
              :class="{'input': true, 'error': !valid}"
+             :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
@@ -17,7 +18,7 @@
 </template>
 
 <style scoped lang="stylus">
-.container {
+.input-container {
   box-sizing: border-box
 
   .label {
@@ -47,7 +48,7 @@
 
   .input {
     font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.05)
+    background-color: rgba(255, 255, 255, 0.08)
     border: none
     outline-width: 0
     font-size: 14px
@@ -56,8 +57,13 @@
     padding: 12px 8px
     width: 100%
 
-    &:not(.error):focus {
-      background-color: rgba(255, 255, 255, 0.1)
+    &:read-only {
+      background-color: rgba(255, 255, 255, 0.03)
+      color: rgba(255, 255, 255, 0.3)
+    }
+
+    &:not(.error):not(:read-only):focus {
+      background-color: rgba(255, 255, 255, 0.12)
     }
 
     &.error:focus {
@@ -88,6 +94,11 @@ export default {
     label: {
       type: String,
       default: '',
+      required: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
       required: false
     },
     placeholder: {

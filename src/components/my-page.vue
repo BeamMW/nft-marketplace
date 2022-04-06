@@ -7,7 +7,7 @@
            :width="width" 
            padding="0px" 
            radius="10px" 
-           @click="$store.toEditArtist"
+           @click="onEditArtist"
       >
         <img src="~assets/icon-pencil.svg">
       </btn>
@@ -18,7 +18,7 @@
         <img src="~assets/icon-key.svg">
       </btn>
 
-      <btn v-if="!is_artist" text="become an artist" color="green" height="34px" @click="$store.toBecomeArtist">
+      <btn v-if="!is_artist" text="become an artist" color="green" height="34px" @click="onBecomeArtist">
         <img src="~assets/add-user.svg"/>
       </btn>
     </div>
@@ -76,6 +76,12 @@ export default {
     },
     onBalanceClick() {
       this.$store.toBalance()
+    },
+    onEditArtist() {
+      this.$store.toEditArtist()
+    },
+    onBecomeArtist() {
+      this.$store.toBecomeArtist()
     }
   },
 }

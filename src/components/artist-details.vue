@@ -1,17 +1,27 @@
 <template>
   <div class="container">
-    <pageTitle title="Become an Artist"/>
-    <p class="description">
-      To become a publisher you need to set up a username.<br>
-      Registration will allow you to publish and manage your NFTs.
-    </p>
+    <template v-if="edit_self">
+      <pageTitle title="Edit your Artist Info"/>
+      <p class="description">
+        After your artist information is changed it would not be visible<br>
+        until reviewed by moderator. NFTs would still appear in gallery.<br>
+      </p>
+    </template>
+    <template v-else>
+      <pageTitle title="Become an Artist"/>
+      <p class="description">
+        To become a publisher you need to set up a username.<br>
+        Registration will allow you to publish and manage your NFTs.
+      </p>
+    </template>
     <div class="fields">
       <div class="col-first">
-        <inputField v-model="name"
+        <inputField v-model="label"
                     label="Artist Name*"
-                    :valid="name_valid"
+                    :valid="label_valid"
                     :max_length="100"
-                    style="margin-bottom:30px;margin-top:0"
+                    :readonly="edit_self || in_set_artist"
+                    style="margin-bottom:60px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -19,6 +29,7 @@
                     img="glob"
                     :max_length="250"
                     :valid="website_valid"
+                    :readonly="in_set_artist"
         />
         <inputField v-model="twitter"
                     label="Twitter"
@@ -26,6 +37,7 @@
                     img="twitter"
                     :max_length="16"
                     :valid="twitter_valid"
+                    :readonly="in_set_artist"
         />
         <inputField v-model="instagram"
                     label="Instagram"
@@ -33,6 +45,7 @@
                     img="instagram"
                     :max_length="31"
                     :valid="instagram_valid"
+                    :readonly="in_set_artist"
         />
       </div>
       <div class="col-second">
@@ -40,32 +53,22 @@
                        label="About me"
                        :valid="about_valid"
                        :max_length="150"
+                       :readonly="in_set_artist"
         />
-        <div class="banner" :style="bannerStyles">
-          <div v-if="banner" class="remove-container">
-            <img v-if="banner" src="~/assets/remove.svg" alt="remove banner" class="remove" @click="onRemoveBanner"/>
-          </div>
-          <img v-if="banner" :src="banner.data" alt="avatar" class="image" :class="{'error': !banner_valid}"/>
-          <label v-if="!banner" class="text" for="banner">Add an artist banner</label>
-          <input id="banner"
-                 ref="banner"
-                 type="file"
-                 accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-                 class="files"
-                 @change="onUploadBanner"
-          />
-        </div>
-        <div v-if="!banner_valid" class="error_msg">
-          <p class="error">image cannot be larger than 250kb</p>
-        </div>
+        <addImage v-model:image="banner"
+                  title="Add an artist banner"
+                  accept="image/jpeg, image/png, image/svg+xml"      
+                  :readonly="in_set_artist" 
+                  :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
+        />
         <div class="container-avatar">
-          <div class="avatar" :style="avatarStyles">
-            <div v-if="avatar" class="remove-container">
-              <img src="~/assets/remove.svg" alt="remove avatar" class="remove" @click="onRemoveAvatar"/>
+          <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
+            <div v-if="avatar" class="remove">
+              <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
-            <img v-if="avatar" :src="avatar.data" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-            <label v-if="!avatar" class="text" for="avatar">Add an artist image</label>
-            <input id="avatar"
+            <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
+            <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
+            <input v-if="!in_set_artist" id="avatar"
                    ref="avatar"
                    type="file"
                    accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
@@ -79,14 +82,20 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="actions">
-    <btn text="cancel" @click="$router.go(-1)">
-      <img src="~assets/icon-cancel.svg"/>
-    </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit" @click="onSetArtist">
-      <img src="~assets/icon-create.svg"/>
-    </btn>
+    <p v-if="in_set_artist" class="intx_text">
+      Artist info cannot be changed while artist transaction is in progress
+    </p>
+    <div class="actions">
+      <btn text="cancel" @click="$router.go(-1)">
+        <img src="~assets/icon-cancel.svg"/>
+      </btn>
+      <btn :text="edit_self ? 'update info' : 'create account'" 
+           color="blue" 
+           :disabled="!can_submit || in_set_artist" @click="onSetArtist"
+      >
+        <img src="~assets/icon-create.svg"/>
+      </btn>
+    </div>
   </div>
 </template>
 
@@ -96,7 +105,15 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 30px 0px
+      margin: 10px 0px 30px 0px
+      font-family: 'SFProDisplay', sans-serif
+    }
+
+    .intx_text {
+      font-size: 14px
+      text-align: center
+      color: #fff
+      margin: 35px 0px 0px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -107,7 +124,7 @@
       .col-first {
         flex-basis: 50%
 
-        & > * {
+        & > *:not(:last-child) {
           margin-bottom: 20px
         }
       }
@@ -116,74 +133,12 @@
         flex-basis: 50%
         margin-left: 30px
 
-        .error_msg {
-          margin-top: -18px
-        }
-
-        .banner {
-          display: flex
-          align-items: center
-          justify-content: center
-          position:relative
-          height: 135px
-          margin-top: 33px
+        & > *:not(:last-child) {
           margin-bottom: 20px
-          background-color: rgba(26, 246, 214, 0.1)
-          border-radius: 10px
-
-          .remove-container {
-            background-color: rgba(0, 0, 0, 0.7)
-            position: absolute
-            z-index: 2
-            top: 20px
-            right: 20px
-            border-radius: 9999px
-            padding: 7px 7px 3px 7px
-
-            .remove {
-              cursor: pointer
-              z-index: 3
-            }
-          }
-
-          .image {
-            width: 100%
-            height: 100%
-            object-fit: cover
-            border-radius: 10px
-            border: 1px dashed transparent
-
-            &.error {
-              filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-            }
-          }
-          
-          .files {
-            visibility:hidden
-            width: 0
-          }
-        }
-
-        .error {
-          font-size: 12px
-          font-weight: 400
-          font-style: italic
-          text-align: right
         }
 
         .container-avatar {
           display: flex
-          
-          .error_msg {
-            align-self: center
-            margin-left: 10px
-          }
-
-          .error {
-            font-style: italic
-            font-size: 12px
-            font-weight: 400
-          }
           
           .avatar {
             display: flex
@@ -194,8 +149,23 @@
             background-color: rgba(26, 246, 214, 0.1)
             border-radius: 9999px
             position: relative
+            
+            .text {
+              width: 100%
+              height: 100%
+              display: flex
+              justify-content: center
+              align-items: center
+              font-size: 14px
+              color: #1af6d6
+              cursor: pointer
+            }
 
-            .remove-container {
+            &[readonly] {
+              opacity: 0.6
+            }
+
+            .remove {
               background-color: rgba(0, 0, 0, 0.7)
               position: absolute
               left: 50%
@@ -227,29 +197,29 @@
               }
             }
           }
+
+          .error_msg {
+            align-self: center
+            margin-left: 10px
+
+            .error {
+              font-style: italic
+              font-size: 12px
+              font-weight: 400
+            }
+          }
         }
       }
     }
 
-    .text {
-      width: 100%
-      height: 100%
-      display: flex
+    .actions {
+      display:flex
       justify-content: center
-      align-items: center
-      font-size: 14px
-      color: #1af6d6
-      cursor: pointer
-    }
-  }
+      margin-top: 40px
 
-  .actions {
-    display:flex
-    justify-content: center
-    margin-top: 50px
-
-    & > *:not(:first-child) {
-      margin-left: 30px
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
     }
   }
 </style>
@@ -259,6 +229,7 @@ import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
+import addImage from './add-image.vue'
 import {common} from '../utils/consts.js'
 
 export default {
@@ -266,33 +237,44 @@ export default {
     inputField, 
     textAreaField, 
     pageTitle,
+    addImage,
     btn
   },
+
+  props: {
+    id: {
+      type: String,
+      required: false,
+      default: ''
+    }
+  },
+
   data () {
     return {
-      name: '',
-      website: '',
-      twitter: '',
-      instagram: '',
-      about: '',
-      banner: undefined,
-      avatar: undefined
+      label_: '',
+      website_: '',
+      twitter_: '',
+      instagram_: '',
+      about_: '',
+      banner_: undefined,
+      avatar_: undefined
     }
   },
 
   computed: {
+    in_set_artist() {
+      return this.$state.set_artist_tx.length > 0
+    },
+    edit_self () {
+      return !!(this.id && this.id.length && this.id === this.$state.my_artist_key)
+    },
     avatarStyles() {
       return {
-        'border' :  this.avatar ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'border' :  this.avatar ? '1px dashed transparent' : (this.in_set_artist ? '1px dashed rgba(26, 246, 214, 0.7)' : '1px dashed #1AF6D6'),
       }
     },
-    bannerStyles() {
-      return {
-        'border' :  this.banner ? '1px dashed transparent' : '1px dashed #1AF6D6',
-      }
-    },
-    name_valid() {
-      let value = this.name
+    label_valid() {
+      let value = this.label
       return !value || value.length <= 100
     },
     website_valid() {
@@ -322,65 +304,136 @@ export default {
       return !value || value.length <= 150
     },
     banner_valid() {
-      return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
+      return this.image_valid(this.banner)
     },
     avatar_valid() {
-      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
+      return this.image_valid(this.avatar)
     },
     can_submit () {
-      return this.name && this.name_valid &&
+      return this.label && this.label_valid &&
              this.website_valid &&
              this.twitter_valid &&
              this.instagram_valid &&
              this.about_valid &&
              this.banner_valid &&
              this.avatar_valid
+    },
+    artist () {
+      return this.id ? this.$state.artists[this.id] : undefined
+    },
+    label: {
+      get () {
+        return this.label_ || this.artist.label
+      },
+      set (val) {
+        this.label_ = val
+      }
+    },
+    website: {
+      get () {
+        return this.website_ || this.artist.website
+      },
+      set (val) {
+        this.website_ = val
+      }
+    },
+    twitter: {
+      get () {
+        return this.twitter_ || this.artist.twitter
+      },
+      set (val) {
+        this.twitter_ = val
+      }
+    },
+    instagram: {
+      get () {
+        return this.instagram_ || this.artist.instagram
+      },
+      set (val) {
+        this.instagram_ = val
+      }
+    },
+    about: {
+      get () {
+        console.log('about get', JSON.stringify(this.artist))
+        return this.about_ || this.artist.about
+      },
+      set (val) {
+        this.about_ = val
+      }
+    },
+    banner: {
+      get () {
+        if (this.banner_ === null) {
+          return undefined
+        }
+        return this.banner_ || this.artist.banner
+      },
+      set (val) {
+        this.banner_ = val
+      }
+    },
+    avatar: {
+      get () {
+        if (this.avatar_ === null) {
+          return undefined
+        }
+        return this.avatar_ || this.artist.avatar
+      },
+      set (val) {
+        this.avatar_ = val
+      }
     }
   },
 
   methods: {    
+    image_valid (image) {
+      if (!image) return true
+
+      if (image.file) {
+        return image.file.size <= common.MAX_IMAGE_SIZE
+      }
+
+      return image.ipfs_hash
+    },
+
     loadImage(e, cback) {
       let file = e.target.files[0]
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
-        cback(e.target.result, file.size)
+        cback(e.target.result, file)
       }
     },
 
-    onUploadBanner(e) {
-      this.loadImage(e, (data, size) => {
-        this.banner = {data, size}
-      })
-    },
-
     onUploadAvatar(e) {
-      this.loadImage(e, (data, size) => {
-        this.avatar = {data, size}
+      this.loadImage(e, (object, file) => {
+        this.avatar_ = {object, file}
       })
-    },
-
-    onRemoveBanner() {
-      this.banner = undefined
-      this.$refs.banner.value = ''
     },
     
     onRemoveAvatar() {
-      this.avatar = undefined
+      this.avatar_ = null
       this.$refs.avatar.value = ''
     },
 
-    onSetArtist() {
-      this.$store.setArtist(this.name,  {
+    async onSetArtist() {
+      let data = {
         website:   this.website,
         twitter:   this.twitter,
         instagram: this.instagram,
-        about:     this.about,
-        avatar:    '',
-        banner:    ''
-      }, (res) => {
-        alert('Artist created: ' + JSON.stringify(res))
-      })
+        about:     this.about
+      }
+
+      if (this.avatar) {
+        data['avatar'] = this.avatar.file
+      }
+
+      if (this.banner) {
+        data['banner'] = this.banner.file
+      }
+
+      await this.$store.setArtist(this.label, data)
     }
   }
 }

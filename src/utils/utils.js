@@ -189,6 +189,15 @@ export default class Utils {
     return newAPI
   }
 
+  static async callApiAsync(method, params) {    
+    return new Promise((resolve, reject) => {
+      Utils.callApi(method, params, (err, res, full) => {
+        if (err) return reject(err)
+        return resolve({res, full})
+      })
+    })
+  }
+
   static callApi(method, params, cback) {
     let callid = ['call', CallID++].join('-')
     Calls[callid] = cback
@@ -218,14 +227,33 @@ export default class Utils {
     }
   }
 
+  static async invokeContractAsync(args, bytes) {
+    return new Promise((resolve, reject) => {
+      Utils.invokeContract(args, (err, res, full) => {
+        if (err) return reject(err)
+        return resolve({res, full})
+      },
+      bytes)
+    })
+  }
+
   static invokeContract(args, cback, bytes) {
     let params = {
       'create_tx': false
     }
 
     if (args) {
+      let assign = args
+
+      if (typeof args === 'object') {
+        assign = ''
+        for (let key in args) {
+          assign += (assign ? ',' : '') + key + '=' + args[key] 
+        }
+      }
+
       params = Object.assign({
-        'args': args
+        'args': assign
       }, params)
     }
 
@@ -240,16 +268,10 @@ export default class Utils {
 
   static handleApiResult (json) {
     let answer = undefined
+    
     try
     {
       answer = JSON.parse(json)
-           
-      if (answer.result && answer.result.output) {
-        //console.log('Output: ', JSON.parse(answer.result.output));
-      } else {
-        //console.log('Api result: ', answer);
-      }
-            
       const id = answer.id
       const cback = Calls[id] || APIResCB
       delete Calls[id]
@@ -721,12 +743,12 @@ export default class Utils {
 
   static ensureField(obj, name, type) {
     if (obj[name] == undefined) {
-      throw `No '${name}' field on object`
+      throw new Error(`No '${name}' field on object`)
     }
 
     if (type == 'array') {
       if (!Array.isArray(obj[name])) {
-        throw `${name} is expected to be an array`
+        throw new Error(`${name} is expected to be an array`)
       }
       return
     }
@@ -734,7 +756,7 @@ export default class Utils {
     if (type) {
       let tof = typeof obj[name]
       if (tof !== type) {
-        throw `Bad type '${tof}' for '${name}'. '${type}' expected.`
+        throw new Error(`Bad type '${tof}' for '${name}'. '${type}' expected.`)
       }
       return
     }
