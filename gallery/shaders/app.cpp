@@ -26,6 +26,9 @@
 #define Gallery_manager_view_collections(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
+    macro(PubKey, artist_id) \
     macro(uint32_t, print_artworks) \
 
 //#define Gallery_manager_manage_artist(macro) \
@@ -643,10 +646,16 @@ ON_METHOD(manager, view_artists)
             Env::VarReader r(k0, k1);
             Gallery::Artist::SecondStageKey ssak;
             Env::DocArray gr0("artists");
-            for (int i = 0; i < count; ++i) {
+            int cur_idx = 0, cur_cnt = 0;
+            while (cur_cnt < count) {
                 if (!r.MoveNext_T(k0, ssak))
                     break;
-                PrintArtists(cid, k0.m_KeyInContract.id, 0, false, false);
+
+                if (cur_idx >= idx0) {
+                    PrintArtists(cid, k0.m_KeyInContract.id, 0, false, false);
+                    ++cur_cnt;
+                }
+                ++cur_idx;
             }
         }
     } else if (buf_len) {
@@ -682,11 +691,44 @@ ON_METHOD(manager, view_collections)
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(PubKey)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len > 0)
+    if (buf_len)
         buf[buf_len - 1] = ';';
 
-    if (!buf_len) {
-        PrintCollections(cid, 0, h0, true, false, print_artworks);
+    if (count) {
+        if (h0) {
+            // to be done
+        } else {
+            Env::Key_T<Gallery::Collection::FirstStageKey> k0, k1;
+            _POD_(k0.m_Prefix.m_Cid) = cid;
+            _POD_(k1.m_Prefix.m_Cid) = cid;
+
+            k0.m_KeyInContract.id = 0;
+            k1.m_KeyInContract.id = static_cast<Gallery::Collection::Id>(-1);
+
+            Env::VarReader r(k0, k1);
+            Gallery::Collection::SecondStageKey ssck;
+            Env::DocArray gr0("collections");
+            int cur_idx = 0, cur_cnt = 0;
+            while (cur_cnt < count) {
+                if (!r.MoveNext_T(k0, ssck))
+                    break;
+
+                if (!_POD_(artist_id).IsZero()) {
+                    Env::Key_T<Gallery::ArtistCollectionKey> ack;
+                    ack.m_Prefix.m_Cid = cid;
+                    ack.m_KeyInContract.collection_id = k0.m_KeyInContract.id;
+                    ack.m_KeyInContract.pkArtist = artist_id;
+                    bool exists;
+                    Env::VarReader::Read_T(ack, exists);
+                    if (!exists) continue;
+                }
+                if (cur_idx >= idx0) {
+                    PrintCollections(cid, k0.m_KeyInContract.id, 0, false, false, print_artworks);
+                    ++cur_cnt;
+                }
+                ++cur_idx;
+            }
+        }
     } else if (buf_len) {
         std::string_view ids(buf);
         int cur_pos = 0;
@@ -703,6 +745,8 @@ ON_METHOD(manager, view_collections)
             cur_pos = next_pos + 1;
             PrintCollections(cid, id, 0, false, false, print_artworks);
         }
+    } else {
+        PrintCollections(cid, 0, h0, true, false, print_artworks);
     }
 }
 
