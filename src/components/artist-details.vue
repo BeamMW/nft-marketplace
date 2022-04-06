@@ -320,7 +320,7 @@ export default {
     },
     label: {
       get () {
-        return this.label_ || this.artist.label
+        return this.label_ || (this.artist || {}).label
       },
       set (val) {
         this.label_ = val
@@ -328,7 +328,7 @@ export default {
     },
     website: {
       get () {
-        return this.website_ || this.artist.website
+        return this.website_ || (this.artist || {}).website
       },
       set (val) {
         this.website_ = val
@@ -336,7 +336,7 @@ export default {
     },
     twitter: {
       get () {
-        return this.twitter_ || this.artist.twitter
+        return this.twitter_ || (this.artist || {}).twitter
       },
       set (val) {
         this.twitter_ = val
@@ -344,7 +344,7 @@ export default {
     },
     instagram: {
       get () {
-        return this.instagram_ || this.artist.instagram
+        return this.instagram_ || (this.artist || {}).instagram
       },
       set (val) {
         this.instagram_ = val
@@ -352,8 +352,7 @@ export default {
     },
     about: {
       get () {
-        console.log('about get for', JSON.stringify(this.artist))
-        return this.about_ || this.artist.about
+        return this.about_ || (this.artist || {}).about
       },
       set (val) {
         this.about_ = val
@@ -364,7 +363,7 @@ export default {
         if (this.banner_ === null) {
           return undefined
         }
-        return this.banner_ || this.artist.banner
+        return this.banner_ || (this.artist || {}).banner
       },
       set (val) {
         this.banner_ = val
@@ -375,7 +374,7 @@ export default {
         if (this.avatar_ === null) {
           return undefined
         }
-        return this.avatar_ || this.artist.avatar
+        return this.avatar_ || (this.artist || {}).avatar
       },
       set (val) {
         this.avatar_ = val

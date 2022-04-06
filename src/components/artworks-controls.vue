@@ -159,16 +159,16 @@ export default {
         result.push({name: 'Everyone', key: 0})
         for(let aid in this.artists) {
           let artist = this.artists[aid]
-          result.push({name: artist.label, key: artist.key})
+          result.push({name: artist.label, id: artist.id})
         } 
       }
       return result
     },
     active_filter_by_artist () {
-      let key = this.$state.filter_by_artist
+      let id = this.$state.filter_by_artist
       let artists = this.artist_options
       for (let idx = 0; idx <artists.length; ++idx) {
-        if (key == artists[idx].key) {
+        if (id == artists[idx].id) {
           return idx
         }
       }
@@ -194,7 +194,7 @@ export default {
       this.scrollToTop()
     },
     onAuthor(opt) {
-      this.$store.setFilterByArtist(opt.key)
+      this.$store.setFilterByArtist(opt.id)
       this.scrollToTop()
     },
     scrollToTop(){
