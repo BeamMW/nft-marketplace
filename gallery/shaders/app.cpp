@@ -437,7 +437,7 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label, b
     return false;
 }
 
-bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool bFindAll, bool bMustFind)
+bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool bFindAll, bool bMustFind, uint32_t count)
 {
     Gallery::Artist::SecondStageKey ssak;
     if (!bFindAll) {
@@ -463,11 +463,15 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
 
     Env::VarReader r(k0, k1);
     MyArtist a;
+    int cur_cnt = 0;
     if (bFindAll) {
         Env::DocArray gr0("artists");
 
         while (true) {
             if (!a.ReadNext(r, k0))
+                break;
+            
+            if (count && cur_cnt++ > count)
                 break;
 
             Env::DocGroup gr1("");
@@ -481,6 +485,7 @@ bool PrintArtists(const ContractID& cid, const PubKey& pkArtist, Height h0, bool
                 OnError("not found");
             return false;
         }
+
         Env::DocGroup gr1("");
         Env::DocAddBlob_T("id", k0.m_KeyInContract.id);
         Env::DocAddNum32("updated", Utils::FromBE(k0.m_KeyInContract.h_updated));
@@ -634,7 +639,7 @@ ON_METHOD(manager, view_artists)
 
     if (count) {
         if (h0) {
-            // to be done
+            PrintArtists(cid, PubKey{}, h0, true, false, count);
         } else {
             Env::Key_T<Gallery::Artist::FirstStageKey> k0, k1;
             _POD_(k0.m_Prefix.m_Cid) = cid;
@@ -652,7 +657,7 @@ ON_METHOD(manager, view_artists)
                     break;
 
                 if (cur_idx >= idx0) {
-                    PrintArtists(cid, k0.m_KeyInContract.id, 0, false, false);
+                    PrintArtists(cid, k0.m_KeyInContract.id, 0, false, false, count);
                     ++cur_cnt;
                 }
                 ++cur_idx;
@@ -679,10 +684,10 @@ ON_METHOD(manager, view_artists)
                 }
             }
             cur_pos = next_pos + 1;
-            PrintArtists(cid, blob.pk, 0, false, false);
+            PrintArtists(cid, blob.pk, 0, false, false, 0);
         }
     } else {
-        PrintArtists(cid, PubKey{}, h0, true, false);
+        PrintArtists(cid, PubKey{}, h0, true, false, 0);
     }
 }
 
@@ -1169,13 +1174,13 @@ ON_METHOD(artist, view)
     PubKey pk;
     km.Get(pk);
 
-    if (PrintArtists(cid, pk, 0, false, false))
+    if (PrintArtists(cid, pk, 0, false, false, 0))
         return;
 
     // try workaround
     km.SetCid();
     km.Get(pk);
-    PrintArtists(cid, pk, 0, false, true);
+    PrintArtists(cid, pk, 0, false, true, 0);
 
 }
 
