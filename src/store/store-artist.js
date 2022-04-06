@@ -3,6 +3,7 @@ import {versions} from './store-consts.js'
 
 export default class {
   static toContract (label, data) {
+    alert(JSON.stringify(data))
     return {
       // TODO: remove test code
       label: label == '1' ? label : formats.toContract(label),

@@ -423,11 +423,27 @@ export default {
       }
 
       if (this.avatar) {
-        data['avatar'] = this.avatar.file
+        if (this.avatar.file) {
+          data['avatar'] = this.avatar.file
+        } 
+        else {
+          data['avatar'] = {
+            ipfs_hash: this.avatar.ipfs_hash,
+            mime_type: this.avatar.mime_type
+          }
+        }
       }
 
       if (this.banner) {
-        data['banner'] = this.banner.file
+        if (this.banner.file) {
+          data['banner'] = this.banner.file
+        } 
+        else {
+          data['banner'] = {
+            ipfs_hash: this.banner.ipfs_hash,
+            mime_type: this.banner.mime_type
+          }
+        }
       }
 
       await this.$store.setArtist(this.label, data)
