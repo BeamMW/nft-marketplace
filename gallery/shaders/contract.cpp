@@ -131,7 +131,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             } c;
 
             MyState s;
-            c.id = ++s.collections_stats.free_id;
+            Gallery::Collection::Id c_id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
             s.artists_stats.total++;
             s.Save();
@@ -149,10 +149,10 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
-            ack.collection_id = c.id;
+            ack.collection_id = c_id;
             Env::SaveVar_T(ack, true);
 
-            c.Save(c.id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+            c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
         }
 
         a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
@@ -191,6 +191,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
         char m_szLabelData[s_TotalMaxLen];
     } c;
 
+    Gallery::Collection::Id c_id;
     switch (r.req) {
     case CollectionReqType::SET: {
         bool collection_exists = r.collection_id > 0 && c.Exists(r.collection_id);
@@ -218,7 +219,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             Env::Halt_if(!r.m_LabelLen); 
 
             MyState s;
-            c.id = ++s.collections_stats.free_id;
+            c_id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
             s.Save();
 
@@ -235,10 +236,10 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
-            ack.collection_id = c.id;
+            ack.collection_id = c_id;
             Env::SaveVar_T(ack, true);
         }
-        c.Save(c.id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+        c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
         Env::AddSig(r.m_pkArtist);
         break;
@@ -290,6 +291,14 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     cak.collection_id = r.collection_id;
     cak.artwork_id = m_id;
     Env::SaveVar_T(cak, true);
+
+    struct CollectionPlus : public Gallery::Collection {
+        char m_szLabelData[s_TotalMaxLen];
+    } c;
+
+    c.TakeOut(r.collection_id);
+    c.artworks_num++;
+    c.Save(r.collection_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
     uint32_t nData = r.data_len;

@@ -11,6 +11,8 @@
 #define Gallery_manager_view_artists(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
 
 #define Gallery_manager_view_artists_stats(macro) \
     macro(ContractID, cid) \
@@ -235,6 +237,7 @@ ON_METHOD(manager, view)
         Gallery::s_SID_24,
         Gallery::s_SID_25,
         Gallery::s_SID_26,
+        Gallery::s_SID_27,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -349,18 +352,17 @@ struct MyCollection
     {
         // DocAddText prints char[] until it meets \0 symbol, but
         // m_szLabelData contains label + data without \0 symbol between them
-        /*
         char label[label_len + 1];
         char data[data_len + 1];
         label[label_len] = 0;
         data[data_len] = 0;
         Env::Memcpy(label, m_szLabelData, label_len);
         Env::Memcpy(data, m_szLabelData + label_len, data_len);
-        */
 
-        Env::DocAddText("label", m_szLabelData);
-        //Env::DocAddText("data", data);
+        Env::DocAddText("label", label);
+        Env::DocAddText("data", data);
         Env::DocAddBlob_T("author", m_pkAuthor);
+        Env::DocAddNum32("artworks_count", artworks_num);
         Env::DocAddNum32("approved", is_approved);
         Env::DocAddNum32("default", is_default);
     }
@@ -624,10 +626,29 @@ ON_METHOD(manager, view_artists)
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(PubKey)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    buf[buf_len - 1] = ';';
+    if (buf_len)
+        buf[buf_len - 1] = ';';
 
-    if (!buf_len) {
-        PrintArtists(cid, PubKey{}, h0, true, false);
+    if (count) {
+        if (h0) {
+            // to be done
+        } else {
+            Env::Key_T<Gallery::Artist::FirstStageKey> k0, k1;
+            _POD_(k0.m_Prefix.m_Cid) = cid;
+            _POD_(k1.m_Prefix.m_Cid) = cid;
+
+            _POD_(k0.m_KeyInContract.id).SetZero();
+            _POD_(k1.m_KeyInContract.id).SetObject(0xff);
+
+            Env::VarReader r(k0, k1);
+            Gallery::Artist::SecondStageKey ssak;
+            Env::DocArray gr0("artists");
+            for (int i = 0; i < count; ++i) {
+                if (!r.MoveNext_T(k0, ssak))
+                    break;
+                PrintArtists(cid, k0.m_KeyInContract.id, 0, false, false);
+            }
+        }
     } else if (buf_len) {
         std::string_view ids(buf);
         int cur_pos = 0;
@@ -651,6 +672,8 @@ ON_METHOD(manager, view_artists)
             cur_pos = next_pos + 1;
             PrintArtists(cid, blob.pk, 0, false, false);
         }
+    } else {
+        PrintArtists(cid, PubKey{}, h0, true, false);
     }
 }
 
