@@ -41,12 +41,10 @@
                        :max_length="150"
         />
         <div class="banner">
-          <addImage title="Add Gallery image"
-                    accept="image/jpeg, image/png, image/svg+xml" 
-                    :banner="banner"
-                    :valid="banner_valid"
-                    @remove="onRemoveBanner"
-                    @upload="onUploadBanner"
+          <addImage v-model:image="banner"
+                    title="Add Gallery image" 
+                    accept="image/jpeg, image/png, image/svg+xml"
+                    :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
           />
         </div>
       </div>
@@ -153,7 +151,6 @@ export default {
     },
 
     website_valid() {
-      console.log(validators)
       let value = this.website
       if (!value) return true
       return validators.url(value)
@@ -206,7 +203,6 @@ export default {
     onUploadBanner(e) {
       this.loadImage(e, (data, size) => {
         this.banner = {data, size}
-        console.log('called',this.banner)
       })
     },
 

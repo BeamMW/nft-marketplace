@@ -83,7 +83,14 @@
     font-style: italic
     text-align: right
     padding-right: 4px
-    color: #c55b61
+    color: #ffffff
+    position:absolute
+    transform: translate(-50%, -100%)
+    left: 50%
+    top: 32%
+    background-color: rgba(0,0,0,0.7)
+    border-radius: 9999px
+    padding: 7px
   }
 </style>
 
