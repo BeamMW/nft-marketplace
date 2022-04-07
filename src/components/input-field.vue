@@ -3,7 +3,7 @@
     <label v-if="label" class="label" :class="{'error': !valid}">
       {{ label }}
     </label>
-    <div class="input-container">
+    <div class="input">
       <img v-if="img" :src="`../assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
       <input :value="modelValue"
              :placeholder="placeholder"
@@ -13,6 +13,9 @@
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
       />
+    </div>
+    <div class="info-container">
+      <charactersLengthInfo :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
     </div>
   </div>
 </template>
@@ -33,7 +36,7 @@
     }
   }
 
-  .input-container {
+  .input {
     display: flex
 
     & > img {
@@ -85,11 +88,19 @@
       color: rgba(255, 98, 92, 0.4)
     }
   }
+  .info-container {
+    margin-top: 2px
+  }
 }
 </style>
 
 <script>
+import charactersLengthInfo from './characters-length-info.vue'
+
 export default {
+  components: {
+    charactersLengthInfo
+  },
   props: {
     label: {
       type: String,
@@ -126,6 +137,11 @@ export default {
       type: Number,
       default: 10,
       required: true
+    },
+    show_counter:{
+      type: Boolean,
+      default: true,
+      required: false
     }
   },
 
