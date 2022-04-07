@@ -9,14 +9,7 @@
               @input="$emit('update:modelValue', $event.target.value)"
     >
   </textarea>
-    <div :class="{
-      'info': true,
-      'readonly': readonly,
-    }"
-    >
-      <span class="text">{{ max_length }} characters max</span> 
-      <span v-if="show_counter">{{ modelValue.length }} / {{ max_length }} </span>
-    </div>
+    <charactersLengthInfo :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
   </div>
 </template>
 
@@ -82,8 +75,12 @@
 </style>
 
 <script>
+import charactersLengthInfo from './characters-length-info.vue'
 
 export default {
+  components: {
+    charactersLengthInfo
+  },
   props: {
     label: {
       type: String,
