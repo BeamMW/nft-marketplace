@@ -108,7 +108,7 @@
 <script>
 import price from './artwork-price.vue'
 import preview from './image-preview.vue'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {

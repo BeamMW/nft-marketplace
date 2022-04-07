@@ -94,7 +94,7 @@ import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
 import artworkPriceModal from './price-dialog.vue'
 import amount from './amount.vue'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {

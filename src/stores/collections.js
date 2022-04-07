@@ -1,11 +1,12 @@
 import {reactive} from 'vue'
 
-class StoreCollections {
+class CollectionsStore {
   constructor () {
     this.reset()
   }
 
-  reset () {
+  reset (global) {
+    this._global = global
     this._state = reactive({
       total: 0
     })
@@ -23,5 +24,5 @@ class StoreCollections {
   }
 }
 
-let collectionsStore = new StoreCollections()
+let collectionsStore = new CollectionsStore()
 export default collectionsStore

@@ -1,6 +1,6 @@
-import utils from 'utils/utils.js'
+import utils from 'utils/utils'
 
-export default class StoreImage {
+export default class ImagesStore {
   static copyImage(newimg, oldimg) {
     if (!newimg || !oldimg) {
       return false
@@ -53,7 +53,7 @@ export default class StoreImage {
   }
 
   static async uploadImageAsync (file) {
-    let buffer = await StoreImage.readFileAsync(file)
+    let buffer = await ImagesStore.readFileAsync(file)
     let array = Array.from(new Uint8Array(buffer))
     let {res} = await utils.callApiAsync('ipfs_add', {data: array})
     return {

@@ -2,9 +2,10 @@ import {router} from '../router.js'
 import {tabs, common, contract, sort} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
-import formats from './store-formats.js'
-import artistsStore from 'store/store-artists.js'
-import collsStore from 'store/store-collections.js'
+
+import formats from 'stores/formats'
+import artistsStore from 'stores/artists'
+import collsStore from 'stores/collections'
 
 function defaultState() {
   let state = {  
@@ -108,8 +109,8 @@ const store = {
   start () {
     Object.assign(this.state, defaultState())
     this.state.is_headless = utils.isHeadless()
-    collsStore.reset()
-    artistsStore.reset()
+    collsStore.reset(this)
+    artistsStore.reset(this)
     router.push({name: 'gallery'})
 
     nextTick(() => {

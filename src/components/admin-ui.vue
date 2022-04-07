@@ -56,7 +56,7 @@
 
 <script>
 import {common} from 'utils/consts.js'
-import {artistsStore} from 'store/store-artists.js'
+import {artistsStore} from 'stores/artists.js'
 
 export default {
   computed: {

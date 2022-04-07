@@ -1,16 +1,17 @@
-import formats from './store-formats.js'
-import {versions, cid} from './store-consts.js'
-import {router} from '../router.js'
-import utils from 'utils/utils.js'
-import imagesStore from './store-images.js'
+import formats from 'stores/formats'
+import utils from 'utils/utils'
+import imagesStore from 'stores/images'
+import {versions, cid} from 'stores/consts'
+import {router} from 'router'
 import {reactive} from 'vue'
 
-class StoreArtists {
+class ArtistsStore {
   constructor () {
     this.reset()
   }
 
-  reset () {
+  reset (global) {
+    this._global = global
     this._state = reactive({
       my_id: '',
       is_artist: false,
@@ -252,5 +253,5 @@ class StoreArtists {
   }
 }
 
-let artistsStore = new StoreArtists()
+let artistsStore = new ArtistsStore()
 export default artistsStore

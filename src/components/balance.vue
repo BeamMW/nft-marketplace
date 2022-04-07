@@ -71,7 +71,7 @@ import publicKeyModal from './public-key-dialog.vue'
 import btn from './button.vue'
 import pageTitle from './page-title.vue'
 import amount from './amount.vue'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {

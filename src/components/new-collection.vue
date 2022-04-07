@@ -124,7 +124,7 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import {common} from 'utils/consts.js'
-import collsStore from 'store/store-collections.js'
+import collsStore from 'stores/collections.js'
 
 export default {
   components: {

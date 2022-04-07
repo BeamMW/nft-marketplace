@@ -48,7 +48,7 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
 import publicKeyModal from './public-key-dialog.vue'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {

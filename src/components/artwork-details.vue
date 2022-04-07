@@ -251,7 +251,7 @@ import backBtn from './back-btn.vue'
 import preview from './image-preview.vue'
 import utils from 'utils/utils.js'
 import {binary_search} from 'utils/search.js'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"

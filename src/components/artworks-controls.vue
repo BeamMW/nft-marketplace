@@ -106,7 +106,7 @@ import {tabs, sort} from 'utils/consts.js'
 import selector from './selector.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
-import artistsStore from 'store/store-artists.js'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {
