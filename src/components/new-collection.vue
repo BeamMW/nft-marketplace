@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <pageTitle title="add new collection"/>
+    <pageTitle title="Add new collection"/>
     <p class="description">
       Before you can add any NFT you need to create a Collection
     </p>
     <div class="fields">
       <div class="col-first">
-        <inputField v-model="name"
-                    label="Gallery Name*"
-                    :valid="name_valid"
+        <inputField v-model="label"
+                    label="Collection Name*"
+                    :valid="label_valid"
                     :max_length="100"
-                    style="margin-bottom:60px;margin-top:0"
+                    style="margin-bottom:46px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -124,6 +124,7 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import {common} from 'utils/consts.js'
+import collsStore from 'store/store-collections.js'
 
 export default {
   components: {
@@ -135,7 +136,7 @@ export default {
   },
   data () {
     return {
-      name: '',
+      label_: '',
       website: '',
       twitter: '',
       instagram: '',
@@ -146,11 +147,22 @@ export default {
   },
 
   computed: {
-    name_valid() {
-      let value = this.name
+    label: {
+      get () {
+        return this.label_ || (this.collection || {}).label
+      },
+      set (val) {
+        this.label_ = val
+      }
+    },
+    label_valid() {
+      let value = this.label
       return !value || value.length <= 100
     },
 
+    //
+    // not refactored
+    //
     website_valid() {
       let value = this.website
       if (!value) return true
@@ -190,7 +202,7 @@ export default {
     },
     
     can_submit () {
-      return this.name && this.name_valid &&
+      return this.label && this.label_valid &&
              this.website_valid &&
              this.twitter_valid &&
              this.instagram_valid &&
@@ -229,6 +241,12 @@ export default {
     onRemoveAvatar() {
       this.avatar = undefined
     },
+
+    async onSetCollection() {
+      let data = {
+      }
+      await collsStore.setCollection(this.label, data, this.$store)
+    }
   }
 }
 </script>

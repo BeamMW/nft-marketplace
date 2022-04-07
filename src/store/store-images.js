@@ -14,6 +14,7 @@ export default class StoreImage {
     return !!newimg.object
   }
 
+  // TODO: check that this doesn't block
   static async loadImageAsync (image, context) {
     if (!image) {
       return

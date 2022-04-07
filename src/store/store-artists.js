@@ -60,27 +60,6 @@ class StoreArtists {
     this._state.artists = val
   }
 
-  toBecomeArtist() {
-    if (this.is_artist) {
-      throw new Error('Unexpected toBecomeArtist, already an artist')
-    }
-    router.push({
-      name: 'artist'
-    })
-  }
-
-  toEditArtist() {
-    if (!this.is_artist) {
-      throw new Error('Unexpected EditArtist, not an artist yet')
-    }
-    router.push({
-      name: 'artist',
-      params: {
-        id: this.my_id
-      }
-    })
-  }
-
   async _loadKey () {
     let {res} = await utils.invokeContractAsync({
       role: 'artist',
@@ -249,6 +228,27 @@ class StoreArtists {
     }
   
     return artist
+  }
+
+  toBecomeArtist() {
+    if (this.is_artist) {
+      throw new Error('Unexpected toBecomeArtist, already an artist')
+    }
+    router.push({
+      name: 'artist'
+    })
+  }
+
+  toEditArtist() {
+    if (!this.is_artist) {
+      throw new Error('Unexpected EditArtist, not an artist yet')
+    }
+    router.push({
+      name: 'artist',
+      params: {
+        id: this.my_id
+      }
+    })
   }
 }
 

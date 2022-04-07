@@ -3,7 +3,8 @@ import {tabs, common, contract, sort} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 import formats from './store-formats.js'
-import artistsStore from './store-artists.js'
+import artistsStore from 'store/store-artists.js'
+import collsStore from 'store/store-collections.js'
 
 function defaultState() {
   let state = {  
@@ -107,6 +108,7 @@ const store = {
   start () {
     Object.assign(this.state, defaultState())
     this.state.is_headless = utils.isHeadless()
+    collsStore.reset()
     artistsStore.reset()
     router.push({name: 'gallery'})
 
@@ -200,6 +202,7 @@ const store = {
     this.state.balance_beam = newBeam
     try {
       await artistsStore.loadAsync()
+      await collsStore.loadAsync()
     }
     catch(err) {
       this.setError(err)
