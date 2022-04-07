@@ -123,7 +123,7 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
 
 export default {
   components: {

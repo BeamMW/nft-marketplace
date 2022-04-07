@@ -227,7 +227,8 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
+import artistsStore from 'store/store-artists.js'
 
 export default {
   components: {
@@ -260,10 +261,10 @@ export default {
 
   computed: {
     in_set_artist() {
-      return this.$state.set_artist_tx.length > 0
+      return !!artistsStore.artist_tx
     },
     edit_self () {
-      return !!(this.id && this.id.length && this.id === this.$state.my_artist_key)
+      return !!(this.id === artistsStore.my_id && artistsStore.is_artist)
     },
     avatarStyles() {
       return {
@@ -316,7 +317,7 @@ export default {
              this.avatar_valid
     },
     artist () {
-      return this.id ? this.$state.artists[this.id] : undefined
+      return this.id ? artistsStore.artists[this.id] : undefined
     },
     label: {
       get () {
@@ -445,7 +446,7 @@ export default {
         }
       }
 
-      await this.$store.setArtist(this.label, data)
+      await artistsStore.setArtist(this.label, data, this.$store)
     }
   }
 }

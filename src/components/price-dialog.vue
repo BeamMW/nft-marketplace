@@ -131,8 +131,8 @@
 import modal from './modal.vue'
 import btn from './button.vue'
 import priceInput from './price-input.vue'
-import utils from '../utils/utils.js'
-import {common} from '../utils/consts.js'
+import utils from 'utils/utils.js'
+import {common} from 'utils/consts.js'
 
 export default {
   components: { 

@@ -1,4 +1,4 @@
-import utils from '../utils/utils.js'
+import utils from 'utils/utils.js'
 
 export default class StoreImage {
   static copyImage(newimg, oldimg) {
@@ -37,6 +37,27 @@ export default class StoreImage {
         context = context || 'loading image from IPFS, hash ' + image.ipfs_hash
         image.error = {err, context}
       }
+    }
+  }
+
+  static async readFileAsync(file) {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader()
+      reader.onload = () => {
+        resolve(reader.result)
+      }
+      reader.onerror = reject
+      reader.readAsArrayBuffer(file)
+    })
+  }
+
+  static async uploadImageAsync (file) {
+    let buffer = await StoreImage.readFileAsync(file)
+    let array = Array.from(new Uint8Array(buffer))
+    let {res} = await utils.callApiAsync('ipfs_add', {data: array})
+    return {
+      ipfs_hash: res.hash,
+      mime_type: file.type
     }
   }
 }

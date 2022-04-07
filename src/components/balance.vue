@@ -71,6 +71,7 @@ import publicKeyModal from './public-key-dialog.vue'
 import btn from './button.vue'
 import pageTitle from './page-title.vue'
 import amount from './amount.vue'
+import artistsStore from 'store/store-artists.js'
 
 export default {
   components: {
@@ -93,7 +94,7 @@ export default {
     },
 
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_key]
+      let artist = artistsStore.artists[artistsStore.my_id]
       return (artist || {}).label
     }
   },

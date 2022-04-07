@@ -236,6 +236,23 @@ export default class Utils {
     })
   }
 
+  static async invokeContractAsyncAndMakeTx (args) {
+    let {full} = await Utils.invokeContractAsync(args)
+    Utils.ensureField(full.result, 'raw_data', 'array')
+
+    try {
+      let {res} = await Utils.callApiAsync('process_invoke_data', {data: full.result.raw_data})
+      Utils.ensureField(res, 'txid', 'string')
+      return res.txid
+    }
+    catch(err) {
+      if (Utils.isUserCancelled(err)) {
+        return undefined
+      }
+      throw err
+    }
+  }
+
   static invokeContract(args, cback, bytes) {
     let params = {
       'create_tx': false

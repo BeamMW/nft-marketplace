@@ -55,15 +55,16 @@
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
+import {artistsStore} from 'store/store-artists.js'
 
 export default {
   computed: {
     artists() {
-      return this.$state.artists
+      return artistsStore.artists
     },
     artists_count() {
-      return this.$state.artists_count
+      return artistsStore.total
     },
     balance_reward() {
       return this.$state.balance_reward  / common.GROTHS_IN_BEAM

@@ -58,6 +58,7 @@
 <script>
 import modal from './modal.vue'
 import btn from './button.vue'
+import artistsStore from 'store/store-artists.js'
 
 export default {
   components: { 
@@ -66,7 +67,7 @@ export default {
 
   computed: {
     artist_key () {
-      return this.$state.my_artist_key
+      return artistsStore.my_id
     },
   },
 

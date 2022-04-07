@@ -1,9 +1,9 @@
 import {router} from '../router.js'
-import {tabs, common, contract, sort} from '../utils/consts.js'
-import utils from '../utils/utils.js'
+import {tabs, common, contract, sort} from 'utils/consts.js'
+import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 import formats from './store-formats.js'
-import artistsStore from './store-artist.js'
+import artistsStore from './store-artists.js'
 
 function defaultState() {
   let state = {  
@@ -50,7 +50,6 @@ function defaultState() {
     })
   }*/
   
-  Object.assign(state, artistsStore.defaultState())
   return state
 }
 
@@ -60,11 +59,6 @@ function appstate() {
     total_pages: computed(() => {
       let total = state.artworks.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
-    }),
-    artist: computed(() => id => {
-      let artist = state.artists[id]
-      if (!id) throw new Error(`No artist with id ${id}`)
-      return artist
     })
   })
   return state
@@ -113,6 +107,7 @@ const store = {
   start () {
     Object.assign(this.state, defaultState())
     this.state.is_headless = utils.isHeadless()
+    artistsStore.reset()
     router.push({name: 'gallery'})
 
     nextTick(() => {
@@ -163,20 +158,6 @@ const store = {
   refreshAllData () {
     // TODO: move loading sequence to promises, now loadBalance initiates update chain
     utils.invokeContract(
-      `role=artist,action=get_id,cid=${this.state.cid}`, 
-      (...args) => this.onGetArtistKeyCID(...args), this.shader
-    )
-  },
-
-  onGetArtistKeyCID(err, res) {
-    if (err) {
-      return this.setError(err, 'Failed to get artist id')     
-    }
-        
-    utils.ensureField(res, 'id', 'string')
-    this.state.my_artist_key = res.id
-        
-    utils.invokeContract(
       `role=manager,action=view_params,cid=${this.state.cid}`, 
       (...args) => this.onLoadParams(...args)
     )
@@ -217,7 +198,12 @@ const store = {
     }
 
     this.state.balance_beam = newBeam
-    await this.loadArtistsAsync()
+    try {
+      await artistsStore.loadAsync()
+    }
+    catch(err) {
+      this.setError(err)
+    }
     this.loadArtworks()
   },
 
@@ -252,7 +238,7 @@ const store = {
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
-    let mykey = this.state.my_artist_key
+    let mykey = artistsStore.my_id
 
     for (let awork of res.items) {
       let oawork = null
@@ -272,7 +258,7 @@ const store = {
         awork.pk_author = oawork.pk_author
       } 
       else {
-        awork.author = (this.state.artists[awork.pk_author] || {}).label
+        awork.author = (artistsStore.artists[awork.pk_author] || {}).label
       }
 
       awork.pk_owner = awork.pk
@@ -479,7 +465,7 @@ const store = {
       }
 
       // We receive author only now, so add what's missing to SOLD
-      let mykey = this.state.my_artist_key
+      let mykey = artistsStore.my_id
       if (artwork.pk_author === mykey && !artwork.owned) {
         this.state.all_artworks[tabs.SOLD].push(artwork)
         if (this.state.active_tab == tabs.SOLD) {
@@ -688,7 +674,7 @@ const store = {
   __showStats() {
     const cnt_stats = 12
     let artworks = this.state.all_artworks[tabs.ALL]
-    let artists = this.state.artists
+    let artists = artistsStore.artists
 
     let likes = [], likes_total = 0
     let sales = [], tvb = 0
@@ -803,83 +789,6 @@ const store = {
     this.state.gallery_collections_page = page
   },
 
-  async invokeContractAsyncAndMakeTx (args) {
-    let {full} = await utils.invokeContractAsync(args)
-    utils.ensureField(full.result, 'raw_data', 'array')
-
-    try {
-      let {res} = await utils.callApiAsync('process_invoke_data', {data: full.result.raw_data})
-      utils.ensureField(res, 'txid', 'string')
-      return res.txid
-    }
-    catch(err) {
-      if (utils.isUserCancelled(err)) {
-        return undefined
-      }
-      throw err
-    }
-  },
-
-  async readFileAsync(file) {
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader()
-      reader.onload = () => {
-        resolve(reader.result)
-      }
-      reader.onerror = reject
-      reader.readAsArrayBuffer(file)
-    })
-  },
-
-  async uploadImageAsync (file) {
-    let buffer = await this.readFileAsync(file)
-    let array = Array.from(new Uint8Array(buffer))
-    let {res} = await utils.callApiAsync('ipfs_add', {data: array})
-    return {
-      ipfs_hash: res.hash,
-      mime_type: file.type
-    }
-  },
-
-  async setArtist(label, data) {
-    if(data.avatar instanceof File) {
-      data.avatar = await this.uploadImageAsync(data.avatar)  
-    }
-
-    if (data.banner instanceof File) {
-      data.banner = await this.uploadImageAsync(data.banner)
-    }
-
-    ({label, data} = artistsStore.toContract(label, data))
-    let txid = await this.invokeContractAsyncAndMakeTx({
-      role: 'artist',
-      action: 'set_artist',
-      cid: this.state.cid,
-      label,
-      data
-    })
-
-    if (!txid) {
-      return
-    }
-
-    this.state.set_artist_tx = txid
-    let interval = setInterval(async () => {
-      try {
-        let {res} = await utils.callApiAsync('tx_status', {txId: this.state.set_artist_tx})
-        console.log(res.status)
-        if ([0, 1, 5].indexOf(res.status) == -1) {
-          clearInterval(interval)
-          this.state.set_artist_tx = ''
-        }
-      }
-      catch(err) {
-        this.setError(err)
-        this.state.set_artist_tx = ''
-      }
-    }, 1000)
-  },
-
   toArtworkDetails(id) {
     router.push({
       name: 'artwork',
@@ -904,18 +813,6 @@ const store = {
       name: 'balance'
     })
   },
-
-  toEditArtist() {
-    if (!this.state.is_artist) {
-      throw new Error('Unexpected EditArtist, not an artist yet')
-    }
-    router.push({
-      name: 'artist',
-      params: {
-        id: this.state.my_artist_key
-      }
-    })
-  },
   
   toNewCollection() {
     router.push({
@@ -928,8 +825,6 @@ const store = {
       name: 'add-nft'
     })
   },
-
-  ...artistsStore.storeMethdos()
 }
 
 export default store

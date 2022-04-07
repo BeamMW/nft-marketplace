@@ -25,6 +25,8 @@ const config = (DEV_MODE) => {return {
   resolve: {
     alias: {
       'assets': path.resolve(__dirname, 'src/assets/'), 
+      'store': path.resolve(__dirname, 'src/store/'),
+      'utils': path.resolve(__dirname, 'src/utils/'),
     }
   },
   module: {

@@ -102,10 +102,11 @@
 </style>
 
 <script>
-import {tabs, sort} from '../utils/consts.js'
+import {tabs, sort} from 'utils/consts.js'
 import selector from './selector.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
+import artistsStore from 'store/store-artists.js'
 
 export default {
   components: {
@@ -129,17 +130,17 @@ export default {
   
   computed: {
     is_artist () {
-      return this.$state.is_artist
+      return artistsStore.is_artist
     },
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_key]
+      let artist = this.artists[artistsStore.my_id]
       return (artist || {}).label
     },
     active_tab () {
       return this.$state.active_tab
     },
     artists () {
-      return this.$state.artists
+      return artistsStore.artists
     },
     active_sort_by() {
       return this.$state.sort_by

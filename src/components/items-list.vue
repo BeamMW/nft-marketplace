@@ -53,7 +53,7 @@
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
 import paginator from './paginator.vue'
 
 export default {

@@ -24,5 +24,5 @@ export const sort = {
 }
 
 export const contract = {
-  cid: 'fbaef769a061648e3519cdbf0715e2ff3ac2027a7b9079f1db7f5d00bd22118f'
+  cid: '36f087d6077696359da036ba75d9490ca7b2b624aee9d42fa6e55f2f4ba8c383'
 }

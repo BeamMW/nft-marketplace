@@ -60,6 +60,12 @@ utils.initialize(
       return store.setError(err, 'Failed to initialize application', true)
     }
 
-    store.start()
+    try {
+      store.start()
+    }
+    catch(err) {
+      alert(err)
+      return store.setError(err, 'Failed to initialize store', true)
+    }
   }
 )
