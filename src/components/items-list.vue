@@ -2,7 +2,7 @@
   <div class="list-container">
     <template v-if="items.length > 0">
       <div ref="itemslist" class="list" :style="style" @scroll="onScroll">
-        <component :is="component" v-for="item in visible_items" 
+        <component :is="component" v-for="item in items" 
                    :key="item.id"
                    :item="item"
         />
@@ -90,7 +90,7 @@ export default {
   ],
 
   computed: {
-    visible_items () {
+    /*visible_items () {
       let all = this.items
       let result  = []
       let start = (this.page - 1) * common.ITEMS_PER_PAGE
@@ -100,6 +100,7 @@ export default {
       }
       return result
     },
+    */
     pages() {
       let total = this.items.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1

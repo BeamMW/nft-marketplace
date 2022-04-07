@@ -11,6 +11,7 @@
 
 <script>
 import list from './items-list.vue'
+import collsStore from 'stores/collections'
 
 export default {
   components: {
@@ -19,7 +20,7 @@ export default {
 
   computed: {
     items () {
-      return this.$state.collections
+      return collsStore.user_colls
     },
 
     page: {

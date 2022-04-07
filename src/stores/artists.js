@@ -83,6 +83,9 @@ class ArtistsStore {
       action: 'view_artists_stats',
       cid
     })
+    
+    utils.ensureField(res, 'artists_stats', 'object')
+    utils.ensureField(res.artists_stats, 'total', 'number')
     this._total = res.artists_stats.total
   }
 
@@ -171,7 +174,7 @@ class ArtistsStore {
       data.banner = await imagesStore.uploadImageAsync(data.banner)
     }
 
-    ({label, data} = artistsStore.toContract(label, data))
+    ({label, data} = this._toContract(label, data))
     let txid = await utils.invokeContractAsyncAndMakeTx({
       role: 'artist',
       action: 'set_artist',
@@ -198,7 +201,7 @@ class ArtistsStore {
     }, 1000)
   }
 
-  toContract (label, data) {
+  _toContract (label, data) {
     return {
       label: formats.toContract(label),
       data: formats.toContract(versions.ARTIST_VERSION, data)
@@ -209,24 +212,16 @@ class ArtistsStore {
   _fromContract (cartist) {
     let artist = Object.assign({}, cartist)
 
-    if (artist.label == '31') 
-    {
-      // TODO:remove test code
-      artist.label = '1'
-      artist.data = {}
-    } 
-    else 
-    {
-      let [label] = formats.fromContract(artist.label)
-      let [version, data] = formats.fromContract(artist.data)
+    let [label] = formats.fromContract(artist.label)
+    let [version, data] = formats.fromContract(artist.data)
 
-      if (version != versions.ARTIST_VERSION) {
-        throw new Error('Artist version mismatch: ' + version + ' != ' + versions.ARTIST_VERSION)
-      }
-
-      artist.label = label
-      Object.assign(artist, data)
+    if (version != versions.ARTIST_VERSION) {
+      throw new Error('Artist version mismatch: ' + version + ' != ' + versions.ARTIST_VERSION)
     }
+
+    artist.label = label
+    artist.version = version
+    Object.assign(artist, data)
   
     return artist
   }
