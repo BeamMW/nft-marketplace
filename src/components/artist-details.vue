@@ -60,7 +60,7 @@
                     title="Add an artist banner"
                     accept="image/jpeg, image/png, image/svg+xml"      
                     :readonly="in_set_artist" 
-                    :error="banner_valid ? '' : 'image cannot be larger than 250kb'"
+                    :error="banner_valid ? '' : ' '"
           />
           <img src="~/assets/elipse.svg" alt="avatar" class="elipse"/>
           <div class="container-avatar">
@@ -78,9 +78,9 @@
                      @change="onUploadAvatar"
               />
             </div>
-            <div v-if="!avatar_valid" class="error_msg">
-              <p class="error">image cannot be larger than 250kb</p>
-            </div>
+          </div>
+          <div v-if="!avatar_valid || !banner_valid" class="error_msg">
+            <p class="error">image cannot be larger than 250kb</p>
           </div>
         </div>
       </div>
@@ -187,10 +187,7 @@
                 z-index: 2
                 border-radius: 9999px
                 padding: 7px 7px 3px 7px
-
-                .remove {
-                  cursor: pointer
-                }
+                cursor: pointer
               }
 
               .files {
@@ -210,16 +207,16 @@
                 }
               }
             }
+          }
+        
+          .error_msg {
+            text-align: center
+            margin-top: -20px
 
-            .error_msg {
-              align-self: center
-              margin-left: 10px
-
-              .error {
-                font-style: italic
-                font-size: 12px
-                font-weight: 400
-              }
+            .error {
+              font-style: italic
+              font-size: 12px
+              font-weight: 400
             }
           }
         }
