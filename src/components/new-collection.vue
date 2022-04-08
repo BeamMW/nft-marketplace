@@ -1,9 +1,19 @@
 <template>
   <div class="container">
-    <pageTitle title="Add new collection"/>
-    <p class="description">
-      Before you can add any NFT you need to create a Collection
-    </p>
+    <template v-if="edit_mode">
+      <pageTitle title="Edit collection"/>
+      <p class="description">
+        After collection is changed it would not be visible until<br> 
+        reviewed by moderator. NFTs would still appear in gallery.
+      </p>
+    </template>
+    <template v-else>
+      <pageTitle title="Add new collection"/>
+      <p class="description">
+        Before you can add any NFT you need to create a collection<br>
+        Collection would not be visible until approved by moderator.
+      </p>
+    </template>
     <div class="fields">
       <div class="col-first">
         <inputField v-model="label"
@@ -23,14 +33,14 @@
                     label="Twitter"
                     placeholder="@twitter"
                     img="twitter"
-                    :max_length="15"
+                    :max_length="16"
                     :valid="twitter_valid"
         />
         <inputField v-model="instagram"
                     label="Instagram"
                     placeholder="@instagram"
                     img="instagram"
-                    :max_length="30"
+                    :max_length="31"
                     :valid="instagram_valid"
         />
       </div>
@@ -40,15 +50,10 @@
                        :valid="description_valid"
                        :max_length="150"
         />
-        <div class="banner">
-          <addImage title="Add Gallery image"
-                    accept="image/jpeg, image/png, image/svg+xml" 
-                    :banner="banner"
-                    :valid="banner_valid"
-                    @remove="onRemoveBanner"
-                    @upload="onUploadBanner"
-          />
-        </div>
+        <addImage v-model:image="cover"
+                  title="Add collection image"
+                  :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
+        />
       </div>
     </div>
   </div>
@@ -56,7 +61,11 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit" @click="onCreate">
+    <btn text="create collection" 
+         color="green" 
+         :disabled="!can_submit" 
+         @click="onSetCollection"
+    >
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -107,7 +116,7 @@
   }
 
   .actions {
-    display:flex
+    display: flex
     justify-content: center
     margin-top: 50px
 
@@ -123,8 +132,9 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from 'utils/consts.js'
-import collsStore from 'stores/collections.js'
+import {common} from 'utils/consts'
+import collsStore from 'stores/collections'
+import {router} from '../router'
 
 export default {
   components: {
@@ -134,19 +144,33 @@ export default {
     btn,
     addImage
   },
+
+  props: {
+    id: {
+      type: Number,
+      required: false,
+      default: undefined
+    },
+  },
+
   data () {
     return {
       label_: '',
-      website: '',
-      twitter: '',
-      instagram: '',
-      description: '',
-      banner: undefined,
-      avatar: undefined
+      website_: '',
+      twitter_: '',
+      instagram_: '',
+      description_: '',
+      cover_: undefined
     }
   },
 
   computed: {
+    edit_mode () {
+      return this.id !== undefined
+    },
+    collection () {
+      return this.id ? collsStore.user_colls[this.id] : undefined
+    },
     label: {
       get () {
         return this.label_ || (this.collection || {}).label
@@ -159,10 +183,14 @@ export default {
       let value = this.label
       return !value || value.length <= 100
     },
-
-    //
-    // not refactored
-    //
+    website: {
+      get () {
+        return this.website_ || (this.collection || {}).website
+      },
+      set (val) {
+        this.website_ = val
+      }
+    },
     website_valid() {
       let value = this.website
       if (!value) return true
@@ -177,75 +205,87 @@ export default {
              (url.protocol === 'http:' || url.protocol === 'https:') &&
              (url.toString() === value || url.toString() === value + '/')
     },
-
+    twitter: {
+      get () {
+        return this.twitter_ || (this.collection || {}).twitter
+      },
+      set (val) {
+        this.twitter_ = val
+      }
+    },
     twitter_valid() {
       let value = this.twitter
       return !value || /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
     },
-
+    instagram: {
+      get () {
+        return this.instagram_ || (this.collection || {}).instagram
+      },
+      set (val) {
+        this.instagram_ = val
+      }
+    },
     instagram_valid() {
       let value = this.instagram
       return !value || (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
     },
-
+    description: {
+      get () {
+        return this.description_ || (this.collection || {}).description
+      },
+      set (val) {
+        this.description_ = val
+      }
+    },
     description_valid() {
       let value = this.description
       return !value || value.length <= 150
     },
-
-    banner_valid() {
-      return !this.banner || this.banner.size <= common.MAX_IMAGE_SIZE
+    cover: {
+      get () {
+        if (this.cover_ === null) {
+          return undefined
+        }
+        return this.cover_ || (this.collection || {}).cover
+      },
+      set (val) {
+        this.cover_ = val
+      }
     },
-
-    avatar_valid() {
-      return !this.avatar || this.avatar.size <= common.MAX_IMAGE_SIZE
+    cover_valid() {
+      return this.image_valid(this.cover)
     },
-    
     can_submit () {
       return this.label && this.label_valid &&
              this.website_valid &&
              this.twitter_valid &&
              this.instagram_valid &&
              this.description_valid &&
-             this.banner_valid &&
-             this.avatar_valid
+             this.cover_valid
     }
   },
 
   methods: {    
-    loadImage(e, cback) {
-      let file = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (e) => {
-        cback(e.target.result, file.size)
+    image_valid (image) {
+      if (!image) return true
+
+      if (image.file) {
+        return image.file.size <= common.MAX_IMAGE_SIZE
       }
-    },
 
-    onUploadBanner(e) {
-      this.loadImage(e, (data, size) => {
-        this.banner = {data, size}
-      })
-    },
-
-    onUploadAvatar(e) {
-      this.loadImage(e, (data, size) => {
-        this.avatar = {data, size}
-      })
-    },
-
-    onRemoveBanner() {
-      this.banner = undefined
-    },
-    
-    onRemoveAvatar() {
-      this.avatar = undefined
+      return image.ipfs_hash
     },
 
     async onSetCollection() {
       let data = {
+        website:     this.website,
+        twitter:     this.twitter,
+        instagram:   this.instagram,
+        description: this.description,
+        cover:       this.cover
       }
-      await collsStore.setCollection(this.label, data, this.$store)
+      await collsStore.setCollection(this.label, data)
+      router.go(-1)
     }
   }
 }

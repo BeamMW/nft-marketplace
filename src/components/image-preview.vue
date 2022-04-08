@@ -32,7 +32,8 @@ export default {
   props: {
     image: {
       type: [Object, String],
-      required: true
+      required: false,
+      default: undefined
     },
     height: {
       type: String,
@@ -67,10 +68,6 @@ export default {
 
       if (this.image && this.image.object) {
         return this.image.object
-      }
-
-      if (this.image && this.image.bytes) {
-        return URL.createObjectURL(new Blob([this.image.bytes], {type: this.image.mime_type}))
       }
       
       return undefined

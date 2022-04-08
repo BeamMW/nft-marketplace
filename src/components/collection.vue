@@ -1,9 +1,9 @@
 <template>
   <div class="collection">
-    <preview class="preview" :image="cover_image" height="140px" cover/>
+    <preview class="preview" :image="item.cover" height="140px" cover/>
     <div class="info-row">  
       <div class="avatar">
-        <preview :image="author_image" 
+        <preview :image="item.avatar" 
                  :show_loading="false"
                  width="72px" 
                  height="72px" 
@@ -11,9 +11,9 @@
         />
       </div>
       <div class="text">
-        <div class="label">{{ label }}</div>
-        <div class="author">{{ author_name }}</div>
-        <div class="description">{{ description }}</div>
+        <div class="label">{{ item.label }}</div>
+        <div class="author">{{ item.author_name }}</div>
+        <div class="description">{{ item.description }}</div>
       </div>
     </div>
   </div>
@@ -68,7 +68,6 @@
 
 <script>
 import preview from './image-preview.vue'
-import artistsStore from 'stores/artists'
 
 export default {
   components: {
@@ -79,37 +78,6 @@ export default {
     item: {
       type: Object,
       required: true,
-    }
-  },
-
-  computed: {
-    cover_image () {
-      if (!this.item.default) {
-        return this.item.cover
-      }
-      return this.author.banner
-    },
-    author_image () {
-      return this.author.avatar
-    },
-    author() {
-      let author = artistsStore.artists[this.item.author]
-      return (author || {})
-    },
-    label () {
-      if (!this.item.default) {
-        return this.item.label
-      }
-      return [this.item.label, ' collection'].join(' ')
-    },
-    author_name () {
-      return this.author.label
-    },
-    description () {
-      if (!this.item.default) {
-        return this.item.description
-      }
-      return 'This collection includes all artworks by ' + this.author_name + ' that are not in other collections.'
     }
   }
 }

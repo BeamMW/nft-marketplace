@@ -4,6 +4,7 @@ import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
 import formats from 'stores/formats'
+import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
 
@@ -111,6 +112,7 @@ const store = {
     this.state.is_headless = utils.isHeadless()
     collsStore.reset(this)
     artistsStore.reset(this)
+    imagesStore.reset(this)
     router.push({name: 'gallery'})
 
     nextTick(() => {

@@ -1,7 +1,9 @@
-import {reactive} from 'vue'
+import {reactive, computed} from 'vue'
 import {versions, cid} from 'stores/consts'
 import utils from 'utils/utils'
 import formats from 'stores/formats'
+import artistsStore from 'stores/artists'
+import imagesStore from 'stores/images'
 
 class CollectionsStore {
   constructor () {
@@ -42,8 +44,29 @@ class CollectionsStore {
     })
     
     utils.ensureField(res, 'collections', 'array')
+
     // TODO: remove test code slice(1)
-    let colls = res.collections.slice(1).map(coll => this._fromContract(coll))
+    res.collections = res.collections.slice(1)
+
+    let colls = []
+    for (let coll of res.collections) {
+      coll = this._fromContract(coll)
+      
+      let author = artistsStore.artists[coll.author]
+      coll.author_name = computed(() => author.label)
+      coll.owned = computed(() => artistsStore.my_id == coll.author)
+      coll.avatar = computed(() => author.avatar)
+      coll.cover = imagesStore.fromContract(coll.cover)
+
+      if (coll.default) {
+        coll.description = computed(() => `This collection includes all artworks by ${author.label} that are not in other collections.`)
+        coll.cover = computed(() => author.banner)
+        coll.label = computed(() => `${author.label} collection`)
+      }
+
+      colls.push(coll)
+    }
+
     this._state[mode].collections = colls
   }
 
@@ -61,15 +84,35 @@ class CollectionsStore {
       if (version != versions.COLLECTION_VERSION) {
         throw new Error('Collection version mismatch: ' + version + ' != ' + versions.COLLECTION_VERSION) 
       }
+
       Object.assign(coll, data)
     }
     
     return coll
   }
 
+  async _toContract(label, data) {
+    data.cover = await imagesStore.toContract(data.cover)
+    alert(JSON.stringify(data))
+    return {
+      label: formats.toContract(label),
+      data: formats.toContract(versions.COLLECTION_VERSION, data)
+    }
+  }
+
   async loadAsync() {
     await this._loadTotals('user')
     await this._loadCollections('user')
+  }
+
+  async setCollection(label, data) {
+    ({label, data} = await this._toContract(label, data))
+
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'artist',
+      action: 'set_collection',
+      label, data, cid
+    })
   }
 }
 

@@ -102,18 +102,10 @@ class ArtistsStore {
 
     // TODO: throw and ensure reload ?
     let artist = this._fromContract(res.artists[0])
-    let oldArtist = this.artists[artist.id]
     this.artists[artist.id] = artist
 
-    if (oldArtist) {
-      if (!imagesStore.copyImage(this.artists[artist.id].banner, oldArtist.banner)) {
-        imagesStore.loadImageAsync(this.artists[artist.id].banner)
-      }
-      if (!imagesStore.copyImage(this.artists[artist.id].avatar, oldArtist.avatar)) {
-        imagesStore.loadImageAsync(this.artists[artist.id].avatar)
-      }
-    }
-
+    //let counter = 0
+    //setInterval(() => this.artists[artist.id].label = 'Label ' + counter++, 1000)
     return this.artists[artist.id]
   }
 
@@ -165,16 +157,8 @@ class ArtistsStore {
     */
   }
 
-  async setArtist(label, data, global) {
-    if(data.avatar instanceof File) {
-      data.avatar = await imagesStore.uploadImageAsync(data.avatar)  
-    }
-
-    if (data.banner instanceof File) {
-      data.banner = await imagesStore.uploadImageAsync(data.banner)
-    }
-
-    ({label, data} = this._toContract(label, data))
+  async setArtist(label, data) {
+    ({label, data} = await this._toContract(label, data))
     let txid = await utils.invokeContractAsyncAndMakeTx({
       role: 'artist',
       action: 'set_artist',
@@ -196,12 +180,15 @@ class ArtistsStore {
       }
       catch(err) {
         this._artist_tx = ''
-        global.setError(err)
+        this.global.setError(err)
       }
     }, 1000)
   }
 
-  _toContract (label, data) {
+  async _toContract (label, data) {
+    data.avatar = await imagesStore.toContract(data.avatar)
+    data.banner = await imagesStore.toContract(data.banner)
+    
     return {
       label: formats.toContract(label),
       data: formats.toContract(versions.ARTIST_VERSION, data)
@@ -221,7 +208,10 @@ class ArtistsStore {
 
     artist.label = label
     artist.version = version
+    
     Object.assign(artist, data)
+    artist.avatar = imagesStore.fromContract(artist.avatar)
+    artist.banner = imagesStore.fromContract(artist.banner)
   
     return artist
   }

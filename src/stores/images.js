@@ -1,47 +1,40 @@
 import utils from 'utils/utils'
+import {computed, reactive} from 'vue'
 
-export default class ImagesStore {
-  static copyImage(newimg, oldimg) {
-    if (!newimg || !oldimg) {
-      return false
-    }
-
-    if (oldimg.ipfs_hash != newimg.ipfs_hash) {
-      return false
-    }
-
-    newimg.object = oldimg.object
-    return !!newimg.object
+class ImagesStore {
+  /*
+   * REFACTORED
+   */ 
+  constructor() {
+    this.reset()
   }
 
-  // TODO: check that this doesn't block
-  static async loadImageAsync (image, context) {
+  reset () {
+    this._state = reactive({
+      images: {}
+    })
+  }
+
+  fromContract(image) {
     if (!image) {
-      return
-    } 
+      return undefined
+    }
 
-    try {
-      let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
-      utils.ensureField(res, 'data', 'array')
-      
-      // TODO: can skip u8arr here?
-      let u8arr = new Uint8Array(res.data)
-      let blob = new Blob([u8arr], {type: image.mime_type})
-      // TODO: revoke object
-      console.log('URLOBJ for', image.ipfs_hash)
-      image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
-      
-      return image
-    }
-    catch(err) {
-      if (err) {
-        context = context || 'loading image from IPFS, hash ' + image.ipfs_hash
-        image.error = {err, context}
+    utils.ensureField(image, 'ipfs_hash', 'string')
+    utils.ensureField(image, 'mime_type', 'string')
+
+    return computed(() => {
+      let cached = this._state.images[image.ipfs_hash]
+      if (cached) {
+        return cached
       }
-    }
+
+      this._ipfsLoad(image)
+      return undefined
+    })
   }
 
-  static async readFileAsync(file) {
+  async _fread(file) {
     return new Promise((resolve, reject) => {
       let reader = new FileReader()
       reader.onload = () => {
@@ -52,13 +45,61 @@ export default class ImagesStore {
     })
   }
 
-  static async uploadImageAsync (file) {
-    let buffer = await ImagesStore.readFileAsync(file)
-    let array = Array.from(new Uint8Array(buffer))
+  async _ipfsLoad(image) {
+    try {
+      let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
+      utils.ensureField(res, 'data', 'array')
+      
+      // TODO: can skip u8arr here?
+      let u8arr = new Uint8Array(res.data)
+      let blob = new Blob([u8arr], {type: image.mime_type})
+      // TODO: revoke object
+      // TODO: keep only N images & delete and release old ones
+      image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
+      
+      this._state.images[image.ipfs_hash] = image
+      return image
+    }
+    catch(err) {
+      let context = 'Loading image from IPFS, hash ' + image.ipfs_hash
+      image.error = {err, context}
+    }
+  }
+
+  async _ipfsStore (image) {
+    let buffer = await this._fread(image.file)
+    let u8arr = new Uint8Array(buffer)
+    let array = Array.from(u8arr)
     let {res} = await utils.callApiAsync('ipfs_add', {data: array})
-    return {
+
+    let blob = new Blob([u8arr], {type: image.file.type})
+    let object =  URL.createObjectURL(blob, {oneTimeOnly: false})
+    
+    image = {
       ipfs_hash: res.hash,
-      mime_type: file.type
+      mime_type: image.file.type,
+      object: object
+    }
+
+    this._state.images[image.ipfs_hash] = image
+    return image
+  }
+
+  async toContract(image) {
+    if (!image) {
+      return
+    }
+
+    if (image.file) {
+      image = await this._ipfsStore(image)
+    }
+
+    return {
+      ipfs_hash: image.ipfs_hash,
+      mime_type: image.mime_type
     }
   }
 }
+
+let imagesStore = new ImagesStore()
+export default imagesStore

@@ -90,7 +90,8 @@
       </btn>
       <btn :text="edit_self ? 'update info' : 'create account'" 
            color="green" 
-           :disabled="!can_submit || in_set_artist" @click="onSetArtist"
+           :disabled="!can_submit || in_set_artist" 
+           @click="onSetArtist"
       >
         <img src="~assets/icon-create.svg"/>
       </btn>
@@ -367,6 +368,7 @@ export default {
         return this.banner_ || (this.artist || {}).banner
       },
       set (val) {
+        console.log('set banner to', val)
         this.banner_ = val
       }
     },
@@ -419,34 +421,11 @@ export default {
         website:   this.website,
         twitter:   this.twitter,
         instagram: this.instagram,
-        about:     this.about
+        about:     this.about,
+        avatar:    this.avatar,
+        banner:    this.banner
       }
-
-      if (this.avatar) {
-        if (this.avatar.file) {
-          data['avatar'] = this.avatar.file
-        } 
-        else {
-          data['avatar'] = {
-            ipfs_hash: this.avatar.ipfs_hash,
-            mime_type: this.avatar.mime_type
-          }
-        }
-      }
-
-      if (this.banner) {
-        if (this.banner.file) {
-          data['banner'] = this.banner.file
-        } 
-        else {
-          data['banner'] = {
-            ipfs_hash: this.banner.ipfs_hash,
-            mime_type: this.banner.mime_type
-          }
-        }
-      }
-
-      await artistsStore.setArtist(this.label, data, this.$store)
+      await artistsStore.setArtist(this.label, data)
     }
   }
 }
