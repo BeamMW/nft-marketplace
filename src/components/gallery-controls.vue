@@ -24,6 +24,8 @@
       </btn>
     </tabsctrl>
   </div>
+  <searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
+  {{ search }}
 </template>
 
 <style scoped lang="stylus">
@@ -45,12 +47,18 @@
       }
     }
   }
+  .search_container {
+    display: flex
+    justify-content: flex-end
+    margin-top: 10px
+  }
 </style>
 
 <script>
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
+import searchInput from './search-input.vue'
 import {tabs, sort} from '../utils/consts.js'
 
 // TODO: headless
@@ -58,7 +66,8 @@ export default {
   components: {
     tabsctrl,
     selector,
-    btn
+    btn,
+    searchInput
   },
 
   data () {
@@ -67,6 +76,7 @@ export default {
         {id: tabs.COLLECTIONS, name: 'Collections'},
         {id: tabs.NFTS, name: 'NFTs'},
       ],
+      search: '',
       selector_options: [
         {name: 'Added: Oldest to Newest', id: sort.OLDEST_TO_NEWEST},
         {name: 'Added: Newest to Oldest', id: sort.NEWEST_TO_OLDEST},
