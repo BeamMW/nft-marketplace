@@ -125,7 +125,19 @@
     macro(Gallery::Artwork::Id, id) \
     macro(uint32_t, val) \
 
+#define Gallery_user_view_artists_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_user_view_collections_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_user_view_artworks_stats(macro) \
+    macro(ContractID, cid) \
+
 #define GalleryRole_user(macro) \
+    macro(user, view_artists_stats) \
+    macro(user, view_collections_stats) \
+    macro(user, view_artworks_stats) \
     macro(user, view_artworks) \
     macro(user, download) \
     macro(user, set_price) \
@@ -214,33 +226,6 @@ ON_METHOD(manager, view)
 {
     static const ShaderID s_pSid[] = {
         Gallery::s_SID_0,
-        Gallery::s_SID_1,
-        Gallery::s_SID_2,
-        Gallery::s_SID_3,
-        Gallery::s_SID_4,
-        Gallery::s_SID_5,
-        Gallery::s_SID_6,
-        Gallery::s_SID_7,
-        Gallery::s_SID_8,
-        Gallery::s_SID_9,
-        Gallery::s_SID_10,
-        Gallery::s_SID_11,
-        Gallery::s_SID_12,
-        Gallery::s_SID_13,
-        Gallery::s_SID_14,
-        Gallery::s_SID_15,
-        Gallery::s_SID_16,
-        Gallery::s_SID_17,
-        Gallery::s_SID_18,
-        Gallery::s_SID_19,
-        Gallery::s_SID_20,
-        Gallery::s_SID_21,
-        Gallery::s_SID_22,
-        Gallery::s_SID_23,
-        Gallery::s_SID_24,
-        Gallery::s_SID_25,
-        Gallery::s_SID_26,
-        Gallery::s_SID_27,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -601,7 +586,6 @@ ON_METHOD(manager, view_artists_stats)
     k.m_KeyInContract = 0;
     k.m_Prefix.m_Cid = cid;
     Env::VarReader::Read_T(k, s);
-    Env::DocGroup gr0("artists_stats");
     Env::DocAddNum32("total", s.artists_stats.total);
 }
 
@@ -612,7 +596,6 @@ ON_METHOD(manager, view_collections_stats)
     k.m_KeyInContract = 0;
     k.m_Prefix.m_Cid = cid;
     Env::VarReader::Read_T(k, s);
-    Env::DocGroup gr0("collections_stats");
     Env::DocAddNum32("total", s.collections_stats.total);
 }
 
@@ -623,8 +606,37 @@ ON_METHOD(manager, view_artworks_stats)
     k.m_KeyInContract = 0;
     k.m_Prefix.m_Cid = cid;
     Env::VarReader::Read_T(k, s);
-    Env::DocGroup gr0("artworks_stats");
     Env::DocAddNum32("total", s.artworks_stats.total);
+}
+
+ON_METHOD(user, view_artists_stats)
+{
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.artists_stats.approved);
+}
+
+ON_METHOD(user, view_collections_stats)
+{
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.collections_stats.approved);
+}
+
+ON_METHOD(user, view_artworks_stats)
+{
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.artworks_stats.approved);
 }
 
 ON_METHOD(manager, view_artists)
@@ -864,7 +876,7 @@ ON_METHOD(artist, set_artwork)
     if (nDataSize)
         nCharge += Env::Cost::Log_For(nDataSize) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 250000);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 2500000);
 }
 
 ON_METHOD(manager, admin_delete)
@@ -1052,7 +1064,7 @@ ON_METHOD(artist, set_artist)
 
     const char* comment = artist_exists ? "Updating artist's info" : "Becoming an artist";
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 250000);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 2500000);
 }
 
 ON_METHOD(artist, set_collection)
@@ -1101,7 +1113,7 @@ ON_METHOD(artist, set_collection)
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 250000);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000);
 }
 
 ON_METHOD(user, download)
@@ -1434,7 +1446,7 @@ ON_METHOD(user, set_price)
 
     const char* comment = args.m_Price.m_Amount ? "Set item price" : "Remove from sale";
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 200000);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 2000000);
 }
 
 ON_METHOD(user, transfer)

@@ -29,11 +29,9 @@ BEAM_EXPORT void Ctor(const Gallery::Method::Init& r)
     if (Env::get_CallDepth() > 1)
     {
         MyState s(false);
-        s.artists_stats.total = 0;
-        s.artworks_stats.total = 0;
-        s.artworks_stats.free_id = 0;
-        s.collections_stats.total = 0;
-        s.collections_stats.free_id = 0;
+        s.artists_stats = {};
+        s.artworks_stats = {};
+        s.collections_stats = {};
 
         s.m_VoteBalance = 0;
         _POD_(s.m_Config) = r.m_Config;
@@ -133,7 +131,9 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             MyState s;
             Gallery::Collection::Id c_id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
+            s.collections_stats.approved++;
             s.artists_stats.total++;
+            s.artists_stats.approved++;
             s.Save();
 
             c.is_default = true;
@@ -221,6 +221,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             MyState s;
             c_id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
+            s.collections_stats.approved++;
             s.Save();
 
             // will be uncommented in future (with moderation adding)
@@ -274,7 +275,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 
     Gallery::Artwork::Id m_id = Utils::FromBE(++s.artworks_stats.free_id);
     s.artworks_stats.total++;
-    
+    s.artworks_stats.approved++;
     s.Save();
 
     _POD_(m.m_pkOwner) = r.m_pkArtist;

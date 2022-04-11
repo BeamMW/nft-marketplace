@@ -95,33 +95,6 @@ ON_METHOD(manager, view)
 {
     static const ShaderID s_pSid[] = {
         Gallery::s_SID_0,
-        Gallery::s_SID_1,
-        Gallery::s_SID_2,
-        Gallery::s_SID_3,
-        Gallery::s_SID_4,
-        Gallery::s_SID_5,
-        Gallery::s_SID_6,
-        Gallery::s_SID_7,
-        Gallery::s_SID_8,
-        Gallery::s_SID_9,
-        Gallery::s_SID_10,
-        Gallery::s_SID_11,
-        Gallery::s_SID_12,
-        Gallery::s_SID_13,
-        Gallery::s_SID_14,
-        Gallery::s_SID_15,
-        Gallery::s_SID_16,
-        Gallery::s_SID_17,
-        Gallery::s_SID_18,
-        Gallery::s_SID_19,
-        Gallery::s_SID_20,
-        Gallery::s_SID_21,
-        Gallery::s_SID_22,
-        Gallery::s_SID_23,
-        Gallery::s_SID_24,
-        Gallery::s_SID_25,
-        Gallery::s_SID_26,
-        Gallery::s_SID_27,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
