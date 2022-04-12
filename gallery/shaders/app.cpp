@@ -8,12 +8,6 @@
 
 #define Gallery_manager_view(macro)
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
-#define Gallery_manager_view_artists(macro) \
-    macro(ContractID, cid) \
-    macro(Height, h0) \
-    macro(uint32_t, idx0) \
-    macro(uint32_t, count) \
-
 #define Gallery_manager_view_artists_stats(macro) \
     macro(ContractID, cid) \
 
@@ -22,14 +16,6 @@
 
 #define Gallery_manager_view_artworks_stats(macro) \
     macro(ContractID, cid) \
-
-#define Gallery_manager_view_collections(macro) \
-    macro(ContractID, cid) \
-    macro(Height, h0) \
-    macro(uint32_t, idx0) \
-    macro(uint32_t, count) \
-    macro(PubKey, artist_id) \
-    macro(uint32_t, print_artworks) \
 
 //#define Gallery_manager_manage_artist(macro) \
     macro(ContractID, cid) \
@@ -53,11 +39,9 @@
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
     macro(manager, view_params) \
-    macro(manager, view_artists) \
     macro(manager, view_artists_stats) \
     macro(manager, view_collections_stats) \
     macro(manager, view_artworks_stats) \
-    macro(manager, view_collections) \
     macro(manager, view_balance) \
     macro(manager, add_rewards) \
     macro(manager, my_admin_key) \
@@ -97,6 +81,20 @@
     macro(uint32_t, idx0) \
     macro(PubKey, artist_id) \
     macro(uint32_t, collection_id) \
+
+#define Gallery_user_view_collections(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
+    macro(PubKey, artist_id) \
+    macro(uint32_t, print_artworks) \
+
+#define Gallery_user_view_artists(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
 
 #define Gallery_user_download(macro) \
     macro(ContractID, cid) \
@@ -139,6 +137,8 @@
 
 #define GalleryRole_user(macro) \
     macro(user, view_artists_stats) \
+    macro(user, view_artists) \
+    macro(user, view_collections) \
     macro(user, view_collections_stats) \
     macro(user, view_artworks_stats) \
     macro(user, view_artworks) \
@@ -870,7 +870,7 @@ ON_METHOD(user, view_artworks_stats)
     Env::DocAddNum32("total", s.artworks_stats.approved);
 }
 
-ON_METHOD(manager, view_artists)
+ON_METHOD(user, view_artists)
 {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(PubKey)];
@@ -932,7 +932,7 @@ ON_METHOD(manager, view_artists)
     }
 }
 
-ON_METHOD(manager, view_collections)
+ON_METHOD(user, view_collections)
 {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
