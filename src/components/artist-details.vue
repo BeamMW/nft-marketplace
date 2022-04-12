@@ -21,7 +21,7 @@
                     :valid="label_valid"
                     :max_length="100"
                     :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:46px;margin-top:0"
+                    :style="edit_self || in_set_artist ? 'margin-bottom:48px;margin-top:0' : 'margin-bottom:30px;margin-top:0'"
         />
         <inputField v-model="website"
                     label="Website"
@@ -38,6 +38,7 @@
                     :max_length="16"
                     :valid="twitter_valid"
                     :readonly="in_set_artist"
+                    :counter="false"
         />
         <inputField v-model="instagram"
                     label="Instagram"
@@ -46,6 +47,7 @@
                     :max_length="31"
                     :valid="instagram_valid"
                     :readonly="in_set_artist"
+                    :counter="false"
         />
       </div>
       <div class="col-second">

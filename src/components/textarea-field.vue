@@ -112,7 +112,7 @@ export default {
       default: 150,
       required: false
     },
-    show_counter:{
+    counter:{
       type: Boolean,
       default: true,
       required: false

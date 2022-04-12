@@ -14,9 +14,12 @@
              @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
-    <div class="info-container">
-      <charactersLengthInfo :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
-    </div>
+    <charactersLengthInfo v-if="max_length && counter && !readonly" 
+                          :readonly="readonly" 
+                          :max_length="max_length" 
+                          :value="modelValue.length"
+                          style="margin-top:2px;"
+    />
   </div>
 </template>
 
@@ -27,7 +30,7 @@
   .label {
     display: block
     margin-bottom:10px
-    color: rgba(255,255,255,0.6)
+    color: rgba(255, 255, 255, 0.6)
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
 
@@ -49,7 +52,7 @@
     }
   }
 
-  .input {
+  input {
     font-family: 'SFProDisplay', sans-serif
     background-color: rgba(255, 255, 255, 0.08)
     border: none
@@ -138,7 +141,7 @@ export default {
       default: 10,
       required: true
     },
-    show_counter:{
+    counter: {
       type: Boolean,
       default: true,
       required: false

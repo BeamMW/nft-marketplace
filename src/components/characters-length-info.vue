@@ -1,11 +1,7 @@
 <template>
-  <div :class="{
-    'info': true,
-    'readonly': readonly,
-  }"
-  >
+  <div class="info">
     <span>{{ max_length }} characters max</span> 
-    <span v-if="show_counter">{{ value }} / {{ max_length }} </span>
+    <span>{{ value }} / {{ max_length }} </span>
   </div>
 </template>
 
@@ -19,7 +15,7 @@
     font-weight: 400
     font-size: 12px
     
-    &.readonly {
+    &[readonly] {
       color: rgba(255, 255, 255, 0.35)
     }
   }
@@ -27,27 +23,16 @@
 <script>
 export default {
   props: {
-    readonly: {
-      type: Boolean,
-      default: false,
-      required: false
-    },
     max_length:{
       type: Number,
       default: 10,
       required: true
-    },
-    show_counter:{
-      type: Boolean,
-      default: true,
-      required: false
     },
     value: {
       type: Number,
       default: 0,
       required: false
     }
-
   }
 }
 </script>
