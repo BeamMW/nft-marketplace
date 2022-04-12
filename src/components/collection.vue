@@ -14,6 +14,14 @@
         <div class="label">{{ item.label }}</div>
         <div class="author">{{ item.author }}</div>
         <div class="description">{{ item.description }}</div>
+        <hr class="line"/>
+        <div class="items-info">
+          <div class="count">
+            <div class="text">4</div>
+            <div>Items</div>
+          </div>
+          <amount :amount="400000" size="12px" :info="true" class="icon_styles"/>
+        </div>
       </div>
     </div>
   </div>
@@ -61,6 +69,24 @@
           -webkit-box-orient: vertical
           overflow: hidden
         }
+        & > .items-info {
+          display:flex
+          font-size: 12px
+          
+          .count {
+            display: flex
+            flex-direction: column
+            flex-basis: 20%
+            
+            & > .text {
+              font-weight: 500
+              color: #24c1ff
+            }
+          }
+          .icon_styles {
+            height: 18px
+          }
+        }
       }
     }
   }
@@ -68,10 +94,12 @@
 
 <script>
 import preview from './image-preview.vue'
+import amount from './amount.vue'
 
 export default {
   components: {
-    preview
+    preview,
+    amount
   },
 
   props: {
