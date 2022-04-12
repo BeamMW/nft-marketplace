@@ -2,7 +2,7 @@ import './styles/fonts.css'
 import './styles/global.css'
 
 import App from './components/app.vue'
-import {router} from './router.js'
+import router from 'router'
 import utils from './utils/utils.js'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'
 

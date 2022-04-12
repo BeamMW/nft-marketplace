@@ -1,6 +1,10 @@
 <template>
-  <div class="collection">
-    <preview class="preview" :image="item.cover" height="140px" cover/>
+  <div :class="{'collection': true, 'pointer-cursor': !item['default']}" @click="onDetails">
+    <preview class="preview" 
+             :image="item.cover" 
+             height="140px" 
+             cover
+    />
     <div class="info-row">  
       <div class="avatar">
         <preview :image="item.avatar" 
@@ -68,6 +72,7 @@
 
 <script>
 import preview from './image-preview.vue'
+import collsStore from 'stores/collections'
 
 export default {
   components: {
@@ -78,6 +83,15 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  methods: {
+    onDetails () {
+      if (this.item.default) {
+        return
+      }
+      collsStore.toEditCollection(this.item.id)
     }
   }
 }

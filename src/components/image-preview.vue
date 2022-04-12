@@ -1,7 +1,7 @@
 <template>
   <div class="preview-container" :style="style">
     <img v-if="src" :src="src" :style="image_style">
-    <loading v-if="!src && show_loading" :error="error"/>
+    <loading v-if="!src && show_loading && loading" :error="error"/>
   </div>  
 </template>
 
@@ -71,6 +71,10 @@ export default {
       }
       
       return undefined
+    },
+
+    loading () {
+      return this.image === undefined
     },
 
     error () {

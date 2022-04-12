@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <template v-if="edit_self">
-      <pageTitle title="Edit your Artist Info"/>
+      <pageTitle title="Edit your Artist"/>
       <p class="description">
         After your artist information is changed it would not be visible<br>
         until reviewed by moderator. NFTs would still appear in gallery.<br>
@@ -88,7 +88,7 @@
       <btn text="cancel" @click="$router.go(-1)">
         <img src="~assets/icon-cancel.svg"/>
       </btn>
-      <btn :text="edit_self ? 'update info' : 'create account'" 
+      <btn :text="edit_self ? 'update artist' : 'create account'" 
            color="green" 
            :disabled="!can_submit || in_set_artist" 
            @click="onSetArtist"

@@ -61,7 +61,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create collection" 
+    <btn :text="edit_mode ? 'update collection' : 'create collection'" 
          color="green" 
          :disabled="!can_submit" 
          @click="onSetCollection"
@@ -134,7 +134,7 @@ import btn from './button.vue'
 import addImage from './add-image.vue'
 import {common} from 'utils/consts'
 import collsStore from 'stores/collections'
-import {router} from '../router'
+import {router} from 'router'
 
 export default {
   components: {
@@ -169,7 +169,11 @@ export default {
       return this.id !== undefined
     },
     collection () {
-      return this.id ? collsStore.user_colls[this.id] : undefined
+      if (this.id) {
+        let coll = collsStore.user_colls.find(c => c.id == this.id)
+        return coll
+      }
+      return undefined
     },
     label: {
       get () {

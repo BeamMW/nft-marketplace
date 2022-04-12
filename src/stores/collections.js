@@ -4,6 +4,7 @@ import utils from 'utils/utils'
 import formats from 'stores/formats'
 import artistsStore from 'stores/artists'
 import imagesStore from 'stores/images'
+import router from 'router'
 
 class CollectionsStore {
   constructor () {
@@ -22,6 +23,10 @@ class CollectionsStore {
 
   get user_colls() {
     return this._state.user.collections
+  }
+
+  user_coll(id) {
+    return computed(() => this._state.user.collections.find(c => c.id === id))
   }
 
   async _loadTotals(mode) {
@@ -112,6 +117,21 @@ class CollectionsStore {
       role: 'artist',
       action: 'set_collection',
       label, data, cid
+    })
+  }
+
+  toNewCollection() {
+    router.push({
+      name: 'new-collection'
+    })
+  }
+
+  toEditCollection(id) {
+    router.push({
+      name: 'edit-collection',
+      params: {
+        id
+      }
     })
   }
 }

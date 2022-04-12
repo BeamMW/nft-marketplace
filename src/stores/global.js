@@ -1,8 +1,8 @@
-import {router} from '../router.js'
 import {tabs, common, contract, sort} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
+import router from 'router'
 import formats from 'stores/formats'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
@@ -817,12 +817,6 @@ const store = {
   toBalance() {
     router.push({
       name: 'balance'
-    })
-  },
-  
-  toNewCollection() {
-    router.push({
-      name: 'add-collection'
     })
   },
 

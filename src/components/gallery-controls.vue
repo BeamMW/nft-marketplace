@@ -16,7 +16,7 @@
       </div>
       Total: {{ artists_total }}
       <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
-      <btn text="add collection" color="green" padding="7px 12px" @click="$store.toNewCollection"/>
+      <btn text="add collection" color="green" padding="7px 12px" @click="onNewCollection"/>
       <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"
@@ -53,7 +53,8 @@ import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
 import {tabs, sort} from 'utils/consts.js'
-import artistsStore from 'stores/artists.js'
+import artistsStore from 'stores/artists'
+import collsStore from 'stores/collections'
 
 // TODO: headless
 export default {
@@ -111,6 +112,12 @@ export default {
     },
     artists_total () {
       return artistsStore.total
+    },
+  },
+
+  methods: {
+    onNewCollection () {
+      collsStore.toNewCollection()
     },
   }
 }

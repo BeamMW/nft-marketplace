@@ -2,7 +2,7 @@ import formats from 'stores/formats'
 import utils from 'utils/utils'
 import imagesStore from 'stores/images'
 import {versions, cid} from 'stores/consts'
-import {router} from 'router'
+import router from 'router'
 import {reactive} from 'vue'
 
 class ArtistsStore {

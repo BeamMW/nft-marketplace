@@ -17,7 +17,7 @@ class ImagesStore {
 
   fromContract(image) {
     if (!image) {
-      return undefined
+      return null
     }
 
     utils.ensureField(image, 'ipfs_hash', 'string')
