@@ -52,29 +52,38 @@ class CollectionsStore {
 
     for (let coll of res.collections) {
       coll = this._fromContract(coll)
-      coll.owned = computed(() => artistsStore.my_id == coll.author)
-      coll.cover = imagesStore.fromContract(coll.cover)
-      
+      coll.owned  = computed(() => artistsStore.my_id == coll.author)
+      coll.cover  = imagesStore.fromContract(coll.cover)
+
       let author = artistsStore.loadArtist(coll.author)
-      coll.author_name = computed(() => author.value.loading ? 'Loading...' : author.value.label)
-      coll.avatar = computed(() => author.value.avatar)
+      coll.author_name = computed(() => {
+        if (author.value.loading) return 'Loading...'
+        if (author.value.error) return 'Failed to load author'
+        return author.value.label
+      }) 
+      
+      coll.avatar = computed(() => {
+        if(author.value.loading) return {loading: true}
+        if(author.value.error) return {error: true}
+        return author.value.avatar
+      })
 
       if (coll.default) {
         coll.cover = computed(() => {
-          return author.value.loading ? {loading: true} : author.value.banner
+          if(author.value.loading) return {loading: true}
+          if(author.value.error) return {error: true}
+          return author.value.banner
         })
         coll.label = computed(() => {
           if (author.value.loading) return 'Loading...'
+          if (author.value.error) return 'Failed to load author'
           return `${author.value.label} collection`
         })
         coll.description = computed(() => {
-          if (author.value.loading) return ''
+          if (author.value.loading || author.value.error) return ''
           return `This collection includes all artworks by ${author.value.label} that are not in other collections.`
         })
-        coll.author_name = computed(() => {
-          return author.value.loading ? '' : author.value.label
-        })        
-      } 
+      }
 
       colls.push(coll)
     }

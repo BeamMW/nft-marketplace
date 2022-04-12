@@ -87,20 +87,25 @@ class ArtistsStore {
     this._total = res.total
   }
 
-  async _loadArtistAsync (id, ignoreError) {
-    let {res} = await utils.invokeContractAsync({
-      role: 'manager',
-      action: 'view_artists',
-      ids: id,
-      cid
-    })
+  async _loadArtistAsync (id, fail) {
+    try {
+      let {res} = await utils.invokeContractAsync({
+        role: 'manager',
+        action: 'view_artists',
+        ids: id,
+        cid
+      })
 
-    utils.ensureField(res, 'artists', 'array')
-    if (res.artists.length != 1) return {label: 'failed'}
+      utils.ensureField(res, 'artists', 'array')
+      if (res.artists.length != 1) throw new Error('_loadArtistAsync: artists.length != 1')
 
-    let artist = this._fromContract(res.artists[0])
-    this._state.artists[id] = artist
-
+      let artist = this._fromContract(res.artists[0])
+      this._state.artists[id] = artist
+    } 
+    catch (err) {
+      if (fail) throw err
+      this._state.artists[id] = {id, error: true}
+    }
     return this._state.artists[id]
   }
 
@@ -114,8 +119,9 @@ class ArtistsStore {
       if (cached) {
         return cached
       }
-      this._loadArtistAsync(id)
-      return {loading: true}
+      this._state.artists[id] = {id, loading: true}
+      this._loadArtistAsync(id, false)
+      return this._state.artists[id]
     })
   }
 
@@ -123,48 +129,6 @@ class ArtistsStore {
     await this._loadKey()
     await this._loadSelf()
     await this._loadTotals()
-    
-    /*
-    let {res} = await utils.invokeContractAsync({
-      role: 'manager',
-      action: 'view_artists',
-      cid
-    })
-
-    // TODO: remove test code --> filter
-    utils.ensureField(res, 'artists', 'array')
-    let artists = res.artists.filter(artist => artist.id !== '5990c629ab78082a0e18a92b897468c7b04cf3c0a39314d951dfc31331ab6bc000') 
-      .map(artist => this.__fromContract(artist))
-
-    // TODO: move to admin                          
-    artists.sort((a,b) => a.label > b.label ? 1 : -1)
-
-    // TODO: keep only id
-    if (!state.selected_artist && artists.length) {  
-      state.selected_artist = {
-        id: artists[0].id,
-        label: artists[0].label
-      }
-    }
-    
-    for (let artist of artists) {
-      if (this.my_id === artist.id) {
-        this._is_artist = true
-      }
-
-      let oldArtist = this.artists[artist.id]
-      this.artists[artist.id] = artist
-
-      if (oldArtist) {
-        if (!imagesStore.copyImage(this.artists[artist.id].banner, oldArtist.banner)) {
-          imagesStore.loadImageAsync(this.artists[artist.id].banner)
-        }
-        if (!imagesStore.copyImage(this.artists[artist.id].avatar, oldArtist.avatar)) {
-          imagesStore.loadImageAsync(this.artists[artist.id].avatar)
-        }
-      }
-    }
-    */
   }
 
   async setArtist(label, data) {
@@ -205,7 +169,6 @@ class ArtistsStore {
     }
   } 
 
-  // TODO: do not fail app on this?
   _fromContract (cartist) {
     let artist = Object.assign({}, cartist)
 
