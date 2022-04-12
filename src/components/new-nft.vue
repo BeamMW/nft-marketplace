@@ -150,7 +150,6 @@ import btn from './button.vue'
 import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
 import {common} from 'utils/consts.js'
-import utils from 'utils/utils.js'
 import switchInput from './switch-input.vue'
 
 export default {

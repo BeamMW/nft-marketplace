@@ -279,15 +279,12 @@ export default {
     },
     website_valid() {
       let value = this.website
-      if (!value) return true
-      return validators.url(value)
+      return !value || validators.url(value)
     },
-
     twitter_valid() {
       let value = this.twitter
       return !value || validators.twitter(value)
     },
-    
     instagram_valid() {
       let value = this.instagram
       return !value || validators.instagram(value)
@@ -362,7 +359,6 @@ export default {
         return this.banner_ || (this.artist || {}).banner
       },
       set (val) {
-        console.log('set banner to', val)
         this.banner_ = val
       }
     },
