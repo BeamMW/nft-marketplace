@@ -8,6 +8,7 @@
 <style lang="stylus" scoped>
 .amount-container {
   display: flex
+  align-items: center
   font-family: 'SFProDisplay', sans-serif
   font-weight: bolder
 
