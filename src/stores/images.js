@@ -76,7 +76,6 @@ class ImagesStore {
       // TODO: revoke object
       // TODO: keep only N images & delete and release old ones
       image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
-      console.log('image loaded', image.ipfs_hash)
 
       this._clearLR(image)
       this._state.images[image.ipfs_hash] = image
@@ -84,7 +83,7 @@ class ImagesStore {
       return image
     }
     catch(err) {
-      console.log(`Failed to load image ${image.ipfs_hash}`, err)
+      console.log(`ImagesStore._ipfsLoad for hash ${image.ipfs_hash}`, err)
       this._setError(image, err)
       if (image.ipfs_hash) { 
         this._state.images[image.ipfs_hash] = image

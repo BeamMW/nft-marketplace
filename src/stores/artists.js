@@ -104,7 +104,8 @@ class ArtistsStore {
     } 
     catch (err) {
       if (fail) throw err
-      this._state.artists[id] = {id, error: true}
+      console.log(`_loadArtistAsync for id ${id}:`, err)
+      this._state.artists[id] = {id, error: err}
     }
     return this._state.artists[id]
   }
@@ -171,6 +172,10 @@ class ArtistsStore {
 
   _fromContract (cartist) {
     let artist = Object.assign({}, cartist)
+
+    if (!artist.label) {
+      throw new Error('ArtistsStore._fromContract : artist label is empty')
+    }
 
     let [label] = formats.fromContract(artist.label)
     let [version, data] = formats.fromContract(artist.data)

@@ -51,11 +51,27 @@ class CollectionsStore {
     let colls = []
 
     for (let coll of res.collections) {
-      coll = this._fromContract(coll)
-      coll.owned  = computed(() => artistsStore.my_id == coll.author)
-      coll.cover  = imagesStore.fromContract(coll.cover)
-
       let author = artistsStore.loadArtist(coll.author)
+
+      try {
+        coll = this._fromContract(coll)
+        coll.cover = imagesStore.fromContract(coll.cover)
+        if (coll.default) {
+          coll.label = computed(() => {
+            if (author.value.loading) return 'Loading...'
+            if (author.value.error) return 'Failed to load author'
+            return `${author.value.label} collection`
+          })
+        }
+      } 
+      catch (err) {
+        console.log(`CollectionsStore._loadCollections for ${coll.id}`, err)
+        coll.error = err
+        coll.label = 'Failed to load collection'
+        coll.cover = {error: true}
+      }
+
+      coll.owned = computed(() => artistsStore.my_id == coll.author)
       coll.author_name = computed(() => {
         if (author.value.loading) return 'Loading...'
         if (author.value.error) return 'Failed to load author'
@@ -74,20 +90,14 @@ class CollectionsStore {
           if(author.value.error) return {error: true}
           return author.value.banner
         })
-        coll.label = computed(() => {
-          if (author.value.loading) return 'Loading...'
-          if (author.value.error) return 'Failed to load author'
-          return `${author.value.label} collection`
-        })
         coll.description = computed(() => {
           if (author.value.loading || author.value.error) return ''
           return `This collection includes all artworks by ${author.value.label} that are not in other collections.`
         })
       }
-
       colls.push(coll)
     }
-
+    
     this._state[mode].collections = colls
   }
 
@@ -97,6 +107,10 @@ class CollectionsStore {
 
     let [label] = formats.fromContract(coll.label)
     coll.label = label
+
+    if (!label) {
+      throw new Error('label cannot be empty')
+    }
 
     if (!coll.default) {
       let [version, data] = formats.fromContract(coll.data)
