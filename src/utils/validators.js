@@ -10,7 +10,7 @@ export default class Validators {
   static url(value) {
     let url 
     try {
-      url = new URL(this.website)
+      url = new URL(value)
     }
     catch(_) {
       return false

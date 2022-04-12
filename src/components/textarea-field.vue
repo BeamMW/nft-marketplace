@@ -8,8 +8,8 @@
               :readonly="readonly"
               @input="$emit('update:modelValue', $event.target.value)"
     >
-  </textarea>
-    <charactersLengthInfo :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
+    </textarea>
+    <charactersLengthInfo v-if="!readonly && max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
   </div>
 </template>
 
@@ -110,11 +110,6 @@ export default {
     max_length:{
       type: Number,
       default: 150,
-      required: false
-    },
-    show_counter:{
-      type: Boolean,
-      default: true,
       required: false
     }
   },

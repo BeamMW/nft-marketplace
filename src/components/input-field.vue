@@ -14,9 +14,12 @@
              @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
-    <div class="info-container">
-      <charactersLengthInfo :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
-    </div>
+    <charactersLengthInfo v-if="max_length && counter && !readonly" 
+                          :readonly="readonly" 
+                          :max_length="max_length" 
+                          :value="modelValue.length"
+                          style="margin-top:2px;"
+    />
   </div>
 </template>
 
@@ -27,7 +30,7 @@
   .label {
     display: block
     margin-bottom:10px
-    color: rgba(255,255,255,0.6)
+    color: rgba(255, 255, 255, 0.6)
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
 
@@ -47,45 +50,45 @@
         filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
       }
     }
+  }
 
-    .input {
-      font-family: 'SFProDisplay', sans-serif
-      background-color: rgba(255, 255, 255, 0.08)
-      border: none
-      outline-width: 0
+  input {
+    font-family: 'SFProDisplay', sans-serif
+    background-color: rgba(255, 255, 255, 0.08)
+    border: none
+    outline-width: 0
+    font-size: 14px
+    color: white
+    border-radius: 10px
+    padding: 12px 8px
+    width: 100%
+
+    &:read-only {
+      background-color: rgba(255, 255, 255, 0.03)
+      color: rgba(255, 255, 255, 0.3)
+    }
+
+    &:not(.error):not(:read-only):focus {
+      background-color: rgba(255, 255, 255, 0.12)
+    }
+
+    &.error:focus {
+      background-color: rgba(255, 98, 92, 0.12)
+    }
+
+    &.error {
+      color: rgba(255, 98, 92, 1)
+      background-color: rgba(255, 98, 92, 0.07)
+    }
+
+    &:not(.error)::placeholder {
       font-size: 14px
-      color: white
-      border-radius: 10px
-      padding: 12px 8px
-      width: 100%
+      color: rgba(255, 255, 255, 0.3)
+    }
 
-      &:read-only {
-        background-color: rgba(255, 255, 255, 0.03)
-        color: rgba(255, 255, 255, 0.3)
-      }
-
-      &:not(.error):not(:read-only):focus {
-        background-color: rgba(255, 255, 255, 0.12)
-      }
-
-      &.error:focus {
-        background-color: rgba(255, 98, 92, 0.12)
-      }
-
-      &.error {
-        color: rgba(255, 98, 92, 1)
-        background-color: rgba(255, 98, 92, 0.07)
-      }
-
-      &:not(.error)::placeholder {
-        font-size: 14px
-        color: rgba(255, 255, 255, 0.3)
-      }
-
-      &.error::placeholder {
-        font-size: 14px
-        color: rgba(255, 98, 92, 0.4)
-      }
+    &.error::placeholder {
+      font-size: 14px
+      color: rgba(255, 98, 92, 0.4)
     }
   }
   .info-container {
@@ -138,7 +141,7 @@ export default {
       default: 10,
       required: true
     },
-    show_counter:{
+    counter: {
       type: Boolean,
       default: true,
       required: false
