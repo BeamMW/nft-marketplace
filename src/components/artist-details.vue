@@ -65,21 +65,19 @@
                     :error="banner_valid ? '' : ' '"
           />
           <img src="~/assets/elipse.svg" alt="avatar" class="elipse"/>
-          <div class="container-avatar">
-            <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
-              <div v-if="avatar" class="remove">
-                <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
-              </div>
-              <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-              <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
-              <input v-if="!in_set_artist" id="avatar"
-                     ref="avatar"
-                     type="file"
-                     accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
-                     class="files"
-                     @change="onUploadAvatar"
-              />
+          <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
+            <div v-if="avatar" class="remove">
+              <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
+            <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
+            <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
+            <input v-if="!in_set_artist" id="avatar"
+                   ref="avatar"
+                   type="file"
+                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                   class="files"
+                   @change="onUploadAvatar"
+            />
           </div>
           <div v-if="!avatar_valid || !banner_valid" class="error_msg">
             <p class="error">image cannot be larger than 250kb</p>
@@ -151,74 +149,72 @@
             filter: grayscale(100%) brightness(0%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
           }
 
-          .container-avatar {
-
-            .avatar {
-              display: flex
-              align-items: center
-              justify-content: center
-              height: 120px
-              width: 120px
-              background-color: rgba(26, 246, 214, 0.1)
-              border-radius: 9999px
-              position: relative
-              left: 50%
-              transform: translate(-50%, -26%)
-              
-              .text {
-                width: 100%
-                height: 100%
-                display: flex
-                justify-content: center
-                align-items: center
-                font-size: 14px
-                color: #1af6d6
-                cursor: pointer
-              }
-
-              &[readonly] {
-                opacity: 0.6
-              }
-
-              .remove {
-                background-color: rgba(0, 0, 0, 0.7)
-                position: absolute
-                left: 50%
-                top: 50%
-                transform: translate(-50%,-50%)
-                z-index: 2
-                border-radius: 9999px
-                padding: 7px 7px 3px 7px
-                cursor: pointer
-              }
-
-              .files {
-                visibility:hidden
-                width: 0
-              }
+          .avatar {
+            display: flex
+            align-items: center
+            justify-content: center
+            height: 120px
+            width: 120px
+            background-color: rgba(26, 246, 214, 0.1)
+            border-radius: 9999px
+            position: relative
+            left: 50%
+            transform: translate(-50%, -26%)
             
-              .image {
-                width: 100%
-                height: 100%
-                object-fit: cover
-                border-radius: 9999px
-                border: 1px dashed transparent
+            .text {
+              width: 100%
+              height: 100%
+              display: flex
+              justify-content: center
+              align-items: center
+              font-size: 14px
+              color: #1af6d6
+              cursor: pointer
+            }
 
-                &.error {
-                  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-                }
+            &[readonly] {
+              opacity: 0.6
+            }
+
+            .remove {
+              background-color: rgba(0, 0, 0, 0.7)
+              position: absolute
+              left: 50%
+              top: 50%
+              transform: translate(-50%,-50%)
+              z-index: 2
+              border-radius: 9999px
+              padding: 7px 7px 3px 7px
+              cursor: pointer
+            }
+
+            .files {
+              visibility:hidden
+              width: 0
+            }
+          
+            .image {
+              width: 100%
+              height: 100%
+              object-fit: cover
+              border-radius: 9999px
+              border: 1px dashed transparent
+
+              &.error {
+                filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
               }
             }
           }
         
           .error_msg {
             text-align: center
-            margin-top: -20px
+            margin-top: -16px
 
             .error {
               font-style: italic
               font-size: 12px
               font-weight: 400
+              margin: 0
             }
           }
         }
