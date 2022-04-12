@@ -24,7 +24,7 @@
       </div>
       <div class="col-second">
         <addImage v-model:image="image"
-                  :valid="image_valid"
+                  :error="image_valid ? '' : 'image cannot be larger than 250kb'"
                   title="Add NFT here<br>(.jpg, .png, .gif)"
                   height="374px"
         />

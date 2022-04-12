@@ -197,7 +197,6 @@ export default {
       }
     },
     website_valid() {
-      console.log(validators)
       let value = this.website
       if (!value) return true
       return validators.url(value)
