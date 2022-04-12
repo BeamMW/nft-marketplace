@@ -2,9 +2,6 @@ import utils from 'utils/utils'
 import {computed, reactive} from 'vue'
 
 class ImagesStore {
-  /*
-   * REFACTORED
-   */ 
   constructor() {
     this.reset()
   }
@@ -17,20 +14,26 @@ class ImagesStore {
 
   fromContract(image) {
     if (!image) {
-      return null
+      return image
     }
 
-    utils.ensureField(image, 'ipfs_hash', 'string')
-    utils.ensureField(image, 'mime_type', 'string')
+    try {
+      utils.ensureField(image, 'ipfs_hash', 'string')
+      utils.ensureField(image, 'mime_type', 'string')
+    }
+    catch(err) {
+      console.log('ImagesStore.from_contract', err)
+      this._setError(image, err)
+      return image
+    }
 
     return computed(() => {
       let cached = this._state.images[image.ipfs_hash]
       if (cached) {
         return cached
       }
-
       this._ipfsLoad(image)
-      return undefined
+      return image
     })
   }
 
@@ -45,8 +48,25 @@ class ImagesStore {
     })
   }
 
+  async _setLoading(image) {
+    delete image.error
+    image.loading = true
+  }
+
+  async _setError(image, err) {
+    delete image.loading
+    image.error = err
+  }
+
+  async _clearLR(image) {
+    delete image.loading
+    delete image.error
+  }
+
   async _ipfsLoad(image) {
     try {
+      this._setLoading(image)
+      
       let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
       utils.ensureField(res, 'data', 'array')
       
@@ -56,13 +76,19 @@ class ImagesStore {
       // TODO: revoke object
       // TODO: keep only N images & delete and release old ones
       image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
-      
+      console.log('image loaded', image.ipfs_hash)
+
+      this._clearLR(image)
       this._state.images[image.ipfs_hash] = image
+      
       return image
     }
     catch(err) {
-      let context = 'Loading image from IPFS, hash ' + image.ipfs_hash
-      image.error = {err, context}
+      console.log(`Failed to load image ${image.ipfs_hash}`, err)
+      this._setError(image, err)
+      if (image.ipfs_hash) { 
+        this._state.images[image.ipfs_hash] = image
+      }
     }
   }
 

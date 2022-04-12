@@ -20,7 +20,7 @@
                     label="Collection Name*"
                     :valid="label_valid"
                     :max_length="100"
-                    style="margin-bottom:46px;margin-top:0"
+                    style="margin-bottom:29px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -35,6 +35,7 @@
                     img="twitter"
                     :max_length="16"
                     :valid="twitter_valid"
+                    :counter="false"
         />
         <inputField v-model="instagram"
                     label="Instagram"
@@ -42,6 +43,7 @@
                     img="instagram"
                     :max_length="31"
                     :valid="instagram_valid"
+                    :counter="false"
         />
       </div>
       <div class="col-second">
@@ -134,7 +136,7 @@ import btn from './button.vue'
 import addImage from './add-image.vue'
 import {common} from 'utils/consts'
 import collsStore from 'stores/collections'
-import {router} from 'router'
+import router from 'router'
 import validators from '../utils/validators.js'
 
 export default {
@@ -280,7 +282,7 @@ export default {
         description: this.description,
         cover:       this.cover
       }
-      await collsStore.setCollection(this.label, data)
+      await collsStore.setCollection(this.id, this.label, data)
       router.go(-1)
     }
   }

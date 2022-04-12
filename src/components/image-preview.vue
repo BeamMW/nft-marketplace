@@ -1,7 +1,8 @@
 <template>
   <div class="preview-container" :style="style">
+    <div v-if="loading && show_loading" class="darker">Loading...</div>
+    <div v-if="error && show_loading" class="darker">Failed to load image</div>
     <img v-if="src" :src="src" :style="image_style">
-    <loading v-if="!src && show_loading && loading" :error="error"/>
   </div>  
 </template>
 
@@ -18,17 +19,15 @@
       max-height: 100%
       object-fit: cover
     }
+
+    & > .darker {
+      opacity: 0.5
+    }
   }
 </style>
 
 <script>
-import loading from './item-loading.vue'
-
 export default {
-  components: {
-    loading
-  },
-  
   props: {
     image: {
       type: [Object, String],
@@ -74,11 +73,11 @@ export default {
     },
 
     loading () {
-      return this.image === undefined
+      return (this.image || {}).loading
     },
 
     error () {
-      return this.image && !!this.image.error
+      return (this.image || {}).error
     },
 
     style () {

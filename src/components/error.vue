@@ -78,7 +78,7 @@ export default {
   },
 
   mounted () {
-    this.errleft = 5
+    this.errleft = 10
     this.timeout = setInterval(() => {
       this.errleft -= 1
       if (this.errleft == 0) {

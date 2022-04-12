@@ -14,7 +14,7 @@
              @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
-    <charactersLengthInfo v-if="max_length && counter && !readonly" 
+    <charactersLengthInfo v-if="max_length && counter" 
                           :readonly="readonly" 
                           :max_length="max_length" 
                           :value="modelValue.length"

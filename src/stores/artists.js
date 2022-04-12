@@ -3,7 +3,7 @@ import utils from 'utils/utils'
 import imagesStore from 'stores/images'
 import {versions, cid} from 'stores/consts'
 import router from 'router'
-import {reactive} from 'vue'
+import {reactive, computed} from 'vue'
 
 class ArtistsStore {
   constructor () {
@@ -73,8 +73,7 @@ class ArtistsStore {
   }
 
   async _loadSelf() {
-    // _loadArtist trhows on error, for self we want to fail
-    this._is_artist = !!await this._loadArtist(this.my_id)
+    this._is_artist = !!await this._loadArtistAsync(this.my_id)
   }
 
   async _loadTotals () {
@@ -84,12 +83,11 @@ class ArtistsStore {
       cid
     })
     
-    utils.ensureField(res, 'artists_stats', 'object')
-    utils.ensureField(res.artists_stats, 'total', 'number')
-    this._total = res.artists_stats.total
+    utils.ensureField(res, 'total', 'number')
+    this._total = res.total
   }
 
-  async _loadArtist (id) {
+  async _loadArtistAsync (id, ignoreError) {
     let {res} = await utils.invokeContractAsync({
       role: 'manager',
       action: 'view_artists',
@@ -98,15 +96,27 @@ class ArtistsStore {
     })
 
     utils.ensureField(res, 'artists', 'array')
-    if (res.artists.length != 1) return undefined
+    if (res.artists.length != 1) return {label: 'failed'}
 
-    // TODO: throw and ensure reload ?
     let artist = this._fromContract(res.artists[0])
-    this.artists[artist.id] = artist
+    this._state.artists[id] = artist
 
-    //let counter = 0
-    //setInterval(() => this.artists[artist.id].label = 'Label ' + counter++, 1000)
-    return this.artists[artist.id]
+    return this._state.artists[id]
+  }
+
+  loadArtist(id) {
+    if (!id) {
+      throw new Error('loadArtist: id is required')
+    }
+
+    return computed(() => {
+      let cached = this._state.artists[id]
+      if (cached) {
+        return cached
+      }
+      this._loadArtistAsync(id)
+      return {loading: true}
+    })
   }
 
   async loadAsync() {

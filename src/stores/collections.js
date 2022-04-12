@@ -36,9 +36,8 @@ class CollectionsStore {
       cid
     })
 
-    utils.ensureField(res, 'collections_stats', 'object')
-    utils.ensureField(res.collections_stats, 'total', 'number')
-    this._state[mode].total = res.collections_stats.total
+    utils.ensureField(res, 'total', 'number')
+    this._state[mode].total = res.total
   }
 
   async _loadCollections(mode) {
@@ -49,25 +48,33 @@ class CollectionsStore {
     })
     
     utils.ensureField(res, 'collections', 'array')
-
-    // TODO: remove test code slice(1)
-    res.collections = res.collections.slice(1)
-
     let colls = []
+
     for (let coll of res.collections) {
       coll = this._fromContract(coll)
-      
-      let author = artistsStore.artists[coll.author]
-      coll.author_name = computed(() => author.label)
       coll.owned = computed(() => artistsStore.my_id == coll.author)
-      coll.avatar = computed(() => author.avatar)
       coll.cover = imagesStore.fromContract(coll.cover)
+      
+      let author = artistsStore.loadArtist(coll.author)
+      coll.author_name = computed(() => author.value.loading ? 'Loading...' : author.value.label)
+      coll.avatar = computed(() => author.value.avatar)
 
       if (coll.default) {
-        coll.description = computed(() => `This collection includes all artworks by ${author.label} that are not in other collections.`)
-        coll.cover = computed(() => author.banner)
-        coll.label = computed(() => `${author.label} collection`)
-      }
+        coll.cover = computed(() => {
+          return author.value.loading ? {loading: true} : author.value.banner
+        })
+        coll.label = computed(() => {
+          if (author.value.loading) return 'Loading...'
+          return `${author.value.label} collection`
+        })
+        coll.description = computed(() => {
+          if (author.value.loading) return ''
+          return `This collection includes all artworks by ${author.value.label} that are not in other collections.`
+        })
+        coll.author_name = computed(() => {
+          return author.value.loading ? '' : author.value.label
+        })        
+      } 
 
       colls.push(coll)
     }
@@ -98,7 +105,6 @@ class CollectionsStore {
 
   async _toContract(label, data) {
     data.cover = await imagesStore.toContract(data.cover)
-    alert(JSON.stringify(data))
     return {
       label: formats.toContract(label),
       data: formats.toContract(versions.COLLECTION_VERSION, data)
@@ -110,14 +116,20 @@ class CollectionsStore {
     await this._loadCollections('user')
   }
 
-  async setCollection(label, data) {
+  async setCollection(id, label, data) {
     ({label, data} = await this._toContract(label, data))
-
-    return await utils.invokeContractAsyncAndMakeTx({
+    
+    let args = {
       role: 'artist',
       action: 'set_collection',
       label, data, cid
-    })
+    }
+
+    if (id) {
+      args['collection_id'] = id
+    }
+
+    return await utils.invokeContractAsyncAndMakeTx(args)
   }
 
   toNewCollection() {

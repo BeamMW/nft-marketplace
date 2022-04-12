@@ -9,7 +9,7 @@
               @input="$emit('update:modelValue', $event.target.value)"
     >
     </textarea>
-    <charactersLengthInfo v-if="!readonly && max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
+    <charactersLengthInfo v-if="max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
   </div>
 </template>
 

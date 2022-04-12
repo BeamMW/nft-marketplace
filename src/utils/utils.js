@@ -199,15 +199,14 @@ export default class Utils {
   }
 
   static callApi(method, params, cback) {
-    let callid = ['call', CallID++].join('-')
-    Calls[callid] = cback
-
+    let callid = ['call', CallID++, method].join('-')
     let request = {
       'jsonrpc': '2.0',
       'id':      callid,
       'method':  method,
       'params':  params
     }
+    Calls[callid] = {cback, request}
 
     if (Utils.isHeadless()) {
       return BEAM.api.callWalletApi(JSON.stringify(request))
@@ -289,7 +288,9 @@ export default class Utils {
     {
       answer = JSON.parse(json)
       const id = answer.id
-      const cback = Calls[id] || APIResCB
+      const call = Calls[id] || {}
+      const cback = call.cback || APIResCB
+      const request = call.request
       delete Calls[id]
             
       if (answer.error) {
@@ -309,7 +310,8 @@ export default class Utils {
         if (shaderAnswer.error) {
           return cback({
             error: shaderAnswer.error,
-            answer
+            answer,
+            request
           })
         }
         return cback(null, shaderAnswer, answer)

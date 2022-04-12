@@ -240,13 +240,13 @@ const store = {
       return this.setError(err, 'Failed to load artwork list')
     }
     
-    utils.ensureField(res, 'items', 'array')
+    utils.ensureField(res, 'artworks', 'array')
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
     let mykey = artistsStore.my_id
 
-    for (let awork of res.items) {
+    for (let awork of res.artworks) {
       let oawork = null
       for (let idx = oldstart; idx < oartworks.length; ++idx) {
         if (oartworks[idx].id == awork.id) {

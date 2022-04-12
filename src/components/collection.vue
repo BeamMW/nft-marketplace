@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'collection': true, 'pointer-cursor': !item['default']}" @click="onDetails">
+  <div :class="{'collection': true, 'pointer-cursor': item.owned && !item.default}" @click="onDetails">
     <preview class="preview" 
              :image="item.cover" 
              height="140px" 
@@ -88,7 +88,7 @@ export default {
 
   methods: {
     onDetails () {
-      if (this.item.default) {
+      if (!this.item.owned || this.item.default || this.item.error) {
         return
       }
       collsStore.toEditCollection(this.item.id)
