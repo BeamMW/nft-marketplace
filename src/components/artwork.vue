@@ -1,5 +1,5 @@
 <template>
-  <div class="artwork">
+  <div :class="{'artwork': true, 'error': error}">
     <!---- Preview OR Loading ---->
     <preview :image="item.image" height="200px" @click="onDetails"/>
 
@@ -38,6 +38,10 @@
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
     position:relative
+
+    &.error {
+      
+    }
 
     & > .delete {
       position: absolute
@@ -126,6 +130,10 @@ export default {
 
     id () {
       return this.item.id
+    },
+
+    error () {
+      return this.item.error || (this.item.author || {}).error
     },
                 
     can_vote () {
