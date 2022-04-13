@@ -173,7 +173,7 @@ export default {
     },
     collection () {
       if (this.id) {
-        let coll = collsStore.user_colls.find(c => c.id == this.id)
+        let coll = collsStore.user_items.find(c => c.id == this.id)
         return coll
       }
       return undefined

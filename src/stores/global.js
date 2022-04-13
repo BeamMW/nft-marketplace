@@ -7,6 +7,7 @@ import formats from 'stores/formats'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
+import artsStore from 'stores/artworks'
 
 function defaultState() {
   let state = {  
@@ -112,6 +113,7 @@ const store = {
     this.state.is_headless = utils.isHeadless()
     collsStore.reset(this)
     artistsStore.reset(this)
+    artsStore.reset(this)
     imagesStore.reset(this)
     router.push({name: 'gallery'})
 
@@ -206,11 +208,13 @@ const store = {
     try {
       await artistsStore.loadAsync()
       await collsStore.loadAsync()
+      await artsStore.loadAsync()
+      this.state.loading = false
     }
-    catch(err) {
+    catch(err) 
+    {
       this.setError(err)
     }
-    this.loadArtworks()
   },
 
   withdrawBEAM () {
@@ -228,13 +232,6 @@ const store = {
   //
   // Artworks
   //
-  loadArtworks () {
-    utils.invokeContract(
-      `role=user,action=view_artworks,cid=${this.state.cid}`, 
-      (...args) => this.onLoadArtworks(...args)
-    )    
-  },
-
   onLoadArtworks (err, res) {
     if (err) {
       return this.setError(err, 'Failed to load artwork list')

@@ -23,8 +23,8 @@
 <script>
 // TODO: headless
 import controls from './gallery-controls.vue'
-import artworks from './gallery-artworks.vue'
-import collections from './gallery-collections.vue'
+import artworks from './user-artworks.vue'
+import collections from './user-collections.vue'
 import {tabs} from 'utils/consts.js'
 
 export default {

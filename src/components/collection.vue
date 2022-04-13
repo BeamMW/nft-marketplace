@@ -91,7 +91,7 @@ export default {
       if (!this.item.owned || this.item.default || this.item.error) {
         return
       }
-      collsStore.toEditCollection(this.item.id)
+      collsStore.toEditItem(this.item.id)
     }
   }
 }

@@ -12,6 +12,7 @@
 
 <script>
 import list from './items-list.vue'
+import artsStore from 'stores/artworks'
 
 export default {
   components: {
@@ -20,7 +21,7 @@ export default {
 
   computed: {
     items () {
-      return this.$state.artworks
+      return artsStore.user_items
     },
 
     page: {
