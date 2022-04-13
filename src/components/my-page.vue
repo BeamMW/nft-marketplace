@@ -48,6 +48,7 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
 import publicKeyModal from './public-key-dialog.vue'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {
@@ -66,7 +67,7 @@ export default {
 
   computed: {
     is_artist() {
-      return this.$store.state.is_artist
+      return artistsStore.is_artist
     }
   },
 
@@ -78,10 +79,10 @@ export default {
       this.$store.toBalance()
     },
     onEditArtist() {
-      this.$store.toEditArtist()
+      artistsStore.toEditArtist()
     },
     onBecomeArtist() {
-      this.$store.toBecomeArtist()
+      artistsStore.toBecomeArtist()
     }
   },
 }

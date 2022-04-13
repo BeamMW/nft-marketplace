@@ -25,7 +25,7 @@
 import controls from './gallery-controls.vue'
 import artworks from './gallery-artworks.vue'
 import collections from './gallery-collections.vue'
-import {tabs} from '../utils/consts.js'
+import {tabs} from 'utils/consts.js'
 
 export default {
   components: {

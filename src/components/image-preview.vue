@@ -1,7 +1,8 @@
 <template>
   <div class="preview-container" :style="style">
-    <img v-if="src" :src="src">
-    <loading v-if="!src && show_loading" :error="error"/>
+    <div v-if="loading && show_loading" class="darker">Loading...</div>
+    <div v-if="error && show_loading" class="darker">Failed to load image</div>
+    <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
 
@@ -18,21 +19,20 @@
       max-height: 100%
       object-fit: cover
     }
+
+    & > .darker {
+      opacity: 0.5
+    }
   }
 </style>
 
 <script>
-import loading from './item-loading.vue'
-
 export default {
-  components: {
-    loading
-  },
-  
   props: {
     image: {
       type: [Object, String],
-      required: true
+      required: false,
+      default: undefined
     },
     height: {
       type: String,
@@ -49,6 +49,10 @@ export default {
       required: false,
       default: '10px 10px 0 0'
     },
+    cover: {
+      type: Boolean,
+      default: false
+    },
     show_loading: {
       type: Boolean,
       default: true
@@ -57,23 +61,23 @@ export default {
 
   computed: {
     src () {
-      if (typeof this.image == 'string' && this.image) {
+      if (typeof this.image == 'string') {
         return this.image
       }
 
-      if (this.image.object) {
+      if (this.image && this.image.object) {
         return this.image.object
-      }
-
-      if (this.image.bytes) {
-        return URL.createObjectURL(new Blob([this.image.bytes], {type: this.image.mime_type}))
       }
       
       return undefined
     },
 
+    loading () {
+      return (this.image || {}).loading
+    },
+
     error () {
-      return !!this.image.error
+      return (this.image || {}).error
     },
 
     style () {
@@ -91,6 +95,18 @@ export default {
 
       if (this.$attrs && this.$attrs['onClick']) {
         res['cursor'] = 'pointer'
+      }
+
+      return res
+    },
+
+    image_style() {
+      let res = {}
+
+      if (this.cover) {
+        res['width'] = '100%'
+        res['height'] = '100%'
+        res['object-fit'] = 'cover%'
       }
 
       return res

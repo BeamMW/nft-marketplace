@@ -29,7 +29,7 @@
 </style>
 
 <script>
-import utils from '../utils/utils.js'
+import utils from 'utils/utils.js'
 
 export default {
   data () {
@@ -53,12 +53,12 @@ export default {
   methods: {
     close () {
       this.show = false
-      document.getElementById('container').style.opacity = 1
+      document.getElementById('app-container').style.opacity = 1
     },
 
     open () {
       this.show = true
-      document.getElementById('container').style.opacity = 0.3
+      document.getElementById('app-container').style.opacity = 0.3
     }
   }
 }

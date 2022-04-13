@@ -1,10 +1,12 @@
-import App from './components/app.vue'
-import store from './store/store.js'
-import {router} from './router.js'
-import utils from './utils/utils.js'
-import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import './styles/fonts.css'
 import './styles/global.css'
+
+import App from './components/app.vue'
+import router from 'router'
+import utils from './utils/utils.js'
+import {createApp} from 'vue/dist/vue.esm-bundler.js'
+
+import store from './stores/global.js'
 import artwork from './components/artwork.vue'
 import collection from './components/collection.vue'
 
@@ -60,6 +62,12 @@ utils.initialize(
       return store.setError(err, 'Failed to initialize application', true)
     }
 
-    store.start()
+    try {
+      store.start()
+    }
+    catch(err) {
+      alert(err)
+      return store.setError(err, 'Failed to initialize store', true)
+    }
   }
 )

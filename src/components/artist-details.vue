@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <template v-if="edit_self">
-      <pageTitle title="Edit your Artist Info"/>
+      <pageTitle title="Edit your Artist"/>
       <p class="description">
         After your artist information is changed it would not be visible<br>
         until reviewed by moderator. NFTs would still appear in gallery.<br>
@@ -21,7 +21,7 @@
                     :valid="label_valid"
                     :max_length="100"
                     :readonly="edit_self || in_set_artist"
-                    :style="edit_self ? (in_set_artist ? 'margin-bottom:32px;margin-top:0' : 'margin-bottom:46px;margin-top:0'): 'margin-bottom:30px;margin-top:0'"
+                    style="margin-bottom:31px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
@@ -59,22 +59,20 @@
         />
         <div class="uploads-container">
           <addImage v-model:image="banner"
-                    title="Add an artist banner"
-                    accept="image/jpeg, image/png, image/svg+xml"      
+                    title="Add an artist banner"  
                     :readonly="in_set_artist" 
                     :error="banner_valid ? '' : ' '"
           />
           <img src="~/assets/elipse.svg" alt="avatar" class="elipse"/>
           <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
-            <div v-if="avatar" class="remove">
+            <div v-if="avatar && !in_set_artist" class="remove">
               <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
-            <img v-if="avatar" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
+            <img v-if="avatar && avatar.object" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
             <input v-if="!in_set_artist" id="avatar"
                    ref="avatar"
-                   type="file"
-                   accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+                   type="file"     
                    class="files"
                    @change="onUploadAvatar"
             />
@@ -92,9 +90,10 @@
       <btn text="cancel" @click="$router.go(-1)">
         <img src="~assets/icon-cancel.svg"/>
       </btn>
-      <btn :text="edit_self ? 'update info' : 'create account'" 
-           color="blue" 
-           :disabled="!can_submit || in_set_artist" @click="onSetArtist"
+      <btn :text="edit_self ? 'update artist' : 'create account'" 
+           color="green" 
+           :disabled="!can_submit || in_set_artist" 
+           @click="onSetArtist"
       >
         <img src="~assets/icon-create.svg"/>
       </btn>
@@ -116,7 +115,7 @@
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 35px 0px 0px 0px
+      margin: 30px 0px 0px 0px
       font-family: 'SFProDisplay', sans-serif
     }
 
@@ -142,6 +141,9 @@
         .uploads-container {
           position: relative
 
+        .uploads-container {
+          position: relative
+
           .elipse {
             position: absolute
             left: 50%
@@ -162,14 +164,16 @@
             transform: translate(-50%, -26%)
             
             .text {
-              width: 100%
-              height: 100%
               display: flex
               justify-content: center
               align-items: center
               font-size: 14px
               color: #1af6d6
               cursor: pointer
+
+              &[readonly] {
+                opacity: 0.6
+              }
             }
 
             &[readonly] {
@@ -208,7 +212,6 @@
         
           .error_msg {
             text-align: center
-            margin-top: -16px
 
             .error {
               font-style: italic
@@ -239,7 +242,8 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
+import artistsStore from 'stores/artists.js'
 import validators from '../utils/validators.js'
 
 export default {
@@ -273,10 +277,10 @@ export default {
 
   computed: {
     in_set_artist() {
-      return this.$state.set_artist_tx.length > 0
+      return !!artistsStore.artist_tx
     },
     edit_self () {
-      return !!(this.id && this.id.length && this.id === this.$state.my_artist_key)
+      return !!(this.id === artistsStore.my_id && artistsStore.is_artist)
     },
     avatarStyles() {
       return {
@@ -289,8 +293,7 @@ export default {
     },
     website_valid() {
       let value = this.website
-      if (!value) return true
-      return validators.url(value)
+      return !value || validators.url(value)
     },
 
     twitter_valid() {
@@ -322,11 +325,11 @@ export default {
              this.avatar_valid
     },
     artist () {
-      return this.id ? this.$state.artists[this.id] : {}
+      return this.id ? artistsStore.artists[this.id] : undefined
     },
     label: {
       get () {
-        return this.label_ || this.artist.label
+        return this.label_ || (this.artist || {}).label
       },
       set (val) {
         this.label_ = val
@@ -334,7 +337,7 @@ export default {
     },
     website: {
       get () {
-        return this.website_ || this.artist.website
+        return this.website_ || (this.artist || {}).website
       },
       set (val) {
         this.website_ = val
@@ -342,7 +345,7 @@ export default {
     },
     twitter: {
       get () {
-        return this.twitter_ || this.artist.twitter
+        return this.twitter_ || (this.artist || {}).twitter
       },
       set (val) {
         this.twitter_ = val
@@ -350,7 +353,7 @@ export default {
     },
     instagram: {
       get () {
-        return this.instagram_ || this.artist.instagram
+        return this.instagram_ || (this.artist || {}).instagram
       },
       set (val) {
         this.instagram_ = val
@@ -358,8 +361,7 @@ export default {
     },
     about: {
       get () {
-        console.log('about get', JSON.stringify(this.artist))
-        return this.about_ || this.artist.about
+        return this.about_ || (this.artist || {}).about
       },
       set (val) {
         this.about_ = val
@@ -370,7 +372,7 @@ export default {
         if (this.banner_ === null) {
           return undefined
         }
-        return this.banner_ || this.artist.banner
+        return this.banner_ || (this.artist || {}).banner
       },
       set (val) {
         this.banner_ = val
@@ -381,7 +383,7 @@ export default {
         if (this.avatar_ === null) {
           return undefined
         }
-        return this.avatar_ || this.artist.avatar
+        return this.avatar_ || (this.artist || {}).avatar
       },
       set (val) {
         this.avatar_ = val
@@ -425,18 +427,11 @@ export default {
         website:   this.website,
         twitter:   this.twitter,
         instagram: this.instagram,
-        about:     this.about
+        about:     this.about,
+        avatar:    this.avatar,
+        banner:    this.banner
       }
-
-      if (this.avatar) {
-        data['avatar'] = this.avatar.file
-      }
-
-      if (this.banner) {
-        data['banner'] = this.banner.file
-      }
-
-      await this.$store.setArtist(this.label, data)
+      await artistsStore.setArtist(this.label, data)
     }
   }
 }

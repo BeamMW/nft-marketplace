@@ -1,9 +1,13 @@
 <template>
-  <div class="collection">
-    <preview class="preview" :image="item.cover_image" height="140px"/>
+  <div :class="{'collection': true, 'pointer-cursor': item.owned && !item.default}" @click="onDetails">
+    <preview class="preview" 
+             :image="item.cover" 
+             height="140px" 
+             cover
+    />
     <div class="info-row">  
       <div class="avatar">
-        <preview :image="item.author_image" 
+        <preview :image="item.avatar" 
                  :show_loading="false"
                  width="72px" 
                  height="72px" 
@@ -12,7 +16,7 @@
       </div>
       <div class="text">
         <div class="label">{{ item.label }}</div>
-        <div class="author">{{ item.author }}</div>
+        <div class="author">{{ item.author_name }}</div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
         <div class="items-info">
@@ -94,6 +98,7 @@
 
 <script>
 import preview from './image-preview.vue'
+import collsStore from 'stores/collections'
 import amount from './amount.vue'
 
 export default {
@@ -106,6 +111,15 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  methods: {
+    onDetails () {
+      if (!this.item.owned || this.item.default || this.item.error) {
+        return
+      }
+      collsStore.toEditCollection(this.item.id)
     }
   }
 }

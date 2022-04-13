@@ -30,7 +30,7 @@
 </style>
 
 <script>
-import utils from '../utils/utils.js'
+import utils from 'utils/utils.js'
 export default {
   props: {
     error: {
@@ -78,7 +78,7 @@ export default {
   },
 
   mounted () {
-    this.errleft = 5
+    this.errleft = 10
     this.timeout = setInterval(() => {
       this.errleft -= 1
       if (this.errleft == 0) {

@@ -1,23 +1,21 @@
-import {router} from '../router.js'
-import {tabs, common, contract, sort} from '../utils/consts.js'
-import utils from '../utils/utils.js'
+import {tabs, common, contract, sort} from 'utils/consts.js'
+import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
-import formats from './store-formats.js'
-import aformat from './store-artist.js'
+
+import router from 'router'
+import formats from 'stores/formats'
+import imagesStore from 'stores/images'
+import artistsStore from 'stores/artists'
+import collsStore from 'stores/collections'
 
 function defaultState() {
-  let state = {
-    // Refactored
-    set_artist_tx: '',
-    
+  let state = {  
     /// OLD
     loading: true,
     error: undefined,
     shader: undefined,
     cid: contract.cid,
     cid_checked: false,
-    my_artist_key: '',
-    is_artist: false,
     is_admin: false,
     artworks: [],
     all_artworks: {
@@ -27,8 +25,6 @@ function defaultState() {
       [tabs.LIKED]: [],
       [tabs.SOLD]:  [],
     },
-    artists: {},
-    artists_count: 0,
     balance_beam: 0,
     balance_reward: 0,
     selected_artist: undefined,
@@ -38,13 +34,13 @@ function defaultState() {
     pending_artworks: 0,
     is_headless: false,
     use_ipfs: true,
-
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
     gallery_collections_page: 1,
     collections: []
   }
 
+  /*
   let desc = 'Blah blah blah, blah blah blah. Blah blah blah, blah blah blah! Blah blah blah, blah blah blah? Blah blah blah, blah blah blah.'
   for(let i = 0; i < 30; ++i) {
     state.collections.push({
@@ -55,7 +51,7 @@ function defaultState() {
       cover_image: '/assets/test-collection-cover.png',
       description: [desc, desc, desc].join(' '),
     })
-  }
+  }*/
   
   return state
 }
@@ -66,11 +62,6 @@ function appstate() {
     total_pages: computed(() => {
       let total = state.artworks.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
-    }),
-    artist: computed(() => id => {
-      let artist = state.artists[id]
-      if (!id) throw new Error(`No artist with id ${id}`)
-      return artist
     })
   })
   return state
@@ -119,6 +110,9 @@ const store = {
   start () {
     Object.assign(this.state, defaultState())
     this.state.is_headless = utils.isHeadless()
+    collsStore.reset(this)
+    artistsStore.reset(this)
+    imagesStore.reset(this)
     router.push({name: 'gallery'})
 
     nextTick(() => {
@@ -140,6 +134,7 @@ const store = {
 
   onApiResult(err, res, full) {
     if (err) {
+      // TODO: wrap in new Error
       return this.setError(err,  'API handling error')
     }
 
@@ -157,7 +152,6 @@ const store = {
       return this.setError(err, 'Failed to verify cid')     
     }
 
-    console.log(this.state.cid)
     if (!res.contracts.some(el => el.cid == this.state.cid)) {
       throw `CID not found '${this.state.cid}'`
     }
@@ -168,20 +162,6 @@ const store = {
 
   refreshAllData () {
     // TODO: move loading sequence to promises, now loadBalance initiates update chain
-    utils.invokeContract(
-      `role=artist,action=get_key,cid=${this.state.cid}`, 
-      (...args) => this.onGetArtistKeyCID(...args), this.shader
-    )
-  },
-
-  onGetArtistKeyCID(err, res) {
-    if (err) {
-      return this.setError(err, 'Failed to get artist key')     
-    }
-        
-    utils.ensureField(res, 'key', 'string')
-    this.state.my_artist_key = res.key
-        
     utils.invokeContract(
       `role=manager,action=view_params,cid=${this.state.cid}`, 
       (...args) => this.onLoadParams(...args)
@@ -203,7 +183,7 @@ const store = {
     )
   },
 
-  onLoadBalance(err, res) {
+  async onLoadBalance(err, res) {
     if (err) {
       return this.setError(err, 'Failed to load balance')
     }
@@ -223,7 +203,14 @@ const store = {
     }
 
     this.state.balance_beam = newBeam
-    this.loadArtists()
+    try {
+      await artistsStore.loadAsync()
+      await collsStore.loadAsync()
+    }
+    catch(err) {
+      this.setError(err)
+    }
+    this.loadArtworks()
   },
 
   withdrawBEAM () {
@@ -239,84 +226,11 @@ const store = {
   },
 
   //
-  // Artists
-  //
-  loadArtists () {
-    console.log('loadArtists')
-    utils.invokeContract(
-      `role=manager,action=view_artists,cid=${this.state.cid}`, 
-      (...args) => this.onLoadArtists(...args)
-    )
-  },
-
-  onLoadArtists(err, res) {
-    if (err) {
-      return this.setError(err, 'Failed to load artists list')
-    }
-
-    utils.ensureField(res, 'artists', 'array')
-    // TODO:TEST
-    let artists = [] 
-    for (let artist of res.artists) {
-      if (artist.key == '27db54db176900d0bf933490b9ecf5c784ddd39c0af5112d2ce60bdc084336f701') {
-        continue
-      }
-
-      artist = aformat.fromContract(artist)
-      console.log('artist', JSON.stringify(artist))
-      this.loadImageAsync(artist.banner).then((image) => {
-        //let stateArtist = this.state.artists[artist.id]
-        //if (stateArtist) {
-        //  stateArtist.banner = artist.banner
-        //}
-      })
-
-      console.log('load avatar')
-      this.loadImageAsync(artist.avatar)
-      console.log('after load avatar')
-      artists.push(artist)
-    }
-    artists.sort((a,b) => a.label > b.label ? 1 : -1)
-
-    //
-    // OPTIMIZE: 
-    //       code below is not optimized, need to ask Vlad  if it is possible for contract/app to
-    //       return artists old artists before new. In this case we can skip artists_count in res.artists
-    //
-    //       for (let idx = this.state.artists_count; idx < res.artists.length; ++idx) {
-    //          let artist = res.artists[idx]
-    //          if (artist.key == ... use indexOf this.state.my_artist_keys) {
-    //            this.state.is_artist = true
-    //          }
-    //          this.state.artists[artist.key] = artist
-    //       }
-    //
-
-    // choose first artist for admin if nobody is selected
-    // TODO: keep only id
-    if (!this.state.selected_artist) {  
-      this.state.selected_artist = {
-        key: artists[0].key,
-        label: artists[0].label
-      }
-    }
-
-    let mykey = this.state.my_artist_key
-    for (let artist of artists) {
-      if (mykey === artist.key) this.state.is_artist = true
-      this.state.artists[artist.key] = artist
-    } 
-
-    this.state.artists_count = artists.length
-    this.loadArtworks() 
-  },
-
-  //
   // Artworks
   //
   loadArtworks () {
     utils.invokeContract(
-      `role=user,action=view_items,cid=${this.state.cid}`, 
+      `role=user,action=view_artworks,cid=${this.state.cid}`, 
       (...args) => this.onLoadArtworks(...args)
     )    
   },
@@ -326,13 +240,13 @@ const store = {
       return this.setError(err, 'Failed to load artwork list')
     }
     
-    utils.ensureField(res, 'items', 'array')
+    utils.ensureField(res, 'artworks', 'array')
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
-    let mykey = this.state.my_artist_key
+    let mykey = artistsStore.my_id
 
-    for (let awork of res.items) {
+    for (let awork of res.artworks) {
       let oawork = null
       for (let idx = oldstart; idx < oartworks.length; ++idx) {
         if (oartworks[idx].id == awork.id) {
@@ -350,7 +264,7 @@ const store = {
         awork.pk_author = oawork.pk_author
       } 
       else {
-        awork.author = (this.state.artists[awork.pk_author] || {}).label
+        awork.author = (artistsStore.artists[awork.pk_author] || {}).label
       }
 
       awork.pk_owner = awork.pk
@@ -557,7 +471,7 @@ const store = {
       }
 
       // We receive author only now, so add what's missing to SOLD
-      let mykey = this.state.my_artist_key
+      let mykey = artistsStore.my_id
       if (artwork.pk_author === mykey && !artwork.owned) {
         this.state.all_artworks[tabs.SOLD].push(artwork)
         if (this.state.active_tab == tabs.SOLD) {
@@ -766,7 +680,7 @@ const store = {
   __showStats() {
     const cnt_stats = 12
     let artworks = this.state.all_artworks[tabs.ALL]
-    let artists = this.state.artists
+    let artists = artistsStore.artists
 
     let likes = [], likes_total = 0
     let sales = [], tvb = 0
@@ -881,108 +795,6 @@ const store = {
     this.state.gallery_collections_page = page
   },
 
-  async invokeContractAsyncAndMakeTx (args) {
-    let {full} = await utils.invokeContractAsync(args)
-    utils.ensureField(full.result, 'raw_data', 'array')
-
-    try {
-      let {res} = await utils.callApiAsync('process_invoke_data', {data: full.result.raw_data})
-      utils.ensureField(res, 'txid', 'string')
-      return res.txid
-    }
-    catch(err) {
-      if (utils.isUserCancelled(err)) {
-        return undefined
-      }
-      throw err
-    }
-  },
-
-  async readFileAsync(file) {
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader()
-      reader.onload = () => {
-        resolve(reader.result)
-      }
-      reader.onerror = reject
-      reader.readAsArrayBuffer(file)
-    })
-  },
-
-  async uploadImageAsync (file) {
-    let buffer = await this.readFileAsync(file)
-    let array = Array.from(new Uint8Array(buffer))
-    let {res} = await utils.callApiAsync('ipfs_add', {data: array})
-    return {
-      ipfs_hash: res.hash,
-      mime_type: file.type
-    }
-  },
-
-  async loadImageAsync (image, context) {
-    if (!image) {
-      return
-    } 
-
-    try {
-      let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
-      utils.ensureField(res, 'data', 'array')
-      
-      // TODO: can skip u8arr here?
-      let u8arr = new Uint8Array(res.data)
-      let blob = new Blob([u8arr], {type: image.mime_type})
-      // TODO: revoke object
-      image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
-      
-      return image
-    }
-    catch(err) {
-      if (err) {
-        context = context || 'loading image from IPFS, hash ' + image.ipfs_hash
-        image.error = {err, context}
-      }
-    }
-  },
-
-  async setArtist(label, data) {
-    if(data.avatar instanceof File) {
-      data.avatar = await this.uploadImageAsync(data.avatar)  
-    }
-
-    if (data.banner instanceof File) {
-      data.banner = await this.uploadImageAsync(data.banner)
-    }
-
-    ({label, data} = aformat.toContract(label, data))
-    let txid = await this.invokeContractAsyncAndMakeTx({
-      role: 'artist',
-      action: 'set_artist',
-      cid: this.state.cid,
-      label,
-      data
-    })
-
-    if (!txid) {
-      return
-    }
-
-    this.state.set_artist_tx = txid
-    let interval = setInterval(async () => {
-      try {
-        let {res} = await utils.callApiAsync('tx_status', {txId: this.state.set_artist_tx})
-        console.log(res.status)
-        if ([0, 1, 5].indexOf(res.status) == -1) {
-          clearInterval(interval)
-          this.state.set_artist_tx = ''
-        }
-      }
-      catch(err) {
-        this.setError(err)
-        this.state.set_artist_tx = ''
-      }
-    }, 1000)
-  },
-
   toArtworkDetails(id) {
     router.push({
       name: 'artwork',
@@ -1008,38 +820,11 @@ const store = {
     })
   },
 
-  toBecomeArtist() {
-    if (this.state.is_artist) {
-      throw new Error('Unexpected BecomeArtist, already an artist')
-    }
-    router.push({
-      name: 'artist'
-    })
-  },
-
-  toEditArtist() {
-    if (!this.state.is_artist) {
-      throw new Error('Unexpected EditArtist, not an artist yet')
-    }
-    router.push({
-      name: 'artist',
-      params: {
-        id: this.state.my_artist_key
-      }
-    })
-  },
-  
-  toNewCollection() {
-    router.push({
-      name: 'add-collection'
-    })
-  },
-
   toNewNFT() {
     router.push({
       name: 'add-nft'
     })
-  }
+  },
 }
 
 export default store

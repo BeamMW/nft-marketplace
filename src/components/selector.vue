@@ -90,7 +90,7 @@
 
 <script>
 import {nextTick} from 'vue'
-import utils from '../utils/utils.js'
+import utils from 'utils/utils.js'
 
 export default {
   props: {
@@ -143,7 +143,7 @@ export default {
     open(ev) {
       this.show = true
       nextTick(() => {
-        /*let downAway = (evc) => {
+        let downAway = (evc) => {
           if (!this.$el.contains(evc.target)) {
             document.removeEventListener('mousedown', downAway, true)
             this.close()
@@ -164,7 +164,7 @@ export default {
         
         document.addEventListener('mousedown', downAway, true)
         document.addEventListener('click', clickAway, true)
-        document.addEventListener('scroll', scrollAway, true) */
+        document.addEventListener('scroll', scrollAway, true) 
       })
     },
   }

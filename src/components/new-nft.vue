@@ -92,9 +92,9 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
+import {common} from 'utils/consts.js'
 import switchInput from './switch-input.vue'
 import formSelect from './form-select.vue'
-import {common} from '../utils/consts.js'
 
 export default {
   components: {

@@ -2,8 +2,17 @@
   <span id="modals"/>
   <error v-if="error" :error="error.error" :context="error.context"/>
   <loading v-else-if="loading"/>
-  <router-view v-else></router-view>
+  <div v-else id="app-container" class="app-container">
+    <router-view></router-view>
+  </div>
 </template>
+
+<style lang="stylus" scoped>
+.app-container {
+  width: 100%
+  height: 100%
+}
+</style>
 
 <script>
 import loading from './loading.vue'

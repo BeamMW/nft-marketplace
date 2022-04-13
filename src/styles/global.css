@@ -55,3 +55,7 @@ html, body {
   cursor: default !important;
   opacity: 0.5;
 }
+
+.error {
+  color: rgba(255, 98, 92, 0.7)
+}

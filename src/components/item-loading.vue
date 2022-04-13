@@ -1,6 +1,6 @@
 <template>
   <div class="loading darker">
-    {{ error ? 'Failed to load artwork' : 'Loading...' }}
+    {{ error ? error : 'Loading...' }}
   </div>
 </template>
 
@@ -25,8 +25,8 @@
 export default {
   props: {
     error: {
-      type: Boolean,
-      default: false,
+      type: String,
+      default: '',
       required: false
     }
   },

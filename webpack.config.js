@@ -25,7 +25,11 @@ const config = (DEV_MODE) => {return {
   resolve: {
     alias: {
       'assets': path.resolve(__dirname, 'src/assets/'), 
-    }
+      'stores': path.resolve(__dirname, 'src/stores/'),
+      'utils': path.resolve(__dirname, 'src/utils/'),
+      'router': path.resolve(__dirname, 'src/router.js'),
+    },
+    extensions: ['.js', '.vue']
   },
   module: {
     rules: [

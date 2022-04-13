@@ -6,12 +6,12 @@
       <span v-else>
         <span>Upload for artist:&nbsp;&nbsp;</span>
         <select v-model="$state.selected_artist" class="upload_artist">
-          <option v-for="artist in artists" :key="artist.key" :value="{key: artist.key, label: artist.label}">
-            {{ artist.label }} - {{ artist.key.substring(0, 4) }}..{{ artist.key.slice(-4) }}
+          <option v-for="artist in artists" :key="artist.id" :value="{id: artist.id, label: artist.label}">
+            {{ artist.label }} - {{ artist.id.substring(0, 4) }}..{{ artist.id.slice(-4) }}
           </option>
         </select>
         &nbsp;&nbsp;
-        <input type="file" multiple accept="image/apng, image/avif, image/gif, image/jpeg, image/png, image/svg+xml, image/webp"      
+        <input type="file" multiple accept="image/*"      
                :disabled="!$state.selected_artist"
                @change="onUploadArtwork"
                @click="value=null"
@@ -55,15 +55,16 @@
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
+import {common} from 'utils/consts.js'
+import {artistsStore} from 'stores/artists.js'
 
 export default {
   computed: {
     artists() {
-      return this.$state.artists
+      return artistsStore.artists
     },
     artists_count() {
-      return this.$state.artists_count
+      return artistsStore.total
     },
     balance_reward() {
       return this.$state.balance_reward  / common.GROTHS_IN_BEAM
@@ -111,7 +112,7 @@ export default {
         if (!file) { 
           continue
         }
-        this.$store.uploadArtwork(file, this.$state.selected_artist.key, this.$state.selected_artist.label)
+        this.$store.uploadArtwork(file, this.$state.selected_artist.id, this.$state.selected_artist.label)
       }
     },
 
@@ -120,4 +121,5 @@ export default {
     }
   }
 }
+// TODO:sort artists by label
 </script>

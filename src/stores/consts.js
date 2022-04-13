@@ -11,3 +11,5 @@ export const types = {
   STRING: 3,
   MAX: 3
 }
+
+export const cid = '94de1d795fccfe1676e7f7ed22cdd988c311bc6d045115d0d270c014279bed85'

@@ -1,10 +1,12 @@
 <template>
   <div :style="ctrlStyle">
     <div class="add-image-container" :style="borderStyle" :readonly="readonly">
-      <div v-if="image" class="remove">
+      <div v-if="image && !readonly" class="remove">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
-      <img v-if="image" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
+      <img v-if="image && image.object" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
+      <div v-if="image && image.loading" class="text" :readonly="readonly">Loading...</div>
+      <div v-if="image && image.error" class="text error" :readonly="readonly">Failed to load image</div>
       <label v-if="!image" class="text" for="image" :readonly="readonly" v-html="title"/>
       <input v-if="!readonly"
              id="image"
@@ -75,6 +77,15 @@
       &:not([readonly]) {
         cursor: pointer
       }
+
+      &[readonly] {
+        opacity: 0.6
+      }
+
+      &.error {
+        color: rgba(255, 98, 92, 0.7)
+        font-style: italic
+      }
     }
   }
 
@@ -141,8 +152,8 @@ export default {
   },
   methods: {
     onRemove () {
-      this.$emit('update:image', undefined)
       this.$refs.image.value = ''
+      this.$emit('update:image', null)
     },
     onUpload (e) {
       let file = e.target.files[0]

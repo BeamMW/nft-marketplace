@@ -131,8 +131,8 @@
 import modal from './modal.vue'
 import btn from './button.vue'
 import priceInput from './price-input.vue'
-import utils from '../utils/utils.js'
-import {common} from '../utils/consts.js'
+import utils from 'utils/utils.js'
+import {common} from 'utils/consts.js'
 
 export default {
   components: { 
@@ -172,7 +172,6 @@ export default {
 
       const current = this.price
       const next = current.concat(ev.key)
-      console.log(next)
       if (!utils.handleString(next)) {
         ev.preventDefault()
       }

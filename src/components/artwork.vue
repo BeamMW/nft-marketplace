@@ -108,6 +108,7 @@
 <script>
 import price from './artwork-price.vue'
 import preview from './image-preview.vue'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {
@@ -156,7 +157,7 @@ export default {
     },
 
     artists () {
-      return this.$state.artists
+      return artistsStore.artists
     },
 
     author () {
