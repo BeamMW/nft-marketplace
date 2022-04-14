@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'artwork': true, 'error': error}">
+  <div :class="{'artwork': true, 'error': item.error}">
     <!---- Preview OR Loading ---->
     <preview :image="item.image" height="200px" @click="onDetails"/>
 
@@ -9,7 +9,7 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div class="title">{{ item.label }}</div>
+      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
       <!---- TODO: enable Likes ----->
       <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
@@ -18,7 +18,7 @@
     </div>
 
     <!---- Second info row, author ---->
-    <div class="info-row">
+    <div class="info-row" :class="{'error': item.author_error}">
       <span class="author">{{ item.by_author }}</span>
     </div>
 
@@ -38,10 +38,6 @@
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
     position:relative
-
-    &.error {
-      
-    }
 
     & > .delete {
       position: absolute
@@ -130,10 +126,6 @@ export default {
 
     id () {
       return this.item.id
-    },
-
-    error () {
-      return this.item.error || (this.item.author || {}).error
     },
                 
     can_vote () {

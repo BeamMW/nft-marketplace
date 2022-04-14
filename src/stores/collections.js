@@ -17,6 +17,10 @@ class CollectionsStore extends ItemsStore {
     let author = artistsStore.loadArtist(coll.author)
     coll.owned = computed(() => artistsStore.my_id == coll.author)
 
+    coll.author_error = computed(() => {
+      return author.value.error
+    })
+
     coll.author_name = computed(() => {
       if (author.value.loading) return 'Loading...'
       if (author.value.error) return 'Failed to load author'

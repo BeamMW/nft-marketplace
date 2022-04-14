@@ -13,6 +13,10 @@ class ArtworksStore extends ItemsStore{
   _fromContract(awork) {
     awork = Object.assign({}, awork)
     let author = artistsStore.loadArtist(awork.author)
+    
+    awork.author_error = computed(() => {
+      return author.value.error
+    })
 
     awork.author_name = computed(() => {
       if (author.value.loading) return 'Loading...'
