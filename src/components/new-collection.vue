@@ -158,11 +158,11 @@ export default {
 
   data () {
     return {
-      label_: '',
-      website_: '',
-      twitter_: '',
-      instagram_: '',
-      description_: '',
+      label_: undefined,
+      website_: undefined,
+      twitter_: undefined,
+      instagram_: undefined,
+      description_: undefined,
       cover_: undefined
     }
   },
@@ -173,14 +173,14 @@ export default {
     },
     collection () {
       if (this.id) {
-        let coll = collsStore.user_colls.find(c => c.id == this.id)
+        let coll = collsStore.user_items.find(c => c.id == this.id)
         return coll
       }
       return undefined
     },
     label: {
       get () {
-        return this.label_ || (this.collection || {}).label
+        return this.label_ != undefined ? this.label_ : (this.collection || {}).label
       },
       set (val) {
         this.label_ = val
@@ -192,7 +192,7 @@ export default {
     },
     website: {
       get () {
-        return this.website_ || (this.collection || {}).website
+        return this.website_ != undefined ? this.website_ : (this.collection || {}).website
       },
       set (val) {
         this.website_ = val
@@ -205,7 +205,7 @@ export default {
     },
     twitter: {
       get () {
-        return this.twitter_ || (this.collection || {}).twitter
+        return this.twitter_ != undefined ? this.twitter_ : (this.collection || {}).twitter
       },
       set (val) {
         this.twitter_ = val
@@ -217,7 +217,7 @@ export default {
     },
     instagram: {
       get () {
-        return this.instagram_ || (this.collection || {}).instagram
+        return this.instagram_ != undefined ? this.instagram_ : (this.collection || {}).instagram
       },
       set (val) {
         this.instagram_ = val
@@ -229,7 +229,7 @@ export default {
     },
     description: {
       get () {
-        return this.description_ || (this.collection || {}).description
+        return this.description_ != undefined ? this.description_ : (this.collection || {}).description
       },
       set (val) {
         this.description_ = val

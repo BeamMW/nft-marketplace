@@ -127,7 +127,7 @@ export default {
 
   methods: {
     onNewCollection () {
-      collsStore.toNewCollection()
+      collsStore.toNewItem()
     },
   }
 }

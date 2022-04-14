@@ -20,7 +20,7 @@ export default {
 
   computed: {
     items () {
-      return collsStore.user_colls
+      return collsStore.user_items
     },
 
     page: {

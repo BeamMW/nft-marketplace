@@ -1,12 +1,18 @@
 <template>
-  <div :class="{'collection': true, 'pointer-cursor': item.owned && !item.default}" @click="onDetails">
+  <div :class="
+         {'collection': true, 
+          'pointer-cursor': item.owned && !item.default,
+          'error': item.error
+         }" 
+       @click="onDetails"
+  >
     <preview class="preview" 
              :image="item.cover" 
              height="140px" 
              cover
     />
     <div class="info-row">  
-      <div class="avatar">
+      <div class="avatar" :class="{'error': item.author_error}">
         <preview :image="item.avatar" 
                  :show_loading="false"
                  width="72px" 
@@ -15,8 +21,8 @@
         />
       </div>
       <div class="text">
-        <div class="label">{{ item.label }}</div>
-        <div class="author">{{ item.author_name }}</div>
+        <div class="label" :class="{'error': item.author_error && item.default}">{{ item.label }}</div>
+        <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
         <div class="items-info">
@@ -119,7 +125,7 @@ export default {
       if (!this.item.owned || this.item.default || this.item.error) {
         return
       }
-      collsStore.toEditCollection(this.item.id)
+      collsStore.toEditItem(this.item.id)
     }
   }
 }

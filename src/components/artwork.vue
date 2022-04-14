@@ -1,7 +1,7 @@
 <template>
-  <div class="artwork">
+  <div :class="{'artwork': true, 'error': item.error}">
     <!---- Preview OR Loading ---->
-    <preview :image="item" height="200px" @click="onDetails"/>
+    <preview :image="item.image" height="200px" @click="onDetails"/>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -9,11 +9,8 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div v-if="loading" class="title">Loading...</div>
-      <div v-else-if="error" class="title">Failed to load</div>
-      <div v-else class="title">{{ title + title + title + title }}</div>
-      
-      <!---- Likes ----->
+      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
+      <!---- TODO: enable Likes ----->
       <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
         <span>{{ likes_cnt }}</span>
@@ -21,12 +18,8 @@
     </div>
 
     <!---- Second info row, author ---->
-    <div class="info-row">
-      <span v-if="loading" class="author">Loading...</span>
-      <span v-else-if="error" class="author"></span>
-      <span v-else class="author">
-        {{ ['by', author].join(' ') }}
-      </span>
+    <div class="info-row" :class="{'error': item.author_error}">
+      <span class="author">{{ item.by_author }}</span>
     </div>
 
     <!---- Third info row, price/buy/sell ----->
@@ -108,7 +101,6 @@
 <script>
 import price from './artwork-price.vue'
 import preview from './image-preview.vue'
-import artistsStore from 'stores/artists.js'
 
 export default {
   components: {
@@ -135,38 +127,10 @@ export default {
     id () {
       return this.item.id
     },
-
-    title () {
-      return this.item.title
-    },
-        
-    likes_cnt () {
-      return this.item.impressions
-    },
-
-    liked () {
-      return !!this.item.my_impression
-    },
-        
+                
     can_vote () {
-      return this.$state.balance_reward > 0
+      return !this.item.error && this.$state.balance_reward > 0
     },
-
-    loading () {
-      return this.item.loading
-    },
-
-    artists () {
-      return artistsStore.artists
-    },
-
-    author () {
-      return (this.artists[this.item.pk_author] || {}).label
-    },
-
-    error () {
-      return !!this.item.error
-    }
   },
 
   methods: {
