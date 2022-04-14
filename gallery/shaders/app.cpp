@@ -81,7 +81,7 @@
 
 #define Gallery_artist_set_collection(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Collection::Id, collection_id) \
+    macro(Gallery::Collection::Id, id) \
 
 #define Gallery_artist_set_artwork(macro) \
     macro(ContractID, cid) \
@@ -1349,7 +1349,7 @@ ON_METHOD(artist, set_collection)
     d.args.m_pkArtist = pkArtist;
     d.args.req = Gallery::Method::ManageCollection::RequestType::SET;
     d.args.role = Gallery::Role::ARTIST;
-    d.args.collection_id = collection_id;
+    d.args.collection_id = id;
 
     uint32_t nArgSize = sizeof(d.args);
 
