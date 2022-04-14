@@ -138,6 +138,8 @@
         & > *:not(:last-child) {
           margin-bottom: 20px
         }
+        .uploads-container {
+          position: relative
 
         .uploads-container {
           position: relative
@@ -210,7 +212,6 @@
         
           .error_msg {
             text-align: center
-            margin-top: -16px
 
             .error {
               font-style: italic
