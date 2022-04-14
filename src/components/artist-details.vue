@@ -138,8 +138,6 @@
         & > *:not(:last-child) {
           margin-bottom: 20px
         }
-        .uploads-container {
-          position: relative
 
         .uploads-container {
           position: relative
