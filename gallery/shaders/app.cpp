@@ -31,7 +31,6 @@
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
     macro(PubKey, artist_id) \
-    macro(uint32_t, print_artworks) \
 
 #define Gallery_manager_view_artists(macro) \
     macro(ContractID, cid) \
@@ -113,7 +112,6 @@
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
     macro(PubKey, artist_id) \
-    macro(uint32_t, print_artworks) \
 
 #define Gallery_user_view_artists(macro) \
     macro(ContractID, cid) \
