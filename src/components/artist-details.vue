@@ -201,10 +201,6 @@
               object-fit: cover
               border-radius: 9999px
               border: 1px dashed transparent
-
-              &.error {
-                filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-              }
             }
           }
         
@@ -262,11 +258,11 @@ export default {
 
   data () {
     return {
-      label_: '',
-      website_: '',
-      twitter_: '',
-      instagram_: '',
-      about_: '',
+      label_: undefined,
+      website_: undefined,
+      twitter_: undefined,
+      instagram_: undefined,
+      about_: undefined,
       banner_: undefined,
       avatar_: undefined
     }
@@ -324,7 +320,7 @@ export default {
     },
     label: {
       get () {
-        return this.label_ || (this.artist || {}).label
+        return this.label_ != undefined ? this.label : (this.artist || {}).label
       },
       set (val) {
         this.label_ = val
@@ -332,7 +328,7 @@ export default {
     },
     website: {
       get () {
-        return this.website_ || (this.artist || {}).website
+        return this.website_ != undefined ? this.website_ : (this.artist || {}).website
       },
       set (val) {
         this.website_ = val
@@ -340,7 +336,7 @@ export default {
     },
     twitter: {
       get () {
-        return this.twitter_ || (this.artist || {}).twitter
+        return this.twitter_ != undefined ? this.twitter_ : (this.artist || {}).twitter
       },
       set (val) {
         this.twitter_ = val
@@ -348,7 +344,7 @@ export default {
     },
     instagram: {
       get () {
-        return this.instagram_ || (this.artist || {}).instagram
+        return this.instagram_ != undefined ? this.instagram_ : (this.artist || {}).instagram
       },
       set (val) {
         this.instagram_ = val
@@ -356,7 +352,7 @@ export default {
     },
     about: {
       get () {
-        return this.about_ || (this.artist || {}).about
+        return this.about_ != undefined ? this.about_ : (this.artist || {}).about
       },
       set (val) {
         this.about_ = val

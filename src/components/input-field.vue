@@ -1,6 +1,6 @@
 <template>
   <div class="input-container">
-    <label v-if="label" class="label" :class="{'error': !valid}">
+    <label v-if="label" class="label" :class="{'err': !valid}">
       {{ label }}
     </label>
     <div class="input">
@@ -9,7 +9,7 @@
              :placeholder="placeholder"
              :style="style"
              :maxlength="max_length"
-             :class="{'input': true, 'error': !valid}"
+             :class="{'input': true, 'err': !valid}"
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
       />
@@ -18,6 +18,7 @@
                           :readonly="readonly" 
                           :max_length="max_length" 
                           :value="modelValue.length"
+                          :class="{'chars-err': !valid}"
                           style="margin-top:2px;"
     />
   </div>
@@ -34,7 +35,7 @@
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
 
-    &.error {
+    &.err {
       color: rgba(255, 98, 92, 0.7)
     }
   }
@@ -45,10 +46,6 @@
     & > img {
       position: absolute
       padding: 15px 15px
-
-      &.error {
-        filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-      }
     }
   }
 
@@ -68,31 +65,31 @@
       color: rgba(255, 255, 255, 0.3)
     }
 
-    &:not(.error):not(:read-only):focus {
+    &:not(.err):not(:read-only):focus {
       background-color: rgba(255, 255, 255, 0.12)
     }
 
-    &.error:focus {
+    &.err:focus {
       background-color: rgba(255, 98, 92, 0.12)
     }
 
-    &.error {
+    &.err {
       color: rgba(255, 98, 92, 1)
       background-color: rgba(255, 98, 92, 0.07)
     }
 
-    &:not(.error)::placeholder {
+    &:not(.err)::placeholder {
       font-size: 14px
       color: rgba(255, 255, 255, 0.3)
     }
 
-    &.error::placeholder {
+    &.err::placeholder {
       font-size: 14px
       color: rgba(255, 98, 92, 0.4)
     }
   }
-  .info-container {
-    margin-top: 2px
+  .chars-err {
+    color: rgba(255, 98, 92, 0.7)
   }
 }
 </style>
