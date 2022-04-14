@@ -4,7 +4,7 @@
     <div class="fields">
       <div class="col-first">
         <inputField v-model="name"
-                    label="Name*"
+                    label="NFT Name*"
                     :valid="name_valid"
                     :max_length="100"
         />

@@ -21,7 +21,7 @@
                     :valid="label_valid"
                     :max_length="100"
                     :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:31px;margin-top:0"
+                    style="margin-bottom:29px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
