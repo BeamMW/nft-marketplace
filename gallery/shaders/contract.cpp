@@ -281,6 +281,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     _POD_(m.m_pkOwner) = r.m_pkArtist;
     _POD_(m.m_pkAuthor) = r.m_pkArtist;
     m.collection_id = r.collection_id;
+    m.is_approved = true;
 
     Gallery::ArtistCollectionKey ack;
     ack.collection_id = r.collection_id;
@@ -316,6 +317,8 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
         Env::Halt_if(!a.Load(r.m_pkArtist));
         Env::Halt_if(!a.is_approved);
     }
+
+    _POD_(m.m_Price) = r.m_Price;
 
     m.Save(m_id);
 
