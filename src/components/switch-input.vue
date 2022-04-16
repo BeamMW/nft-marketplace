@@ -2,12 +2,12 @@
   <div class="switch-container">
     <label class="switch">
       <input type="checkbox"
-             :checked="checked"
-             @change="$emit('update:checked', $event.target.checked)"
+             :checked="modelValue"
+             @change="$emit('update:modelValue', $event.target.checked)"
       >
       <span class="slider round"></span>
     </label>
-    <label class="switch_text">Not for sale</label>
+    <label class="switch_text">{{ label }}</label>
   </div>
 </template>
 
@@ -29,7 +29,7 @@
       left: 0
       right: 0
       bottom: 0
-      background-color: rgba(255,255,255,0.05)
+      background-color: rgba(255, 255, 255, 0.05)
       transition: 0.4s
       border: 1px solid #b4bec8
 
@@ -58,7 +58,7 @@
       height: 0
       
       &:checked + .slider {
-        background-color: rgba(26,246,214,0.5)
+        background-color: rgba(26, 246, 214, 0.35)
       }
 
       &:focus + .slider {
@@ -78,18 +78,23 @@
     color: rgba(255, 255, 255, 0.7)
   }
 }
-
 </style>
 
 <script>
-
 export default {
   props: {
-    checked: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: Boolean,
       required: true,
     },
+    label: {
+      type: String,
+      default: '',
+    },
   },
-  emits: ['update:checked'],
+  emits: [
+    'update:modelValue'
+  ]
 }
 </script>

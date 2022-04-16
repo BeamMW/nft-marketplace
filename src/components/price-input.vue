@@ -1,91 +1,81 @@
 <template>
-  <div :style="{'--color': color}">
-    <div class="input">
-      <input id="sell-input" 
-             :value="price"
-             type="text" 
-             class="elem"
-             :placeholder="placeholder"
-             @keydown="onKey"
-             @paste="onPaste"
-             @input="$emit('update:price', $event.target.value)"
-      />
-      <span class="text">BEAM</span>
-    </div>
-    <span class="price">{{ price }} USD</span>
+  <div class="price-input">
+    <inputField v-model="computedValue"
+                :label="label"
+                :readonly="readonly"
+                @keydown="onKey"
+                @paste="onPaste"
+    >
+      <span class="beam" :class="{'readonly': readonly}">BEAM</span>
+    </inputField>
   </div>
 </template>
 
-<style scoped lang="stylus">
-.input {
-  margin-top: 20px
-  height: 45px
-  width: 100%
-  border-radius: 10px
-  background-color: rgba(255, 255, 255, 0.05)
-  display: flex
-  flex-direction: row
-  align-items: center
-
-  .elem {
-    background: rgba(255, 255, 255, 0)
-    border: none
-    font-size: 24px
-    resize: none
-    color: var(--color)
-    height: 100%
-    padding: 0
-    border-radius: 10px
-    padding: 8px 8px 8px 20px
-    max-width: 292px
-
-    &:focus {
-      outline-width: 0
-      color: var(--color)
+<style lang="stylus">
+  .price-input {
+    input {
+      font-size: 24px !important
+      padding-top: 8px !important
+      padding-bottom: 10px !important
     }
 
-    &::placeholder {
-      color: var(--color)
+    .beam {
+      font-size: 20px
+      padding-right: 12px
+
+      &.readonly {
+        color: rgba(255, 255, 255, 0.3)
+      }
     }
   }
-
-  .text {
-    margin-right: 12px
-    font-size: 16px
-    margin-left: auto
-    color: var(--color)
-  }
-}
-
-.price {
-  display: block
-  margin-top: 6px
-  font-size: 12px
-  color: var(--color)
-}
 </style>
 
 <script>
-import utils from '../utils/utils.js'
+import utils from 'utils/utils'
+import inputField from './input-field'
 
 export default {
+  components: {
+    inputField
+  },
   props: {
-    color: {
+    label: {
       type: String,
-      default: '#fff'
+      default: '',
+      required: false
     },
     placeholder: {
       type: String,
       default: '0',
       required: false
     },
-    price: {
+    readonly: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: String,
       default: '',
       required: true
     },
   },
-  emits: ['update:price'],
+  
+  emits: [
+    'update:modelValue'
+  ],
+
+  computed: {
+    computedValue: {
+      get() {
+        return this.modelValue
+      },
+      set (val) {
+        this.$emit('update:modelValue', val)
+      }
+    }
+  },
 
   methods: {    
     onKey(ev) {
@@ -102,7 +92,7 @@ export default {
         return
       }
 
-      const current = this.price
+      const current = ev.target.value
       const next = current.concat(ev.key)
       if (!utils.handleString(next)) {
         ev.preventDefault()

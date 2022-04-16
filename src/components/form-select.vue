@@ -6,12 +6,12 @@
       </label>
     </div>
     <div class="custom-select" @blur="show = false">
-      <div class="selected" :class="{ open: show }" @click="open">
+      <div class="selected" :class="{'open': show}" @click="open">
         {{ options[selected_collection].name }}
         <img src="~assets/icon-down.svg" class="arrow"/>
       </div>
       <div v-show="show" class="items">
-        <div v-for="option of options || []" :key="option.id" @click="onSelected(option.id)">
+        <div v-for="option of options || []" :key="option.id" @click="onSelected($event, option.id)">
           <span :class="{ highlight: selected_collection === option.id}">{{ option.name }}</span>
         </div>
       </div>
@@ -35,24 +35,23 @@
     }
   }
 }
+
 .custom-select {
   position: relative
   display: flex
   outline: none
   background: rgba(255,255,255,0.05)
   border-radius: 10px
-  padding: 12px 8px
 
   .selected {
     color: #fff
-    padding-left: 1em
-    cursor: pointer
     width: 100%
     user-select: none
-    opacity: 0.7
     font-size: 14px
-    font-weight: bold
+    font-weight: normal
     letter-spacing: 0.47px
+    cursor: pointer
+    padding: 12px 15px
 
     &.open {
       border: none
@@ -76,7 +75,7 @@
     font-size: 16px
     right: 0
     z-index: 1
-    margin-top: 40px
+    margin-top: 47px
     width: 100%
     height: 300px
     overflow-y: scroll
@@ -121,15 +120,19 @@ export default {
     }
   },
   methods: {
-    onSelected(opt) {
+    onSelected(ev, opt) {
       this.selected_collection = opt
       this.$emit('selected', opt)
-      this.show = false
+      nextTick(() => {this.show = false})
     },
     close() {
       this.show = false
     },
     open(ev) {
+      if (this.show) {
+        return
+      }
+      
       this.show = true
       nextTick(() => {
         let clickAway = (evc) => {

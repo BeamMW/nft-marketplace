@@ -16,16 +16,16 @@
         <formSelect :options="selector_options"
                     @selected="selectCollection"
         />
-        <div class="price-container">
-          <div class="label">Price</div>
-          <priceInput v-model:price="price" color="rgba(255,255,255,0.7)"/>
-        </div>
-        <switchInput v-model:checked="sale"/>
+        <priceInput v-model="price"
+                    label="Price"
+                    :readonly="dontsell"
+        />
+        <switchInput v-model="dontsell" label="Not for sale"/>
       </div>
       <div class="col-second">
         <addImage v-model:image="image"
                   :error="image_valid ? '' : 'image cannot be larger than 250kb'"
-                  title="Add NFT here<br>(.jpg, .png, .gif)"
+                  title="Add NFT here<br>(any image)"
                   height="374px"
         />
       </div>
@@ -35,7 +35,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit">
+    <btn text="create account" color="green" :disabled="!can_submit">
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -43,7 +43,6 @@
 
 <style scoped lang="stylus">
   .nft-container {
-
     .fields {
       padding: 50px 30px 0px 30px
       display: flex
@@ -53,16 +52,6 @@
 
         & > *:not(:last-child) {
           margin-bottom: 20px
-        }
-
-        .price-container {
-
-          .label {
-            margin-bottom: -10px
-            color: rgba(255, 255, 255, 0.6)
-            font-family: 'SFProDisplay', sans-serif
-            font-size: 14px
-          }
         }
       }
 
@@ -116,8 +105,7 @@ export default {
       description: '',
       image: undefined,
       price: '',
-      show: false,
-      sale: false,
+      dontsell: false,
       selector_options: [
         {name: 'Collection 0', id: 0},
         {name: 'Collection 1', id: 1},
