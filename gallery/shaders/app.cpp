@@ -98,10 +98,25 @@
     macro(Amount, amount) \
     macro(AssetID, aid)
 
+#define Gallery_artist_view_artworks(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(Amount, count) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, collection_id) \
+
+#define Gallery_artist_view_collections(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
+
 #define GalleryRole_artist(macro) \
     macro(artist, view) \
     macro(artist, view_collections_stats) \
     macro(artist, view_artworks_stats) \
+    macro(artist, view_collections) \
+    macro(artist, view_artworks) \
     macro(artist, get_id) \
     macro(artist, set_artwork) \
     macro(artist, set_artist) \
@@ -591,7 +606,7 @@ struct MyCollection : public Gallery::Collection {
         return std::string_view(m_szLabelData, label_len);
     }
 
-    void Print(const ContractID& cid) {
+    void Print(const ContractID& cid, const Gallery::Artist::Id& artist_id = PubKey{}) {
         Env::Key_T<SecondStageKey> k0, k1;
         _POD_(k0.m_Prefix.m_Cid) = cid;
         _POD_(k1.m_Prefix.m_Cid) = cid;
@@ -604,11 +619,12 @@ struct MyCollection : public Gallery::Collection {
         Env::DocArray gr0("collections");
 
         while (ReadNext(r, k0)) {
+            if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) continue;
             Print(cid, k0.m_KeyInContract.id, Utils::FromBE(k0.m_KeyInContract.h_updated));
         }
     }
 
-    void Print(const ContractID& cid, const std::string_view& ids) {
+    void Print(const ContractID& cid, const std::string_view& ids, const Gallery::Artist::Id& artist_id = PubKey{}) {
         int cur_pos = 0;
         int next_pos;
         Env::DocArray gr0("collections");
@@ -620,11 +636,11 @@ struct MyCollection : public Gallery::Collection {
 
             cur_pos = next_pos + 1;
 
-            Print(cid, id);
+            Print(cid, id, artist_id);
         }
     }
 
-    void Print(const ContractID& cid, const Id& id) {
+    void Print(const ContractID& cid, const Id& id, const Gallery::Artist::Id& artist_id = PubKey{}) {
         SecondStageKey ssck;
         Env::Key_T<FirstStageKey> k2;
         k2.m_Prefix.m_Cid = cid;
@@ -639,6 +655,8 @@ struct MyCollection : public Gallery::Collection {
         Env::VarReader r(k0, k0);
         if (!ReadNext(r, k0))
             return;
+
+        if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) return;
 
         Print(cid, k0.m_KeyInContract.id, Utils::FromBE(k0.m_KeyInContract.h_updated));
     }
@@ -657,13 +675,6 @@ struct MyCollection : public Gallery::Collection {
         int cur_idx = 1, cur_cnt = 0;
         while (cur_cnt < count && r.MoveNext_T(fsk0, ssck)) {
             if (cur_idx >= idx0) {
-                if (!_POD_(artist_id).IsZero()) {
-                    Env::Key_T<SecondStageKey> ssck1;
-                    ssck1.m_Prefix.m_Cid = cid;
-                    ssck1.m_KeyInContract = ssck;
-                    Env::VarReader::Read_T(ssck1, *this);
-                    if (_POD_(m_pkAuthor) != artist_id) continue;
-                }
                 Env::Key_T<SecondStageKey> ssk;
                 _POD_(ssk.m_Prefix.m_Cid) = cid;
                 ssk.m_KeyInContract.id = ssck.id;
@@ -672,6 +683,8 @@ struct MyCollection : public Gallery::Collection {
                 Env::VarReader r(ssk, ssk);
                 if (!ReadNext(r, ssk))
                     break;
+
+                if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) continue;
 
                 Print(cid, ssk.m_KeyInContract.id, Utils::FromBE(ssk.m_KeyInContract.h_updated));
                 ++cur_cnt;
@@ -712,7 +725,6 @@ struct MyCollection : public Gallery::Collection {
         data[data_len] = 0;
         Env::Memcpy(label, m_szLabelData, label_len);
         Env::Memcpy(data, m_szLabelData + label_len, data_len);
-
 
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
@@ -767,7 +779,7 @@ struct MyArtwork : public Gallery::Artwork {
 
     MyArtwork(bool only_approved) : only_approved_(only_approved) {}
 
-    void Print(const ContractID& cid) {
+    void Print(const ContractID& cid, const Gallery::Artist::Id& artist_id = PubKey{}) {
         Env::Key_T<SecondStageKey> k0, k1;
         _POD_(k0.m_Prefix.m_Cid) = cid;
         _POD_(k1.m_Prefix.m_Cid) = cid;
@@ -780,6 +792,7 @@ struct MyArtwork : public Gallery::Artwork {
         Env::DocArray gr0("artworks");
 
         while (ReadNext(r, k0)) {
+            if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) continue;
             ImpressionWalker iwlk;
             iwlk.Enum(cid, Utils::FromBE(k0.m_KeyInContract.id));
 
@@ -787,7 +800,7 @@ struct MyArtwork : public Gallery::Artwork {
         }
     }
 
-    void Print(const ContractID& cid, const std::string_view& ids) {
+    void Print(const ContractID& cid, const std::string_view& ids, const Gallery::Artist::Id& artist_id = PubKey{}) {
         int cur_pos = 0;
         int next_pos;
         Env::DocArray gr0("artworks");
@@ -798,11 +811,11 @@ struct MyArtwork : public Gallery::Artwork {
                 id = id * 10 + ids[i] - '0';
 
             cur_pos = next_pos + 1;
-            Print(cid, id);
+            Print(cid, id, artist_id);
         }
     }
 
-    void Print(const ContractID& cid, const Id& id) {
+    void Print(const ContractID& cid, const Id& id, const Gallery::Artist::Id& artist_id) {
         SecondStageKey ssak;
         Env::Key_T<FirstStageKey> k2;
         k2.m_Prefix.m_Cid = cid;
@@ -817,6 +830,8 @@ struct MyArtwork : public Gallery::Artwork {
         Env::VarReader r(k0, k0);
         if (!ReadNext(r, k0))
             return;
+
+        if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) return;
 
         ImpressionWalker iwlk;
         iwlk.Enum(cid, Utils::FromBE(k0.m_KeyInContract.id));
@@ -836,14 +851,6 @@ struct MyArtwork : public Gallery::Artwork {
         Env::DocArray gr0("artworks");
         int cur_cnt = 0;
         while (cur_cnt < count && r.MoveNext_T(fsk0, ssak)) {
-            if (!_POD_(artist_id).IsZero()) {
-                Env::Key_T<SecondStageKey> ssak1;
-                ssak1.m_Prefix.m_Cid = cid;
-                ssak1.m_KeyInContract = ssak;
-                Env::VarReader::Read_T(ssak1, *this);
-                if (_POD_(m_pkAuthor) != artist_id) continue;
-            }
-
             if (collection_id) {
                 Env::Key_T<Gallery::CollectionArtworkKey> cak;
                 cak.m_Prefix.m_Cid = cid;
@@ -863,6 +870,8 @@ struct MyArtwork : public Gallery::Artwork {
 
             if (!ReadNext(r, ssk))
                 break;
+
+            if (!_POD_(artist_id).IsZero() && _POD_(m_pkAuthor) != artist_id) return;
 
             ImpressionWalker iwlk;
             iwlk.Enum(cid, Utils::FromBE(fsk0.m_KeyInContract.id));
@@ -1120,12 +1129,48 @@ ON_METHOD(user, view_artworks_stats)
 
 ON_METHOD(artist, view_collections_stats)
 {
-    // TODO
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey artist_id;
+    km.Get(artist_id);
+
+    Env::Key_T<Gallery::Artist::FirstStageKey> fsk;
+    fsk.m_Prefix.m_Cid = cid;
+    fsk.m_KeyInContract.id = artist_id;
+    Gallery::Artist::SecondStageKey ssk;
+    Env::VarReader::Read_T(fsk, ssk);
+
+    Env::Key_T<Gallery::Artist::SecondStageKey> k0;
+    _POD_(k0.m_Prefix.m_Cid) = cid;
+    k0.m_KeyInContract = ssk;
+
+    Env::VarReader r(k0, k0);
+    MyArtist a{false};
+    a.ReadNext(r, k0);
+    Env::DocAddNum32("collections", a.collections_num);
 }
 
 ON_METHOD(artist, view_artworks_stats)
 {
-    // TODO
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey artist_id;
+    km.Get(artist_id);
+
+    Env::Key_T<Gallery::Artist::FirstStageKey> fsk;
+    fsk.m_Prefix.m_Cid = cid;
+    fsk.m_KeyInContract.id = artist_id;
+    Gallery::Artist::SecondStageKey ssk;
+    Env::VarReader::Read_T(fsk, ssk);
+
+    Env::Key_T<Gallery::Artist::SecondStageKey> k0;
+    _POD_(k0.m_Prefix.m_Cid) = cid;
+    k0.m_KeyInContract = ssk;
+
+    Env::VarReader r(k0, k0);
+    MyArtist a{false};
+    a.ReadNext(r, k0);
+    Env::DocAddNum32("artworks", a.artworks_num);
 }
 
 ON_METHOD(user, view_artists)
@@ -1164,6 +1209,28 @@ ON_METHOD(user, view_collections)
         c.Print(cid, buf);
     else
         c.Print(cid);
+}
+
+ON_METHOD(artist, view_collections)
+{
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey artist_id;
+    km.Get(artist_id);
+
+    MyCollection c{false};
+    if (count && idx0)
+        c.Print(cid, idx0, count, artist_id);
+    else if (buf_len)
+        c.Print(cid, buf, artist_id);
+    else
+        c.Print(cid, artist_id);
 }
 
 /*
@@ -1775,6 +1842,28 @@ ON_METHOD(manager, view_artworks)
         a.Print(cid, buf);
     else
         a.Print(cid);
+}
+
+ON_METHOD(artist, view_artworks)
+{
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey artist_id;
+    km.Get(artist_id);
+
+    MyArtwork a{true};
+    if (count && idx0)
+        a.Print(cid, idx0, count, artist_id, collection_id);
+    else if (buf_len)
+        a.Print(cid, buf, artist_id);
+    else
+        a.Print(cid, artist_id);
 }
 
 ON_METHOD(user, set_price)

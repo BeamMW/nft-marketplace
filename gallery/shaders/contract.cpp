@@ -121,6 +121,8 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             a.m_hRegistered = Env::get_Height();
             a.label_len = r.m_LabelLen;
             a.data_len = r.m_DataLen;
+            a.collections_num = 1; // default
+            a.artworks_num = 0;
             Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
             // create default collection
@@ -239,6 +241,13 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             _POD_(ack.pkArtist) = c.m_pkAuthor;
             ack.collection_id = c_id;
             Env::SaveVar_T(ack, true);
+
+            struct ArtistPlus : public Gallery::Artist {
+                char m_szLabelData[s_TotalMaxLen];
+            } a;
+            a.TakeOut(r.m_pkArtist);
+            ++a.collections_num;
+            a.Save(r.m_pkArtist);
         }
         c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
@@ -323,6 +332,14 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
     m.Save(m_id);
 
     Env::AddSig(r.m_pkArtist);
+
+    struct ArtistPlus : public Gallery::Artist {
+        char m_szLabelData[s_TotalMaxLen];
+    } a;
+
+    a.TakeOut(r.m_pkArtist);
+    ++a.artworks_num;
+    a.Save(r.m_pkArtist);
 
     Gallery::Events::AddArtworkData::Key adk;
     adk.m_ID = m_id;
