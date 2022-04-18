@@ -1,6 +1,6 @@
 <template>
   <div class="select-container" :style="style" @click="select">
-    <img :src="`../assets/${getImg()}.svg`" alt="icon" :class="[ true ? 'admin_img' : '','img']">
+    <img :src="`../assets/${getImg()}.svg`" alt="icon" :class="[is_admin ? 'admin_img' : '','img']">
     <slot></slot>
   </div>
 </template>
@@ -57,7 +57,7 @@ export default {
         'border': this.selected ? '1px solid #00f6d2' : '',
       }
     },
-    is_admin () {
+    is_admin() {
       return this.$state.is_admin
     },
   },
