@@ -2,8 +2,9 @@ import ItemsStore from 'stores/items'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import formats from 'stores/formats'
-import {versions} from 'stores/consts'
+import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
+import utils from 'utils/utils'
 
 class ArtworksStore extends ItemsStore{
   constructor () {
@@ -47,6 +48,19 @@ class ArtworksStore extends ItemsStore{
       label: formats.toContract(label),
       data: formats.toContract(versions.ARTWORK_VERSION, data)
     }
+  }
+
+  async createNFT(collid, label, data) {
+    ({label, data} = await this._toContract(label, data))
+    
+    let args = {
+      role: 'artist',
+      action: 'set_artwork',
+      collection_id: collid,
+      label, data, cid
+    }
+
+    return await utils.invokeContractAsyncAndMakeTx(args)
   }
 }
 

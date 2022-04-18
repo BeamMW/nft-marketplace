@@ -21,7 +21,7 @@
         />
       </div>
       <div class="text">
-        <div class="label" :class="{'error': item.author_error && item.default}">{{ item.label }}</div>
+        <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
         <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
         <div class="description">{{ item.description }}</div>
       </div>
@@ -89,6 +89,12 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  computed: {
+    coll_name () {
+      return [this.$state.debug ? `[${this.item.id}] - ` : '', this.item.label].join('')
     }
   },
 

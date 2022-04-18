@@ -73,7 +73,18 @@ class ArtistsStore {
   }
 
   async _loadSelf() {
-    this._is_artist = !(await this._loadArtistAsync(this.my_id)).error
+    let self = await this._loadArtistAsync(this.my_id)
+    
+    if (self === null) {
+      this._is_artist = false
+    }
+    
+    // We always fail if unable to load self
+    if (self.error) {
+      throw self.error
+    }
+
+    this._is_artist = true
   }
 
   async _loadTotals () {
@@ -87,7 +98,7 @@ class ArtistsStore {
     this._total = res.total
   }
 
-  async _loadArtistAsync (id, fail) {
+  async _loadArtistAsync (id) {
     try {
       let {res} = await utils.invokeContractAsync({
         role: 'manager',
@@ -97,16 +108,17 @@ class ArtistsStore {
       })
 
       utils.ensureField(res, 'artists', 'array')
-      if (res.artists.length != 1) throw new Error('_loadArtistAsync: artists.length != 1')
+      if (res.artists.length > 1) throw new Error('_loadArtistAsync: artists.length > 1')
+      if (res.artists.length == 0) return null
 
       let artist = this._fromContract(res.artists[0])
       this._state.artists[id] = artist
     } 
     catch (err) {
-      if (fail) throw err
       console.log(`_loadArtistAsync for id ${id}:`, err)
       this._state.artists[id] = {id, error: err}
     }
+
     return this._state.artists[id]
   }
 
@@ -121,7 +133,12 @@ class ArtistsStore {
         return cached
       }
       this._state.artists[id] = {id, loading: true}
-      this._loadArtistAsync(id, false)
+      
+      this._state.artists[id] = this._loadArtistAsync(id)
+      if (this._state.artists[id] === null) {
+        this._state.artists[id] = {id, error: new Error('Artist not found')}
+      }
+
       return this._state.artists[id]
     })
   }
@@ -174,7 +191,7 @@ class ArtistsStore {
     let artist = Object.assign({}, cartist)
 
     if (!artist.label) {
-      throw new Error('ArtistsStore._fromContract : artist label is empty')
+      //throw new Error('ArtistsStore._fromContract : artist label is empty')
     }
 
     let [label] = formats.fromContract(artist.label)

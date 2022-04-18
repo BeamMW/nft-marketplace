@@ -38,7 +38,8 @@ function defaultState() {
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
     gallery_collections_page: 1,
-    collections: []
+    collections: [],
+    debug: true
   }
 
   /*

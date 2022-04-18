@@ -73,7 +73,7 @@ export default class ItemsStore {
       
       try {
         [item.label] = formats.fromContract(item.label)
-        if (!item.label) {
+        if (!item.label && !item.default) {
           throw new Error('label cannot be empty')
         }
 

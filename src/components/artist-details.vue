@@ -235,9 +235,8 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from 'utils/consts.js'
-import artistsStore from 'stores/artists.js'
-import validators from '../utils/validators.js'
+import artistsStore from 'stores/artists'
+import validators from 'utils/validators'
 
 export default {
   components: {
@@ -270,7 +269,7 @@ export default {
 
   computed: {
     in_set_artist() {
-      return !!artistsStore.artist_t
+      return !!artistsStore.artist_tx
     },
     edit_self () {
       return !!(this.id === artistsStore.my_id && artistsStore.is_artist)
@@ -301,10 +300,10 @@ export default {
       return !value || value.length <= 150
     },
     banner_valid() {
-      return this.image_valid(this.banner)
+      return !this.banner || validators.image(this.banner)
     },
     avatar_valid() {
-      return this.image_valid(this.avatar)
+      return !this.avatar || validators.image(this.avatar)
     },
     can_submit () {
       return this.label && this.label_valid &&
@@ -384,16 +383,6 @@ export default {
   },
 
   methods: {    
-    image_valid (image) {
-      if (!image) return true
-
-      if (image.file) {
-        return image.file.size <= common.MAX_IMAGE_SIZE
-      }
-
-      return image.ipfs_hash
-    },
-
     loadImage(e, cback) {
       let file = e.target.files[0]
       let reader = new FileReader()

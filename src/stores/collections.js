@@ -81,7 +81,7 @@ class CollectionsStore extends ItemsStore {
     }
 
     if (id) {
-      args['collection_id'] = id
+      args['id'] = id
     }
 
     return await utils.invokeContractAsyncAndMakeTx(args)

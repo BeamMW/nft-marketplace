@@ -35,7 +35,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="green" :disabled="!can_submit">
+    <btn text="upload NFT" color="green" :disabled="!can_submit" @click="onUploadNFT">
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -81,10 +81,12 @@ import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
-import {common} from 'utils/consts.js'
 import switchInput from './switch-input.vue'
 import formSelect from './form-select.vue'
 import collsStore from 'stores/collections'
+import artsStore from 'stores/artworks'
+import validators from 'utils/validators'
+import router from 'router'
 
 export default {
   components: {
@@ -121,12 +123,12 @@ export default {
       return !value || value.length <= 150
     },
     image_valid() {
-      return !this.image || this.image.size <= common.MAX_IMAGE_SIZE
+      return !this.image || validators.image(this.image)
     },
     can_submit () {
       return this.name && this.name_valid &&
              this.description_valid &&
-             this.image_valid
+             this.image && this.image_valid
     },
     collections () {
       let colls = collsStore.artist_items
@@ -142,6 +144,15 @@ export default {
   },
 
   methods: {    
+    async onUploadNFT() {
+      let data = {
+        description: this.description,
+        image: this.image
+      }
+      let collID = this.collections[this.collection].id
+      await artsStore.createNFT(collID, this.name, data)
+      router.go(-1)
+    }
   }
 }
 </script>
