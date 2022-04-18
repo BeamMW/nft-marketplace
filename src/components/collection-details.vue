@@ -309,8 +309,8 @@ export default {
 
   computed: {
     collection() {
-      let all = this.$state.collections
-      let idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
+      const all = this.$state.collections
+      const idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
 
       return all[idx]
     },
