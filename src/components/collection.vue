@@ -1,40 +1,42 @@
 <template>
-  <div :class="
-         {'collection': true, 
-          'pointer-cursor': item.owned && !item.default,
-          'error': item.error
-         }" 
-       @click="onDetails"
-  >
-    <preview class="preview" 
-             :image="item.cover" 
-             height="140px" 
-             cover
-    />
-    <div class="info-row">  
-      <div class="avatar" :class="{'error': item.author_error}">
-        <preview :image="item.avatar" 
-                 :show_loading="false"
-                 width="72px" 
-                 height="72px" 
-                 radius="36px 36px"
-        />
-      </div>
-      <div class="text">
-        <div class="label" :class="{'error': item.author_error && item.default}">{{ item.label }}</div>
-        <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
-        <div class="description">{{ item.description }}</div>
-        <hr class="line"/>
-        <div class="items-info">
-          <div class="count">
-            <div class="text">4</div>
-            <div>Items</div>
+  <selectItem :selected="selected" @select-item="onSelectItem">
+    <div :class="
+           {'collection': true, 
+            'pointer-cursor': item.owned && !item.default,
+            'error': item.error
+           }" 
+         @click="onDetails"
+    >
+      <preview class="preview" 
+               :image="item.cover" 
+               height="140px" 
+               cover
+      />
+      <div class="info-row">  
+        <div class="avatar" :class="{'error': item.author_error}">
+          <preview :image="item.avatar" 
+                   :show_loading="false"
+                   width="72px" 
+                   height="72px" 
+                   radius="36px 36px"
+          />
+        </div>
+        <div class="text">
+          <div class="label" :class="{'error': item.author_error && item.default}">{{ item.label }}</div>
+          <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
+          <div class="description">{{ item.description }}</div>
+          <hr class="line"/>
+          <div class="items-info">
+            <div class="count">
+              <div class="text">4</div>
+              <div>Items</div>
+            </div>
+            <amount :amount="400000" size="12px" :info="true" class="icon_styles"/>
           </div>
-          <amount :amount="400000" size="12px" :info="true" class="icon_styles"/>
         </div>
       </div>
     </div>
-  </div>
+  </selectItem>
 </template>
     
 <style scoped lang="stylus">
@@ -86,7 +88,7 @@
           .count {
             display: flex
             flex-direction: column
-            flex-basis: 20%
+            margin-right: 20px
             
             & > .text {
               font-weight: 500
@@ -106,17 +108,23 @@
 import preview from './image-preview.vue'
 import collsStore from 'stores/collections'
 import amount from './amount.vue'
-
+import selectItem from './select-item.vue'
 export default {
   components: {
     preview,
-    amount
+    amount,
+    selectItem
   },
 
   props: {
     item: {
       type: Object,
       required: true,
+    }
+  },
+  data: function () {
+    return {
+      selected: false
     }
   },
 
@@ -126,6 +134,10 @@ export default {
         return
       }
       collsStore.toEditItem(this.item.id)
+    },
+    onSelectItem() { 
+      this.selected = !this.selected
+
     }
   }
 }
