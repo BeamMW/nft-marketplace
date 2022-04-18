@@ -160,8 +160,10 @@
             position: relative
             left: 50%
             transform: translate(-50%, -26%)
-            
+            cursor:pointer
+
             .text {
+              height: 100%
               display: flex
               justify-content: center
               align-items: center
