@@ -6,13 +6,13 @@
       </label>
     </div>
     <div class="custom-select" @blur="show = false">
-      <div class="selected" :class="{ open: show }" @click="open">
-        {{ options[selected_collection].name }}
+      <div class="selected" :class="{'open': show}" @click="open">
+        {{ options[modelValue].name }}
         <img src="~assets/icon-down.svg" class="arrow"/>
       </div>
       <div v-show="show" class="items">
-        <div v-for="option of options || []" :key="option.id" @click="onSelected(option.id)">
-          <span :class="{ highlight: selected_collection === option.id}">{{ option.name }}</span>
+        <div v-for="(option, idx) in (options || [])" :key="option.id" @click="onSelected($event, idx)">
+          <span :class="{ highlight: modelValue === idx}">{{ option.name }}</span>
         </div>
       </div>
     </div>
@@ -35,24 +35,23 @@
     }
   }
 }
+
 .custom-select {
   position: relative
   display: flex
   outline: none
   background: rgba(255,255,255,0.05)
   border-radius: 10px
-  padding: 12px 8px
 
   .selected {
     color: #fff
-    padding-left: 1em
-    cursor: pointer
     width: 100%
     user-select: none
-    opacity: 0.7
     font-size: 14px
-    font-weight: bold
+    font-weight: normal
     letter-spacing: 0.47px
+    cursor: pointer
+    padding: 12px 15px
 
     &.open {
       border: none
@@ -73,12 +72,12 @@
     position: absolute
     border:none
     border-radius: 4px
-    font-size: 16px
+    font-size: 14px
     right: 0
     z-index: 1
-    margin-top: 40px
+    margin-top: 47px
     width: 100%
-    height: 300px
+    max-height: 250px
     overflow-y: scroll
 
     div {
@@ -95,7 +94,6 @@
     }
 
     .highlight {
-      font-size: 14px
       font-weight: bold
       color: #00f6d2
     }
@@ -112,24 +110,38 @@ export default {
       type: Array,
       required: true,
     },
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
+      type: [Number],
+      required: true,
+      default: 0,
+    },
   },
-  emits: ['selected'],
+  
+  emits: [
+    'update:modelValue'
+  ],
+
   data () {
     return {
       show: false,
-      selected_collection: 1
     }
   },
+  
   methods: {
-    onSelected(opt) {
-      this.selected_collection = opt
-      this.$emit('selected', opt)
-      this.show = false
+    onSelected(ev, idx) {
+      this.$emit('update:modelValue', idx)
+      nextTick(() => {
+        this.show = false
+      })
     },
     close() {
       this.show = false
     },
     open(ev) {
+      if (this.show) {
+        return
+      }
       this.show = true
       nextTick(() => {
         let clickAway = (evc) => {

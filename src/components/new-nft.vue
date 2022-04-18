@@ -4,7 +4,7 @@
     <div class="fields">
       <div class="col-first">
         <inputField v-model="name"
-                    label="Name*"
+                    label="NFT Name*"
                     :valid="name_valid"
                     :max_length="100"
         />
@@ -13,19 +13,19 @@
                        :valid="description_valid"
                        :max_length="150"
         />
-        <formSelect :options="selector_options"
-                    @selected="selectCollection"
+        <formSelect v-model="collection"
+                    :options="collections"
         />
-        <div class="price-container">
-          <div class="label">Price</div>
-          <priceInput v-model:price="price" color="rgba(255,255,255,0.7)"/>
-        </div>
-        <switchInput v-model:checked="sale"/>
+        <priceInput v-model="price"
+                    label="Price"
+                    :readonly="dontsell"
+        />
+        <switchInput v-model="dontsell" label="Not for sale"/>
       </div>
       <div class="col-second">
         <addImage v-model:image="image"
                   :error="image_valid ? '' : 'image cannot be larger than 250kb'"
-                  title="Add NFT here<br>(.jpg, .png, .gif)"
+                  title="Add NFT here<br>(any image)"
                   height="374px"
         />
       </div>
@@ -35,7 +35,7 @@
     <btn text="cancel" @click="$router.go(-1)">
       <img src="~assets/icon-cancel.svg"/>
     </btn>
-    <btn text="create account" color="blue" :disabled="!can_submit">
+    <btn text="create account" color="green" :disabled="!can_submit">
       <img src="~assets/icon-create.svg"/>
     </btn>
   </div>
@@ -43,7 +43,6 @@
 
 <style scoped lang="stylus">
   .nft-container {
-
     .fields {
       padding: 50px 30px 0px 30px
       display: flex
@@ -53,16 +52,6 @@
 
         & > *:not(:last-child) {
           margin-bottom: 20px
-        }
-
-        .price-container {
-
-          .label {
-            margin-bottom: -10px
-            color: rgba(255, 255, 255, 0.6)
-            font-family: 'SFProDisplay', sans-serif
-            font-size: 14px
-          }
         }
       }
 
@@ -95,6 +84,7 @@ import priceInput from './price-input.vue'
 import {common} from 'utils/consts.js'
 import switchInput from './switch-input.vue'
 import formSelect from './form-select.vue'
+import collsStore from 'stores/collections'
 
 export default {
   components: {
@@ -116,19 +106,8 @@ export default {
       description: '',
       image: undefined,
       price: '',
-      show: false,
-      sale: false,
-      selector_options: [
-        {name: 'Collection 0', id: 0},
-        {name: 'Collection 1', id: 1},
-        {name: 'Collection 2', id: 2},
-        {name: 'Collection 3', id: 3},
-        {name: 'Collection 4', id: 4},
-        {name: 'Collection 5', id: 5},
-        {name: 'Collection 6', id: 6},
-        {name: 'Collection 7', id: 7}
-
-      ],
+      dontsell: false,
+      collection: 0,
     }
   },
 
@@ -149,20 +128,20 @@ export default {
              this.description_valid &&
              this.image_valid
     },
+    collections () {
+      let colls = collsStore.artist_items
+      let res = []
+      for (let coll of colls) {
+        res.push({
+          name: coll.label,
+          id: coll.id
+        })
+      }
+      return res
+    }
   },
 
   methods: {    
-    loadImage(e, cback) {
-      let file = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (e) => {
-        cback(e.target.result, file.size)
-      }
-    },
-    selectCollection(opt) {
-      console.log(opt)
-    },
   }
 }
 </script>

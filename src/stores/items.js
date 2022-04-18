@@ -22,6 +22,14 @@ export default class ItemsStore {
           let total = this._state.user.total
           return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
         })
+      },
+      artist: {
+        items: [],
+        total: 0,
+        pages: computed(() => {
+          let total = this._state.artist.total
+          return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+        })
       }
     })
   }
@@ -34,6 +42,10 @@ export default class ItemsStore {
     return this._state.user.page
   }
 
+  get artist_items() {
+    return this._state.artist.items
+  }
+  
   async _loadTotals(mode) {
     let {res} = await utils.invokeContractAsync({
       role: mode,
@@ -96,6 +108,12 @@ export default class ItemsStore {
   async loadAsync() {
     await this._loadTotals('user')
     await this._loadItems('user')
+    
+    // TODO: remove test code
+    // await this._loadTotals('artist')
+    await this._loadItems('artist')
+    this._state.artist.total = this._state.artist.items.length
+    console.log(`ItemsStore.loadAsync artist ${this._objname}: `, this._state.artist.total)
   }
 
   toNewItem() {

@@ -3,16 +3,17 @@
     <label v-if="label" class="label" :class="{'err': !valid}">
       {{ label }}
     </label>
-    <div class="input">
+    <div class="input" :class="{'err': !valid, 'readonly': readonly}">
       <img v-if="img" :src="`../assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
       <input :value="modelValue"
              :placeholder="placeholder"
              :style="style"
              :maxlength="max_length"
-             :class="{'input': true, 'err': !valid}"
+             :class="{'err': !valid}"
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
       />
+      <slot></slot>
     </div>
     <charactersLengthInfo v-if="max_length && counter" 
                           :readonly="readonly" 
@@ -42,52 +43,62 @@
 
   .input {
     display: flex
+    background-color: rgba(255, 255, 255, 0.08)
+    border: none
+    border-radius: 10px
+    align-items: center
 
     & > img {
       position: absolute
       padding: 15px 15px
     }
-  }
 
-  input {
-    font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.08)
-    border: none
-    outline-width: 0
-    font-size: 14px
-    color: white
-    border-radius: 10px
-    padding: 12px 8px
-    width: 100%
-
-    &:read-only {
+    &.readonly {
       background-color: rgba(255, 255, 255, 0.03)
-      color: rgba(255, 255, 255, 0.3)
-    }
-
-    &:not(.err):not(:read-only):focus {
-      background-color: rgba(255, 255, 255, 0.12)
-    }
-
-    &.err:focus {
-      background-color: rgba(255, 98, 92, 0.12)
     }
 
     &.err {
-      color: rgba(255, 98, 92, 1)
       background-color: rgba(255, 98, 92, 0.07)
+      &:focus-within {
+        background-color: rgba(255, 98, 92, 0.12)
+      }
     }
 
-    &:not(.err)::placeholder {
-      font-size: 14px
-      color: rgba(255, 255, 255, 0.3)
+    &:not(.err):not(.readonly):focus-within {
+      background-color: rgba(255, 255, 255, 0.12)
     }
 
-    &.err::placeholder {
+    & > input {
+      font-family: 'SFProDisplay', sans-serif
+      background-color: transparent
+      border: none
+      border-radius: 10px
+      outline-width: 0
       font-size: 14px
-      color: rgba(255, 98, 92, 0.4)
+      color: rgba(255, 255, 255, 0.8)
+      padding: 12px 8px
+      width: 100%
+
+      &:read-only {
+        color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.err {
+        color: rgba(255, 98, 92, 1)
+      }
+
+      &:not(.err)::placeholder {
+        font-size: 14px
+        color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.err::placeholder {
+        font-size: 14px
+        color: rgba(255, 98, 92, 0.4)
+      }
     }
   }
+
   .chars-err {
     color: rgba(255, 98, 92, 0.7)
   }
@@ -135,8 +146,8 @@ export default {
     },
     max_length:{
       type: Number,
-      default: 10,
-      required: true
+      default: undefined,
+      required: false
     },
     counter: {
       type: Boolean,
