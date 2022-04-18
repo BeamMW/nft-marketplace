@@ -13,8 +13,8 @@
                        :valid="description_valid"
                        :max_length="150"
         />
-        <formSelect :options="selector_options"
-                    @selected="selectCollection"
+        <formSelect v-model="collection"
+                    :options="collections"
         />
         <priceInput v-model="price"
                     label="Price"
@@ -84,6 +84,7 @@ import priceInput from './price-input.vue'
 import {common} from 'utils/consts.js'
 import switchInput from './switch-input.vue'
 import formSelect from './form-select.vue'
+import collsStore from 'stores/collections'
 
 export default {
   components: {
@@ -106,17 +107,7 @@ export default {
       image: undefined,
       price: '',
       dontsell: false,
-      selector_options: [
-        {name: 'Collection 0', id: 0},
-        {name: 'Collection 1', id: 1},
-        {name: 'Collection 2', id: 2},
-        {name: 'Collection 3', id: 3},
-        {name: 'Collection 4', id: 4},
-        {name: 'Collection 5', id: 5},
-        {name: 'Collection 6', id: 6},
-        {name: 'Collection 7', id: 7}
-
-      ],
+      collection: 0,
     }
   },
 
@@ -137,20 +128,20 @@ export default {
              this.description_valid &&
              this.image_valid
     },
+    collections () {
+      let colls = collsStore.artist_items
+      let res = []
+      for (let coll of colls) {
+        res.push({
+          name: coll.label,
+          id: coll.id
+        })
+      }
+      return res
+    }
   },
 
   methods: {    
-    loadImage(e, cback) {
-      let file = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (e) => {
-        cback(e.target.result, file.size)
-      }
-    },
-    selectCollection(opt) {
-      console.log(opt)
-    },
   }
 }
 </script>

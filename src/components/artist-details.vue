@@ -270,7 +270,7 @@ export default {
 
   computed: {
     in_set_artist() {
-      return !!artistsStore.artist_tx
+      return !!artistsStore.artist_t
     },
     edit_self () {
       return !!(this.id === artistsStore.my_id && artistsStore.is_artist)
@@ -320,9 +320,10 @@ export default {
     },
     label: {
       get () {
-        return this.label_ != undefined ? this.label : (this.artist || {}).label
+        return this.label_ != undefined ? this.label_ : (this.artist || {}).label
       },
       set (val) {
+        console.log('set label: ', val)
         this.label_ = val
       }
     },

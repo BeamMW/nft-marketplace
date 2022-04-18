@@ -73,7 +73,7 @@ class ArtistsStore {
   }
 
   async _loadSelf() {
-    this._is_artist = !!await this._loadArtistAsync(this.my_id)
+    this._is_artist = !(await this._loadArtistAsync(this.my_id)).error
   }
 
   async _loadTotals () {
