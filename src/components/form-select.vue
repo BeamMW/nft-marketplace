@@ -5,8 +5,8 @@
         Collection
       </label>
     </div>
-    <div class="custom-select" @blur="show = false">
-      <div class="selected" :class="{'open': show}" @click="open">
+    <div class="custom-select" :class="{'readonly': readonly}" @blur="show = false">
+      <div class="selected" :class="{'open focus': show}" @click="open">
         {{ options[modelValue].name }}
         <img src="~assets/icon-down.svg" class="arrow"/>
       </div>
@@ -40,8 +40,9 @@
   position: relative
   display: flex
   outline: none
-  background: rgba(255,255,255,0.05)
+  background-color: rgba(255, 255, 255, 0.08)
   border-radius: 10px
+  cursor: pointer
 
   .selected {
     color: #fff
@@ -50,11 +51,15 @@
     font-size: 14px
     font-weight: normal
     letter-spacing: 0.47px
-    cursor: pointer
     padding: 12px 15px
 
     &.open {
       border: none
+      border-radius: 10px
+    }
+
+    &.focus {
+      background-color: rgba(255, 255, 255, 0.12)
     }
   }
 
@@ -99,6 +104,11 @@
     }
   }
 }
+
+.readonly {
+  background: rgba(255, 255, 255, 0.03)
+  cursor: initial
+}
 </style>
 
 <script>
@@ -115,6 +125,11 @@ export default {
       type: [Number],
       required: true,
       default: 0,
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
+      required: false
     },
   },
   
@@ -139,6 +154,9 @@ export default {
       this.show = false
     },
     open(ev) {
+      if(this.readonly) {
+        return 
+      }
       if (this.show) {
         return
       }
