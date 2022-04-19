@@ -5,8 +5,9 @@ import formats from 'stores/formats'
 import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
+import router from 'router'
 
-class ArtworksStore extends ItemsStore{
+class ArtworksStore extends ItemsStore {
   constructor () {
     super('artwork', [versions.ARTWORK_VERSION])
   }
@@ -61,6 +62,54 @@ class ArtworksStore extends ItemsStore{
     }
 
     return await utils.invokeContractAsyncAndMakeTx(args)
+  }
+
+  toDetails(id) {
+    router.push({
+      name: 'artwork',
+      params: {
+        id
+      }
+    })
+  }
+
+  async setPrice (id, amount) {
+    try {
+      return await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'set_price',
+        aid: 0,
+        amount, id, cid
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async buyArtwork (id) {
+    try {
+      return await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'buy',
+        id, cid
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async getSales(id) {
+    /*let res = utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${id}`,
+        (err, res) => {
+          if (err) {
+            return this.setError(err)
+          }
+          cback(res.sales)
+        }
+      )
+    },*/
   }
 }
 

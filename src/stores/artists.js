@@ -77,6 +77,7 @@ class ArtistsStore {
     
     if (self === null) {
       this._is_artist = false
+      return
     }
     
     // We always fail if unable to load self
