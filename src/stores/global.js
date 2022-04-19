@@ -123,7 +123,7 @@ const store = {
         if (err) return this.setError(err, 'Failed to download shader')
         this.state.shader = bytes
 
-        //utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
+        //tils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
         utils.callApi('ev_subunsub', {ev_system_state: true}, (err) => this.checkError(err))
         utils.invokeContract('role=manager,action=view', (...args) => this.onCheckCID(...args), this.state.shader)
       })

@@ -101,15 +101,17 @@ class ArtworksStore extends ItemsStore {
   }
 
   async getSales(id) {
-    /*let res = utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${id}`,
-        (err, res) => {
-          if (err) {
-            return this.setError(err)
-          }
-          cback(res.sales)
-        }
-      )
-    },*/
+    try {
+      let {res} = await utils.invokeContractAsync({
+        role: 'manager',
+        action: 'view_artwork_sales',
+        id, cid
+      })
+      return res.sales
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
   }
 }
 
