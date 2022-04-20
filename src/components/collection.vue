@@ -28,9 +28,9 @@
         <div class="items-info">
           <div class="count">
             <div class="text">4</div>
-            <div>Items</div>
+            <div>items</div>
           </div>
-          <amount :amount="400000" size="12px" :info="true" class="icon_styles"/>
+          <amount :amount="400000" size="12px" info="trade volume" class="icon_styles"/>
         </div>
       </div>
     </div>
