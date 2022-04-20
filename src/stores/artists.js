@@ -42,7 +42,7 @@ class ArtistsStore {
   }
 
   set _is_artist(value) {
-    //this._state.is_artist = value
+    this._state.is_artist = value
   }
 
   get artist_tx () {
