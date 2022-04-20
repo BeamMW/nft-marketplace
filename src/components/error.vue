@@ -2,7 +2,7 @@
   <modal v-if="debug" ref="modal">
     <div class="content">
       <div class="title">
-        Set the price
+        {{ title }}
       </div>
       <div class="description">
         <p>Something went wrong. The page will be automatically restarted.</p>
@@ -110,7 +110,11 @@ export default {
     debug: {
       type: Boolean,
       default: false
-    }
+    },
+    title: {
+      type: String,
+      default: 'Error'
+    },
   },
 
   data () {
