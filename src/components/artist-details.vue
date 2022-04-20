@@ -242,6 +242,7 @@ import btn from './button.vue'
 import addImage from './add-image.vue'
 import artistsStore from 'stores/artists'
 import validators from 'utils/validators'
+import router from 'router'
 
 export default {
   components: {
@@ -418,6 +419,7 @@ export default {
         banner:    this.banner
       }
       await artistsStore.setArtist(this.label, data)
+      router.go(-1)
     }
   }
 }
