@@ -25,8 +25,7 @@
       </btn>
     </tabsctrl>
   </div>
-  <searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
-  {{ search }}
+  <searchInput v-model="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
 </template>
 
 <style scoped lang="stylus">
@@ -63,7 +62,6 @@ import searchInput from './search-input.vue'
 import {tabs, sort} from 'utils/consts.js'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
-import searchInput from './search-input.vue'
 
 // TODO: headless
 export default {

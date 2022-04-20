@@ -3,11 +3,11 @@
     <div class="input-container">
       <img src="../assets/icon-search.svg" alt="icon" @click="onShowInput"/>
       <input v-show="show"
-             :value="search"
+             :value="modelValue"
              :maxlength="max_length"
              :placeholder="placeholder"
              class="input"
-             @input="$emit('update:search', $event.target.value)"
+             @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
   </div>
@@ -23,7 +23,7 @@
     & > img {
       position: absolute
       right: 0
-      padding: 10px 11px 9px 10px
+      padding: 8px 11px 10px 10px
       cursor: pointer
     }
 
@@ -36,7 +36,7 @@
       font-size: 14px
       color: white
       border-radius: 999px
-      padding: 9px 46px 9px 20px
+      padding: 6px 46px 9px 20px
       width: 100%
       overflow: hidden
       text-overflow: ellipsis
@@ -46,6 +46,10 @@
         font-size: 12px
         color: rgba(255, 255, 255, 0.3)
       }
+  
+      &:focus-within {
+        background-color: rgba(255, 255, 255, 0.12)
+      }
     }
   }
 </style>
@@ -54,15 +58,11 @@
 
 export default {
   props: {
-    search: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: String,
       default: '',
       required: true
-    },
-    img: {
-      type: String,
-      default:'',
-      required: false,
     },
     max_length:{
       type: Number,
@@ -76,7 +76,7 @@ export default {
     },
   },
   emits: [
-    'update:search'
+    'update:modelValue'
   ],
   data () {
     return {
