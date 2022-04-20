@@ -1,7 +1,10 @@
 <template>
   <div class="amount-container" :style="text_style">
-    <img src="~assets/icon-beam.svg" :style="icon_style "/>
-    <div>{{ value }} BEAM</div>
+    <img src="~assets/icon-beam.svg" :style="icon_style"/>
+    <div>
+      <div>{{ value }} BEAM</div>
+      <div v-if="info">volume Trade</div>
+    </div>
   </div>
 </template>
 
@@ -30,7 +33,11 @@ export default {
     size: {
       type: String,
       default: '18px'
-    }
+    },
+    info: {
+      type: Boolean,
+      default: false
+    },
   },
 
   computed: {

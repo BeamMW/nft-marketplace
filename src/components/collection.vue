@@ -24,6 +24,14 @@
         <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
         <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
         <div class="description">{{ item.description }}</div>
+        <hr class="line"/>
+        <div class="items-info">
+          <div class="count">
+            <div class="text">4</div>
+            <div>Items</div>
+          </div>
+          <amount :amount="400000" size="12px" :info="true" class="icon_styles"/>
+        </div>
       </div>
     </div>
   </div>
@@ -71,6 +79,24 @@
           -webkit-box-orient: vertical
           overflow: hidden
         }
+        & > .items-info {
+          display:flex
+          font-size: 12px
+          
+          .count {
+            display: flex
+            flex-direction: column
+            flex-basis: 20%
+            
+            & > .text {
+              font-weight: 500
+              color: #24c1ff
+            }
+          }
+          .icon_styles {
+            height: 18px
+          }
+        }
       }
     }
   }
@@ -78,11 +104,13 @@
 
 <script>
 import preview from './image-preview.vue'
+import amount from './amount.vue'
 import collsStore from 'stores/collections'
 
 export default {
   components: {
-    preview
+    preview,
+    amount
   },
 
   props: {
