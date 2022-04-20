@@ -79,9 +79,18 @@
           -webkit-box-orient: vertical
           overflow: hidden
         }
+
+        & > .line {
+          height: 1px
+          opacity: 0.1
+          background-color: white
+          border: none
+        }
+
         & > .items-info {
           display:flex
           font-size: 12px
+          margin-top: 10px
           
           .count {
             display: flex
@@ -93,6 +102,7 @@
               color: #24c1ff
             }
           }
+
           .icon_styles {
             height: 18px
           }
