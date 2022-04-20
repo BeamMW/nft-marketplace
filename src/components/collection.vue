@@ -7,7 +7,7 @@
        @click="onDetails"
   >
     <preview class="preview" 
-             :image="undefined"
+             :image="item.cover"
              :default="def_banner"
              height="140px" 
              cover
