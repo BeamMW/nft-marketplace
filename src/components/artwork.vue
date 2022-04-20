@@ -1,7 +1,12 @@
 <template>
   <div :class="{'artwork': true, 'error': item.error}">
     <!---- Preview OR Loading ---->
-    <preview :image="item.image" height="200px" @click="onDetails"/>
+    <preview :image="item.image" 
+             :default="def_artwork"
+             height="200px" 
+             :cover="!(item.image || {}).object"
+             @click="onDetails"
+    />
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -9,7 +14,7 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div class="title" :class="{'error': item.error}">{{ (item.price || {}).amount }} - {{ item.label }}</div>
+      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
       <!---- TODO: enable Likes ----->
       <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
@@ -99,9 +104,10 @@
 </style>
 
 <script>
-import price from './artwork-price.vue'
-import preview from './image-preview.vue'
+import price from './artwork-price'
+import preview from './image-preview'
 import artsStore from 'stores/artworks'
+import {def_images} from 'utils/consts'
 
 export default {
   components: {
@@ -113,6 +119,12 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  data () {
+    return {
+      def_artwork: def_images.artwork,
     }
   },
 

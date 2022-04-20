@@ -1,7 +1,7 @@
 <template>
   <div class="preview-container" :style="style">
-    <div v-if="loading && show_loading" class="darker">Loading...</div>
-    <div v-if="error && show_loading" class="darker">Failed to load image</div>
+    <div v-if="loading && show_text" class="loading">Loading...</div>
+    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
     <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
@@ -20,8 +20,16 @@
       object-fit: cover
     }
 
-    & > .darker {
-      opacity: 0.5
+    & > div {
+      position: absolute
+    }
+
+    & > .loading {
+      color: dimgray
+    }
+
+    & > .error {
+      color: dimgray
     }
   }
 </style>
@@ -53,9 +61,13 @@ export default {
       type: Boolean,
       default: false
     },
-    show_loading: {
+    show_text: {
       type: Boolean,
       default: true
+    },
+    default: {
+      type: String,
+      default: ''
     }
   },
 
@@ -69,7 +81,7 @@ export default {
         return this.image.object
       }
       
-      return undefined
+      return (this.default || undefined)
     },
 
     loading () {

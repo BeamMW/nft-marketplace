@@ -8,6 +8,7 @@
           }"         
           :disabled="disabled"
           :style="button_style"
+          :title="tooltip"
   >
     <slot></slot>
     <span class="text" :style="text_style">{{ text }}</span>
@@ -121,6 +122,10 @@ export default {
     radius: {
       type: String,
       default: '50px'
+    },
+    tooltip: {
+      type: String,
+      default: ''
     }
   },
 

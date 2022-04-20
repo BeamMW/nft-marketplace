@@ -7,14 +7,16 @@
        @click="onDetails"
   >
     <preview class="preview" 
-             :image="item.cover" 
+             :image="undefined"
+             :default="def_banner"
              height="140px" 
              cover
     />
     <div class="info-row">  
       <div class="avatar" :class="{'error': item.author_error}">
         <preview :image="item.avatar" 
-                 :show_loading="false"
+                 :show_text="false"
+                 :default="def_avatar"
                  width="72px" 
                  height="72px" 
                  radius="36px 36px"
@@ -27,10 +29,10 @@
         <hr class="line"/>
         <div class="items-info">
           <div class="count">
-            <div class="text">4</div>
-            <div>items</div>
+            <div class="text">{{ item.artworks.length }}</div>
+            <div>{{ item.artworks.length == 1 ? 'item' : 'items' }}</div>
           </div>
-          <amount :amount="400000" size="12px" info="trade volume" class="icon_styles"/>
+          <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>
       </div>
     </div>
@@ -117,9 +119,10 @@
 </style>
 
 <script>
-import preview from './image-preview.vue'
-import amount from './amount.vue'
+import preview from './image-preview'
+import amount from './amount'
 import collsStore from 'stores/collections'
+import {def_images} from 'utils/consts'
 
 export default {
   components: {
@@ -131,6 +134,13 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  data () {
+    return {
+      def_avatar: def_images.artist_avatar,
+      def_banner: def_images.artist_banner
     }
   },
 
