@@ -364,20 +364,6 @@ export default {
     if (scrollHeight > offsetHeight) {
       this.is_long_text = true
     }
-  },
-
-  methods: {
-    toggleVisibleText() {
-      !this.full_text ? this.full_text : !this.full_text
-    },
-
-    formatNumber(num) {
-      if (num < 0.01) {
-        return '< 0.01'
-      }
-
-      return num.toFixed(3)
-    }
-  },
+  }
 }
 </script>
