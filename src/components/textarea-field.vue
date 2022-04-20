@@ -37,7 +37,7 @@
     height: 100%
     padding: 0
     border-radius: 10px
-    padding: 12px 13px 
+    padding: 10px 12px 
     width: 100%
     resize: none
     min-height: 79px
