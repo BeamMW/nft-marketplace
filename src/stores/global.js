@@ -39,7 +39,7 @@ function defaultState() {
     gallery_artworks_page: 1,
     gallery_collections_page: 1,
     collections: [],
-    debug: true
+    debug: false
   }
 
   /*

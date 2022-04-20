@@ -22,7 +22,7 @@
       </div>
       <div class="text">
         <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
-        <div class="author" :class="{'error': item.author_error}">{{ item.author_name }}</div>
+        <div class="author" :class="{'error': item.author_error}">by <span>{{ item.author_name }}</span></div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
         <div class="items-info">
@@ -51,7 +51,7 @@
     & > .info-row {
       display: flex
       flex-direction: row
-      padding: 16px 16px 20px 20px
+      padding: 10px 16px 10px 20px
 
       & > .avatar {
         margin-right: 16px
@@ -66,14 +66,17 @@
         }
 
         & > .author {
-          margin-top: 4px
           font-size: 14px
+
+          & > span {
+            color: #00f6d2
+          }
         }
 
         & > .description {
           font-size: 12px
           color: rgba(255, 255, 255, 0.5)
-          margin-top: 10px
+          margin-top: 6px
           display: -webkit-box
           -webkit-line-clamp: 3
           -webkit-box-orient: vertical
