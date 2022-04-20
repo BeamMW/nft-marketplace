@@ -72,7 +72,8 @@
             <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
             <input v-if="!in_set_artist" id="avatar"
                    ref="avatar"
-                   type="file"     
+                   type="file"
+                   accept="image/*"      
                    class="files"
                    @change="onUploadAvatar"
             />
@@ -162,6 +163,8 @@
             transform: translate(-50%, -26%)
             
             .text {
+              width: 100%
+              height: 100%
               display: flex
               justify-content: center
               align-items: center
@@ -206,11 +209,13 @@
         
           .error_msg {
             text-align: center
+            margin-top: -16px
 
             .error {
               font-style: italic
               font-size: 12px
               font-weight: 400
+              margin: 0
             }
           }
         }
