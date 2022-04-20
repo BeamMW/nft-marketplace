@@ -1,6 +1,6 @@
 <template>
   <span id="modals"/>
-  <error v-if="error" :error="error.error" :context="error.context"/>
+  <error v-if="error" :error="error.error" :context="error.context" :debug="true"/>
   <loading v-else-if="loading"/>
   <div v-else id="app-container" class="app-container">
     <router-view></router-view>
