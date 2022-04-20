@@ -161,9 +161,9 @@
             position: relative
             left: 50%
             transform: translate(-50%, -26%)
-            
+            cursor:pointer
+
             .text {
-              width: 100%
               height: 100%
               display: flex
               justify-content: center
