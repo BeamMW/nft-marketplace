@@ -9,6 +9,7 @@ export default class ItemsStore {
   constructor(objname, versions) {
     this._objname = objname
     this._versions = versions
+    this._modes = ['user', 'artist']
     this.reset()
   }
 
@@ -31,6 +32,19 @@ export default class ItemsStore {
           return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
         })
       }
+    })
+  }
+
+  getItem(id) {
+    return computed(() => {
+      for (let mode of this._modes) {
+        for (let item of this._state[mode].items) {
+          if (item.id == id) {
+            return item
+          }
+        }
+      }
+      throw new Error(`ItemsStore::getItem - item ${this._objname}-${id} not found`)
     })
   }
 
@@ -73,7 +87,7 @@ export default class ItemsStore {
       
       try {
         [item.label] = formats.fromContract(item.label)
-        if (!item.label) {
+        if (!item.label && !item.default) {
           throw new Error('label cannot be empty')
         }
 

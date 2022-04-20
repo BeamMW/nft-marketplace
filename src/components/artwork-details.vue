@@ -3,7 +3,7 @@
     <backBtn/>
     <div class="details-row"> 
       <div class="artwork-container">
-        <preview :image="artwork" height="360px" radius="0"/>
+        <preview :image="image" height="360px" radius="0"/>
       </div>
       <div class="info-container">
         <div class="info-box">
@@ -14,7 +14,7 @@
           <div v-else class="author">Loading...</div>
           <div class="price">
             <div class="separator"/>
-            <artPrice :artwork="artwork"/>
+            <artPrice :artwork="artwork.value"/>
           </div>
         </div>
       </div>
@@ -250,8 +250,9 @@ import artPrice from './artwork-price.vue'
 import backBtn from './back-btn.vue'
 import preview from './image-preview.vue'
 import utils from 'utils/utils.js'
-import {binary_search} from 'utils/search.js'
 import artistsStore from 'stores/artists.js'
+import artsStore from 'stores/artworks'
+
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -283,34 +284,35 @@ export default {
   },
 
   computed: {
+    artwork () {
+      return artsStore.getItem(this.id)
+    },
+    
     title () {
-      return this.artwork.title
+      return this.artwork.value.label
+    },
+
+    author () {
+      return this.artwork.value.author_name
+    },
+
+    image () {
+      return this.artwork.value.image
+    },
+
+    error () {
+      return !!this.artwork.value.error
     },
 
     artists () {
       return artistsStore.artists
-    },
-
-    author () {
-      return (this.artists[this.artwork.pk_author] || {}).label
-    },
-
-    artwork () {
-      let all = this.$state.artworks
-      let idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
-      return all[idx]
-    },
-
-    error () {
-      return !!this.artwork.error
     }
   },
   
   created() {
-    // TODO: also update on new block
-    this.$store.getSalesHistory(this.id, (sales) => {
-      this.sales = sales
-    })
+    (async () => {
+      this.sales = await artsStore.getSales(this.id)
+    })()
   },
 
   methods: {  

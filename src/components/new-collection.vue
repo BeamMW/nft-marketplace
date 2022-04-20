@@ -134,10 +134,9 @@ import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
-import {common} from 'utils/consts'
 import collsStore from 'stores/collections'
 import router from 'router'
-import validators from '../utils/validators.js'
+import validators from 'utils/validators'
 
 export default {
   components: {
@@ -251,7 +250,7 @@ export default {
       }
     },
     cover_valid() {
-      return this.image_valid(this.cover)
+      return !this.cover || validators.image(this.cover)
     },
     can_submit () {
       return this.label && this.label_valid &&
@@ -263,17 +262,7 @@ export default {
     }
   },
 
-  methods: {    
-    image_valid (image) {
-      if (!image) return true
-
-      if (image.file) {
-        return image.file.size <= common.MAX_IMAGE_SIZE
-      }
-
-      return image.ipfs_hash
-    },
-
+  methods: {   
     async onSetCollection() {
       let data = {
         website:     this.website,

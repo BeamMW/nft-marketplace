@@ -38,7 +38,8 @@ function defaultState() {
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
     gallery_collections_page: 1,
-    collections: []
+    collections: [],
+    debug: false
   }
 
   /*
@@ -122,7 +123,7 @@ const store = {
         if (err) return this.setError(err, 'Failed to download shader')
         this.state.shader = bytes
 
-        //utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
+        //tils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
         utils.callApi('ev_subunsub', {ev_system_state: true}, (err) => this.checkError(err))
         utils.invokeContract('role=manager,action=view', (...args) => this.onCheckCID(...args), this.state.shader)
       })
@@ -487,20 +488,6 @@ const store = {
   //
   // Artwork actions, Buy, Sell, Like &c.
   //
-  buyArtwork (id) {
-    utils.invokeContract(
-      `role=user,action=buy,id=${id},cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
-  },
-
-  sellArtwork (id, price) {
-    utils.invokeContract(
-      `role=user,action=set_price,id=${id},amount=${price},aid=0,cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
-  },
-
   likeArtwork (id) {
     utils.invokeContract(
       `role=user,action=vote,id=${id},val=1,cid=${this.state.cid}`, 
@@ -634,17 +621,6 @@ const store = {
     catch(err) {
       this.setError(err, 'Failed to upload artwork')
     }
-  },
-
-  getSalesHistory(id, cback) {
-    utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${id}`,
-      (err, res) => {
-        if (err) {
-          return this.setError(err)
-        }
-        cback(res.sales)
-      }
-    )
   },
 
   showStats() {
@@ -790,15 +766,6 @@ const store = {
 
   setGalleryCollectionsPage (page) {
     this.state.gallery_collections_page = page
-  },
-
-  toArtworkDetails(id) {
-    router.push({
-      name: 'artwork',
-      params: {
-        id
-      }
-    })
   },
 
   toBack () {

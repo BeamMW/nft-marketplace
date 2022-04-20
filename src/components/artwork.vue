@@ -9,7 +9,7 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
+      <div class="title" :class="{'error': item.error}">{{ (item.price || {}).amount }} - {{ item.label }}</div>
       <!---- TODO: enable Likes ----->
       <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
@@ -101,6 +101,7 @@
 <script>
 import price from './artwork-price.vue'
 import preview from './image-preview.vue'
+import artsStore from 'stores/artworks'
 
 export default {
   components: {
@@ -159,7 +160,7 @@ export default {
     },
 
     onDetails(ev) {
-      this.$store.toArtworkDetails(this.id)
+      artsStore.toDetails(this.id)
     }
   }
 }

@@ -20,7 +20,7 @@
                           :max_length="max_length" 
                           :value="modelValue.length"
                           :class="{'chars-err': !valid}"
-                          style="margin-top:2px;"
+                          style="margin-top:3px;"
     />
   </div>
 </template>
@@ -76,7 +76,7 @@
       outline-width: 0
       font-size: 14px
       color: rgba(255, 255, 255, 0.8)
-      padding: 12px 8px
+      padding: 10px 8px
       width: 100%
 
       &:read-only {

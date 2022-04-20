@@ -35,6 +35,19 @@
           </div>
         </div>
       </div>
+      <div class="text">
+        <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
+        <div class="author" :class="{'error': item.author_error}">by <span>{{ item.author_name }}</span></div>
+        <div class="description">{{ item.description }}</div>
+        <hr class="line"/>
+        <div class="items-info">
+          <div class="count">
+            <div class="text">4</div>
+            <div>items</div>
+          </div>
+          <amount :amount="400000" size="12px" info="trade volume" class="icon_styles"/>
+        </div>
+      </div>
     </div>
   </selectItem>
 </template>
@@ -53,14 +66,15 @@
     & > .info-row {
       display: flex
       flex-direction: row
-      padding: 16px 16px 20px 20px
+      padding: 10px 16px 10px 20px
 
       & > .avatar {
-        margin-right: 16px
+        margin-right: 18px
       }
 
       & > .text {
         font-family: 'SFProDisplay', sans-serif
+        flex: 1
         
         & > .label {
           font-weight: 700
@@ -68,33 +82,46 @@
         }
 
         & > .author {
-          margin-top: 4px
           font-size: 14px
+
+          & > span {
+            color: #00f6d2
+          }
         }
 
         & > .description {
           font-size: 12px
           color: rgba(255, 255, 255, 0.5)
-          margin-top: 10px
+          margin-top: 6px
           display: -webkit-box
           -webkit-line-clamp: 3
           -webkit-box-orient: vertical
           overflow: hidden
         }
+
+        & > .line {
+          height: 1px
+          opacity: 0.1
+          background-color: white
+          border: none
+        }
+
         & > .items-info {
           display:flex
           font-size: 12px
+          margin-top: 10px
           
           .count {
             display: flex
             flex-direction: column
-            margin-right: 20px
+            flex-basis: 20%
             
             & > .text {
               font-weight: 500
               color: #24c1ff
             }
           }
+
           .icon_styles {
             height: 18px
           }
@@ -106,14 +133,14 @@
 
 <script>
 import preview from './image-preview.vue'
+import amount from './amount.vue'
 import collsStore from 'stores/collections'
 import amount from './amount.vue'
 import selectItem from './select-item.vue'
 export default {
   components: {
     preview,
-    amount,
-    selectItem
+    amount
   },
 
   props: {
@@ -125,6 +152,12 @@ export default {
   data: function () {
     return {
       selected: false
+    }
+  },
+
+  computed: {
+    coll_name () {
+      return [this.$state.debug ? `[${this.item.id}] - ` : '', this.item.label].join('')
     }
   },
 

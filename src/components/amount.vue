@@ -3,7 +3,7 @@
     <img src="~assets/icon-beam.svg" :style="icon_style"/>
     <div>
       <div>{{ value }} BEAM</div>
-      <div v-if="info">volume Trade</div>
+      <div v-if="info">{{ info }}</div>
     </div>
   </div>
 </template>
@@ -35,8 +35,8 @@ export default {
       default: '18px'
     },
     info: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: ''
     },
   },
 

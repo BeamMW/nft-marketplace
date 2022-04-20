@@ -1,7 +1,7 @@
 <template>
   <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork"/>
   <!--- has price, so display it --->
-  <span v-if="price" class="container">
+  <span v-if="price" class="price-container">
     <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
     
     <!--- has price and owned, display change price / remove from sale options --->
@@ -34,7 +34,7 @@
     </template>  
   </span>
 
-  <span v-if="!price" class="container">
+  <span v-if="!price" class="price-container">
     <!---- doesn't have price & owned, can sell ---->
     <template v-if="owned">
       <btn v-if="compact" 
@@ -62,7 +62,7 @@
 </template>
 
 <style scoped lang="stylus">
-.container {
+.price-container {
   display: flex
   line-height: 2
   flex-wrap: wrap
@@ -94,7 +94,8 @@ import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
 import artworkPriceModal from './price-dialog.vue'
 import amount from './amount.vue'
-import artistsStore from 'stores/artists.js'
+import artistsStore from 'stores/artists'
+import artsStore from 'stores/artworks'
 
 export default {
   components: {
@@ -129,10 +130,10 @@ export default {
     },
 
     author () {
-      return artistsStore.my_id === this.artwork.pk_author
+      return artistsStore.my_id === this.artwork.author
     },
 
-    price() {
+    price () {
       return this.artwork.price
     },
 
@@ -155,16 +156,16 @@ export default {
     },
 
     onSellArtwork (price) {
-      this.$store.sellArtwork(this.id, price)
+      artsStore.setPrice(this.id, price)
     },
 
     onRemoveFromSale () {
-      this.$store.sellArtwork(this.id, 0)
+      artsStore.setPrice(this.id, 0)
     },
 
     onBuy () {
       if (this.is_headless) return this.$store.switchToHeaded()
-      this.$store.buyArtwork(this.id)
+      artsStore.buyArtwork(this.id)
     }
   }
 }

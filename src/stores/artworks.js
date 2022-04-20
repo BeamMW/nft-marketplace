@@ -2,10 +2,12 @@ import ItemsStore from 'stores/items'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import formats from 'stores/formats'
-import {versions} from 'stores/consts'
+import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
+import utils from 'utils/utils'
+import router from 'router'
 
-class ArtworksStore extends ItemsStore{
+class ArtworksStore extends ItemsStore {
   constructor () {
     super('artwork', [versions.ARTWORK_VERSION])
   }
@@ -46,6 +48,69 @@ class ArtworksStore extends ItemsStore{
     return {
       label: formats.toContract(label),
       data: formats.toContract(versions.ARTWORK_VERSION, data)
+    }
+  }
+
+  async createNFT(collid, label, data) {
+    ({label, data} = await this._toContract(label, data))
+    
+    let args = {
+      role: 'artist',
+      action: 'set_artwork',
+      collection_id: collid,
+      label, data, cid
+    }
+
+    return await utils.invokeContractAsyncAndMakeTx(args)
+  }
+
+  toDetails(id) {
+    router.push({
+      name: 'artwork',
+      params: {
+        id
+      }
+    })
+  }
+
+  async setPrice (id, amount) {
+    try {
+      return await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'set_price',
+        aid: 0,
+        amount, id, cid
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async buyArtwork (id) {
+    try {
+      return await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'buy',
+        id, cid
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async getSales(id) {
+    try {
+      let {res} = await utils.invokeContractAsync({
+        role: 'manager',
+        action: 'view_artwork_sales',
+        id, cid
+      })
+      return res.sales
+    }
+    catch(err) {
+      this._global.setError(err)
     }
   }
 }

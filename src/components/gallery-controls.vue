@@ -59,6 +59,7 @@
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
+import searchInput from './search-input.vue'
 import {tabs, sort} from 'utils/consts.js'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
