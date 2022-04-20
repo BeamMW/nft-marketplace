@@ -28,7 +28,7 @@ export const contract = {
 }
 
 export const def_images = {
-  artist_avatar: 'assets/artist-default-avatar.svg',
-  artist_banner: 'assets/artist-default-banner.svg',
-  artwork: 'assets/artwork-default.svg'
+  artist_avatar: '/assets/artist-default-avatar.svg',
+  artist_banner: '/assets/artist-default-banner.svg',
+  artwork: '/assets/artwork-default.svg'
 }
