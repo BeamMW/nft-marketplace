@@ -54,11 +54,12 @@
       padding: 10px 16px 10px 20px
 
       & > .avatar {
-        margin-right: 16px
+        margin-right: 18px
       }
 
       & > .text {
         font-family: 'SFProDisplay', sans-serif
+        flex: 1
         
         & > .label {
           font-weight: 700
