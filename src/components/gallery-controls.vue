@@ -14,7 +14,6 @@
                   title="Sort by"
         />
       </div>
-      Total: {{ artists_total }}
       <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
       <btn text="add collection" color="green" padding="7px 12px" @click="onNewCollection"/>
       <btn class="user" height="34px"
@@ -25,7 +24,8 @@
       </btn>
     </tabsctrl>
   </div>
-  <searchInput v-model="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
+  <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
+  {{ search }} -->
 </template>
 
 <style scoped lang="stylus">
@@ -58,7 +58,7 @@
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
-import searchInput from './search-input.vue'
+//import searchInput from './search-input.vue'
 import {tabs, sort} from 'utils/consts.js'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
@@ -69,7 +69,7 @@ export default {
     tabsctrl,
     selector,
     btn,
-    searchInput
+    //searchInput
   },
 
   data () {

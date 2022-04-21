@@ -26,3 +26,9 @@ export const sort = {
 export const contract = {
   cid: '0326045c5fe97ea1f7389b5c1386af49fab6466ea841c4eb204036822bdc9fe8'
 }
+
+export const def_images = {
+  artist_avatar: '/assets/artist-default-avatar.svg',
+  artist_banner: '/assets/artist-default-banner.svg',
+  artwork: '/assets/artwork-default.svg'
+}
