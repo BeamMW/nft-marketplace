@@ -104,8 +104,8 @@
             flex-basis: 20%
             
             & > .text {
-              font-weight: 500
-              color: #24c1ff
+              font-weight: bold
+              color: white
             }
           }
 
