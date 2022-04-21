@@ -79,7 +79,7 @@
           color: rgba(255, 255, 255, 0.5)
           margin-top: 6px
           display: -webkit-box
-          -webkit-line-clamp: 3
+          -webkit-line-clamp: 2
           -webkit-box-orient: vertical
           overflow: hidden
         }
