@@ -8,10 +8,10 @@
           }"         
           :disabled="disabled"
           :style="button_style"
-          :title="tooltip"
   >
     <slot></slot>
     <span class="text" :style="text_style">{{ text }}</span>
+    <span v-if="tooltip" class="tooltip">{{ tooltip }}</span>
   </button>
 </template>
 
@@ -28,6 +28,7 @@
   cursor: pointer
   background-color: rgba(255, 255, 255, 0.1)
   user-select: none
+  position: relative
 
   &:not(.disabled):hover {
     box-shadow: 0 0 8px white
@@ -64,6 +65,40 @@
 
   & > span {
     padding-bottom: 1px
+  }
+
+  & > .tooltip {
+    box-sizing: border-box
+    visibility: hidden
+    width: 120px
+    background: rgba(255, 255, 255, 0.15)
+    backdrop-filter: blur(30px)
+    color: #fff
+    text-align: center
+    border-radius: 6px
+    padding: 11px 0px
+    position: absolute
+    z-index: 1
+    top: 150%
+    left: -54%
+    margin-left: -60px
+    font-family: 'SFProDisplay', sans-serif
+    font-size: 14px
+
+    &::after {
+      content: ""
+      position: absolute
+      bottom: 100%
+      left: 83%
+      margin-left: -5px
+      border-width: 5px
+      border-style: solid
+      border-color: transparent transparent rgba(255, 255, 255, 0.15) transparent
+    }
+  }
+
+  &:hover .tooltip {
+    visibility: visible
   }
 }
 </style>
