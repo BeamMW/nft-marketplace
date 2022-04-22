@@ -72,15 +72,6 @@ class ArtworksStore extends ItemsStore {
     return await utils.invokeContractAsyncAndMakeTx(args)
   }
 
-  toDetails(id) {
-    router.push({
-      name: 'artwork',
-      params: {
-        id
-      }
-    })
-  }
-
   async setPrice (id, amount) {
     try {
       return await utils.invokeContractAsyncAndMakeTx({
@@ -120,6 +111,56 @@ class ArtworksStore extends ItemsStore {
     catch(err) {
       this._global.setError(err)
     }
+  }
+
+  async likeArtwork(id) {
+    try {
+      await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'vote',
+        val: 1,
+        id, cid, 
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async unlikeArtwork(id) {
+    try {
+      await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'vote',
+        val: 0,
+        id, cid, 
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  async deleteArtwork (id) {
+    try {
+      await utils.invokeContractAsyncAndMakeTx({
+        role: 'manager',
+        action: 'admin_delete',
+        id, cid, 
+      })
+    }
+    catch(err) {
+      this._global.setError(err)
+    }
+  }
+
+  toDetails(id) {
+    router.push({
+      name: 'artwork',
+      params: {
+        id
+      }
+    })
   }
 }
 

@@ -12,4 +12,4 @@ export const types = {
   MAX: 3
 }
 
-export const cid = '0326045c5fe97ea1f7389b5c1386af49fab6466ea841c4eb204036822bdc9fe8'
+export const cid = '3e4c3e1d67f52c4067aea0f9951faffa005c0a9da62f776a627f2b74b23c2062'
