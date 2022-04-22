@@ -209,7 +209,7 @@ const store = {
     try {
       await artistsStore.loadAsync()
       await collsStore.loadAsync()
-      await artsStore.loadAsync()
+      //await artsStore.loadAsync()
       this.state.loading = false
     }
     catch(err) 

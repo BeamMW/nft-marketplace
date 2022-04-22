@@ -18,19 +18,25 @@ class CollectionsStore extends ItemsStore {
     coll.owned = computed(() => artistsStore.my_id == coll.author)
 
     coll.author_error = computed(() => {
-      return author.value.error
+      return author.error
     })
 
     coll.author_name = computed(() => {
-      if (author.value.loading) return 'Loading...'
-      if (author.value.error) return 'Failed to load author'
-      return author.value.label
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      return author.label
     }) 
+
+    coll.by_author = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      return `by <span style="color:#00f6d2">${author.label}</span>`
+    })
     
     coll.avatar = computed(() => {
-      if(author.value.loading) return {loading: true}
-      if(author.value.error) return {error: true}
-      return author.value.avatar
+      if(author.loading) return {loading: true}
+      if(author.error) return {error: true}
+      return author.avatar
     })
 
     if (coll.error) {
@@ -44,22 +50,22 @@ class CollectionsStore extends ItemsStore {
 
       if (coll.default) {
         coll.cover = computed(() => {
-          if(author.value.loading) return {loading: true}
-          if(author.value.error) return {error: true}
-          return author.value.banner
+          if(author.loading) return {loading: true}
+          if(author.error) return {error: true}
+          return author.banner
         })
         coll.label = computed(() => {
-          if (author.value.loading) return 'Loading...'
-          if (author.value.error) return 'Failed to load author'
-          return `${author.value.label} collection`
+          if (author.loading) return 'Loading...'
+          if (author.error) return 'Failed to load author'
+          return `${author.label} collection`
         })
         coll.description = computed(() => {
-          if (author.value.loading || author.value.error) return ''
-          return `This collection includes all artworks by ${author.value.label} that are not in other collections.`
+          if (author.loading || author.error) return ''
+          return `This collection includes all artworks by ${author.label} that are not in other collections.`
         })
       } 
     }
-
+    
     return coll
   }
 

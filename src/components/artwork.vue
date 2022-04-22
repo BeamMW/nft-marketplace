@@ -24,7 +24,7 @@
 
     <!---- Second info row, author ---->
     <div class="info-row" :class="{'error': item.author_error}">
-      <span class="author">{{ item.by_author }}</span>
+      <span class="author" v-html="item.by_author"></span>
     </div>
 
     <!---- Third info row, price/buy/sell ----->

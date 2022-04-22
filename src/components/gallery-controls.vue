@@ -116,12 +116,11 @@ export default {
       return artistsStore.is_artist
     },
     my_artist_name () {
-      let artist = artistsStore.artists[artistsStore.my_id] 
-      return (artist || {}).label
+      return (artistsStore.self || {}).label
     },
     artists_total () {
       return artistsStore.total
-    },
+    }
   },
 
   methods: {

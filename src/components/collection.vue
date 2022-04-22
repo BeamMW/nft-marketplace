@@ -24,10 +24,10 @@
       </div>
       <div class="text">
         <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
-        <div class="author" :class="{'error': item.author_error}">by <span>{{ item.author_name }}</span></div>
+        <div class="author" :class="{'error': item.author_error}" v-html="item.by_author"></div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
-        <div class="items-info">
+        <div class="items-info" :class="{'error': item.error}">
           <div class="count">
             <div class="text">{{ item.artworks.length }}</div>
             <div>{{ item.artworks.length == 1 ? 'item' : 'items' }}</div>
@@ -70,10 +70,6 @@
 
         & > .author {
           font-size: 14px
-
-          & > span {
-            color: #00f6d2
-          }
         }
 
         & > .description {
@@ -104,8 +100,8 @@
             flex-basis: 20%
             
             & > .text {
-              font-weight: 500
-              color: #24c1ff
+              font-weight: bold
+              color: white
             }
           }
 

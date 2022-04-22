@@ -3,7 +3,7 @@ import utils from 'utils/utils'
 import imagesStore from 'stores/images'
 import {versions, cid} from 'stores/consts'
 import router from 'router'
-import {reactive, computed} from 'vue'
+import {reactive} from 'vue'
 
 class ArtistsStore {
   constructor () {
@@ -17,16 +17,12 @@ class ArtistsStore {
       is_artist: false,
       artist_tx: '',
       artists: {},
-      total: 0
+      total: 0,
     })
   }
 
   get my_id() {
     return this._state.my_id
-  }
-
-  set _my_id (val) {
-    this._state.my_id = val
   }
 
   get total() {
@@ -41,24 +37,30 @@ class ArtistsStore {
     return this._state.is_artist
   }
 
-  set _is_artist(value) {
-    this._state.is_artist = value
-  }
-
   get artist_tx () {
     return this._state.artist_tx
-  }
-
-  set _artist_tx (val) {
-    this._state.artist_tx = val
   }
 
   get artists () {
     return this._state.artists
   }
 
-  set _artists (val) {
-    this._state.artists = val
+  get self () {
+    return this._state.artists[this._state.my_id]
+  }
+
+  _setArtist(id, artist) {
+    let old = this._state.artists[id]
+    
+    if (old) {
+      utils.clearAssign(this._state.artists[id], artist)
+    }
+
+    if (!old) {
+      this._state.artists[id] = artist
+    }
+
+    return this._state.artists[id]
   }
 
   async _loadKey () {
@@ -69,14 +71,14 @@ class ArtistsStore {
     })
 
     utils.ensureField(res, 'id', 'string')
-    this._my_id = res.id
+    this._state.my_id = res.id
   }
 
   async _loadSelf() {
-    let self = await this._loadArtistAsync(this.my_id)
+    let self = await this._loadArtistAsync(this.my_id, false)
     
     if (self === null) {
-      this._is_artist = false
+      this._state.is_artist = false
       return
     }
     
@@ -85,7 +87,7 @@ class ArtistsStore {
       throw self.error
     }
 
-    this._is_artist = true
+    this._state.is_artist = true
   }
 
   async _loadTotals () {
@@ -96,10 +98,10 @@ class ArtistsStore {
     })
     
     utils.ensureField(res, 'total', 'number')
-    this._total = res.total
+    this._state.total = res.total
   }
 
-  async _loadArtistAsync (id) {
+  async _loadArtistAsync (id, fail) {
     try {
       let {res} = await utils.invokeContractAsync({
         role: 'manager',
@@ -109,15 +111,23 @@ class ArtistsStore {
       })
 
       utils.ensureField(res, 'artists', 'array')
-      if (res.artists.length > 1) throw new Error('_loadArtistAsync: artists.length > 1')
-      if (res.artists.length == 0) return null
+      if (res.artists.length > 1) {
+        throw new Error('artists.length > 1')
+      }
+
+      if (res.artists.length == 0) {
+        if (fail) {
+          throw new Error('artist not found')
+        }
+        return null
+      }
 
       let artist = this._fromContract(res.artists[0])
-      this._state.artists[id] = artist
+      this._setArtist(id, artist)
     } 
     catch (err) {
       console.log(`_loadArtistAsync for id ${id}:`, err)
-      this._state.artists[id] = {id, error: err}
+      this._setArtist(id, {id, error: err})
     }
 
     return this._state.artists[id]
@@ -128,26 +138,21 @@ class ArtistsStore {
       throw new Error('loadArtist: id is required')
     }
 
-    return computed(() => {
-      let cached = this._state.artists[id]
-      if (cached) {
-        return cached
-      }
-      this._state.artists[id] = {id, loading: true}
-      
-      this._state.artists[id] = this._loadArtistAsync(id)
-      if (this._state.artists[id] === null) {
-        this._state.artists[id] = {id, error: new Error('Artist not found')}
-      }
-
-      return this._state.artists[id]
-    })
+    let cached = this._state.artists[id]
+    if (cached) {
+      return cached
+    }
+    
+    this._setArtist(id, {id, loading: true})
+    this._loadArtistAsync(id)
+    return this._state.artists[id]
   }
 
   async loadAsync() {
     await this._loadKey()
     await this._loadSelf()
     await this._loadTotals()
+    // TODO: check that after reload artists loaded with loadArtist would reload themselves
   }
 
   async setArtist(label, data) {
@@ -162,17 +167,17 @@ class ArtistsStore {
       return
     }
 
-    this._artist_tx = txid
+    this._state.artist_tx = txid
     let interval = setInterval(async () => {
       try {
         let {res} = await utils.callApiAsync('tx_status', {txId: this.artist_tx})
         if ([0, 1, 5].indexOf(res.status) == -1) {
           clearInterval(interval)
-          this._artist_tx = ''
+          this._state.artist_tx = ''
         }
       }
       catch(err) {
-        this._artist_tx = ''
+        this._state.artist_tx = ''
         this.global.setError(err)
       }
     }, 1000)
@@ -192,7 +197,7 @@ class ArtistsStore {
     let artist = Object.assign({}, cartist)
 
     if (!artist.label) {
-      //throw new Error('ArtistsStore._fromContract : artist label is empty')
+      throw new Error('ArtistsStore._fromContract : artist label is empty')
     }
 
     let [label] = formats.fromContract(artist.label)

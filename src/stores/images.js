@@ -1,5 +1,5 @@
 import utils from 'utils/utils'
-import {computed, reactive} from 'vue'
+import {reactive} from 'vue'
 
 class ImagesStore {
   constructor() {
@@ -27,14 +27,30 @@ class ImagesStore {
       return image
     }
 
-    return computed(() => {
-      let cached = this._state.images[image.ipfs_hash]
-      if (cached) {
-        return cached
-      }
-      this._ipfsLoad(image)
-      return image
-    })
+    let cached = this._state.images[image.ipfs_hash]
+    if (cached) {
+      return cached
+    }
+
+    this._state.images[image.ipfs_hash] = image
+    this._setLoading(image)
+    this._ipfsLoad(image)
+
+    return this._state.images[image.ipfs_hash]
+  }
+
+  _setImage(image) {
+    let old = this._state.images[image.ipfs_hash]
+    
+    if (old) {
+      utils.clearAssign(this._state.images[image.ipfs_hash], image)
+    }
+
+    if (!old) {
+      this._state.images[image.ipfs_hash] = image
+    }
+
+    return this._state.images[image.ipfs_hash]
   }
 
   async _fread(file) {
@@ -78,17 +94,14 @@ class ImagesStore {
       image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
 
       this._clearLR(image)
-      this._state.images[image.ipfs_hash] = image
-      
       return image
     }
     catch(err) {
       console.log(`ImagesStore._ipfsLoad for hash ${image.ipfs_hash}`, err)
       this._setError(image, err)
-      if (image.ipfs_hash) { 
-        this._state.images[image.ipfs_hash] = image
-      }
     }
+
+    return image
   }
 
   async _ipfsStore (image) {
@@ -106,7 +119,7 @@ class ImagesStore {
       object: object
     }
 
-    this._state.images[image.ipfs_hash] = image
+    this._setImage(image)
     return image
   }
 

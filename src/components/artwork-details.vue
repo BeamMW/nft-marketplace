@@ -16,7 +16,7 @@
         <div class="info-container">
           <div class="info-box">
             <div class="title" :class="{'error': error}">{{ title }}</div>
-            <div class="author" :class="{'error': error}">{{ by_author }}</div>
+            <div class="author" :class="{'error': error}" v-html="by_author"></div>
             <div class="price">
               <div class="separator"/>
               <artPrice :artwork="artwork.value"/>
