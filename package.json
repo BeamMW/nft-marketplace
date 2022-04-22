@@ -12,7 +12,7 @@
     "build": "webpack --mode=production"
   },
   "devDependencies": {
-    "beam-wasm-client-masternet": "^6.2.12071",
+    "beam-wasm-client-masternet": "^7.0.12638",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.0",
     "eslint": "^8.11.0",

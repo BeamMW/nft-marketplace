@@ -39,6 +39,14 @@ class ArtworksStore extends ItemsStore {
     if (!awork.error) {
       awork.image = imagesStore.fromContract(awork.image)
     }
+
+    // TODO: convert to true js object
+    if (awork['price.aid'] != undefined) {
+      awork.price = {
+        aid: awork['price.aid'],
+        amount: awork['price.amount']
+      }
+    }
     
     return awork
   }

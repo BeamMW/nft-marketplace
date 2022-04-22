@@ -125,7 +125,7 @@ const config = (DEV_MODE) => {return {
       ]
     })
   ],
-  devtool: DEV_MODE ? 'eval-source-map' : undefined
+  devtool: DEV_MODE ? 'source-map' : undefined
 }}
 
 module.exports = (env, argv) => {
