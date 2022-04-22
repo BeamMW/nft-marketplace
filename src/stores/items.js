@@ -39,16 +39,15 @@ export default class ItemsStore {
   }
 
   getItem(id) {
-    return computed(() => {
-      for (let mode of this._modes) {
-        for (let item of this._state[mode].items) {
-          if (item.id == id) {
-            return item
-          }
+    for (let mode of this._modes) {
+      for (let item of this._state[mode].items) {
+        if (item.id == id) {
+          return item
         }
       }
-      throw new Error(`ItemsStore::getItem - item ${this._objname}-${id} not found`)
-    })
+    }
+   
+    throw new Error(`ItemsStore::getItem - item ${this._objname}-${id} not found`)
   }
 
   get user_items() {

@@ -2,16 +2,13 @@
   <list v-model:page="page"
         emptymsg="There are no NFTs at the moment"
         component="artwork"
-        gap="16px"
-        :items="items"
+        mode="user"
+        :store="store"
   />  
 </template>
 
-<style scoped lang="stylus">
-</style>
-
 <script>
-import list from './items-list.vue'
+import list from './items-list'
 import artsStore from 'stores/artworks'
 
 export default {
@@ -20,17 +17,8 @@ export default {
   },
 
   computed: {
-    items () {
-      return artsStore.user_items
-    },
-
-    page: {
-      get() {
-        return this.$state.gallery_artworks_page
-      },
-      set (value) {
-        this.$store.setGalleryArtworksPage(value)
-      }
+    store () {
+      return artsStore
     }
   }
 }
