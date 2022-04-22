@@ -58,9 +58,9 @@
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
 
-#define Gallery_manager_admin_delete(macro) \
-    macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id)
+//#define Gallery_manager_admin_delete(macro) \
+    //macro(ContractID, cid) \
+    //macro(Gallery::Artwork::Id, id)
 
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
@@ -76,7 +76,7 @@
     macro(manager, add_rewards) \
     macro(manager, my_admin_key) \
     macro(manager, explicit_upgrade) \
-    macro(manager, admin_delete) \
+    //macro(manager, admin_delete) \
     //macro(manager, manage_artist) \
 
 // ARTIST
@@ -150,9 +150,9 @@
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
 
-#define Gallery_user_download(macro) \
-    macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id)
+//#define Gallery_user_download(macro) \
+    //macro(ContractID, cid) \
+    //macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_set_price(macro) \
     macro(ContractID, cid) \
@@ -196,13 +196,13 @@
     macro(user, view_collections_stats) \
     macro(user, view_artworks_stats) \
     macro(user, view_artworks) \
-    macro(user, download) \
     macro(user, set_price) \
     macro(user, transfer) \
     macro(user, buy) \
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
+    //macro(user, download) \
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
@@ -1392,6 +1392,7 @@ ON_METHOD(artist, set_artwork) {
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 2500000);
 }
 
+/*
 ON_METHOD(manager, admin_delete)
 {
     auto id_ = Utils::FromBE(id);
@@ -1402,6 +1403,7 @@ ON_METHOD(manager, admin_delete)
     KeyMaterial::MyAdminKey kid;
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Delete artwork", 0);
 }
+*/
 
 ON_METHOD(manager, add_rewards)
 {
@@ -1624,6 +1626,7 @@ ON_METHOD(artist, set_collection)
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000);
 }
 
+/*
 ON_METHOD(user, download)
 {
     auto id_ = Utils::FromBE(id);
@@ -1684,6 +1687,7 @@ ON_METHOD(user, download)
     else
         OnError("not found");
 }
+*/
 
 ON_METHOD(artist, view)
 {
@@ -1706,6 +1710,7 @@ ON_METHOD(artist, get_id)
     Env::DocAddBlob_T("id", pk);
 }
 
+/*
 void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWalker& iwlk)
 {
     const ContractID& cid = iwlk.m_Key.m_Prefix.m_Cid;
@@ -1769,6 +1774,7 @@ void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWal
     if (bMyImpressionSet)
         Env::DocAddNum("my_impression", nMyImpression);
 }
+*/
 
 ON_METHOD(manager, view_artwork_sales)
 {
