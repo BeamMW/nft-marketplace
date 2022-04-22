@@ -153,7 +153,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        this.$store.likeArtwork(this.id)
+        artsStore.likeArtwork(this.id)
       }
     },
 
@@ -163,7 +163,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        this.$store.unlikeArtwork(this.id)
+        artsStore.unlikeArtwork(this.id)
       }
     },
 

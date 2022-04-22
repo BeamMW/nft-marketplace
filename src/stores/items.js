@@ -96,7 +96,7 @@ export default class ItemsStore {
       role: mode,
       action: `view_${this._objname}s`,
       idx0: (this._state[mode].page - 1) * this._per_page,
-      count: 2,
+      count: this._per_page,
       cid
     })
 

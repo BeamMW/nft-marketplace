@@ -37,23 +37,8 @@ function defaultState() {
     use_ipfs: true,
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
-    gallery_collections_page: 1,
-    collections: [],
     debug: false
   }
-
-  /*
-  let desc = 'Blah blah blah, blah blah blah. Blah blah blah, blah blah blah! Blah blah blah, blah blah blah? Blah blah blah, blah blah blah.'
-  for(let i = 0; i < 30; ++i) {
-    state.collections.push({
-      id: i,
-      label: `Collection ${i}`,
-      author: `Artist ${i}`,
-      author_image: '/assets/test-author.png',
-      cover_image: '/assets/test-collection-cover.png',
-      description: [desc, desc, desc].join(' '),
-    })
-  }*/
   
   return state
 }
@@ -209,7 +194,7 @@ const store = {
     try {
       await artistsStore.loadAsync()
       await collsStore.loadAsync()
-      //await artsStore.loadAsync()
+      await artsStore.loadAsync()
       this.state.loading = false
     }
     catch(err) 
@@ -488,27 +473,6 @@ const store = {
   //
   // Artwork actions, Buy, Sell, Like &c.
   //
-  likeArtwork (id) {
-    utils.invokeContract(
-      `role=user,action=vote,id=${id},val=1,cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
-  },
-
-  unlikeArtwork (id) {
-    utils.invokeContract(
-      `role=user,action=vote,id=${id},val=0,cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
-  },
-
-  deleteArtwork (id) {
-    utils.invokeContract(
-      `role=manager,action=admin_delete,id=${id},cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
-  },
-
   onMakeTx (err, sres, full) {
     if (err) {
       return this.setError(err, 'Failed to generate transaction request')
@@ -544,83 +508,6 @@ const store = {
       `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
       (...args) => this.onMakeTx(...args)
     )
-  },
-
-  uploadArtwork (file, artist_key) {
-    if (this.use_ipfs) {
-      return this.uploadArtworkIPFS(file, artist_key)
-    }
-    return this.uploadArtworkChain(file, artist_key)
-  },
-
-  uploadArtworkChain (file, artist_key) {
-    let name = file.name.split('.')[0]
-    name = [name[0].toUpperCase(), name.substring(1)].join('')
-            
-    try {
-      let reader = new FileReader()
-      reader.readAsArrayBuffer(file)
-
-      reader.onload = ()=> {
-        let aver  = Uint8Array.from([1])
-        let aname = (new TextEncoder()).encode(name)
-        let asep  = Uint8Array.from([0, 0])
-        let aimg  = new Uint8Array(reader.result)
-        let hex   = [formats.u8arrToHex(aver), 
-          formats.u8arrToHex(aname), 
-          formats.u8arrToHex(asep), 
-          formats.u8arrToHex(aimg)
-        ].join('')
-                        
-        utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
-          (...args) => this.onMakeTx(...args)
-        )
-      }
-    }
-    catch(err) {
-      this.setError(err, 'Failed to upload artwork')
-    }
-  },
-
-  uploadArtworkIPFS (file, artist_key) {
-    let name = file.name.split('.')[0]
-    name = [name[0].toUpperCase(), name.substring(1)].join('')
-            
-    try {
-      let reader = new FileReader()
-      reader.readAsArrayBuffer(file)
-
-      reader.onload = ()=> {
-        let imgArray = Array.from(new Uint8Array(reader.result))
-        utils.callApi('ipfs_add', {data: imgArray}, (err, res) => {
-          if (err) {
-            return this.setError(err)
-          }
-
-          utils.ensureField(res, 'hash', 'string')
-          // alert(`new ipfs hash: ${res.hash}`)
-                    
-          // Form what we write on blockchain
-          // 2 (version) then meta
-          let aver = Uint8Array.from([2])
-          let meta = JSON.stringify({
-            title: name,
-            ipfs_hash: res.hash,
-            mime_type: file.type
-          })
-          let ameta = (new TextEncoder()).encode(meta)
-          let hex = [formats.u8arrToHex(aver), formats.u8arrToHex(ameta)].join('')
-
-          // Register our NFT
-          utils.invokeContract(`role=manager,action=upload,cid=${this.state.cid},pkArtist=${artist_key},data=${hex}`, 
-            (...args) => this.onMakeTx(...args)
-          )
-        })  
-      }
-    }
-    catch(err) {
-      this.setError(err, 'Failed to upload artwork')
-    }
   },
 
   showStats() {
@@ -762,10 +649,6 @@ const store = {
 
   setGalleryTab(id) {
     this.state.gallery_tab = id
-  },
-
-  setGalleryCollectionsPage (page) {
-    this.state.gallery_collections_page = page
   },
 
   toBack () {
