@@ -6,10 +6,11 @@ import formats from 'stores/formats'
 import router from 'router'
 
 export default class ItemsStore {
-  constructor(objname, versions) {
+  constructor(objname, versions, perPage) {
     this._objname = objname
     this._versions = versions
     this._modes = ['user', 'artist']
+    this._per_page = perPage || common.ITEMS_PER_PAGE
     this.reset()
   }
 
@@ -19,17 +20,19 @@ export default class ItemsStore {
       user: {
         items: [],
         total: 0,
+        page: 1,
         pages: computed(() => {
           let total = this._state.user.total
-          return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+          return total ? Math.ceil(total / this._per_page) : 1
         })
       },
       artist: {
         items: [],
         total: 0,
+        page: 1,
         pages: computed(() => {
           let total = this._state.artist.total
-          return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+          return total ? Math.ceil(total / this._per_page) : 1
         })
       }
     })
@@ -59,6 +62,23 @@ export default class ItemsStore {
   get artist_items() {
     return this._state.artist.items
   }
+
+  getPage(mode) {
+    return this._state[mode].page
+  }
+
+  setPage(mode, page) {
+    this._state[mode].page = page
+    this._loadItems(mode)
+  }
+
+  getPages(mode) {
+    return this._state[mode].pages
+  }
+
+  getItems(mode) {
+    return this._state[mode].items
+  }
   
   async _loadTotals(mode) {
     let {res} = await utils.invokeContractAsync({
@@ -75,6 +95,8 @@ export default class ItemsStore {
     let {res} = await utils.invokeContractAsync({
       role: mode,
       action: `view_${this._objname}s`,
+      idx0: (this._state[mode].page - 1) * this._per_page,
+      count: 2,
       cid
     })
 

@@ -192,7 +192,7 @@ class ArtistsStore {
     let artist = Object.assign({}, cartist)
 
     if (!artist.label) {
-      //throw new Error('ArtistsStore._fromContract : artist label is empty')
+      throw new Error('ArtistsStore._fromContract : artist label is empty')
     }
 
     let [label] = formats.fromContract(artist.label)

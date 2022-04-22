@@ -2,11 +2,10 @@
   <div class="list-container">
     <template v-if="items.length > 0">
       <div class="list-wrap">  
-        <div ref="itemslist" class="list" :style="container_style" @scroll="onScroll">
+        <div ref="itemslist" class="list" @scroll="onScroll">
           <component :is="component" v-for="item in items" 
                      :key="item.id"
                      :item="item"
-                     :style="item_style"
           />              
         </div>
       </div>
@@ -63,7 +62,6 @@
 </style>
 
 <script>
-import {common} from 'utils/consts.js'
 import paginator from './paginator.vue'
 
 export default {
@@ -72,22 +70,22 @@ export default {
   },
 
   props: {
-    items: {
-      type: Array,
-      default: () => []
+    store: {
+      type: Object,
+      required: true
     },
-    emptymsg: {
+    mode: {
       type: String,
-      default: ''
+      default: 'user'
     },
     component: {
       type: String,
       required: true,
       default: undefined
     },
-    page: {
-      type: Number,
-      default: 1
+    emptymsg: {
+      type: String,
+      default: ''
     },
     gap: {
       type: String,
@@ -95,36 +93,15 @@ export default {
     }
   },
 
-  emits: [
-    'update:page'
-  ],
-
   computed: {
-    /*visible_items () {
-      let all = this.items
-      let result  = []
-      let start = (this.page - 1) * common.ITEMS_PER_PAGE
-      let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
-      for (let idx = start; idx < end; ++idx) {
-        result.push(all[idx])
-      }
-      return result
+    items () {
+      return this.store.getItems(this.mode)
     },
-    */
     pages() {
-      let total = this.items.length
-      return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+      return this.store.getPages(this.mode)
     },
-    container_style () {
-      return {
-        ///'gap': this.gap
-        //margin: '0 16px 16px 0'
-      }
-    },
-    item_style () {
-      return {
-        //'margin': '0 -16px -16px 0px'
-      }
+    page() {
+      return this.store.getPage(this.mode)
     }
   },
 
@@ -141,8 +118,8 @@ export default {
     },
 
     onPage(page) {
-      this.$emit('update:page', page)
       this.$refs.itemslist.scrollTop = 0
+      this.store.setPage(this.mode, page)
     } 
   }
 }

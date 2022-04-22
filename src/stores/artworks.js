@@ -29,7 +29,7 @@ class ArtworksStore extends ItemsStore {
     awork.by_author = computed(() => {
       if (author.value.loading) return 'Loading...'
       if (author.value.error) return 'Failed to load author'
-      return `by ${author.value.label}`
+      return `by <span style="color:#00f6d2">${author.value.label}</span>`
     })
 
     if (awork.error) {

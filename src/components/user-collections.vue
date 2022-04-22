@@ -2,12 +2,10 @@
   <list v-model:page="page"
         emptymsg="There are no collections at the moment"
         component="collection"
-        :items="items"
+        mode="user"
+        :store="store"
   />
 </template>
-
-<style scoped lang="stylus">
-</style>
 
 <script>
 import list from './items-list.vue'
@@ -19,17 +17,8 @@ export default {
   },
 
   computed: {
-    items () {
-      return collsStore.user_items
-    },
-
-    page: {
-      get() {
-        return this.$state.gallery_collections_page
-      },
-      set (value) {
-        this.$store.setGalleryCollectionsPage(value)
-      }
+    store () {
+      return collsStore
     }
   }
 }

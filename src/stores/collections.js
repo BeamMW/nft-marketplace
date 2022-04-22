@@ -26,6 +26,12 @@ class CollectionsStore extends ItemsStore {
       if (author.value.error) return 'Failed to load author'
       return author.value.label
     }) 
+
+    coll.by_author = computed(() => {
+      if (author.value.loading) return 'Loading...'
+      if (author.value.error) return 'Failed to load author'
+      return `by <span style="color:#00f6d2">${author.value.label}</span>`
+    })
     
     coll.avatar = computed(() => {
       if(author.value.loading) return {loading: true}
@@ -59,6 +65,12 @@ class CollectionsStore extends ItemsStore {
         })
       } 
     }
+
+    let cntr = 0
+    setInterval(() => {
+      coll.label = 'Coll ' + cntr++
+      console.log(coll.id, coll.label)
+    }, 1000)
 
     return coll
   }

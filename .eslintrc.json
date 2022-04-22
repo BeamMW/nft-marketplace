@@ -55,6 +55,9 @@
     "vue/html-self-closing": [
       "off"
     ],
+    "vue/no-v-html": [
+      "off"
+    ],
     "vue/first-attribute-linebreak": [
       "error",
       {
