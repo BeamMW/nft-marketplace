@@ -80,8 +80,7 @@ BEAM_EXPORT void Method_2(void*)
     // called on upgrade
 }
 
-BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
-{
+BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
     using ArtistReqType = Gallery::Method::ManageArtist::RequestType;
 
     struct ArtistPlus : public Gallery::Artist {
@@ -93,7 +92,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
         bool artist_exists = a.Exists(r.m_pkArtist);
 
         if (artist_exists) {
-            a.TakeOut(r.m_pkArtist, sizeof(a));
+            Env::Halt_if(!a.TakeOut(r.m_pkArtist, sizeof(a)));
 
             uint32_t old_data_len = a.data_len;
             uint32_t old_label_len = a.label_len;
@@ -106,7 +105,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 
             if (r.m_DataLen) {
                 a.data_len = r.m_DataLen;
-                Env::Memcpy(a.m_szLabelData + a.label_len, reinterpret_cast<const uint8_t *>(&r + 1) + r.m_LabelLen, a.data_len);
+                Env::Memcpy(a.m_szLabelData + a.label_len, reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen, a.data_len);
             } else {
                 Env::Memcpy(a.m_szLabelData + a.label_len, old_data, old_data_len);
             }
@@ -139,22 +138,28 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
             s.Save();
 
             c.is_default = true;
-
             // will be uncommented in future (with moderation adding)
             //c.is_approved = false;
             c.is_approved = true;
 
             c.label_len = a.label_len;
             c.data_len = 0;
-            _POD_(c.m_pkAuthor) = r.m_pkArtist;
+            c.m_pkAuthor = r.m_pkArtist;
+            c.artworks_num = 0;
+            c.total_sold = 0;
+            c.total_sold_price = 0;
+            c.max_sold.price.m_Aid = 0;
+            c.max_sold.price.m_Amount = 0;
+            c.max_sold.artwork_id = 0;
             Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen);
 
             Gallery::ArtistCollectionKey ack;
-            _POD_(ack.pkArtist) = c.m_pkAuthor;
+            ack.pkArtist = c.m_pkAuthor;
             ack.collection_id = c_id;
             Env::SaveVar_T(ack, true);
 
-            c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+            // assert: collection was not saved before
+            Env::Halt_if(c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len));
         }
 
         a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
@@ -199,7 +204,8 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
         bool collection_exists = r.collection_id > 0 && c.Exists(r.collection_id);
 
         if (collection_exists) {
-            c.TakeOut(r.collection_id, sizeof(c));
+            c_id = r.collection_id;
+            c.TakeOut(c_id, sizeof(c));
 
             uint32_t old_data_len = c.data_len;
             uint32_t old_label_len = c.label_len;
@@ -237,9 +243,9 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             _POD_(c.m_pkAuthor) = r.m_pkArtist;
             c.total_sold = 0;
             c.total_sold_price = 0;
-            c.max_sold = {
-                .artwork_id = 0,
-            };
+            c.max_sold.artwork_id = 0;
+            c.max_sold.price.m_Amount = 0;
+            c.max_sold.price.m_Aid = 0;
             Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
             Gallery::ArtistCollectionKey ack;

@@ -429,7 +429,7 @@ struct ImpressionWalker
 #pragma pack (push, 0)
 struct MyArtist : public Gallery::Artist {
 public:
-    char m_szLabelData[s_TotalMaxLen + 2];
+    char m_szLabelData[s_TotalMaxLen];
 
     MyArtist(bool only_approved) : only_approved_(only_approved) {}
 
@@ -737,11 +737,18 @@ struct MyCollection : public Gallery::Collection {
         Env::DocAddNum32("artworks_count", artworks_num);
         Env::DocAddNum32("approved", is_approved);
         Env::DocAddNum32("default", is_default);
-        Env::DocAddNum("total_sold", total_sold);
-        Env::DocAddNum("total_sold_price", total_sold_price);
-        Env::DocAddNum("max_price", max_sold.price.m_Amount);
-        Env::DocAddNum("max_price_aid", max_sold.price.m_Aid);
-        Env::DocAddNum32("max_price_artwork", max_sold.artwork_id);
+        {
+            Env::DocGroup gr_sold("total_sold");
+            Env::DocAddNum("count", total_sold);
+            Env::DocAddNum("volume", total_sold_price);
+            Env::DocAddNum32("aid", 0);
+        }
+        {
+            Env::DocGroup gr_price("max_price");
+            Env::DocAddNum("value", max_sold.price.m_Amount);
+            Env::DocAddNum("aid", max_sold.price.m_Aid);
+            Env::DocAddNum32("artwork_id", max_sold.artwork_id);
+        }
 
         Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
         _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -933,8 +940,9 @@ struct MyArtwork : public Gallery::Artwork {
             Env::DocAddNum("owned", (uint32_t) !!oi.DeduceOwner(cid, iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID, *this));
 
             if (m_Price.m_Amount) {
-                Env::DocAddNum("price.aid", m_Price.m_Aid);
-                Env::DocAddNum("price.amount", m_Price.m_Amount);
+                Env::DocGroup gr_price("price");
+                Env::DocAddNum("aid", m_Price.m_Aid);
+                Env::DocAddNum("amount", m_Price.m_Amount);
             }
         }
 
@@ -1026,6 +1034,7 @@ struct MyArtwork : public Gallery::Artwork {
             alr.MoveNext(&alk0, nKey, vLabel.m_p + vLabel.m_Count, nData, 1);
             vLabel.m_Count += nData;
         }
+        vLabel.m_p[vLabel.m_Count] = '\0';
 
         if (!nDataCount)
             return false;
@@ -1037,17 +1046,14 @@ private:
 };
 #pragma pack (pop)
 
-bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists)
-{
+bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists) {
     artist_exists = false;
 
     Env::Key_T<Gallery::Artist::SecondStageKey> k0, k1;
-    _POD_(k0.m_Prefix.m_Cid) = cid;
-    _POD_(k1.m_Prefix.m_Cid) = cid;
-
+    k0.m_Prefix.m_Cid = cid;
+    k1.m_Prefix.m_Cid = cid;
     _POD_(k0.m_KeyInContract.id).SetZero();
     _POD_(k1.m_KeyInContract.id).SetObject(0xff);
-
     k0.m_KeyInContract.h_updated = 0;
     k1.m_KeyInContract.h_updated = static_cast<Height>(-1);
 
@@ -1518,33 +1524,31 @@ ON_METHOD(manager, view_balance)
     wlk.PrintTotals();
 }
 
-ON_METHOD(artist, set_artist)
-{
-    struct {
-        Gallery::Method::ManageArtist args;
-        char m_szLabelData[Gallery::Artist::s_TotalMaxLen + 2];
-    } d;
-
+ON_METHOD(artist, set_artist) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey pkArtist;
     km.Get(pkArtist);
+
+    struct {
+        Gallery::Method::ManageArtist args;
+        char m_szLabelData[Gallery::Artist::s_TotalMaxLen + 1];
+    } d;
 
     d.args.m_pkArtist = pkArtist;
     d.args.req = Gallery::Method::ManageArtist::RequestType::SET;
     d.args.role = Gallery::Role::ARTIST;
 
     uint32_t nArgSize = sizeof(d.args);
-
     uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artist::s_LabelMaxLen + 1); // including 0-term
 
-    if (nLabelSize > Gallery::Artist::s_LabelMaxLen + 1) // plus \0
-    {
+    if (nLabelSize > Gallery::Artist::s_LabelMaxLen + 1) { // plus \0
         OnError("label is too long");
         return;
     }
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
+    nArgSize += d.args.m_LabelLen;
 
     bool artist_exists = false;
     if (artist_label_exists(cid, d.m_szLabelData, artist_exists)) {
@@ -1552,13 +1556,10 @@ ON_METHOD(artist, set_artist)
         return;
     }
 
-    nArgSize += d.args.m_LabelLen;
-
     uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.m_LabelLen, Gallery::Artist::s_DataMaxLen + 1); // including 0-term
 
-    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1)
-    {
-        OnError("data too long");
+    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1) {
+        OnError("data is too long");
         return;
     }
 

@@ -2,7 +2,7 @@
 
 namespace Gallery
 {
-    static const ShaderID s_SID_0 = {0x76,0x90,0xd0,0x1d,0x45,0xa4,0x1d,0x2f,0xa1,0x59,0x16,0xc7,0x26,0x86,0xae,0x7c,0xaf,0x9e,0xcd,0x16,0xf5,0x6c,0x57,0xac,0x6b,0xa0,0xb1,0x9e,0x1c,0x84,0xcf,0xd9};
+    static const ShaderID s_SID_0 = {0xb7,0x4b,0x8f,0xe7,0xfa,0x5e,0xa0,0x1f,0xcf,0xd8,0xfc,0xf2,0xa1,0xe6,0x95,0x65,0x35,0x0a,0xad,0xb5,0x28,0x64,0xe0,0x63,0x09,0x32,0x1d,0xcf,0x3a,0x29,0x28,0xab};
 #pragma pack (push, 1)
 
     struct Tags
@@ -283,14 +283,13 @@ namespace Gallery
             Config m_Config;
         };
 
-        struct ManageArtist
-        {
+        struct ManageArtist {
             static const uint32_t s_iMethod = 10;
 
             enum class RequestType { SET, DISABLE, ENABLE, DELETE } req;
             Gallery::Role role;
             PubKey m_pkArtist;
-            uint32_t m_LabelLen; // set Artist::s_LabelMaxLen to remove
+            uint32_t m_LabelLen;
             uint32_t m_DataLen;
             // followed by label and data without delimiter
         };
@@ -308,8 +307,7 @@ namespace Gallery
             // followed by label and data without delimiter
         };
 
-        struct AddExhibit
-        {
+        struct AddExhibit {
             static const uint32_t s_iMethod = 3;
 
             enum class RequestType { SET, DISABLE, ENABLE } req;
