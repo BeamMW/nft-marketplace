@@ -2,7 +2,7 @@
 
 namespace Gallery
 {
-    static const ShaderID s_SID_0 = {0x85,0x96,0x60,0x95,0xec,0x27,0x17,0x52,0x8c,0x8d,0x02,0x36,0x0e,0x04,0x4d,0x58,0x76,0x3e,0x66,0x87,0xd5,0xbe,0xa6,0x5b,0x1e,0x8a,0xca,0xe7,0xbc,0x07,0x91,0x8a};
+    static const ShaderID s_SID_0 = {0x76,0x90,0xd0,0x1d,0x45,0xa4,0x1d,0x2f,0xa1,0x59,0x16,0xc7,0x26,0x86,0xae,0x7c,0xaf,0x9e,0xcd,0x16,0xf5,0x6c,0x57,0xac,0x6b,0xa0,0xb1,0x9e,0x1c,0x84,0xcf,0xd9};
 #pragma pack (push, 1)
 
     struct Tags
@@ -23,6 +23,11 @@ namespace Gallery
         MANAGER,
         ARTIST,
         USER,
+    };
+
+    struct AmountWithAsset {
+        Amount m_Amount;
+        AssetID m_Aid;
     };
 
     struct ArtistCollectionKey {
@@ -135,17 +140,20 @@ namespace Gallery
         uint32_t data_len;
         uint32_t label_len;
         PubKey m_pkAuthor;
+        uint32_t total_sold;
+        Amount total_sold_price;
+        struct {
+            AmountWithAsset price;
+            uint32_t artwork_id;
+        } max_sold;
+        
         //Id id;
 
         // followed by label and data without delimiter
         static const uint32_t s_LabelMaxLen = 120;
         static const uint32_t s_DataMaxLen = 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
-    };
-
-    struct AmountWithAsset {
-        Amount m_Amount;
-        AssetID m_Aid;
+        static const uint32_t s_MaxArtworks = 500;
     };
 
     struct Artwork : public GalleryObject<Artwork, uint32_t> {
@@ -168,8 +176,8 @@ namespace Gallery
         AssetID m_Aid; // set when it's taken out of gallery
         Collection::Id collection_id;
         bool is_approved;
-
         AmountWithAsset m_Price;
+
         static const uint32_t s_LabelMaxLen = 120;
         static const uint32_t s_DataMaxLen = 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;

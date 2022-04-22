@@ -24,7 +24,11 @@
     macro(Amount, count) \
     macro(uint32_t, idx0) \
     macro(PubKey, artist_id) \
-    macro(uint32_t, collection_id) \
+    macro(Gallery::Collection::Id, collection_id) \
+
+#define Gallery_manager_view_artwork_sales(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Artwork::Id, id) \
 
 #define Gallery_manager_view_collections(macro) \
     macro(ContractID, cid) \
@@ -65,6 +69,7 @@
     macro(manager, view_artists) \
     macro(manager, view_collections) \
     macro(manager, view_artworks) \
+    macro(manager, view_artwork_sales) \
     macro(manager, view_collections_stats) \
     macro(manager, view_artworks_stats) \
     macro(manager, view_balance) \
@@ -123,10 +128,6 @@
     macro(artist, set_collection) \
 
 // USER
-
-//#define Gallery_user_view_item(macro) \
-    macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_view_artworks(macro) \
     macro(ContractID, cid) \
@@ -202,7 +203,6 @@
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
-    //macro(user, view_item) \
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
@@ -300,16 +300,18 @@ ON_METHOD(manager, view)
 bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m)
 {
     Env::Key_T<Gallery::Artwork::FirstStageKey> fskey;
-    Env::Key_T<Gallery::Artwork::SecondStageKey> sskey;
-    _POD_(fskey.m_Prefix.m_Cid) = cid;
-    _POD_(sskey.m_Prefix.m_Cid) = cid;
+    fskey.m_Prefix.m_Cid = cid;
     fskey.m_KeyInContract.id = id;
-    sskey.m_KeyInContract.id = id;
 
-    if (!Env::VarReader::Read_T(fskey, sskey.m_KeyInContract.h_updated)) {
+    Gallery::Artwork::SecondStageKey ssk;
+    if (!Env::VarReader::Read_T(fskey, ssk)) {
         OnError("not found");
         return false;
     }
+
+    Env::Key_T<Gallery::Artwork::SecondStageKey> sskey;
+    sskey.m_Prefix.m_Cid = cid;
+    sskey.m_KeyInContract = ssk;
 
     Env::VarReader::Read_T(sskey, m);
     return true;
@@ -735,6 +737,11 @@ struct MyCollection : public Gallery::Collection {
         Env::DocAddNum32("artworks_count", artworks_num);
         Env::DocAddNum32("approved", is_approved);
         Env::DocAddNum32("default", is_default);
+        Env::DocAddNum("total_sold", total_sold);
+        Env::DocAddNum("total_sold_price", total_sold_price);
+        Env::DocAddNum("max_price", max_sold.price.m_Amount);
+        Env::DocAddNum("max_price_aid", max_sold.price.m_Aid);
+        Env::DocAddNum32("max_price_artwork", max_sold.artwork_id);
 
         Env::Key_T<Gallery::CollectionArtworkKey> cak0, cak1;
         _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -1290,8 +1297,7 @@ ON_METHOD(manager, view_collections)
         c.Print(cid);
 }
 
-ON_METHOD(artist, set_artwork)
-{
+ON_METHOD(artist, set_artwork) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey pkArtist;
@@ -1299,58 +1305,50 @@ ON_METHOD(artist, set_artwork)
 
     struct {
         Gallery::Method::AddExhibit args;
-        char m_szLabelData[Gallery::Artwork::s_TotalMaxLen + 2];
+        char m_szLabelData[Gallery::Artwork::s_TotalMaxLen];
     } d;
 
     d.args.m_pkArtist = pkArtist;
     d.args.req = Gallery::Method::AddExhibit::RequestType::SET;
     d.args.role = Gallery::Role::ARTIST;
-
-    uint32_t nArgSize = sizeof(d.args);
-
-    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artwork::s_LabelMaxLen + 1); // including 0-term
-
-    if (nLabelSize > Gallery::Artwork::s_LabelMaxLen + 1) // plus \0
-    {
-        OnError("label is too long");
-        return;
-    }
-
-    d.args.label_len = (nLabelSize ? nLabelSize - 1 : 0);
-
-    nArgSize += d.args.label_len;
-
-    auto nDataSize = Env::DocGetBlob("data", nullptr, 0);
-    if (!nDataSize)
-    {
-        OnError("data not specified");
-        return;
-    }
-
-    if (Env::DocGetBlob("data", d.m_szLabelData + d.args.label_len, nDataSize) != nDataSize)
-    {
-        OnError("data can't be parsed");
-        return;
-    }
-
-    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1)
-    {
-        OnError("data too long");
-        return;
-    }
-
-    d.args.data_len = nDataSize;
     d.args.collection_id = collection_id;
+    d.args.m_Price.m_Amount = amount;
+    d.args.m_Price.m_Aid = aid;
 
     if (!collection_id) {
         OnError("collection_id must be specified");
         return;
     }
 
-    nArgSize += d.args.data_len;
+    uint32_t nArgSize = sizeof(d.args);
+    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artwork::s_LabelMaxLen + 1); // including 0-term
 
-    d.args.m_Price.m_Amount = amount;
-    d.args.m_Price.m_Aid = aid;
+    if (nLabelSize > Gallery::Artwork::s_LabelMaxLen + 1) {
+        OnError("label is too long");
+        return;
+    }
+
+    d.args.label_len = (nLabelSize ? nLabelSize - 1 : 0);
+    nArgSize += d.args.label_len;
+
+    auto nDataSize = Env::DocGetBlob("data", nullptr, 0);
+    if (!nDataSize) {
+        OnError("data not specified");
+        return;
+    }
+
+    if (nDataSize > Gallery::Artist::s_DataMaxLen) {
+        OnError("data is too long");
+        return;
+    }
+
+    if (Env::DocGetBlob("data", d.m_szLabelData + d.args.label_len, nDataSize) != nDataSize) {
+        OnError("data can't be parsed");
+        return;
+    }
+
+    d.args.data_len = nDataSize;
+    nArgSize += d.args.data_len;
 
     SigRequest sig;
     sig.m_pID = &km;
@@ -1376,7 +1374,7 @@ ON_METHOD(artist, set_artwork)
         Env::Cost::AddSig +
         Env::Cost::Cycle * 200;
 
-    const uint32_t nSizeEvt = 0x2000;
+    const uint32_t nSizeEvt = 0x100000;
     uint32_t nFullCycles = nDataSize / nSizeEvt;
 
     nCharge += (Env::Cost::Log_For(nSizeEvt) + Env::Cost::Cycle * 50) * nFullCycles;
@@ -1385,7 +1383,7 @@ ON_METHOD(artist, set_artwork)
     if (nDataSize)
         nCharge += Env::Cost::Log_For(nDataSize) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload masterpiece", nCharge + 2500000);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 2500000);
 }
 
 ON_METHOD(manager, admin_delete)
@@ -1771,25 +1769,13 @@ void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWal
         Env::DocAddNum("my_impression", nMyImpression);
 }
 
-/*ON_METHOD(user, view_item)
+ON_METHOD(manager, view_artwork_sales)
 {
-    auto id_ = Utils::FromBE(id);
-
-    Gallery::Artwork m;
-    if (!ReadItem(cid, id_, m))
-        return;
-
-    ImpressionWalker iwlk;
-    iwlk.Enum(cid, id_);
-
-    PrintItem(m, id_, iwlk);
-
-    Env::DocArray gr0("sales");
-
-
     Env::Key_T<Gallery::Events::Sell::Key> key;
     _POD_(key.m_Prefix.m_Cid) = cid;
-    key.m_KeyInContract.m_ID = id_;
+    key.m_KeyInContract.m_ID = Utils::FromBE(id);
+
+    Env::DocArray gr0("sales");
 
     for (Env::LogReader r(key, key); ; )
     {
@@ -1802,9 +1788,7 @@ void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWal
         Env::DocAddNum("amount", evt.m_Price.m_Amount);
         Env::DocAddNum("aid", evt.m_Price.m_Aid);
     }
-
 }
-*/
 
 ON_METHOD(user, view_artworks)
 {
