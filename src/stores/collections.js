@@ -65,13 +65,7 @@ class CollectionsStore extends ItemsStore {
         })
       } 
     }
-
-    let cntr = 0
-    setInterval(() => {
-      coll.label = 'Coll ' + cntr++
-      console.log(coll.id, coll.label)
-    }, 1000)
-
+    
     return coll
   }
 
