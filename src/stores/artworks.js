@@ -17,19 +17,19 @@ class ArtworksStore extends ItemsStore {
     let author = artistsStore.loadArtist(awork.author)
     
     awork.author_error = computed(() => {
-      return author.value.error
+      return author.error
     })
 
     awork.author_name = computed(() => {
-      if (author.value.loading) return 'Loading...'
-      if (author.value.error) return 'Failed to load author'
-      return author.value.label
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      return author.label
     }) 
 
     awork.by_author = computed(() => {
-      if (author.value.loading) return 'Loading...'
-      if (author.value.error) return 'Failed to load author'
-      return `by <span style="color:#00f6d2">${author.value.label}</span>`
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      return `by <span style="color:#00f6d2">${author.label}</span>`
     })
 
     if (awork.error) {

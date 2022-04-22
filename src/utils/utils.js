@@ -796,4 +796,19 @@ export default class Utils {
   static formatHeight(height) {
     return new Intl.NumberFormat().format(height)
   }
+
+  static clearAssign(oldobj, newobj) {
+    for (let key in oldobj) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (oldobj.hasOwnProperty(key)) {
+        delete oldobj[key]
+      }
+    }
+    for (let key in newobj) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (newobj.hasOwnProperty(key)) {
+        oldobj[key] = newobj[key]
+      }
+    }
+  }
 }
