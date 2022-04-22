@@ -1,6 +1,6 @@
 <template>
   <span id="modals"/>
-  <error v-if="error" :error="error.error" :context="error.context" :debug="true" title="NFT Gallery"/>
+  <error v-if="error" :error="error.error" :context="error.context"/>
   <loading v-else-if="loading"/>
   <div v-else id="app-container" class="app-container">
     <router-view></router-view>
