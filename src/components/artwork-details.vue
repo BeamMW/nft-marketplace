@@ -17,9 +17,10 @@
           <div class="info-box">
             <div class="title" :class="{'error': error}">{{ title }}</div>
             <div class="author" :class="{'error': error}" v-html="by_author"></div>
+            <div class="description" :class="{'error': error}">{{ description }}</div>
             <div class="price">
               <div class="separator"/>
-              <artPrice :artwork="artwork.value"/>
+              <artPrice :artwork="artwork"/>
             </div>
           </div>
         </div>
@@ -302,19 +303,23 @@ export default {
     },
 
     error () {
-      return !!this.artwork.value.error
+      return !!this.artwork.error
     },
     
     title () {
-      return this.artwork.value.label
+      return this.artwork.label
+    },
+
+    description () {
+      return this.artwork.description
     },
 
     by_author () {
-      return this.artwork.value.by_author
+      return this.artwork.by_author
     },
 
     image () {
-      return this.artwork.value.image
+      return this.artwork.image
     },
 
     artists () {
