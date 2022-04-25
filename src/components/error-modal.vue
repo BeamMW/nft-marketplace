@@ -11,7 +11,7 @@
       <div class="error">
         <div>
           <div class="data">
-            <span>{{ errtext }}</span>
+            <span>{{ text }}</span>
             <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
               <img src="~assets/icon-copy.svg"/>
             </btn>
@@ -111,6 +111,7 @@ export default {
       default: 'Error'
     },
   },
+  emits: ['copy'],
 
   data () {
     return {
@@ -133,22 +134,7 @@ export default {
 
   methods: {
     onCopy() {
-      var textArea = document.createElement('textarea')
-      textArea.style.position = 'fixed'
-      textArea.value = this.errtext
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-            
-      try {
-        return document.execCommand('copy')
-      } 
-      catch (ex) {
-        return false
-      } 
-      finally {
-        document.body.removeChild(textArea)
-      }
+      this.$emit('copy')
     },
  
     close() {

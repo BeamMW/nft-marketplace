@@ -1,7 +1,7 @@
 <template>
-  <div class="error">
+  <div v-if="debug" class="error">
     <div>
-      <pre>{{ errtext }}</pre>
+      <pre>{{ text }}</pre>
       <span class="restart">Restarting in {{ errleft }}</span>
     </div>
   </div>
@@ -30,50 +30,21 @@
 </style>
 
 <script>
-import utils from 'utils/utils.js'
 export default {
   props: {
-    error: {
+    text: {
       default: undefined,
       type: [String, Object]
     },
-    context: {
-      type: String,
-      default: ''
-    }
+    debug: {
+      type: Boolean,
+      default: false
+    },
   },
 
   data () {
     return {
       errleft: 0
-    }
-  },
-
-  computed: {
-    errtext () {
-      if (typeof this.error === 'string') {
-        return [this.context || 'Error occured', this.error].join('\n')
-      }
-
-      if (this.error instanceof Error) {
-        return this.error.stack
-      }
-      
-      let err = Object.assign({}, this.error)
-      // strip off some long unncessary binary stuff that might occur here
-      if (err.answer && err.answer.result) {
-        if(err.answer.result.raw_data) {
-          err.answer.result.raw_data = '--excluded--'
-        }
-
-        const maxLen = 50
-        if (err.answer.result.output && err.answer.result.output.length > maxLen) {
-          err.answer.result.output = err.answer.result.output.substring(0, maxLen) + ' --excluded--'
-        }
-      }
-            
-      let serr = utils.formatJSON(err)
-      return [this.context || 'Error occured', serr].join('\n')
     }
   },
 
