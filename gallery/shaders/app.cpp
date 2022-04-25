@@ -7,8 +7,19 @@
 #include <string_view>
 
 // MANAGER
+
 #define Gallery_manager_view(macro)
+
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
+
+#define Gallery_manager_view_moderators(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_manager_set_moderator(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Moderator::Id, id) \
+    macro(uint32_t, enable)
+
 #define Gallery_manager_view_artists_stats(macro) \
     macro(ContractID, cid) \
 
@@ -23,7 +34,7 @@
     macro(Height, h0) \
     macro(Amount, count) \
     macro(uint32_t, idx0) \
-    macro(PubKey, artist_id) \
+    macro(Gallery::Artist::Id, artist_id) \
     macro(Gallery::Collection::Id, collection_id) \
 
 #define Gallery_manager_view_artwork_sales(macro) \
@@ -35,7 +46,7 @@
     macro(Height, h0) \
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
-    macro(PubKey, artist_id) \
+    macro(Gallery::Artist::Id, artist_id) \
 
 #define Gallery_manager_view_artists(macro) \
     macro(ContractID, cid) \
@@ -43,24 +54,31 @@
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
 
-//#define Gallery_manager_manage_artist(macro) \
-    macro(ContractID, cid) \
-    macro(PubKey, pkArtist) \
-    macro(uint32_t, bEnable)
-
 #define Gallery_manager_view_balance(macro)  macro(ContractID, cid)
 
 #define Gallery_manager_add_rewards(macro) \
     macro(ContractID, cid) \
     macro(uint32_t, num)
 
-#define Gallery_manager_my_admin_key(macro)
+#define Gallery_manager_get_id(macro)
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
 
 //#define Gallery_manager_admin_delete(macro) \
     //macro(ContractID, cid) \
     //macro(Gallery::Artwork::Id, id)
+
+#define Gallery_manager_set_artwork(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Artwork::Id, id) \
+
+#define Gallery_manager_set_collection(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Collection::Id, id) \
+
+#define Gallery_manager_set_artist(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Artist::Id, id) \
 
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
@@ -74,10 +92,69 @@
     macro(manager, view_artworks_stats) \
     macro(manager, view_balance) \
     macro(manager, add_rewards) \
-    macro(manager, my_admin_key) \
+    macro(manager, get_id) \
     macro(manager, explicit_upgrade) \
+    macro(manager, set_moderator) \
+    macro(manager, view_moderators) \
+    macro(manager, set_artwork) \
+    macro(manager, set_artist) \
+    macro(manager, set_collection) \
     //macro(manager, admin_delete) \
-    //macro(manager, manage_artist) \
+
+// MODERATOR
+
+#define Gallery_moderator_view_artists_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_moderator_view_collections_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_moderator_view_artworks_stats(macro) \
+    macro(ContractID, cid) \
+
+#define Gallery_moderator_view_artworks(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(Amount, count) \
+    macro(uint32_t, idx0) \
+    macro(Gallery::Artist::Id, artist_id) \
+    macro(Gallery::Collection::Id, collection_id) \
+
+#define Gallery_moderator_view_collections(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
+    macro(Gallery::Artist::Id, artist_id) \
+
+#define Gallery_moderator_view_artists(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(uint32_t, idx0) \
+    macro(uint32_t, count) \
+
+#define Gallery_moderator_set_artwork(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Artwork::Id, id) \
+
+#define Gallery_moderator_set_collection(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Collection::Id, id) \
+
+#define Gallery_moderator_set_artist(macro) \
+    macro(ContractID, cid) \
+    macro(Gallery::Artist::Id, id) \
+
+#define GalleryRole_moderator(macro) \
+    macro(moderator, view_artists_stats) \
+    macro(moderator, view_artists) \
+    macro(moderator, view_collections) \
+    macro(moderator, view_artworks) \
+    macro(moderator, view_collections_stats) \
+    macro(moderator, view_artworks_stats) \
+    macro(moderator, set_artwork) \
+    macro(moderator, set_artist) \
+    macro(moderator, set_collection) \
 
 // ARTIST
 
@@ -99,7 +176,7 @@
 
 #define Gallery_artist_set_artwork(macro) \
     macro(ContractID, cid) \
-    macro(uint32_t, collection_id) \
+    macro(Gallery::Collection::Id, collection_id) \
     macro(Amount, amount) \
     macro(AssetID, aid)
 
@@ -108,7 +185,7 @@
     macro(Height, h0) \
     macro(Amount, count) \
     macro(uint32_t, idx0) \
-    macro(uint32_t, collection_id) \
+    macro(Gallery::Collection::Id, collection_id) \
 
 #define Gallery_artist_view_collections(macro) \
     macro(ContractID, cid) \
@@ -134,25 +211,21 @@
     macro(Height, h0) \
     macro(Amount, count) \
     macro(uint32_t, idx0) \
-    macro(PubKey, artist_id) \
-    macro(uint32_t, collection_id) \
+    macro(Gallery::Artist::Id, artist_id) \
+    macro(Gallery::Collection::Id, collection_id) \
 
 #define Gallery_user_view_collections(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
-    macro(PubKey, artist_id) \
+    macro(Gallery::Artist::Id, artist_id) \
 
 #define Gallery_user_view_artists(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(uint32_t, idx0) \
     macro(uint32_t, count) \
-
-//#define Gallery_user_download(macro) \
-    //macro(ContractID, cid) \
-    //macro(Gallery::Artwork::Id, id)
 
 #define Gallery_user_set_price(macro) \
     macro(ContractID, cid) \
@@ -163,7 +236,7 @@
 #define Gallery_user_transfer(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Artwork::Id, id) \
-    macro(PubKey, pkNewOwner)
+    macro(Gallery::Artist::Id, pkNewOwner)
 
 #define Gallery_user_buy(macro) \
     macro(ContractID, cid) \
@@ -202,19 +275,19 @@
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
-    //macro(user, download) \
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
+    macro(moderator) \
     macro(artist) \
     macro(user)
 
-BEAM_EXPORT void Method_0()
-{
+BEAM_EXPORT void Method_0() {
     // scheme
     Env::DocGroup root("");
 
-    {   Env::DocGroup gr("roles");
+    {
+        Env::DocGroup gr("roles");
 
 #define THE_FIELD(type, name) Env::DocAddText(#name, #type);
 #define THE_METHOD(role, name) { Env::DocGroup grMethod(#name);  Gallery_##role##_##name(THE_FIELD) }
@@ -230,43 +303,33 @@ BEAM_EXPORT void Method_0()
 #define THE_FIELD(type, name) const type& name,
 #define ON_METHOD(role, name) void On_##role##_##name(Gallery_##role##_##name(THE_FIELD) int unused = 0)
 
-void OnError(const char* sz)
-{
+void OnError(const char* sz) {
     Env::DocAddText("error", sz);
 }
 
-namespace KeyMaterial
-{
+namespace KeyMaterial {
     const char g_szAdmin[] = "Gallery-key-admin";
 
-    struct MyAdminKey :public Env::KeyID {
-        MyAdminKey() :Env::KeyID(g_szAdmin, sizeof(g_szAdmin) - sizeof(char)) {}
+    struct MyAdminKey : public Env::KeyID {
+        MyAdminKey() : Env::KeyID(g_szAdmin, sizeof(g_szAdmin) - sizeof(char)) {}
     };
 
 #pragma pack (push, 1)
 
     const char g_szOwner[] = "Gallery-key-owner";
 
-    struct Owner
-    {
+    struct Owner {
         ContractID m_Cid;
         Gallery::Artwork::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
-        Owner()
-        {
+        Owner() {
             Env::Memcpy(m_pSeed, g_szOwner, sizeof(m_pSeed));
             m_ID = 0;
         }
 
-        void SetCid(const ContractID& cid)
-        {
+        void SetCid(const ContractID& cid) {
             _POD_(m_Cid) = cid;
-        }
-
-        void SetCid()
-        {
-            _POD_(m_Cid).SetZero();
         }
 
         void Get(PubKey& pk) const {
@@ -278,8 +341,7 @@ namespace KeyMaterial
     const Gallery::Artwork::Id g_MskImpression = (static_cast<Gallery::Artwork::Id>(-1) >> 1) + 1; // hi bit
 }
 
-ON_METHOD(manager, view)
-{
+ON_METHOD(manager, view) {
     static const ShaderID s_pSid[] = {
         Gallery::s_SID_0,
     };
@@ -297,8 +359,7 @@ ON_METHOD(manager, view)
     wlk.ViewAll(&kid);
 }
 
-bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m)
-{
+bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m) {
     Env::Key_T<Gallery::Artwork::FirstStageKey> fskey;
     fskey.m_Prefix.m_Cid = cid;
     fskey.m_KeyInContract.id = Utils::FromBE(id);
@@ -317,17 +378,14 @@ bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& 
     return true;
 }
 
-struct OwnerInfo
-{
+struct OwnerInfo {
     KeyMaterial::Owner m_km;
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const Gallery::Artwork& m)
-    {
+    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const Gallery::Artwork& m) {
         return DeduceOwner(cid, id, m.m_pkOwner);
     }
 
-    bool DeduceOwnerRaw(Gallery::Artwork::Id id, const PubKey& pkOwner)
-    {
+    bool DeduceOwnerRaw(Gallery::Artwork::Id id, const PubKey& pkOwner) {
         PubKey pk;
 
         m_km.m_ID = id;
@@ -335,15 +393,13 @@ struct OwnerInfo
         return (_POD_(pk) == pkOwner);
     }
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const PubKey& pkOwner)
-    {
+    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const PubKey& pkOwner) {
         m_km.SetCid(cid);
         return DeduceOwnerRaw(id, pkOwner) || // owner
             DeduceOwnerRaw(0, pkOwner); // artist
     }
 
-    bool ReadOwnedItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m)
-    {
+    bool ReadOwnedItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m) {
         if (!ReadItem(cid, id, m))
             return false;
 
@@ -355,11 +411,8 @@ struct OwnerInfo
     }
 };
 
-struct StatePlus
-    :public Gallery::State
-{
-    bool Init(const ContractID& cid)
-    {
+struct StatePlus : public Gallery::State {
+    bool Init(const ContractID& cid) {
         Env::Key_T<uint8_t> key;
         _POD_(key.m_Prefix.m_Cid) = cid;
         key.m_KeyInContract = Gallery::State::s_Key;
@@ -372,8 +425,7 @@ struct StatePlus
     }
 };
 
-ON_METHOD(manager, view_params)
-{
+ON_METHOD(manager, view_params) {
     StatePlus s;
     if (!s.Init(cid))
         return;
@@ -390,8 +442,20 @@ ON_METHOD(manager, view_params)
     Env::DocAddNum("voteReward_balance", s.m_VoteBalance);
 }
 
-struct ImpressionWalker
-{
+ON_METHOD(manager, set_moderator) {
+    Gallery::Method::ManageModerator args;
+
+    args.id = id;
+
+    args.req = enable ?
+        Gallery::Method::ManageModerator::RequestType::kEnable :
+        Gallery::Method::ManageModerator::RequestType::kDisable;
+
+    KeyMaterial::MyAdminKey kid;
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Set moderator", 500000);
+}
+
+struct ImpressionWalker {
     Env::VarReaderEx<true> m_Reader;
     Env::Key_T<Gallery::Impression::Key> m_Key;
     Gallery::Impression m_Value;
@@ -401,8 +465,7 @@ struct ImpressionWalker
         Enum(cid, id, id);
     }
 
-    void Enum(const ContractID& cid, Gallery::Artwork::Id id0, Gallery::Artwork::Id id1)
-    {
+    void Enum(const ContractID& cid, Gallery::Artwork::Id id0, Gallery::Artwork::Id id1) {
         _POD_(m_Key.m_Prefix.m_Cid) = cid;
         m_Key.m_KeyInContract.m_ID.m_ArtworkID = id0;
         _POD_(m_Key.m_KeyInContract.m_ID.m_pkUser).SetZero();
@@ -416,11 +479,31 @@ struct ImpressionWalker
         Move();
     }
 
-    void Move()
-    {
+    void Move() {
         m_Valid = m_Reader.MoveNext_T(m_Key, m_Value);
     }
 };
+
+#pragma pack (push, 0)
+struct MyModerator : public Gallery::Moderator {
+public:
+    std::string_view name() const {
+        return "moderators";
+    }
+
+    void Print(const Id& id, Height updated) {
+        Env::DocGroup gr1("");
+        Env::DocAddBlob_T("id", id);
+        Env::DocAddNum32("updated", updated);
+        Env::DocAddNum("hReg", registered);
+        Env::DocAddText("status", approved ? "approved" : "pending");
+    }
+
+    bool ReadNext(Env::VarReader& r, Env::Key_T<SecondStageKey>& key) {
+        return r.MoveNext_T(key, *this);
+    }
+};
+#pragma pack (pop)
 
 #pragma pack (push, 0)
 struct MyArtist : public Gallery::Artist {
@@ -439,6 +522,8 @@ public:
         return "artists";
     }
 
+    // TODO: label_exists
+
     void Print(const Id& id, Height updated) {
         // DocAddText prints char[] until it meets \0 symbol, but
         // m_szLabelData contains label + data without \0 symbol between them
@@ -455,7 +540,7 @@ public:
         Env::DocAddText("label", label);
         Env::DocAddText("data", data);
         Env::DocAddNum("hReg", m_hRegistered);
-        Env::DocAddNum32("approved", is_approved);
+        Env::DocAddText("status", Gallery::status_to_string(status).data());
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<SecondStageKey>& key) {
@@ -509,7 +594,7 @@ struct MyCollection : public Gallery::Collection {
         Env::DocAddText("data", data);
         Env::DocAddBlob_T("author", m_pkAuthor);
         Env::DocAddNum32("artworks_count", artworks_num);
-        Env::DocAddNum32("approved", is_approved);
+        Env::DocAddText("status", Gallery::status_to_string(status).data());
         Env::DocAddNum32("default", is_default);
         {
             Env::DocGroup gr_sold("total_sold");
@@ -574,7 +659,7 @@ struct MyArtwork : public Gallery::Artwork {
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
         Env::DocAddNum32("updated", updated);
-        Env::DocAddNum32("approved", is_approved);
+        Env::DocAddText("status", Gallery::status_to_string(status).data());
         Env::DocAddText("label", vLabel.m_p);
         Env::DocAddBlob("data", vData.m_p, vData.m_Count);
         Env::DocAddBlob_T("author", m_pkAuthor);
@@ -632,6 +717,9 @@ struct MyArtwork : public Gallery::Artwork {
         if (bMyImpressionSet)
             Env::DocAddNum("my_impression", nMyImpression);
     }
+    
+
+    // TODO: ReadItem
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artwork::SecondStageKey>& key) {
         uint32_t nKey = sizeof(key), nVal = sizeof(Gallery::Artwork);
@@ -773,7 +861,7 @@ public:
 
         if (!filter_(object_)) return false;
  
-        if constexpr(std::is_same_v<T, MyArtist>)
+        if constexpr(std::is_same_v<typename T::Id, PubKey>)
             object_.Print(k0.m_KeyInContract.id, Utils::FromBE(k0.m_KeyInContract.h_updated));
         else 
             object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id), Utils::FromBE(k0.m_KeyInContract.h_updated));
@@ -822,7 +910,7 @@ public:
         Height prev_h = -1;
         while (object_.ReadNext(r, k0) && (cur_cnt++ < count || prev_h == k0.m_KeyInContract.h_updated)) {
             if (!filter_(object_)) continue;
-            if constexpr(std::is_same_v<T, MyArtist>)
+            if constexpr(std::is_same_v<typename T::Id, PubKey>)
                 object_.Print(k0.m_KeyInContract.id, Utils::FromBE(k0.m_KeyInContract.h_updated));
             else 
                 object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id), Utils::FromBE(k0.m_KeyInContract.h_updated));
@@ -869,8 +957,7 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label, b
     return false;
 }
 
-ON_METHOD(manager, view_artists_stats)
-{
+ON_METHOD(manager, view_artists_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -879,8 +966,7 @@ ON_METHOD(manager, view_artists_stats)
     Env::DocAddNum32("total", s.artists_stats.total);
 }
 
-ON_METHOD(manager, view_collections_stats)
-{
+ON_METHOD(manager, view_collections_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -889,8 +975,7 @@ ON_METHOD(manager, view_collections_stats)
     Env::DocAddNum32("total", s.collections_stats.total);
 }
 
-ON_METHOD(manager, view_artworks_stats)
-{
+ON_METHOD(manager, view_artworks_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -899,8 +984,34 @@ ON_METHOD(manager, view_artworks_stats)
     Env::DocAddNum32("total", s.artworks_stats.total);
 }
 
-ON_METHOD(user, view_artists_stats)
-{
+ON_METHOD(moderator, view_artists_stats) {
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.artists_stats.pending);
+}
+
+ON_METHOD(moderator, view_collections_stats) {
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.collections_stats.pending);
+}
+
+ON_METHOD(moderator, view_artworks_stats) {
+    Gallery::State s;
+    Env::Key_T<uint8_t> k;
+    k.m_KeyInContract = 0;
+    k.m_Prefix.m_Cid = cid;
+    Env::VarReader::Read_T(k, s);
+    Env::DocAddNum32("total", s.artworks_stats.pending);
+}
+
+ON_METHOD(user, view_artists_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -909,8 +1020,7 @@ ON_METHOD(user, view_artists_stats)
     Env::DocAddNum32("total", s.artists_stats.approved);
 }
 
-ON_METHOD(user, view_collections_stats)
-{
+ON_METHOD(user, view_collections_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -919,8 +1029,7 @@ ON_METHOD(user, view_collections_stats)
     Env::DocAddNum32("total", s.collections_stats.approved);
 }
 
-ON_METHOD(user, view_artworks_stats)
-{
+ON_METHOD(user, view_artworks_stats) {
     Gallery::State s;
     Env::Key_T<uint8_t> k;
     k.m_KeyInContract = 0;
@@ -929,8 +1038,8 @@ ON_METHOD(user, view_artworks_stats)
     Env::DocAddNum32("total", s.artworks_stats.approved);
 }
 
-ON_METHOD(artist, view_collections_stats)
-{
+ON_METHOD(artist, view_collections_stats) {
+    // TODO: move to MyArtist
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey artist_id;
@@ -952,8 +1061,8 @@ ON_METHOD(artist, view_collections_stats)
     Env::DocAddNum32("collections", a.collections_num);
 }
 
-ON_METHOD(artist, view_artworks_stats)
-{
+ON_METHOD(artist, view_artworks_stats) {
+    // TODO: move to MyArtist
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey artist_id;
@@ -972,11 +1081,10 @@ ON_METHOD(artist, view_artworks_stats)
     Env::VarReader r(k0, k0);
     MyArtist a;
     a.ReadNext(r, k0);
-    Env::DocAddNum32("artworks", a.artworks_num);
+    Env::DocAddNum32("total", a.artworks_num);
 }
 
-ON_METHOD(user, view_artists)
-{
+ON_METHOD(user, view_artists) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Artist::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -984,7 +1092,7 @@ ON_METHOD(user, view_artists)
         buf[buf_len - 1] = ';';
 
     auto only_approved_filter = [](const MyArtist& a) {
-        return a.is_approved;
+        return a.status == Gallery::Status::kApproved;
     };
 
     GalleryObjectPrinter<MyArtist, decltype(only_approved_filter)> a{cid, only_approved_filter};
@@ -999,8 +1107,7 @@ ON_METHOD(user, view_artists)
         a.Print();
 }
 
-ON_METHOD(user, view_collections)
-{
+ON_METHOD(user, view_collections) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1008,7 +1115,7 @@ ON_METHOD(user, view_collections)
         buf[buf_len - 1] = ';';
 
     auto only_approved_artist_id_filter = [artist_id](const MyCollection& c) {
-        return c.is_approved && 
+        return c.status == Gallery::Status::kApproved && 
             (_POD_(artist_id).IsZero() || (_POD_(c.m_pkAuthor) == artist_id));
     };
 
@@ -1023,8 +1130,7 @@ ON_METHOD(user, view_collections)
         c.Print();
 }
 
-ON_METHOD(artist, view_collections)
-{
+ON_METHOD(artist, view_collections) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1037,7 +1143,7 @@ ON_METHOD(artist, view_collections)
     km.Get(artist_id);
 
     auto artist_id_filter = [artist_id](const MyCollection& c) {
-        return (_POD_(artist_id).IsZero() || (_POD_(c.m_pkAuthor) == artist_id));
+        return _POD_(c.m_pkAuthor) == artist_id;
     };
 
     GalleryObjectPrinter<MyCollection, decltype(artist_id_filter)> c{cid, artist_id_filter};
@@ -1049,27 +1155,7 @@ ON_METHOD(artist, view_collections)
         c.Print();
 }
 
-/*
-ON_METHOD(manager, manage_artist)
-{
-    Gallery::Method::ManageArtist args;
-
-    args.m_pkArtist = pkArtist;
-
-    args.req = bEnable ?
-        Gallery::Method::ManageArtist::RequestType::ENABLE :
-        Gallery::Method::ManageArtist::RequestType::DISABLE;
-
-    args.m_LabelLen = Gallery::Artist::s_LabelMaxLen + 1;
-    args.role = Gallery::Role::MANAGER;
-
-    KeyMaterial::MyAdminKey kid;
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Gallery manage artist", 120000);
-}
-*/
-
-ON_METHOD(manager, view_artists)
-{
+ON_METHOD(manager, view_artists) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Artist::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1087,8 +1173,12 @@ ON_METHOD(manager, view_artists)
         a.Print();
 }
 
-ON_METHOD(manager, view_collections)
-{
+ON_METHOD(manager, view_moderators) {
+    GalleryObjectPrinter<MyModerator> m{cid};
+    m.Print();
+}
+
+ON_METHOD(manager, view_collections) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1110,6 +1200,77 @@ ON_METHOD(manager, view_collections)
         c.Print();
 }
 
+ON_METHOD(moderator, view_artists) {
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Artist::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    auto only_pending_filter = [](const MyArtist& a) {
+        return a.status == Gallery::Status::kPending;
+    };
+
+    GalleryObjectPrinter<MyArtist, decltype(only_pending_filter)> a{cid, only_pending_filter};
+
+    if (count && h0)
+        a.Print(h0, count);
+    else if (count && idx0)
+        a.Print(idx0, count);
+    else if (buf_len)
+        a.Print(buf);
+    else
+        a.Print();
+}
+
+ON_METHOD(moderator, view_collections) {
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    auto only_pending_artist_id_filter = [artist_id](const MyCollection& c) {
+        return c.status == Gallery::Status::kPending && 
+            (_POD_(artist_id).IsZero() || (_POD_(c.m_pkAuthor) == artist_id));
+    };
+
+    GalleryObjectPrinter<MyCollection, decltype(only_pending_artist_id_filter)> c{cid, only_pending_artist_id_filter};
+    if (count && h0)
+        c.Print(h0, count);
+    else if (count && idx0)
+        c.Print(idx0, count);
+    else if (buf_len)
+        c.Print(buf);
+    else
+        c.Print();
+}
+
+ON_METHOD(moderator, view_artworks) {
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    auto only_pending_filter = [artist_id, collection_id](const MyArtwork& a) {
+        return a.status == Gallery::Status::kPending &&
+            (_POD_(artist_id).IsZero() || (_POD_(a.m_pkAuthor) == artist_id)) &&
+            (!collection_id || collection_id == a.collection_id);
+    };
+
+    GalleryObjectPrinter<MyArtwork, decltype(only_pending_filter)> a{cid, only_pending_filter};
+
+    if (count && h0)
+        a.Print(h0, count);
+    else if (count && idx0)
+        a.Print(idx0, count);
+    else if (buf_len)
+        a.Print(buf);
+    else
+        a.Print();
+}
+
 ON_METHOD(artist, set_artwork) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
@@ -1117,16 +1278,18 @@ ON_METHOD(artist, set_artwork) {
     km.Get(pkArtist);
 
     struct {
-        Gallery::Method::AddExhibit args;
+        Gallery::Method::ManageArtwork args;
         char m_szLabelData[Gallery::Artwork::s_TotalMaxLen];
     } d;
 
     d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::AddExhibit::RequestType::SET;
-    d.args.role = Gallery::Role::ARTIST;
+    d.args.req = Gallery::Method::ManageArtwork::RequestType::kSet;
+    d.args.role = Gallery::Role::kArtist;
     d.args.collection_id = collection_id;
     d.args.m_Price.m_Amount = amount;
     d.args.m_Price.m_Aid = aid;
+    d.args.signer = pkArtist;
+    d.args.artwork_id = 0;
 
     if (!collection_id) {
         OnError("collection_id must be specified");
@@ -1212,8 +1375,7 @@ ON_METHOD(manager, admin_delete)
 }
 */
 
-ON_METHOD(manager, add_rewards)
-{
+ON_METHOD(manager, add_rewards) {
     StatePlus s;
     if (!s.Init(cid))
         return;
@@ -1221,8 +1383,7 @@ ON_METHOD(manager, add_rewards)
     Gallery::Method::AddVoteRewards args;
     args.m_Amount = s.m_Config.m_VoteReward.m_Amount * num;
 
-    if (!args.m_Amount)
-    {
+    if (!args.m_Amount) {
         OnError("no rewards");
         return;
     }
@@ -1235,20 +1396,17 @@ ON_METHOD(manager, add_rewards)
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Add voting rewards", 0);
 }
 
-ON_METHOD(manager, my_admin_key)
-{
+ON_METHOD(manager, get_id) {
     PubKey pk;
     KeyMaterial::MyAdminKey().get_Pk(pk);
-    Env::DocAddBlob_T("admin_key", pk);
+    Env::DocAddBlob_T("get_id", pk);
 }
 
-ON_METHOD(manager, explicit_upgrade)
-{
+ON_METHOD(manager, explicit_upgrade) {
     ManagerUpgadable2::MultiSigRitual::Perform_ExplicitUpgrade(cid);
 }
 
-struct BalanceWalker
-{
+struct BalanceWalker {
     Env::VarReaderEx<true> m_Reader;
     Env::Key_T<Gallery::Payout::Key> m_Key;
     Gallery::Payout m_Data;
@@ -1256,8 +1414,7 @@ struct BalanceWalker
     // TODO: add tree (map) class
     Utils::Vector<Gallery::AmountWithAsset> m_Totals;
 
-    void Enum(const ContractID& cid)
-    {
+    void Enum(const ContractID& cid) {
         _POD_(m_Key.m_Prefix.m_Cid) = cid;
         _POD_(m_Key.m_KeyInContract).SetZero();
 
@@ -1268,46 +1425,38 @@ struct BalanceWalker
         m_Reader.Enum_T(m_Key, k1);
     }
 
-    bool MoveNext()
-    {
+    bool MoveNext() {
         return m_Reader.MoveNext_T(m_Key, m_Data);
     }
 
-    void Print() const
-    {
+    void Print() const {
         Env::DocAddNum("aid", m_Key.m_KeyInContract.m_Aid);
         Env::DocAddNum("amount", m_Data.m_Amount);
     }
 
-    void AddToTotals()
-    {
+    void AddToTotals() {
         auto aid = m_Key.m_KeyInContract.m_Aid;
 
         uint32_t iIdx = 0;
-        for (; ; iIdx++)
-        {
-            if (iIdx == m_Totals.m_Count)
-            {
+        for (; ; iIdx++) {
+            if (iIdx == m_Totals.m_Count) {
                 auto& x = m_Totals.emplace_back();
                 x.m_Aid = aid;
                 x.m_Amount = m_Data.m_Amount;
                 break;
             }
 
-            if (m_Totals.m_p[iIdx].m_Aid == aid)
-            {
+            if (m_Totals.m_p[iIdx].m_Aid == aid) {
                 m_Totals.m_p[iIdx].m_Amount += m_Data.m_Amount; // don't care if overflows
                 break;
             }
         }
     }
 
-    void PrintTotals()
-    {
+    void PrintTotals() {
         Env::DocArray gr0("totals");
 
-        for (uint32_t i = 0; i < m_Totals.m_Count; i++)
-        {
+        for (uint32_t i = 0; i < m_Totals.m_Count; i++) {
             Env::DocGroup gr1("");
 
             auto& x = m_Totals.m_p[i];
@@ -1317,20 +1466,186 @@ struct BalanceWalker
     }
 };
 
-ON_METHOD(manager, view_balance)
-{
+ON_METHOD(manager, view_balance) {
     BalanceWalker wlk;
 
     {
         Env::DocArray gr0("items");
-        for (wlk.Enum(cid); wlk.MoveNext(); )
-        {
+        for (wlk.Enum(cid); wlk.MoveNext(); ) {
             Env::DocGroup gr1("");
             wlk.Print();
             wlk.AddToTotals();
         }
     }
     wlk.PrintTotals();
+}
+
+ON_METHOD(manager, set_artwork) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+
+    Gallery::Method::ManageArtwork args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    args.role = Gallery::Role::kManager;
+    KeyMaterial::MyAdminKey kid;
+    kid.get_Pk(args.signer);
+    args.artwork_id = id;
+    
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
+}
+
+ON_METHOD(moderator, set_artwork) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+    
+    Gallery::Method::ManageArtwork args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageArtwork::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    km.Get(args.signer);
+
+    args.role = Gallery::Role::kModerator;
+    args.artwork_id = id;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+    
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artwork's status", 2500000);
+}
+
+ON_METHOD(moderator, set_artist) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+    
+    Gallery::Method::ManageArtist args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    km.Get(args.signer);
+
+    args.role = Gallery::Role::kModerator;
+    args.m_pkArtist = id;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+    
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artist's status", 2500000);
+}
+
+ON_METHOD(manager, set_artist) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+    
+    Gallery::Method::ManageArtist args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageArtist::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    args.role = Gallery::Role::kManager;
+    KeyMaterial::MyAdminKey kid;
+    kid.get_Pk(args.signer);
+    args.m_pkArtist = id;
+
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artist's status", 2500000);
+}
+
+ON_METHOD(manager, set_collection) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+    
+    Gallery::Method::ManageCollection args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    args.role = Gallery::Role::kManager;
+    KeyMaterial::MyAdminKey kid;
+    kid.get_Pk(args.signer);
+    args.collection_id = id;
+
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update collection's status", 2500000);
+}
+
+ON_METHOD(moderator, set_collection) {
+    char buf[128];
+    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    std::string_view status(buf);
+    
+    Gallery::Method::ManageCollection args;
+    if (status == "pending") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kPending;
+    } else if (status == "approved") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kApprove;
+    } else if (status == "rejected") {
+        args.req = Gallery::Method::ManageCollection::RequestType::kReject;
+    } else {
+        OnError("Invalid status");
+        return;
+    }
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    km.Get(args.signer);
+
+    args.role = Gallery::Role::kModerator;
+    args.collection_id = id;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+    
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update collection's status", 2500000);
 }
 
 ON_METHOD(artist, set_artist) {
@@ -1345,8 +1660,9 @@ ON_METHOD(artist, set_artist) {
     } d;
 
     d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageArtist::RequestType::SET;
-    d.args.role = Gallery::Role::ARTIST;
+    d.args.req = Gallery::Method::ManageArtist::RequestType::kSet;
+    d.args.role = Gallery::Role::kArtist;
+    d.args.signer = pkArtist;
 
     uint32_t nArgSize = sizeof(d.args);
     uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artist::s_LabelMaxLen + 1); // including 0-term
@@ -1384,8 +1700,7 @@ ON_METHOD(artist, set_artist) {
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 2500000);
 }
 
-ON_METHOD(artist, set_collection)
-{
+ON_METHOD(artist, set_collection) {
     struct {
         Gallery::Method::ManageCollection args;
         char m_szLabelData[Gallery::Collection::s_TotalMaxLen + 2];
@@ -1397,16 +1712,16 @@ ON_METHOD(artist, set_collection)
     km.Get(pkArtist);
 
     d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageCollection::RequestType::SET;
-    d.args.role = Gallery::Role::ARTIST;
+    d.args.req = Gallery::Method::ManageCollection::RequestType::kSet;
+    d.args.role = Gallery::Role::kArtist;
     d.args.collection_id = id;
+    d.args.signer = pkArtist;
 
     uint32_t nArgSize = sizeof(d.args);
 
     uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Collection::s_LabelMaxLen + 1); // including 0-term
 
-    if (nLabelSize > Gallery::Collection::s_LabelMaxLen + 1) // plus \0
-    {
+    if (nLabelSize > Gallery::Collection::s_LabelMaxLen + 1) { // plus \0
         OnError("label is too long");
         return;
     }
@@ -1417,8 +1732,7 @@ ON_METHOD(artist, set_collection)
 
     uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.m_LabelLen, Gallery::Collection::s_DataMaxLen + 1); // including 0-term
 
-    if (nDataSize > Gallery::Collection::s_DataMaxLen + 1)
-    {
+    if (nDataSize > Gallery::Collection::s_DataMaxLen + 1) {
         OnError("data too long");
         return;
     }
@@ -1433,71 +1747,7 @@ ON_METHOD(artist, set_collection)
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000);
 }
 
-/*
-ON_METHOD(user, download)
-{
-    auto id_ = Utils::FromBE(id);
-    
-    Env::Key_T<Gallery::Events::AddArtworkData::Key> adk0, adk1;
-    _POD_(adk0.m_Prefix.m_Cid) = cid;
-    _POD_(adk1.m_Prefix.m_Cid) = cid;
-    adk0.m_KeyInContract.m_ID = id_;
-    adk1.m_KeyInContract.m_ID = id_;
-    _POD_(adk0.m_KeyInContract.m_pkArtist).SetZero();
-    _POD_(adk1.m_KeyInContract.m_pkArtist).SetObject(0xff);
-
-    Env::Key_T<Gallery::Events::AddArtworkLabel::Key> alk0, alk1;
-    _POD_(alk0.m_Prefix.m_Cid) = cid;
-    _POD_(alk1.m_Prefix.m_Cid) = cid;
-    alk0.m_KeyInContract.m_ID = id_;
-    alk1.m_KeyInContract.m_ID = id_;
-    _POD_(alk0.m_KeyInContract.m_pkArtist).SetZero();
-    _POD_(alk1.m_KeyInContract.m_pkArtist).SetObject(0xff);
-
-    uint32_t nDataCount = 0;
-    Utils::Vector<uint8_t> vData;
-
-    uint32_t nLabelCount = 0;
-    Utils::Vector<char> vLabel;
-
-    Env::LogReader adr(adk0, adk1);
-    for ( ; ; nDataCount++)
-    {
-        uint32_t nData = 0, nKey = sizeof(adk0);
-        if (!adr.MoveNext(&adk0, nKey, nullptr, nData, 0))
-            break;
-
-        vData.Prepare(vData.m_Count + nData);
-        adr.MoveNext(&adk0, nKey, vData.m_p + vData.m_Count, nData, 1);
-        vData.m_Count += nData;
-    }
-
-    Env::LogReader alr(alk0, alk1);
-    for ( ; ; nLabelCount++)
-    {
-        uint32_t nData = 0, nKey = sizeof(alk0);
-        if (!alr.MoveNext(&alk0, nKey, nullptr, nData, 0))
-            break;
-
-        vLabel.Prepare(vLabel.m_Count + nData);
-        alr.MoveNext(&alk0, nKey, vLabel.m_p + vLabel.m_Count, nData, 1);
-        vLabel.m_Count += nData;
-    }
-
-    if (nDataCount)
-    {
-        Env::DocAddNum("h", alr.m_Pos.m_Height);
-        Env::DocAddBlob_T("artist", alk0.m_KeyInContract.m_pkArtist);
-        Env::DocAddText("label", vLabel.m_p);
-        Env::DocAddBlob("data", vData.m_p, vData.m_Count);
-    }
-    else
-        OnError("not found");
-}
-*/
-
-ON_METHOD(artist, view)
-{
+ON_METHOD(artist, view) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey pk;
@@ -1507,8 +1757,7 @@ ON_METHOD(artist, view)
     a.Print(pk);
 }
 
-ON_METHOD(artist, get_id)
-{
+ON_METHOD(artist, get_id) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
     PubKey pk;
@@ -1517,82 +1766,14 @@ ON_METHOD(artist, get_id)
     Env::DocAddBlob_T("id", pk);
 }
 
-/*
-void PrintItem(const Gallery::Artwork& m, Gallery::Artwork::Id id, ImpressionWalker& iwlk)
-{
-    const ContractID& cid = iwlk.m_Key.m_Prefix.m_Cid;
-    OwnerInfo oi;
-
-    if (m.m_Aid)
-        Env::DocAddBlob_T("checkout.aid", m.m_Aid);
-
-    Env::DocAddBlob_T("pk_author", m.m_pkAuthor);
-
-    if (!_POD_(m.m_pkOwner).IsZero())
-    {
-        Env::DocAddBlob_T("pk_owner", m.m_pkOwner);
-        Env::DocAddNum("owned", (uint32_t) !!oi.DeduceOwner(cid, id, m));
-
-        if (m.m_Price.m_Amount)
-        {
-            Env::DocAddNum("price.aid", m.m_Price.m_Aid);
-            Env::DocAddNum("price.amount", m.m_Price.m_Amount);
-        }
-    }
-
-    uint32_t nImpressions = 0;
-    uint32_t nMyImpression = 0;
-    bool bMyImpressionSet = false;
-    bool bMyImpressionKey = false;
-    PubKey pkMyImpression;
-
-    auto idNorm = Utils::FromBE(id);
-
-    for ( ; iwlk.m_Valid; iwlk.Move())
-    {
-        auto idWlk = Utils::FromBE(iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID);
-        if (idWlk < idNorm)
-            continue;
-        if (idWlk > idNorm)
-            break;
-
-        if (!bMyImpressionSet)
-        {
-            if (!bMyImpressionKey)
-            {
-                bMyImpressionKey = true;
-                oi.m_km.SetCid(cid);
-                oi.m_km.m_ID = id | KeyMaterial::g_MskImpression;
-                oi.m_km.Get(pkMyImpression);
-            }
-
-            if (_POD_(pkMyImpression) == iwlk.m_Key.m_KeyInContract.m_ID.m_pkUser)
-            {
-                bMyImpressionSet = true;
-                nMyImpression = iwlk.m_Value.m_Value;
-            }
-        }
-
-        if (iwlk.m_Value.m_Value)
-            nImpressions++;
-    }
-
-    Env::DocAddNum("impressions", nImpressions);
-    if (bMyImpressionSet)
-        Env::DocAddNum("my_impression", nMyImpression);
-}
-*/
-
-ON_METHOD(manager, view_artwork_sales)
-{
+ON_METHOD(manager, view_artwork_sales) {
     Env::Key_T<Gallery::Events::Sell::Key> key;
     _POD_(key.m_Prefix.m_Cid) = cid;
     key.m_KeyInContract.m_ID = id;
 
     Env::DocArray gr0("sales");
 
-    for (Env::LogReader r(key, key); ; )
-    {
+    for (Env::LogReader r(key, key); ; ) {
         Gallery::Events::Sell evt;
         if (!r.MoveNext_T(key, evt))
             break;
@@ -1604,8 +1785,7 @@ ON_METHOD(manager, view_artwork_sales)
     }
 }
 
-ON_METHOD(user, view_artworks)
-{
+ON_METHOD(user, view_artworks) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1613,7 +1793,7 @@ ON_METHOD(user, view_artworks)
         buf[buf_len - 1] = ';';
 
     auto only_approved_filter = [artist_id, collection_id](const MyArtwork& a) {
-        return a.is_approved &&
+        return a.status == Gallery::Status::kApproved &&
             (_POD_(artist_id).IsZero() || (_POD_(a.m_pkAuthor) == artist_id)) &&
             (!collection_id || collection_id == a.collection_id);
     };
@@ -1630,8 +1810,7 @@ ON_METHOD(user, view_artworks)
         a.Print();
 }
 
-ON_METHOD(manager, view_artworks)
-{
+ON_METHOD(manager, view_artworks) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1654,8 +1833,7 @@ ON_METHOD(manager, view_artworks)
         a.Print();
 }
 
-ON_METHOD(artist, view_artworks)
-{
+ON_METHOD(artist, view_artworks) {
     const size_t MAX_IDS = 128;
     char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
@@ -1668,8 +1846,7 @@ ON_METHOD(artist, view_artworks)
     km.Get(artist_id);
 
     auto only_approved_filter = [artist_id, collection_id](const MyArtwork& a) {
-        return a.is_approved &&
-            (_POD_(artist_id).IsZero() || (_POD_(a.m_pkAuthor) == artist_id)) &&
+        return (_POD_(a.m_pkAuthor) == artist_id) &&
             (!collection_id || collection_id == a.collection_id);
     };
 
@@ -1682,8 +1859,7 @@ ON_METHOD(artist, view_artworks)
         a.Print();
 }
 
-ON_METHOD(user, set_price)
-{
+ON_METHOD(user, set_price) {
     Gallery::Artwork m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id, m))
@@ -1703,8 +1879,7 @@ ON_METHOD(user, set_price)
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, comment, 2000000);
 }
 
-ON_METHOD(user, transfer)
-{
+ON_METHOD(user, transfer) {
     Gallery::Artwork m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id, m))
@@ -1721,14 +1896,12 @@ ON_METHOD(user, transfer)
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Transfer item", 0);
 }
 
-ON_METHOD(user, buy)
-{
+ON_METHOD(user, buy) {
     Gallery::Artwork m;
     if (!ReadItem(cid, id, m))
         return;
 
-    if (!m.m_Price.m_Amount)
-    {
+    if (!m.m_Price.m_Amount) {
         OnError("not for sale");
         return;
     }
@@ -1751,20 +1924,15 @@ ON_METHOD(user, buy)
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Buy item", 0);
 }
 
-struct BalanceWalkerOwner
-    :public BalanceWalker
-{
+struct BalanceWalkerOwner : public BalanceWalker {
     OwnerInfo m_Oi;
 
-    void Enum(const ContractID& cid)
-    {
+    void Enum(const ContractID& cid) {
         BalanceWalker::Enum(cid);
     }
 
-    bool MoveNext()
-    {
-        while (true)
-        {
+    bool MoveNext() {
+        while (true) {
             if (!BalanceWalker::MoveNext())
                 return false;
 
@@ -1776,14 +1944,12 @@ struct BalanceWalkerOwner
     }
 };
 
-ON_METHOD(user, view_balance)
-{
+ON_METHOD(user, view_balance) {
     BalanceWalkerOwner wlk;
 
     {
         Env::DocArray gr0("items");
-        for (wlk.Enum(cid); wlk.MoveNext(); )
-        {
+        for (wlk.Enum(cid); wlk.MoveNext(); ) {
             Env::DocGroup gr1("");
             wlk.Print();
             wlk.AddToTotals();
@@ -1792,12 +1958,10 @@ ON_METHOD(user, view_balance)
     wlk.PrintTotals();
 }
 
-ON_METHOD(user, withdraw)
-{
+ON_METHOD(user, withdraw) {
     BalanceWalkerOwner wlk;
     uint32_t nCount = 0;
-    for (wlk.Enum(cid); wlk.MoveNext(); )
-    {
+    for (wlk.Enum(cid); wlk.MoveNext(); ) {
         Gallery::Method::Withdraw args;
         _POD_(args.m_Key) = wlk.m_Key.m_KeyInContract;
         args.m_Value = wlk.m_Data.m_Amount; // everything
@@ -1818,8 +1982,7 @@ ON_METHOD(user, withdraw)
     }
 }
 
-ON_METHOD(user, vote)
-{
+ON_METHOD(user, vote) {
     StatePlus s;
     if (!s.Init(cid))
         return;
@@ -1858,8 +2021,7 @@ ON_METHOD(user, vote)
 #undef ON_METHOD
 #undef THE_FIELD
 
-BEAM_EXPORT void Method_1()
-{
+BEAM_EXPORT void Method_1() {
     Env::DocGroup root("");
 
     char szRole[0x10], szAction[0x20];

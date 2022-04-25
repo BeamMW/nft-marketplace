@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string_view>
+
 namespace Gallery
 {
-    static const ShaderID s_SID_0 = {0x5d,0xd4,0x9e,0xb3,0xe1,0x11,0x42,0xe9,0x8c,0x55,0x50,0x12,0xfc,0xb1,0x03,0xab,0xd5,0x97,0x61,0x9a,0xed,0x91,0x86,0x74,0x85,0x1e,0x45,0x1d,0x62,0x8c,0xd4,0x8f};
+    static const ShaderID s_SID_0 = {0xf1,0x54,0x7b,0x92,0xd1,0x24,0x80,0x6c,0xf4,0x88,0xfc,0xae,0x7b,0x8c,0xa1,0xc1,0x3f,0xfc,0x6b,0x7f,0xa5,0xaa,0xee,0x06,0xa4,0xd4,0x8b,0x14,0x6e,0xd8,0x81,0xb6};
 #pragma pack (push, 1)
 
     struct Tags
@@ -17,13 +19,36 @@ namespace Gallery
         static const uint8_t s_Collection = 9;
         static const uint8_t s_ArtistCollection = 10;
         static const uint8_t s_CollectionArtwork = 11;
+        static const uint8_t s_Moderator = 12;
+        static const uint8_t s_ModeratorHeight = 13;
     };
 
     enum class Role {
-        MANAGER,
-        ARTIST,
-        USER,
+        kManager,
+        kModerator,
+        kArtist,
+        kUser,
     };
+
+    enum class Status {
+        kPending,
+        kApproved,
+        kRejected,
+
+    };
+
+    const std::string_view status_to_string(const Status& status) {
+        switch (status) {
+        case Status::kPending:
+            return "pending";
+        case Status::kApproved:
+            return "approved";
+        case Status::kRejected:
+            return "rejected";
+        default:
+            return "";
+        };
+    }
 
     struct AmountWithAsset {
         Amount m_Amount;
@@ -112,6 +137,22 @@ namespace Gallery
         }
     };
 
+    struct Moderator : GalleryObject<Moderator, PubKey> {
+        struct FirstStageKey {
+            uint8_t m_Tag = Tags::s_ModeratorHeight;
+            Id id;
+        };
+
+        struct SecondStageKey {
+            uint8_t m_Tag = Tags::s_Moderator;
+            Height h_updated;
+            Id id;
+        };
+
+        Height registered;
+        bool approved;
+    };
+
     struct Artist : public GalleryObject<Artist, PubKey> {
         struct FirstStageKey {
             uint8_t m_Tag = Tags::s_ArtistHeight;
@@ -125,7 +166,7 @@ namespace Gallery
         };
 
         Height m_hRegistered;
-        bool is_approved;
+        Status status;
         uint32_t data_len;
         uint32_t label_len;
         uint32_t collections_num;
@@ -149,7 +190,7 @@ namespace Gallery
             Id id;
         };
 
-        bool is_approved;
+        Status status;
         bool is_default;
         uint32_t artworks_num;
         uint32_t data_len;
@@ -190,7 +231,7 @@ namespace Gallery
         PubKey m_pkOwner;
         AssetID m_Aid; // set when it's taken out of gallery
         Collection::Id collection_id;
-        bool is_approved;
+        Status status;
         AmountWithAsset m_Price;
 
         static const uint32_t s_LabelMaxLen = 120;
@@ -239,22 +280,22 @@ namespace Gallery
 
         Config m_Config;
 
-        struct {
+        struct Stats {
             uint32_t total;
             uint32_t approved;
-        } artists_stats;
+            uint32_t pending;
+        };
 
-        struct {
-            uint32_t total;
-            uint32_t approved;
+        struct : public Stats {
             uint32_t free_id;
         } artworks_stats;
 
-        struct {
-            uint32_t total;
-            uint32_t approved;
+        struct : public Stats {
             uint32_t free_id;
         } collections_stats;
+
+        struct : public Stats {
+        } artists_stats;
 
         Amount m_VoteBalance;
     };
@@ -298,10 +339,19 @@ namespace Gallery
             Config m_Config;
         };
 
+        struct ManageModerator
+        {
+            static const uint32_t s_iMethod = 16;
+
+            enum class RequestType { kDisable, kEnable } req;
+            Gallery::Moderator::Id id;
+        };
+
         struct ManageArtist {
             static const uint32_t s_iMethod = 10;
 
-            enum class RequestType { SET, DISABLE, ENABLE, DELETE } req;
+            enum class RequestType { kSet, kReject, kApprove, kPending } req;
+            PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
             uint32_t m_LabelLen;
@@ -313,7 +363,8 @@ namespace Gallery
         {
             static const uint32_t s_iMethod = 15;
 
-            enum class RequestType { SET, DISABLE, ENABLE } req;
+            enum class RequestType { kSet, kReject, kApprove, kPending } req;
+            PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
             Collection::Id collection_id;
@@ -322,15 +373,17 @@ namespace Gallery
             // followed by label and data without delimiter
         };
 
-        struct AddExhibit {
+        struct ManageArtwork {
             static const uint32_t s_iMethod = 3;
 
-            enum class RequestType { SET, DISABLE, ENABLE } req;
+            enum class RequestType { kSet, kReject, kApprove, kPending } req;
             Gallery::Role role;
             PubKey m_pkArtist;
+            PubKey signer;
             uint32_t data_len;
             uint32_t label_len;
             uint32_t collection_id;
+            uint32_t artwork_id;
             AmountWithAsset m_Price;
             // followed by the data and label
         };
