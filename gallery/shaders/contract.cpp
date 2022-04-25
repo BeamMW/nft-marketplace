@@ -159,10 +159,10 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
             Env::SaveVar_T(ack, true);
 
             // assert: collection was not saved before
-            Env::Halt_if(c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len));
+            Env::Halt_if(c.Save(c_id, Env::get_Height(), sizeof(Gallery::Collection) + c.label_len + c.data_len));
         }
 
-        a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
+        a.Save(r.m_pkArtist, Env::get_Height(), sizeof(Gallery::Artist) + a.label_len + a.data_len);
 
         Env::AddSig(r.m_pkArtist);
         break;
@@ -258,9 +258,9 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
             } a;
             a.TakeOut(r.m_pkArtist, sizeof(a));
             ++a.collections_num;
-            a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
+            a.Save(r.m_pkArtist, Env::get_Height(), sizeof(Gallery::Artist) + a.label_len + a.data_len);
         }
-        c.Save(c_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+        c.Save(c_id, Env::get_Height(), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
         Env::AddSig(r.m_pkArtist);
         break;
@@ -292,7 +292,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r) {
     MyState s;
     Gallery::Artwork m;
 
-    Gallery::Artwork::Id m_id = Utils::FromBE(++s.artworks_stats.free_id);
+    Gallery::Artwork::Id m_id = ++s.artworks_stats.free_id;
     s.artworks_stats.total++;
     s.artworks_stats.approved++;
     s.Save();
@@ -326,7 +326,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r) {
     Env::Halt_if(!c.TakeOut(r.collection_id, sizeof(c)));
     c.artworks_num++;
     Env::Halt_if(c.artworks_num > c.s_MaxArtworks);
-    c.Save(r.collection_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    c.Save(r.collection_id, Env::get_Height(), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
     // verify artist
     struct ArtistPlus : public Gallery::Artist {
@@ -337,7 +337,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r) {
     Env::Halt_if(!a.TakeOut(r.m_pkArtist, sizeof(a)));
     Env::Halt_if(!a.is_approved);
     ++a.artworks_num;
-    a.Save(r.m_pkArtist, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    a.Save(r.m_pkArtist, Env::get_Height(), sizeof(Gallery::Artist) + a.label_len + a.data_len);
 
     Env::AddSig(r.m_pkArtist);
 
@@ -426,7 +426,7 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
         c.max_sold.price = m.m_Price;
         c.max_sold.artwork_id = r.m_ID;
     }
-    c.Save(m.collection_id, Utils::FromBE(Env::get_Height()), sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    c.Save(m.collection_id, Env::get_Height(), sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
     //Env::AddSig(r.m_pkUser);
 }
@@ -503,7 +503,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
         Strict::Sub(s.m_VoteBalance, s.m_Config.m_VoteReward.m_Amount);
         s.Save();
 
-        Env::Halt_if(Utils::FromBE(impk.m_ID.m_ArtworkID) > s.artworks_stats.free_id);
+        Env::Halt_if(impk.m_ID.m_ArtworkID > s.artworks_stats.free_id);
 
         Env::FundsUnlock(s.m_Config.m_VoteReward.m_Aid, s.m_Config.m_VoteReward.m_Amount);
     }

@@ -2,7 +2,7 @@
 
 namespace Gallery
 {
-    static const ShaderID s_SID_0 = {0xb7,0x4b,0x8f,0xe7,0xfa,0x5e,0xa0,0x1f,0xcf,0xd8,0xfc,0xf2,0xa1,0xe6,0x95,0x65,0x35,0x0a,0xad,0xb5,0x28,0x64,0xe0,0x63,0x09,0x32,0x1d,0xcf,0x3a,0x29,0x28,0xab};
+    static const ShaderID s_SID_0 = {0x5d,0xd4,0x9e,0xb3,0xe1,0x11,0x42,0xe9,0x8c,0x55,0x50,0x12,0xfc,0xb1,0x03,0xab,0xd5,0x97,0x61,0x9a,0xed,0x91,0x86,0x74,0x85,0x1e,0x45,0x1d,0x62,0x8c,0xd4,0x8f};
 #pragma pack (push, 1)
 
     struct Tags
@@ -48,29 +48,39 @@ namespace Gallery
 
         bool Load(const Id& id, size_t object_size = sizeof(T)) {
             typename T::FirstStageKey fsk;
-            fsk.id = id; 
+            if constexpr(std::is_same_v<Id, PubKey>)
+                fsk.id = id;
+            else
+                fsk.id = Utils::FromBE(id); 
+
             typename T::SecondStageKey ssk;
-            ssk.id = id;
             if (!Env::LoadVar_T(fsk, ssk))
                 return false;
             return Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
         }
 
-        bool Save(const Id& id, Height h = Utils::FromBE(Env::get_Height()), size_t object_size = sizeof(T)) {
+        bool Save(const Id& id, Height h = Env::get_Height(), size_t object_size = sizeof(T)) {
             typename T::FirstStageKey fsk;
-            fsk.id = id; 
             typename T::SecondStageKey ssk;
-            ssk.id = id;
-            ssk.h_updated = h;
+            if constexpr(std::is_same_v<Id, PubKey>) {
+                ssk.id = id;
+                fsk.id = id;
+            } else {
+                fsk.id = Utils::FromBE(id); 
+                ssk.id = Utils::FromBE(id); 
+            }
+            ssk.h_updated = Utils::FromBE(h);
             Env::SaveVar_T(fsk, ssk);
             return Env::SaveVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
         }
 
         bool TakeOut(const Id& id, size_t object_size = sizeof(T)) {
             typename T::FirstStageKey fsk;
-            fsk.id = id; 
+            if constexpr(std::is_same_v<Id, PubKey>)
+                fsk.id = id; 
+            else
+                fsk.id = Utils::FromBE(id); 
             typename T::SecondStageKey ssk;
-            ssk.id = id;
             if (!Env::LoadVar_T(fsk, ssk))
                 return false;
             if (!Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal))
@@ -81,17 +91,22 @@ namespace Gallery
 
         void Delete(const Id& id) {
             typename T::FirstStageKey fsk;
-            fsk.id = id; 
+            if constexpr(std::is_same_v<Id, PubKey>)
+                fsk.id = id; 
+            else
+                fsk.id = Utils::FromBE(id); 
             typename T::SecondStageKey ssk;
-            ssk.id = id;
-            Env::LoadVar_T(fsk, ssk.h_updated);
+            Env::LoadVar_T(fsk, ssk);
             Env::DelVar_T(ssk);
             Env::DelVar_T(fsk);
         }
 
         bool Exists(const Id& id) {
             typename T::FirstStageKey fsk;
-            fsk.id = id; 
+            if constexpr(std::is_same_v<Id, PubKey>)
+                fsk.id = id; 
+            else
+                fsk.id = Utils::FromBE(id); 
             typename T::SecondStageKey ssk;
             return Env::LoadVar_T(fsk, ssk);
         }
