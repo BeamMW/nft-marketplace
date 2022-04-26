@@ -116,7 +116,18 @@ export default {
       return artistsStore.is_artist
     },
     my_artist_name () {
-      return (artistsStore.self || {}).label
+      let label = (artistsStore.self || {}).label
+      let role = ''
+
+      if (this.$state.is_moderator) {
+        role = '[moderator]'
+      }
+
+      if (this.$state.is_admin) {
+        role = '[admin]'
+      } 
+
+      return label ? [label, role].join(' ') : role
     },
     artists_total () {
       return artistsStore.total

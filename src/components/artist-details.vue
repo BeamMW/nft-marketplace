@@ -1,17 +1,19 @@
 <template>
   <div class="container">
-    <template v-if="edit_self">
+    <template v-if="!edit_self">
       <pageTitle title="Edit your Artist"/>
       <p class="description">
-        After your artist information is changed it would not be visible<br>
-        until reviewed by moderator. NFTs would still appear in gallery.<br>
+        <i>After your account is changed it would not be visible until reviewed by a moderator.<br>
+          NFTs from this collection would still appear in the gallery.
+        </i>
       </p>
     </template>
     <template v-else>
       <pageTitle title="Become an Artist"/>
       <p class="description">
         To become a publisher you need to set up a username.<br>
-        Registration will allow you to publish and manage your NFTs.
+        Registration will allow you to publish and manage your NFTs.<br>
+        <i>After your account is created it would not be visible until reviewed by a moderator.</i>
       </p>
     </template>
     <div class="fields">
@@ -19,15 +21,15 @@
         <inputField v-model="label"
                     label="Artist Name*"
                     :valid="label_valid"
-                    :max_length="100"
+                    :max_length="25"
                     :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:29px;margin-top:0"
+                    style="margin-bottom:58px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
                     placeholder="https://website.name/"
                     img="glob"
-                    :max_length="250"
+                    :max_length="40"
                     :valid="website_valid"
                     :readonly="in_set_artist"
         />
@@ -54,10 +56,10 @@
         <textAreaField v-model="about"
                        label="About me"
                        :valid="about_valid"
-                       :max_length="150"
+                       :max_length="300"
                        :readonly="in_set_artist"
         />
-        <div class="uploads-container">
+        <div class="uploads-container" style="margin-top:45px;">
           <addImage v-model:image="banner"
                     title="Add an artist banner"  
                     :readonly="in_set_artist" 
@@ -104,12 +106,19 @@
 
 <style scoped lang="stylus">
   .container {
+
     .description {
       font-size: 14px
       text-align: center
       color: #fff
       margin: 10px 0px 30px 0px
       font-family: 'SFProDisplay', sans-serif
+
+      & > i {
+        opacity: 0.7
+        display: block
+        margin-top: 6px
+      }
     }
 
     .intx_text {

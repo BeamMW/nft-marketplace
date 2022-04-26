@@ -160,10 +160,11 @@ const store = {
     if (err) {
       return this.setError(err, 'Failed to load contract params')
     }
-
+    
     utils.ensureField(res, 'Admin', 'number')
     utils.ensureField(res, 'voteReward_balance', 'number')
     this.state.is_admin = !!res.Admin
+    this.state.is_moderator = !!res.Admin || !!res.Moderator
     this.state.balance_reward = res.voteReward_balance
     utils.invokeContract(
       `role=user,action=view_balance,cid=${this.state.cid}`, 

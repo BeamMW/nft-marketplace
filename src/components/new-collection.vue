@@ -4,14 +4,14 @@
       <pageTitle title="Edit collection"/>
       <p class="description">
         After collection is changed it would not be visible until<br> 
-        reviewed by moderator. NFTs would still appear in gallery.
+        <i>After your collection is changed it would not be visible until reviewed by a moderator.</i>
       </p>
     </template>
     <template v-else>
       <pageTitle title="Add new collection"/>
       <p class="description">
         Before you can add any NFT you need to create a collection<br>
-        Collection would not be visible until approved by moderator.
+        <i>After your collection is created it would not be visible until reviewed by a moderator.</i>
       </p>
     </template>
     <div class="fields">
@@ -19,14 +19,14 @@
         <inputField v-model="label"
                     label="Collection Name*"
                     :valid="label_valid"
-                    :max_length="100"
-                    style="margin-bottom:27px;margin-top:0"
+                    :max_length="40"
+                    style="margin-bottom:55px;margin-top:0"
         />
         <inputField v-model="website"
                     label="Website"
                     placeholder="https://website.name/"
                     img="glob"
-                    :max_length="250"
+                    :max_length="40"
                     :valid="website_valid"
         />
         <inputField v-model="twitter"
@@ -49,8 +49,9 @@
       <div class="col-second">
         <textAreaField v-model="description"
                        label="Description"
+                       height="198px"
                        :valid="description_valid"
-                       :max_length="150"
+                       :max_length="1000"
         />
         <addImage v-model:image="cover"
                   title="Add collection image"
@@ -81,6 +82,11 @@
       color: #fff
       margin: 10px 0px 30px 0px
       font-family: 'SFProDisplay', sans-serif
+
+      & > i {
+        opacity: 0.7
+        line-height: 29px
+      }
     }
 
     .fields {

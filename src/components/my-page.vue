@@ -4,6 +4,7 @@
       <btn v-if="is_artist" 
            :height="height" 
            :width="width" 
+           :disabled="in_set_artist"
            padding="0px" 
            radius="10px" 
            @click="onEditArtist"
@@ -14,7 +15,15 @@
       <btnWallet/>
       <btnKey/>
 
-      <btn v-if="!is_artist" :height="height" :width="width" radius="10px" padding="0px" tooltip="become an artist" @click="onBecomeArtist">
+      <btn v-if="!is_artist" 
+           :height="height" 
+           :width="width" 
+           :disabled="in_set_artist"
+           radius="10px" 
+           padding="0px" 
+           tooltip="become an artist" 
+           @click="onBecomeArtist"
+      >
         <img src="~assets/add-user.svg"/>
       </btn>
     </div>
@@ -63,6 +72,9 @@ export default {
   computed: {
     is_artist() {
       return artistsStore.is_artist
+    },
+    in_set_artist() {
+      return artistsStore.in_set_artist
     }
   },
 

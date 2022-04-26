@@ -6,6 +6,7 @@
               :placeholder="placeholder"
               :maxlength="max_length"
               :readonly="readonly"
+              :style="input_style"
               @input="$emit('update:modelValue', $event.target.value)"
     >
     </textarea>
@@ -34,13 +35,11 @@
     outline-width: 0
     font-size: 14px
     color: white
-    height: 100%
     padding: 0
     border-radius: 10px
     padding: 10px 12px 
     width: 100%
     resize: none
-    min-height: 79px
 
     &:read-only {
       background-color: rgba(255, 255, 255, 0.03)
@@ -111,11 +110,23 @@ export default {
       type: Number,
       default: 150,
       required: false
+    },
+    height: {
+      type: String,
+      default: '79px'
     }
   },
   
   emits: [
     'update:modelValue'
   ],
+
+  computed: {
+    input_style () {
+      return {
+        'min-height': this.height
+      }
+    }
+  }
 }
 </script>
