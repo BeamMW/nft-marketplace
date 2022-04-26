@@ -9,6 +9,7 @@
 .select-container {
   position: relative
   cursor: pointer
+  height: 100%
 
   & > img {
     position: absolute
@@ -52,7 +53,7 @@ export default {
     style() {
       return {
         'border-radius': this.border_radius,
-        'border': this.selected ? '1px solid #00f6d2' : '',
+        'border': this.selected ? '1px solid #00f6d2' : '1px solid transparent',
       }
     },
     is_admin() {
