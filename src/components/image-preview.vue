@@ -1,7 +1,7 @@
 <template>
   <div class="preview-container" :style="style">
-    <div v-if="loading && show_text" class="loading">Loading...</div>
     <!--div v-if="error && show_text" class="error">Failed to load image</div-->
+    <div v-if="loading && show_text" class="loading">Loading...</div>
     <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
@@ -13,23 +13,20 @@
     align-items: center
     justify-content: center
     overflow: hidden
+    position: relative
 
     & > img {
-      max-width: 100%
-      max-height: 100%
-      object-fit: cover
+      width: 100%
+      height: 100%
     }
 
     & > div {
       position: absolute
-    }
-
-    & > .loading {
-      color: dimgray
+      z-index: 1
     }
 
     & > .error {
-      color: dimgray
+      color: black
     }
   }
 </style>
@@ -64,6 +61,10 @@ export default {
     show_text: {
       type: Boolean,
       default: true
+    },
+    text_color: {
+      type: String,
+      default: '#fff'
     },
     default: {
       type: String,
@@ -116,12 +117,16 @@ export default {
       let res = {}
 
       if (this.cover) {
-        res['width'] = '100%'
-        res['height'] = '100%'
-        res['object-fit'] = 'cover%'
+        res['object-fit'] = 'cover'
       }
 
       return res
+    },
+
+    text_style() {
+      return {
+        'color': this.text_color
+      }
     }
   }
 }

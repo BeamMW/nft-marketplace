@@ -4,6 +4,7 @@
     <preview :image="item.image" 
              :default="def_artwork"
              height="200px" 
+             text_color="dimgray"
              :cover="!(item.image || {}).object"
              @click="onDetails"
     />
