@@ -36,10 +36,6 @@ export default {
       default: undefined,
       type: [String, Object]
     },
-    debug: {
-      type: Boolean,
-      default: false
-    },
   },
 
   data () {
