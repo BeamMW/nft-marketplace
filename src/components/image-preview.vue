@@ -2,6 +2,8 @@
   <div class="preview-container" :style="style">
     <!--div v-if="error && show_text" class="error">Failed to load image</div-->
     <div v-if="loading && show_text" class="loading">Loading...</div>
+    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
+    <slot></slot>
     <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
@@ -14,7 +16,7 @@
     justify-content: center
     overflow: hidden
     position: relative
-
+    
     & > img {
       width: 100%
       height: 100%

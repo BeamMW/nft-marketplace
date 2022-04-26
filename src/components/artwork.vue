@@ -7,7 +7,12 @@
              text_color="dimgray"
              :cover="!(item.image || {}).object"
              @click="onDetails"
-    />
+    >
+      <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+        <div>{{ likes_cnt }}</div>
+        <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
+      </div>
+    </preview>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -16,11 +21,6 @@
     <div class="info-row">
       <!---- Title ---->
       <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
-      <!---- TODO: enable Likes ----->
-      <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
-        <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
-        <span>{{ likes_cnt }}</span>
-      </div-->
     </div>
 
     <!---- Second info row, author ---->
@@ -71,18 +71,6 @@
         flex: 1
       }
 
-      & .likes {
-        display: flex
-        align-items: center
-        cursor: pointer
-        box-sizing: border-box
-        padding-top: 20px
-
-        & > span {
-          padding-left: 5px
-        }
-      }
-
       & .author {
         font-size: 12px
         color: rgba(255, 255, 255, 0.5)
@@ -90,6 +78,26 @@
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
+      }
+    }
+
+    & .likes {
+      display: flex
+      position: absolute
+      bottom: 8px
+      right: 8px
+      align-items: center
+      cursor: pointer
+      box-sizing: border-box
+      background: rgba(0, 0, 0, 0.3)
+      border-radius: 10px
+
+      & > div {
+        padding: 8px 6px 9px 8px
+      }
+      
+      & > img {
+        padding: 8px
       }
     }
 
@@ -144,6 +152,12 @@ export default {
                 
     can_vote () {
       return !this.item.error && this.$state.balance_reward > 0
+    },
+    liked () {
+      return !!this.item.my_impression
+    },
+    likes_cnt () {
+      return this.item.impressions
     },
   },
 
