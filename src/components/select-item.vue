@@ -12,6 +12,7 @@
 
   & > img {
     position: absolute
+    z-index: 999
   }
 
   .img {
@@ -30,10 +31,6 @@
 
 export default {
   props: {
-    selected: {
-      type: Boolean,
-      default: false,
-    },
     border_radius: {
       type: String,
       default: '10px',
@@ -46,6 +43,7 @@ export default {
 
   data () {
     return {
+      selected: false,
       img: 'icon-unselected',
     }
   },
@@ -64,7 +62,7 @@ export default {
 
   methods: {
     select () {
-      this.$emit('select-item')
+      this.selected = !this.selected
     },
     getImg () {
       return this.selected ? 'icon-selected' : 'icon-unselected'

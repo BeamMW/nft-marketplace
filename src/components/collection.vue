@@ -43,7 +43,7 @@
     
 <style scoped lang="stylus">
   .collection {
-    width: 442px
+    width: 441px
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
