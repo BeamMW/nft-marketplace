@@ -1,6 +1,6 @@
 <template>
   <div class="select-container" :style="style" @click="select">
-    <img :src="`../assets/${getImg()}.svg`" alt="icon" :class="[is_admin ? 'admin_img' : '','img']">
+    <img :src="`../assets/${getImg()}.svg`" alt="icon">
     <slot></slot>
   </div>
 </template>
@@ -12,15 +12,7 @@
 
   & > img {
     position: absolute
-  }
-
-  .img {
     right: 8px
-    top: 8px
-  }
-
-  .admin_img {
-    right: 50px
     top: 8px
   }
 }
@@ -50,9 +42,6 @@ export default {
         'border-radius': this.border_radius,
         'border': this.selected ? '1px solid #00f6d2' : '',
       }
-    },
-    is_admin() {
-      return this.$state.is_admin
     },
   },
 
