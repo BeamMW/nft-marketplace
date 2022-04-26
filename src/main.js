@@ -9,6 +9,7 @@ import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import store from './stores/global.js'
 import artwork from './components/artwork.vue'
 import collection from './components/collection.vue'
+import newCollection from './components/new-collection.vue'
 
 utils.initialize(
   {
@@ -27,6 +28,7 @@ utils.initialize(
     }
     vueApp.component('artwork', artwork)
     vueApp.component('collection', collection)
+    vueApp.component('new-collection', newCollection)
     vueApp.use(router)
     vueApp.mount('body')
 

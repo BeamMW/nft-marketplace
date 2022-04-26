@@ -1,12 +1,13 @@
 <template>
   <div class="list-container">
-    <template v-if="items.length > 0">
+    <template v-if="items.length > 0 || new_component">
       <div class="list-wrap">  
         <div ref="itemslist" class="list" @scroll="onScroll">
           <component :is="component" v-for="item in items" 
                      :key="item.id"
                      :item="item"
-          />              
+          /> 
+          <component :is="new_component" v-if="new_component"/>
         </div>
       </div>
       <paginator :current="page"
@@ -90,6 +91,10 @@ export default {
     gap: {
       type: String,
       default: '16px'
+    },
+    new_component: {
+      type: String,
+      default: ''
     }
   },
 

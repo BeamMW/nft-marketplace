@@ -1,286 +1,34 @@
 <template>
-  <div class="container">
-    <template v-if="edit_mode">
-      <pageTitle title="Edit collection"/>
-      <p class="description">
-        After collection is changed it would not be visible until<br> 
-        <i>After your collection is changed it would not be visible until reviewed by a moderator.</i>
-      </p>
-    </template>
-    <template v-else>
-      <pageTitle title="Add new collection"/>
-      <p class="description">
-        Before you can add any NFT you need to create a collection<br>
-        <i>After your collection is created it would not be visible until reviewed by a moderator.</i>
-      </p>
-    </template>
-    <div class="fields">
-      <div class="col-first">
-        <inputField v-model="label"
-                    label="Collection Name*"
-                    :valid="label_valid"
-                    :max_length="40"
-                    style="margin-bottom:55px;margin-top:0"
-        />
-        <inputField v-model="website"
-                    label="Website"
-                    placeholder="https://website.name/"
-                    img="glob"
-                    :max_length="40"
-                    :valid="website_valid"
-        />
-        <inputField v-model="twitter"
-                    label="Twitter"
-                    placeholder="@twitter"
-                    img="twitter"
-                    :max_length="16"
-                    :valid="twitter_valid"
-                    :counter="false"
-        />
-        <inputField v-model="instagram"
-                    label="Instagram"
-                    placeholder="@instagram"
-                    img="instagram"
-                    :max_length="31"
-                    :valid="instagram_valid"
-                    :counter="false"
-        />
-      </div>
-      <div class="col-second">
-        <textAreaField v-model="description"
-                       label="Description"
-                       height="198px"
-                       :valid="description_valid"
-                       :max_length="1000"
-        />
-        <addImage v-model:image="cover"
-                  title="Add collection image<br>(*.jpg, *.png, *.svg)"
-                  accept="image/jpeg;image/png;image/svg+xml"
-                  :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
-        />
-      </div>
-    </div>
-  </div>
-  <div class="actions">
-    <btn text="cancel" @click="$router.go(-1)">
-      <img src="~assets/icon-cancel.svg"/>
-    </btn>
-    <btn :text="edit_mode ? 'update collection' : 'create collection'" 
-         color="green" 
-         :disabled="!can_submit" 
-         @click="onSetCollection"
-    >
-      <img src="~assets/icon-create.svg"/>
-    </btn>
+  <div class="new-box" @click="onNewCollection">
+    Create new collection
   </div>
 </template>
 
-<style scoped lang="stylus">
-  .container {
-    .description {
-      font-size: 14px
-      text-align: center
-      color: #fff
-      margin: 10px 0px 30px 0px
-      font-family: 'SFProDisplay', sans-serif
+<style lang="stylus" scoped>
+.new-box {
+  width: 442px
+  height: 150px !important
+  border-radius: 10px
+  border: 1px dashed rgba(26, 246, 214, 0.5)
+  background-color: rgba(26, 246, 214, 0.1)
+  cursor: pointer
+  color: rgba(26, 246, 214, 0.7)
+  font-size: 14px
 
-      & > i {
-        opacity: 0.7
-        line-height: 29px
-      }
-    }
-
-    .fields {
-      padding: 0 30px
-      display: flex
-
-      .col-first {
-        flex-basis: 50%
-
-        & > *:not(:last-child) {
-          margin-bottom: 20px
-        }
-      }
-
-      .col-second {
-        flex-basis: 50%
-        margin-left: 30px
-
-        & > *:not(:last-child) {
-          margin-bottom: 20px
-        }
-      }
-    }
-
-    .text {
-      width: 100%
-      height: 100%
-      display: flex
-      justify-content: center
-      align-items: center
-      font-size: 14px
-      color: #1af6d6
-      cursor: pointer
-    }
-  }
-
-  .actions {
-    display: flex
-    justify-content: center
-    margin-top: 50px
-
-    & > *:not(:first-child) {
-      margin-left: 30px
-    }
-  }
+  display: flex
+  align-items: center
+  justify-content: center
+}
 </style>
 
 <script>
-import inputField from './input-field.vue'
-import textAreaField from './textarea-field.vue'
-import pageTitle from './page-title.vue'
-import btn from './button.vue'
-import addImage from './add-image.vue'
 import collsStore from 'stores/collections'
-import router from 'router'
-import validators from 'utils/validators'
 
 export default {
-  components: {
-    inputField, 
-    textAreaField, 
-    pageTitle,
-    btn,
-    addImage
-  },
-
-  props: {
-    id: {
-      type: Number,
-      required: false,
-      default: undefined
-    },
-  },
-
-  data () {
-    return {
-      label_: undefined,
-      website_: undefined,
-      twitter_: undefined,
-      instagram_: undefined,
-      description_: undefined,
-      cover_: undefined
+  methods: {
+    onNewCollection () {
+      collsStore.toNewItem()
     }
-  },
-
-  computed: {
-    edit_mode () {
-      return this.id !== undefined
-    },
-    collection () {
-      if (this.id) {
-        let coll = collsStore.user_items.find(c => c.id == this.id)
-        return coll
-      }
-      return undefined
-    },
-    label: {
-      get () {
-        return this.label_ != undefined ? this.label_ : (this.collection || {}).label
-      },
-      set (val) {
-        this.label_ = val
-      }
-    },
-    label_valid() {
-      let value = this.label
-      return !value || value.length <= 100
-    },
-    website: {
-      get () {
-        return this.website_ != undefined ? this.website_ : (this.collection || {}).website
-      },
-      set (val) {
-        this.website_ = val
-      }
-    },
-    website_valid() {
-      let value = this.website
-      if (!value) return true
-      return validators.url(value)
-    },
-    twitter: {
-      get () {
-        return this.twitter_ != undefined ? this.twitter_ : (this.collection || {}).twitter
-      },
-      set (val) {
-        this.twitter_ = val
-      }
-    },
-    twitter_valid() {
-      let value = this.twitter
-      return !value || validators.twitter(value)
-    },
-    instagram: {
-      get () {
-        return this.instagram_ != undefined ? this.instagram_ : (this.collection || {}).instagram
-      },
-      set (val) {
-        this.instagram_ = val
-      }
-    },
-    instagram_valid() {
-      let value = this.instagram
-      return !value || validators.instagram(value)
-    },
-    description: {
-      get () {
-        return this.description_ != undefined ? this.description_ : (this.collection || {}).description
-      },
-      set (val) {
-        this.description_ = val
-      }
-    },
-    description_valid() {
-      let value = this.description
-      return !value || value.length <= 150
-    },
-    cover: {
-      get () {
-        if (this.cover_ === null) {
-          return undefined
-        }
-        return this.cover_ || (this.collection || {}).cover
-      },
-      set (val) {
-        this.cover_ = val
-      }
-    },
-    cover_valid() {
-      return !this.cover || validators.image(this.cover)
-    },
-    can_submit () {
-      return this.label && this.label_valid &&
-             this.website_valid &&
-             this.twitter_valid &&
-             this.instagram_valid &&
-             this.description_valid &&
-             this.cover_valid
-    }
-  },
-
-  methods: {   
-    async onSetCollection() {
-      let data = {
-        website:     this.website,
-        twitter:     this.twitter,
-        instagram:   this.instagram,
-        description: this.description,
-        cover:       this.cover
-      }
-      await collsStore.setCollection(this.id, this.label, data)
-      router.go(-1)
-    }
-  }
+  } 
 }
 </script>

@@ -10,7 +10,7 @@
 
 <style scoped lang="stylus">
   .container {
-    min-height: 43px 
+    min-height: 45px 
     display: flex
     flex-flow: row
     justify-content: center

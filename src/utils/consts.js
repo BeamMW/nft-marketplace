@@ -14,6 +14,12 @@ export const tabs = {
   NFTS: 6,
 }
 
+export const my_tabs = {
+  COLLECTIONS: 0,
+  CREATED_NFTS: 1,
+  OWNED_NFTS: 2,
+}
+
 export const sort = {
   OLDEST_TO_NEWEST: 0,
   NEWEST_TO_OLDEST: 1,

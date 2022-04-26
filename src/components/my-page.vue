@@ -28,6 +28,7 @@
       </btn>
     </div>
   </pageTitle>
+  <myGallery/>
 </template>
 
 <style scoped lang="stylus">
@@ -53,13 +54,15 @@ import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
 import btnKey from './button-key.vue'
 import artistsStore from 'stores/artists.js'
+import myGallery from './my-gallery'
 
 export default {
   components: {
     pageTitle,
     btn,
     btnWallet,
-    btnKey
+    btnKey,
+    myGallery
   },
 
   data() {

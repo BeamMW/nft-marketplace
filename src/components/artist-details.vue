@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <template v-if="!edit_self">
+    <template v-if="edit_self">
       <pageTitle title="Edit your Artist"/>
       <p class="description">
         <i>After your account is changed it would not be visible until reviewed by a moderator.<br>
