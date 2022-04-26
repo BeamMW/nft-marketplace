@@ -9,9 +9,11 @@
 .select-container {
   position: relative
   cursor: pointer
+  height: 100%
 
   & > img {
     position: absolute
+    z-index: 999
   }
 
   .img {
@@ -30,25 +32,28 @@
 
 export default {
   props: {
-    selected:{
-      type: Boolean,
-    },
     border_radius: {
       type: String,
       default: '10px',
     },
   },
-  emits: ['select-item'],
-  data: function () {
+
+  emits: [
+    'select-item'
+  ],
+
+  data () {
     return {
+      selected: false,
       img: 'icon-unselected',
     }
   },
+
   computed: {
     style() {
       return {
         'border-radius': this.border_radius,
-        'border': this.selected ? '1px solid #00f6d2' : '',
+        'border': this.selected ? '1px solid #00f6d2' : '1px solid transparent',
       }
     },
     is_admin() {
@@ -57,13 +62,12 @@ export default {
   },
 
   methods: {
-    select: function () {
-      this.$emit('select-item')
+    select () {
+      this.selected = !this.selected
     },
-    getImg() {
+    getImg () {
       return this.selected ? 'icon-selected' : 'icon-unselected'
     },
-
   }
 }
 </script>

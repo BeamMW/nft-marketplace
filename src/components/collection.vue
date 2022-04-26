@@ -1,47 +1,49 @@
 <template>
-  <div :class="
-         {'collection': true, 
-          'pointer-cursor': item.owned && !item.default,
-          'error': item.error
-         }" 
-       @click="onDetails"
-  >
-    <preview class="preview" 
-             :image="item.cover"
-             :default="def_banner"
-             height="140px" 
-             cover
-    />
-    <div class="info-row">  
-      <div class="avatar" :class="{'error': item.author_error}">
-        <preview :image="item.avatar" 
-                 :show_text="false"
-                 :default="def_avatar"
-                 width="72px" 
-                 height="72px" 
-                 radius="36px 36px"
-        />
-      </div>
-      <div class="text">
-        <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
-        <div class="author" :class="{'error': item.author_error}" v-html="item.by_author"></div>
-        <div class="description">{{ item.description }}</div>
-        <hr class="line"/>
-        <div class="items-info" :class="{'error': item.error}">
-          <div class="count">
-            <div class="text">{{ item.artworks.length }}</div>
-            <div>{{ item.artworks.length == 1 ? 'item' : 'items' }}</div>
+  <selectItem>
+    <div :class="
+           {'collection': true, 
+            'pointer-cursor': item.owned && !item.default,
+            'error': item.error
+           }" 
+         @click="onDetails"
+    >
+      <preview class="preview" 
+               :image="item.cover"
+               :default="def_banner"
+               height="140px" 
+               cover
+      />
+      <div class="info-row">  
+        <div class="avatar" :class="{'error': item.author_error}">
+          <preview :image="item.avatar" 
+                   :show_text="false"
+                   :default="def_avatar"
+                   width="72px" 
+                   height="72px" 
+                   radius="36px 36px"
+          />
+        </div>
+        <div class="text">
+          <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
+          <div class="author" :class="{'error': item.author_error}" v-html="item.by_author"></div>
+          <div class="description">{{ item.description }}</div>
+          <hr class="line"/>
+          <div class="items-info" :class="{'error': item.error}">
+            <div class="count">
+              <div class="text">{{ item.artworks.length }}</div>
+              <div>{{ item.artworks.length == 1 ? 'item' : 'items' }}</div>
+            </div>
+            <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
           </div>
-          <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>
       </div>
     </div>
-  </div>
+  </selectitem>
 </template>
     
 <style scoped lang="stylus">
   .collection {
-    width: 442px
+    width: 441px
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
@@ -119,11 +121,13 @@ import preview from './image-preview'
 import amount from './amount'
 import collsStore from 'stores/collections'
 import {def_images} from 'utils/consts'
+import selectItem from './select-item.vue'
 
 export default {
   components: {
     preview,
-    amount
+    amount,
+    selectItem
   },
 
   props: {
