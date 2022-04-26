@@ -1,5 +1,5 @@
 <template>
-  <modal v-if="!debug" ref="modal">
+  <modal ref="modal">
     <div class="content">
       <div class="title">
         {{ title }}
@@ -102,10 +102,6 @@ export default {
       default: undefined,
       type: [String, Object]
     },
-    debug: {
-      type: Boolean,
-      default: false
-    },
     title: {
       type: String,
       default: 'Error'
@@ -115,7 +111,8 @@ export default {
 
   data () {
     return {
-      errleft: 0
+      errleft: 0,
+      timeout: null,
     }
   },
 
@@ -138,6 +135,8 @@ export default {
     },
  
     close() {
+      clearInterval(this.timeout)
+      this.$store.clearError()
       this.$refs.modal.close()
     }
   }

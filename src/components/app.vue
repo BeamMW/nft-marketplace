@@ -1,7 +1,7 @@
 <template>
   <span id="modals"/>
-  <error v-if="error && debug" :text="errtext" :debug="debug"/>
-  <errorModal v-if="error && !debug" :text="errtext" :debug="debug" @copy="onCopy"/>
+  <error v-if="error && debug" :text="errtext"/>
+  <errorModal v-if="error && !debug" :text="errtext" @copy="onCopy"/>
   <loading v-if="loading"/>
   <div v-else-if="!loading" id="app-container" class="app-container">
     <router-view></router-view>
@@ -27,7 +27,6 @@ export default {
   },
   data () {
     return {
-      debug: true,
       allErrorText: null,
     }
   },
@@ -38,6 +37,9 @@ export default {
     error () {
       return this.$state.error
     },
+    debug () {
+      return this.$state.debug
+    },
     errtext () {
       const maxLen = 50
 
@@ -46,7 +48,11 @@ export default {
       }
 
       if (this.error.error instanceof Error) {
-        return this.error.error.stack.substring(0, maxLen) + ' --excluded--'
+        if (this.debug) {
+          return this.error.error.stack
+        } else {
+          return this.error.error.stack.substring(0, maxLen) + ' --excluded--'
+        }
       }
       
       let err = Object.assign({}, this.error.error)
@@ -69,12 +75,11 @@ export default {
     onCopy () {
       let err = Object.assign({}, this.error.error)
       if (typeof this.error.error === 'string') {
-        console.log('copied', this.allErrorText)
         this.allErrorText = [this.error.context || 'Error occured', this.error.error].join(' ')
       }
       
       if (err.answer && err.answer.result) {
-        if(err.answer.result.raw_data) {
+        if (err.answer.result.raw_data) {
           this.allErrorText = err.answer.result.raw_data
         }
 
@@ -96,7 +101,6 @@ export default {
       textArea.select()
             
       try {
-        console.log(this.allErrorText)
         return document.execCommand('copy')
       } 
       catch (ex) {

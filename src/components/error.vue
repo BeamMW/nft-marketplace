@@ -1,5 +1,5 @@
 <template>
-  <div v-if="debug" class="error">
+  <div class="error">
     <div>
       <pre>{{ text }}</pre>
       <span class="restart">Restarting in {{ errleft }}</span>
@@ -35,10 +35,6 @@ export default {
     text: {
       default: undefined,
       type: [String, Object]
-    },
-    debug: {
-      type: Boolean,
-      default: false
     },
   },
 
