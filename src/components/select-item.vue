@@ -30,7 +30,7 @@
 
 export default {
   props: {
-    selected:{
+    selected: {
       type: Boolean,
       default: false,
     },
