@@ -32,18 +32,24 @@ export default {
   props: {
     selected:{
       type: Boolean,
+      default: false,
     },
     border_radius: {
       type: String,
       default: '10px',
     },
   },
-  emits: ['select-item'],
-  data: function () {
+
+  emits: [
+    'select-item'
+  ],
+
+  data () {
     return {
       img: 'icon-unselected',
     }
   },
+
   computed: {
     style() {
       return {
@@ -57,13 +63,12 @@ export default {
   },
 
   methods: {
-    select: function () {
+    select () {
       this.$emit('select-item')
     },
-    getImg() {
+    getImg () {
       return this.selected ? 'icon-selected' : 'icon-unselected'
     },
-
   }
 }
 </script>
