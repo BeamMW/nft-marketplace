@@ -1,16 +1,16 @@
 <template>
-  <modal v-if="!debug" ref="modal">
+  <modal ref="modal">
     <div class="content">
-      <div class="title">
+      <div class="error_title">
         {{ title }}
       </div>
-      <div class="description">
+      <div class="error_description">
         <p>Something went wrong. The page will be automatically restarted.</p>
         <p>If you came across this problem again, copy the following text and send it to support, please.</p>
       </div>
       <div class="error">
         <div>
-          <div class="data">
+          <div class="error_data">
             <span>{{ text }}</span>
             <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
               <img src="~assets/icon-copy.svg"/>
@@ -31,23 +31,27 @@
     display: flex
     flex-direction: column
     align-items: center
-    font-family: 'SF Pro Display'
+    font-family: 'SFProDisplay', sans-serif
 
-    .title {
+    .error_title {
+      font-family: 'SFProDisplay', sans-serif
       font-size: 18px
       font-weight: 700
       line-height: 21px
+      font-style: normal
       text-align: center
       color: #fff
     }
 
-    .description {
+    .error_description {
       text-align: center
-      font-size: 14px
-      line-height: 17px
 
       & > p {
-        margin-bottom: 0px
+        font-size: 14px
+        line-height: 17px
+        font-style: normal
+        font-weight: 400
+        margin-bottom: 10px
       }
     }
 
@@ -65,7 +69,7 @@
       & > div {
         width: 70%
         
-        & > .data {
+        & > .error_data {
           font-family: 'SFProDisplay', sans-serif
           font-weight: normal
           white-space: pre-wrap
@@ -81,7 +85,7 @@
         }
       }
       .restart {
-        color: #fff
+        color: rgba(255, 255, 255, 0.7)
         text-align: center
         margin: 24px 0px 41px
       }
@@ -102,10 +106,6 @@ export default {
       default: undefined,
       type: [String, Object]
     },
-    debug: {
-      type: Boolean,
-      default: false
-    },
     title: {
       type: String,
       default: 'Error'
@@ -115,7 +115,8 @@ export default {
 
   data () {
     return {
-      errleft: 0
+      errleft: 0,
+      timeout: null,
     }
   },
 
@@ -138,6 +139,8 @@ export default {
     },
  
     close() {
+      clearInterval(this.timeout)
+      this.$store.clearError()
       this.$refs.modal.close()
     }
   }

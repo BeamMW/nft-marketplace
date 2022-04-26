@@ -37,7 +37,7 @@ function defaultState() {
     use_ipfs: true,
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
-    debug: false
+    debug: true
   }
   
   return state
