@@ -120,6 +120,9 @@
 import preview from './image-preview'
 import amount from './amount'
 import collsStore from 'stores/collections'
+import {def_images} from 'utils/consts'
+import selectItem from './select-item.vue'
+
 export default {
   components: {
     preview,
