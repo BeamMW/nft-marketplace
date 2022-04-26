@@ -61,7 +61,8 @@
         />
         <div class="uploads-container" style="margin-top:45px;">
           <addImage v-model:image="banner"
-                    title="Add an artist banner"  
+                    accept="image/jpeg;image/png;image/svg+xml"
+                    title="Add an artist banner<br>(*.jpg, *.png, *.svg)"  
                     :readonly="in_set_artist" 
                     :error="banner_valid ? '' : ' '"
           />
@@ -75,7 +76,7 @@
             <input v-if="!in_set_artist" id="avatar"
                    ref="avatar"
                    type="file"
-                   accept="image/*"      
+                   accept="image/jpeg;image/png;image/svg+xml"  
                    class="files"
                    @change="onUploadAvatar"
             />

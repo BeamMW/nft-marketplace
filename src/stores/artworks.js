@@ -59,7 +59,7 @@ class ArtworksStore extends ItemsStore {
     }
   }
 
-  async createNFT(collid, label, data) {
+  async createNFT(collid, label, data, price) {
     ({label, data} = await this._toContract(label, data))
     
     let args = {
@@ -67,6 +67,11 @@ class ArtworksStore extends ItemsStore {
       action: 'set_artwork',
       collection_id: collid,
       label, data, cid
+    }
+
+    if (price) {
+      args['aid'] = 0
+      args['amount'] = price
     }
 
     return await utils.invokeContractAsyncAndMakeTx(args)

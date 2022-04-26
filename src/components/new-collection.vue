@@ -54,7 +54,8 @@
                        :max_length="1000"
         />
         <addImage v-model:image="cover"
-                  title="Add collection image"
+                  title="Add collection image<br>(*.jpg, *.png, *.svg)"
+                  accept="image/jpeg;image/png;image/svg+xml"
                   :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
         />
       </div>

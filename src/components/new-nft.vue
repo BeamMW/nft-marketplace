@@ -6,26 +6,26 @@
         <inputField v-model="name"
                     label="NFT Name*"
                     :valid="name_valid"
-                    :max_length="100"
+                    :max_length="35"
         />
         <textAreaField v-model="description"
                        label="Description"
                        :valid="description_valid"
-                       :max_length="150"
+                       :max_length="300"
         />
         <formSelect v-model="collection"
                     :options="collections"
         />
         <priceInput v-model="price"
                     label="Price"
-                    :readonly="dontsell"
         />
         <switchInput v-model="dontsell" label="Not for sale"/>
       </div>
       <div class="col-second">
         <addImage v-model:image="image"
                   :error="image_valid ? '' : 'image cannot be larger than 250kb'"
-                  title="Add NFT here<br>(any image)"
+                  accept="image/*"
+                  title="Add NFT here<br>(any image, including animated)"
                   height="374px"
         />
       </div>
@@ -87,6 +87,7 @@ import collsStore from 'stores/collections'
 import artsStore from 'stores/artworks'
 import validators from 'utils/validators'
 import router from 'router'
+import {common} from 'utils/consts'
 
 export default {
   components: {
@@ -108,7 +109,7 @@ export default {
       description: '',
       image: undefined,
       price: '',
-      dontsell: false,
+      dontsell: true,
       collection: 0,
     }
   },
@@ -143,6 +144,17 @@ export default {
     }
   },
 
+  watch: {
+    dontsell(newval) {
+      if(newval) {
+        this.price = ''
+      }
+    },
+    price(newval) {
+      this.dontsell = !newval || parseFloat(newval) === 0.0
+    }
+  },
+
   methods: {    
     async onUploadNFT() {
       let data = {
@@ -150,7 +162,8 @@ export default {
         image: this.image
       }
       let collID = this.collections[this.collection].id
-      await artsStore.createNFT(collID, this.name, data)
+      let price  = parseFloat(this.price) * common.GROTHS_IN_BEAM
+      await artsStore.createNFT(collID, this.name, data, price)
       router.go(-1)
     }
   }
