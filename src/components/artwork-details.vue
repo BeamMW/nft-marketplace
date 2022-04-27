@@ -16,8 +16,15 @@
         <div class="info-container">
           <div class="info-box">
             <div class="title" :class="{'error': error}">{{ title }}</div>
-            <div class="author" :class="{'error': error}" v-html="by_author"></div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
+            <div class="separator"/>
+            <div class="creator">
+              <p>Creator: <span :class="{'error': error}" v-html="by_author"></span></p>
+              <p>Collection: <span>{{ collection }}</span></p>
+            </div>
+            <!-- <div class="collection">
+              <p>Collection: <span>Master Splinter</span></p>
+            </div> -->
             <div class="price">
               <div class="separator"/>
               <artPrice :artwork="artwork"/>
@@ -190,12 +197,60 @@
         display: flex
         flex-direction: row
         margin-top: 15px
+        
+        .description {
+          font-family: 'SFProDisplay', sans-serif
+          font-style: normal
+          font-weight: 400
+          font-size: 16px
+          line-height: 19px
+          display: -webkit-box
+          -webkit-line-clamp: 3
+          -webkit-box-orient: vertical
+          overflow: hidden
+          margin-top: 26px
+        }
 
         .separator {
           height: 1px
           margin: 20px 0
           opacity: 0.2
           border-top: solid 1px #fff
+        }
+
+        .creator {
+          font-family: 'SFProDisplay', sans-serif
+
+          & > p:first-child {
+            margin-bottom: 12px
+          }
+
+          & > p {
+            font-style: normal
+            font-weight: 400
+            font-size: 16px
+            line-height: 19px
+            margin: 0
+
+            & > span {
+              color: #00f6d2
+            }
+          }
+        }
+
+        .collection {
+          font-style: normal
+          font-weight: 400
+          font-size: 16px
+          line-height: 19px
+
+          & > span {
+            font-style: normal
+            font-weight: 400
+            font-size: 16px
+            line-height: 19px
+            color: #00f6d2
+          }
         }
 
         & .artwork-container {
@@ -224,13 +279,14 @@
             border-radius: 10px
             height: 100%
             box-sizing: border-box
-            padding: 35px 40px 
+            padding: 28px 40px 
             display: flex
             flex-direction: column
 
             & .title {
               font-size: 20px
               font-weight: bold
+              font-style: normal
               color: #fff
               white-space: nowrap
               text-overflow: ellipsis
@@ -264,6 +320,7 @@ import backBtn from './back-btn.vue'
 import preview from './image-preview'
 import artistsStore from 'stores/artists'
 import artsStore from 'stores/artworks'
+import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
 /*
@@ -324,6 +381,10 @@ export default {
 
     artists () {
       return artistsStore.artists
+    },
+    collection () {
+      let col  = collsStore.user_items.find(c => c.id == this.id)
+      return (col || {}).label
     }
   },
   
