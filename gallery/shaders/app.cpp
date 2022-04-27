@@ -425,23 +425,6 @@ struct StatePlus : public Gallery::State {
     }
 };
 
-ON_METHOD(manager, view_params) {
-    StatePlus s;
-    if (!s.Init(cid))
-        return;
-
-    PubKey pk;
-    KeyMaterial::MyAdminKey().get_Pk(pk);
-
-    uint32_t bIsAdmin = (_POD_(s.m_Config.m_pkAdmin) == pk);
-
-    Env::DocAddNum("Admin", bIsAdmin);
-    Env::DocAddNum("Exhibits", s.artworks_stats.total);
-    Env::DocAddNum("voteReward.aid", s.m_Config.m_VoteReward.m_Aid);
-    Env::DocAddNum("voteReward.amount", s.m_Config.m_VoteReward.m_Amount);
-    Env::DocAddNum("voteReward_balance", s.m_VoteBalance);
-}
-
 ON_METHOD(manager, set_moderator) {
     Gallery::Method::ManageModerator args;
 
@@ -489,6 +472,34 @@ struct MyModerator : public Gallery::Moderator {
 public:
     std::string_view name() const {
         return "moderators";
+    }
+
+    PubKey id(const ContractID& cid) const {
+        KeyMaterial::Owner km;
+        km.SetCid(cid);
+        PubKey pk;
+        km.Get(pk);
+        return pk;
+    }
+
+    bool is_moderator(const ContractID& cid) {
+        Id id_ = id(cid);
+        return Read(cid, id_);
+    }
+
+    bool Read(const ContractID& cid, const Id& id) {
+        Env::Key_T<FirstStageKey> fsk;
+        fsk.m_Prefix.m_Cid = cid;
+        fsk.m_KeyInContract.id = id;
+        SecondStageKey ssk;
+        if (!Env::VarReader::Read_T(fsk, ssk))
+            return false;
+        Env::Key_T<SecondStageKey> ssk0;
+        ssk0.m_Prefix.m_Cid = cid;
+        _POD_(ssk0.m_KeyInContract) = ssk;
+        if (!Env::VarReader::Read_T(ssk0, *this))
+            return false;
+        return approved;
     }
 
     void Print(const Id& id, Height updated) {
@@ -922,6 +933,25 @@ private:
     T object_;
     ContractID cid_;
 };
+
+ON_METHOD(manager, view_params) {
+    StatePlus s;
+    if (!s.Init(cid))
+        return;
+
+    PubKey admin_pk;
+    KeyMaterial::MyAdminKey().get_Pk(admin_pk);
+
+    uint32_t bIsAdmin = (_POD_(s.m_Config.m_pkAdmin) == admin_pk);
+
+    MyModerator moder;
+    Env::DocAddNum("is_admin", bIsAdmin);
+    Env::DocAddNum32("is_moderator", moder.is_moderator(cid));
+    Env::DocAddNum("Exhibits", s.artworks_stats.total);
+    Env::DocAddNum("voteReward.aid", s.m_Config.m_VoteReward.m_Aid);
+    Env::DocAddNum("voteReward.amount", s.m_Config.m_VoteReward.m_Amount);
+    Env::DocAddNum("voteReward_balance", s.m_VoteBalance);
+}
 
 bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists) {
     artist_exists = false;
