@@ -77,7 +77,7 @@ export default {
       return artistsStore.is_artist
     },
     in_set_artist() {
-      return artistsStore.in_set_artist
+      return !!artistsStore.artist_tx
     }
   },
 

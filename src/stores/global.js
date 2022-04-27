@@ -18,6 +18,7 @@ function defaultState() {
     cid: contract.cid,
     cid_checked: false,
     is_admin: false,
+    is_moderator: false,
     artworks: [],
     all_artworks: {
       [tabs.ALL]:   [],
@@ -161,10 +162,12 @@ const store = {
       return this.setError(err, 'Failed to load contract params')
     }
     
-    utils.ensureField(res, 'Admin', 'number')
+    utils.ensureField(res, 'is_admin', 'number')
+    utils.ensureField(res, 'is_moderator', 'number')  
     utils.ensureField(res, 'voteReward_balance', 'number')
-    this.state.is_admin = !!res.Admin
-    this.state.is_moderator = !!res.Admin || !!res.Moderator
+   
+    this.state.is_admin = !!res.is_admin
+    this.state.is_moderator = !!res.is_moderator
     this.state.balance_reward = res.voteReward_balance
     utils.invokeContract(
       `role=user,action=view_balance,cid=${this.state.cid}`, 

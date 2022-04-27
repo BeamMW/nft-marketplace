@@ -1,7 +1,7 @@
 <template>
   <div class="gallery-container">
     <tabsctrl v-model:active="active_tab" :tabs="tabs"/>
-    <list v-if="active_tab==0"
+    <list v-if="show_collections"
           class="list"
           emptymsg="There are no collections at the moment"
           component="collection"
@@ -44,7 +44,7 @@ export default {
       active_tab: my_tabs.COLLECTIONS,
       tabs: [
         {id: my_tabs.COLLECTIONS, name: 'Collections'},
-        {id: my_tabs.CREATED_NFTS, name: 'Created NFTs'},
+        {id: my_tabs.CREATED_NFTS, name: 'NFTs'},
         {id: my_tabs.OWNED_NFTS, name: 'Owned NFTs'},
       ],
     }
@@ -57,6 +57,15 @@ export default {
     is_artist() {
       return artistsStore.is_artist
     },
+    show_collections() {
+      return this.active_tab === my_tabs.COLLECTIONS
+    },
+    show_created() {
+      return this.active_tab === my_tabs.CREATED_NFTS
+    },
+    show_owned() {
+      return this.active_tab == my_tabs.OWNED_NFTS
+    }
   }
 }
 </script>
