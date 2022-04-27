@@ -1,369 +1,285 @@
 <template>
-  <hdr title="collection name"/>
-  <div class="collection">
-    <!-- banner -->
-    <imagePreview :image="banner" width="100vw" height="200px"/>
-
-    <div :class="!full_text ? 'block' : 'block--transformed'">
-      <div class="left">
-        <!-- artist info -->
-        <div class="artist">
-          <div class="image">
-            <imagePreview :image="author_image" radius="36px 36px"/>
-          </div>
-
-          <div class="artist__info">
-            <span class="artist__name">{{ author }}</span>
-            <span class="artist__description">{{ author_description }}</span>
-          </div>
-        </div>
-
-        <!-- collection description -->
-        <div class="collection__description">
-          <span ref="desc" :class="!full_text ? 'desc' : ''">{{ description }}</span>
-          <span v-if="!full_text && is_long_text" class="button-more" @click="full_text = true">See more</span>
-        </div>
+  <div class="container">
+    <template v-if="edit_mode">
+      <pageTitle title="Edit collection"/>
+      <p class="description">
+        After collection is changed it would not be visible until<br> 
+        <i>After your collection is changed it would not be visible until reviewed by a moderator.</i>
+      </p>
+    </template>
+    <template v-else>
+      <pageTitle title="Add new collection"/>
+      <p class="description">
+        Before you can add any NFT you need to create a collection<br>
+        <i>After your collection is created it would not be visible until reviewed by a moderator.</i>
+      </p>
+    </template>
+    <div class="fields">
+      <div class="col-first">
+        <inputField v-model="label"
+                    label="Collection Name*"
+                    :valid="label_valid"
+                    :max_length="40"
+                    style="margin-bottom:55px;margin-top:0"
+        />
+        <inputField v-model="website"
+                    label="Website"
+                    placeholder="https://website.name/"
+                    img="glob"
+                    :max_length="40"
+                    :valid="website_valid"
+        />
+        <inputField v-model="twitter"
+                    label="Twitter"
+                    placeholder="@twitter"
+                    img="twitter"
+                    :max_length="16"
+                    :valid="twitter_valid"
+                    :counter="false"
+        />
+        <inputField v-model="instagram"
+                    label="Instagram"
+                    placeholder="@instagram"
+                    img="instagram"
+                    :max_length="31"
+                    :valid="instagram_valid"
+                    :counter="false"
+        />
       </div>
-
-      <div class="right">
-        <!-- "social" block -->
-        <div class="social">
-          <btn v-if="website" color="transparent" height="20px">
-            <img src="~assets/glob-green.svg">
-          </btn>
-
-          <btn v-if="twitter" color="transparent" height="20px">
-            <img src="~assets/twitter-green.svg">
-          </btn>
-
-          <btn v-if="instagram" color="transparent" height="20px">
-            <img src="~assets/instagram-green.svg">
-          </btn>
-
-          <btn color="transparent" height="20px">
-            <img src="~assets/icon-key-small.svg">
-          </btn>
-        </div>
-
-        <!-- collection info -->
-        <div v-if="!full_text" class="collection__details">
-          <div>
-            <span class="value">{{ items }}</span>
-            <span>items</span>
-          </div>
-
-          <div>
-            <span class="value">{{ owners }}</span>
-            <span>owners</span>
-          </div>
-
-          <div>
-            <span class="tooltip">{{ price }}</span>
-            <div>
-              <img src="~assets/icon-beam.svg">
-              <span class="value">{{ formatted_price }}</span>
-            </div>
-            <span>price</span>
-          </div>
-
-          <div>
-            <span class="tooltip">{{ volume_traded }}</span>
-            <div>
-              <img src="~assets/icon-beam.svg">
-              <span class="value">{{ formatted_volume_traded }}</span>
-            </div>
-            <span>volume traded</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- footer button -->
-      <div v-if="full_text" class="footer">
-        <btn text="See less"
-             height="20px"
-             color="transparent"
-             :text_bold="false"
-             @click="full_text = false"
+      <div class="col-second">
+        <textAreaField v-model="description"
+                       label="Description"
+                       height="198px"
+                       :valid="description_valid"
+                       :max_length="1000"
+        />
+        <addImage v-model:image="cover"
+                  title="Add collection image<br>(*.jpg, *.png, *.svg)"
+                  accept="image/jpeg;image/png;image/svg+xml"
+                  :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
         />
       </div>
     </div>
   </div>
+  <div class="actions">
+    <btn text="cancel" @click="$router.go(-1)">
+      <img src="~assets/icon-cancel.svg"/>
+    </btn>
+    <btn :text="edit_mode ? 'update collection' : 'create collection'" 
+         color="green" 
+         :disabled="!can_submit" 
+         @click="onSetCollection"
+    >
+      <img src="~assets/icon-create.svg"/>
+    </btn>
+  </div>
 </template>
 
-<style lang="stylus" scoped>
-.collection {
-  display: grid
-  grid-template-columns: 1fr 1fr
-  grid-template-rows: repeat(3, minmax(min-content, max-content))
-  border-radius: 10px
-  overflow: hidden
-}
+<style scoped lang="stylus">
+  .container {
+    .description {
+      font-size: 14px
+      text-align: center
+      color: #fff
+      margin: 10px 0px 30px 0px
+      font-family: 'SFProDisplay', sans-serif
 
-.banner {
-  min-height: 200px
-  max-height: 300px
-  min-width: 100%
-  grid-column: 1 / 3
-}
-
-.block {
-  grid-column: 1 / 3
-  display: grid
-  grid-template-columns: 1fr 1fr
-  grid-template-rows: 1fr
-  column-gap: 10px
-  padding: 20px
-  background-color: rgba(255, 255, 255, 0.05)
-}
-
-.block--transformed {
-  grid-column: 1 / 3
-  grid-row: 2 / 3
-  display: grid
-  padding: 20px
-  background-color: rgba(255, 255, 255, 0.05)
-}
-
-.artist {
-  display: flex
-  margin-bottom: 20px
-
-  .image {
-    margin-right: 16px
-    min-width: 72px
-    min-height: 72px
-    max-width: 72px
-    max-height: 72px
-  }
-
-  &__info {
-    display: flex
-    flex-direction: column
-    justify-content: center
-    padding-right: 20px
-
-    & > * {
-      overflow: hidden
-      text-overflow: ellipsis
-      display: -moz-box
-      -moz-box-orient: vertical
-      display: -webkit-box
-      -webkit-line-clamp: 1
-      -webkit-box-orient: vertical
-      line-clamp: 1
-    }
-  }
-
-  &__name {
-    font-weight: bold
-    font-size: 16px
-    margin-bottom: 4px
-  }
-
-  &__description {
-    font-size: 14px
-  }
-}
-
-.collection__description {
-  color: #8897a8
-  font-size: 14px
-  display: flex
-  flex-direction: column
-
-  .desc {
-    overflow: hidden
-    text-overflow: ellipsis
-    display: -moz-box
-    -moz-box-orient: vertical
-    display: -webkit-box
-    -webkit-line-clamp: 3
-    -webkit-box-orient: vertical
-    line-clamp: 3
-  }
-
-  .button-more {
-    cursor: pointer
-    color: #00f6d2
-    align-self: flex-end
-    margin-right: 20px
-  }
-}
-
-.social {
-  height: 16px
-  display: flex
-  justify-content: flex-end
-  align-items: center
-  margin-bottom: 20px
-
-  & > * {
-    margin-left: 6px
-  }
-}
-
-.collection__details {
-  width: 100%
-  height: 60px
-  padding-top: 16px
-  padding-bottom: 16px
-  border-radius: 10px
-  background-color: rgba(255, 255, 255, 0.05)
-  display: grid
-  grid-template-columns: 1fr 1fr 1fr 1fr
-
-  & > div {
-    display: grid
-    grid-template-rows: 1fr 1fr
-    align-items: center
-    justify-items: center
-    position: relative
-    
-    & > div {
-      display: flex
-      
-      & img {
-        margin-right: 5px
+      & > i {
+        opacity: 0.7
+        line-height: 29px
       }
     }
-    
-    & > span:not(.value) {
-      font-size: 14px
-    }
 
-    & .value {
+    .fields {
+      padding: 0 30px
       display: flex
-      font-size: 16px
+
+      .col-first {
+        flex-basis: 50%
+
+        & > *:not(:last-child) {
+          margin-bottom: 20px
+        }
+      }
+
+      .col-second {
+        flex-basis: 50%
+        margin-left: 30px
+
+        & > *:not(:last-child) {
+          margin-bottom: 20px
+        }
+      }
     }
 
-    &:hover .tooltip {
-      visibility: visible
-    }
-
-    & .tooltip {
-      position: absolute
-      width: max-content
-      padding: 7px 21px
-      border-radius: 10px
-      bottom: 120%
-      color: black
-      background-color: #0bccf7
-      visibility: hidden
-    }
-
-    & .tooltip::after {
-      content: ""
-      position: absolute
-      top: 100%
-      left: 45%
-      border-width: 5px
-      border-style: solid
-      border-color: #0bccf7 transparent transparent transparent
+    .text {
+      width: 100%
+      height: 100%
+      display: flex
+      justify-content: center
+      align-items: center
+      font-size: 14px
+      color: #1af6d6
+      cursor: pointer
     }
   }
 
-  & > *:not(:last-child) {
-    border-right: 1px solid rgba(255, 255, 255, 0.1)
-  }
-}
+  .actions {
+    display: flex
+    justify-content: center
+    margin-top: 50px
 
-.footer {
-  grid-column: 1 / 3
-  height: min-content
-  display: flex
-  justify-content: center
-  align-items: center
-  margin-top: 20px
-  color: red
-}
+    & > *:not(:first-child) {
+      margin-left: 30px
+    }
+  }
 </style>
 
 <script>
-import hdr from './page-title.vue'
+import inputField from './input-field.vue'
+import textAreaField from './textarea-field.vue'
+import pageTitle from './page-title.vue'
 import btn from './button.vue'
-import imagePreview from './image-preview.vue'
-
-import {binary_search} from '../utils/search.js'
-import formatter from '../utils/formatter.js'
+import addImage from './add-image.vue'
+import collsStore from 'stores/collections'
+import router from 'router'
+import validators from 'utils/validators'
 
 export default {
   components: {
-    hdr,
+    inputField, 
+    textAreaField, 
+    pageTitle,
     btn,
-    imagePreview
+    addImage
   },
 
   props: {
     id: {
       type: Number,
-      required: true
+      required: false,
+      default: undefined
     },
   },
 
-  data() {
+  data () {
     return {
-      full_text: false,
-      is_long_text: false
+      label_: undefined,
+      website_: undefined,
+      twitter_: undefined,
+      instagram_: undefined,
+      description_: undefined,
+      cover_: undefined
     }
   },
 
   computed: {
-    collection() {
-      const all = this.$state.collections
-      const idx = binary_search(all, a => a.id == this.id ? 0 : a.id < this.id ? 1 : -1)
-
-      return all[idx]
+    edit_mode () {
+      return this.id !== undefined
     },
-    author() {
-      return this.collection.author
+    collection () {
+      if (this.id) {
+        let coll = collsStore.user_items.find(c => c.id == this.id)
+        return coll
+      }
+      return undefined
     },
-    author_description() {
-      return this.collection.author_description
+    label: {
+      get () {
+        return this.label_ != undefined ? this.label_ : (this.collection || {}).label
+      },
+      set (val) {
+        this.label_ = val
+      }
     },
-    author_image() {
-      return this.collection.author_image
+    label_valid() {
+      let value = this.label
+      return !value || value.length <= 100
     },
-    banner() {
-      return this.collection.cover_image
+    website: {
+      get () {
+        return this.website_ != undefined ? this.website_ : (this.collection || {}).website
+      },
+      set (val) {
+        this.website_ = val
+      }
     },
-    description() {
-      return this.collection.description
+    website_valid() {
+      let value = this.website
+      if (!value) return true
+      return validators.url(value)
     },
-    items() {
-      return this.collection.items
+    twitter: {
+      get () {
+        return this.twitter_ != undefined ? this.twitter_ : (this.collection || {}).twitter
+      },
+      set (val) {
+        this.twitter_ = val
+      }
     },
-    owners() {
-      return this.collection.owners
+    twitter_valid() {
+      let value = this.twitter
+      return !value || validators.twitter(value)
     },
-    price() {
-      return this.collection.price
+    instagram: {
+      get () {
+        return this.instagram_ != undefined ? this.instagram_ : (this.collection || {}).instagram
+      },
+      set (val) {
+        this.instagram_ = val
+      }
     },
-    volume_traded() {
-      return this.collection.volume_traded
+    instagram_valid() {
+      let value = this.instagram
+      return !value || validators.instagram(value)
     },
-    formatted_price() {
-      return formatter(this.collection.price)
+    description: {
+      get () {
+        return this.description_ != undefined ? this.description_ : (this.collection || {}).description
+      },
+      set (val) {
+        this.description_ = val
+      }
     },
-    formatted_volume_traded() {
-      return formatter(this.collection.volume_traded)
+    description_valid() {
+      let value = this.description
+      return !value || value.length <= 150
     },
-    website() {
-      return this.collection.website
+    cover: {
+      get () {
+        if (this.cover_ === null) {
+          return undefined
+        }
+        return this.cover_ || (this.collection || {}).cover
+      },
+      set (val) {
+        this.cover_ = val
+      }
     },
-    twitter() {
-      return this.collection.twitter
+    cover_valid() {
+      return !this.cover || validators.image(this.cover)
     },
-    instagram() {
-      return this.collection.instagram
-    },
+    can_submit () {
+      return this.label && this.label_valid &&
+             this.website_valid &&
+             this.twitter_valid &&
+             this.instagram_valid &&
+             this.description_valid &&
+             this.cover_valid
+    }
   },
 
-  mounted() {
-    const scrollHeight = this.$refs.desc.scrollHeight
-    const offsetHeight = this.$refs.desc.offsetHeight
-
-    if (scrollHeight > offsetHeight) {
-      this.is_long_text = true
+  methods: {   
+    async onSetCollection() {
+      let data = {
+        website:     this.website,
+        twitter:     this.twitter,
+        instagram:   this.instagram,
+        description: this.description,
+        cover:       this.cover
+      }
+      await collsStore.setCollection(this.id, this.label, data)
+      router.go(-1)
     }
   }
 }

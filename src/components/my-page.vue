@@ -1,87 +1,106 @@
 <template>
-  <publicKeyModal ref="keyModal"/>
-  <pageTitle title="my page">
-    <div class="options">
-      <btn v-if="is_artist" 
-           :height="height" 
-           :width="width" 
-           padding="0px" 
-           radius="10px" 
-           @click="onEditArtist"
-      >
-        <img src="~assets/icon-pencil.svg">
-      </btn>
+  <div class="my-page">
+    <pageTitle title="my page">
+      <div class="actions">
+        <btn v-if="is_artist" 
+             :height="height" 
+             :width="width" 
+             :disabled="in_set_artist"
+             padding="0px" 
+             radius="10px" 
+             @click="onEditArtist"
+        >
+          <img src="~assets/icon-pencil.svg">
+        </btn>
 
-      <btnWallet @click="onBalanceClick"/>
-      
-      <btn :height="height" :width="width" radius="10px" padding="0px" @click="onShowKeyClick">
-        <img src="~assets/icon-key.svg">
-      </btn>
+        <btnWallet/>
+        <btnKey/>
 
-      <btn v-if="!is_artist" text="become an artist" color="green" height="34px" @click="onBecomeArtist">
-        <img src="~assets/add-user.svg"/>
-      </btn>
-    </div>
-  </pageTitle>
+        <btn v-if="!is_artist" 
+             :height="height" 
+             :width="width" 
+             :disabled="in_set_artist"
+             radius="10px" 
+             padding="0px" 
+             tooltip="become an artist" 
+             @click="onBecomeArtist"
+        >
+          <img src="~assets/add-user.svg"/>
+        </btn>
+      </div>
+    </pageTitle>
+    <myGallery class="gallery"/>
+  </div>
 </template>
 
 <style scoped lang="stylus">
-.options {
-  display: flex
-  justify-content: flex-end
-  align-items: center
+  .my-page {
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
 
-  & > button {
-    border-radius: 10px
-    margin-left: 12px
-    margin-top: 7px
+    & > .gallery {
+      flex: 1
+      box-sizing: border-box
+    }
 
-    &:last-child {
-      margin-right: 7px
+    .actions {
+      display: flex
+      justify-content: flex-end
+      align-items: center
+
+      & > * {
+        margin-left: 12px
+        margin-top: 7px
+
+        &:last-child {
+          margin-right: 7px
+        }
+      }
     }
   }
-}
 </style>
 
 <script>
 import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
-import publicKeyModal from './public-key-dialog.vue'
+import btnKey from './button-key.vue'
+import artistsStore from 'stores/artists.js'
+import myGallery from './my-gallery'
 
 export default {
   components: {
     pageTitle,
     btn,
     btnWallet,
-    publicKeyModal
+    btnKey,
+    myGallery
   },
 
   data() {
     return {
-      width: '34px',
-      height: '34px'
+      width: '36px',
+      height: '36px'
     }
   },
 
   computed: {
     is_artist() {
-      return this.$store.state.is_artist
+      return artistsStore.is_artist
+    },
+    in_set_artist() {
+      return !!artistsStore.artist_tx
     }
   },
 
   methods: {
-    onShowKeyClick() {
-      this.$refs.keyModal.open()
-    },
-    onBalanceClick() {
-      this.$store.toBalance()
-    },
     onEditArtist() {
-      this.$store.toEditArtist()
+      artistsStore.toEditArtist()
     },
     onBecomeArtist() {
-      this.$store.toBecomeArtist()
+      artistsStore.toBecomeArtist()
     }
   },
 }

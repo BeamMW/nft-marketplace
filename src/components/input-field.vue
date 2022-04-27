@@ -1,19 +1,27 @@
 <template>
   <div class="input-container">
-    <label v-if="label" class="label" :class="{'error': !valid}">
+    <label v-if="label" class="label" :class="{'err': !valid}">
       {{ label }}
     </label>
-    <div class="input-container">
+    <div class="input" :class="{'err': !valid, 'readonly': readonly}">
       <img v-if="img" :src="`../assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
       <input :value="modelValue"
              :placeholder="placeholder"
              :style="style"
              :maxlength="max_length"
-             :class="{'input': true, 'error': !valid}"
+             :class="{'err': !valid}"
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
       />
+      <slot></slot>
     </div>
+    <charactersLengthInfo v-if="max_length && counter" 
+                          :readonly="readonly" 
+                          :max_length="max_length" 
+                          :value="modelValue.length"
+                          :class="{'chars-err': !valid}"
+                          style="margin-top:3px;"
+    />
   </div>
 </template>
 
@@ -28,68 +36,82 @@
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
 
-    &.error {
+    &.err {
       color: rgba(255, 98, 92, 0.7)
     }
   }
 
-  .input-container {
+  .input {
     display: flex
+    background-color: rgba(255, 255, 255, 0.08)
+    border: none
+    border-radius: 10px
+    align-items: center
 
     & > img {
       position: absolute
       padding: 15px 15px
+    }
 
-      &.error {
-        filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
+    &.readonly {
+      background-color: rgba(255, 255, 255, 0.03)
+    }
+
+    &.err {
+      background-color: rgba(255, 98, 92, 0.07)
+      &:focus-within {
+        background-color: rgba(255, 98, 92, 0.12)
+      }
+    }
+
+    &:not(.err):not(.readonly):focus-within {
+      background-color: rgba(255, 255, 255, 0.12)
+    }
+
+    & > input {
+      font-family: 'SFProDisplay', sans-serif
+      background-color: transparent
+      border: none
+      border-radius: 10px
+      outline-width: 0
+      font-size: 14px
+      color: rgba(255, 255, 255, 0.8)
+      padding: 10px 8px
+      width: 100%
+
+      &:read-only {
+        color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.err {
+        color: rgba(255, 98, 92, 1)
+      }
+
+      &:not(.err)::placeholder {
+        font-size: 14px
+        color: rgba(255, 255, 255, 0.3)
+      }
+
+      &.err::placeholder {
+        font-size: 14px
+        color: rgba(255, 98, 92, 0.4)
       }
     }
   }
 
-  .input {
-    font-family: 'SFProDisplay', sans-serif
-    background-color: rgba(255, 255, 255, 0.08)
-    border: none
-    outline-width: 0
-    font-size: 14px
-    color: white
-    border-radius: 10px
-    padding: 12px 8px
-    width: 100%
-
-    &:read-only {
-      background-color: rgba(255, 255, 255, 0.03)
-      color: rgba(255, 255, 255, 0.3)
-    }
-
-    &:not(.error):not(:read-only):focus {
-      background-color: rgba(255, 255, 255, 0.12)
-    }
-
-    &.error:focus {
-      background-color: rgba(255, 98, 92, 0.12)
-    }
-
-    &.error {
-      color: rgba(255, 98, 92, 1)
-      background-color: rgba(255, 98, 92, 0.07)
-    }
-
-    &:not(.error)::placeholder {
-      font-size: 14px
-      color: rgba(255, 255, 255, 0.3)
-    }
-
-    &.error::placeholder {
-      font-size: 14px
-      color: rgba(255, 98, 92, 0.4)
-    }
+  .chars-err {
+    color: rgba(255, 98, 92, 0.7)
   }
 }
 </style>
 
 <script>
+import charactersLengthInfo from './characters-length-info.vue'
+
 export default {
+  components: {
+    charactersLengthInfo
+  },
   props: {
     label: {
       type: String,
@@ -124,8 +146,13 @@ export default {
     },
     max_length:{
       type: Number,
-      default: 10,
-      required: true
+      default: undefined,
+      required: false
+    },
+    counter: {
+      type: Boolean,
+      default: true,
+      required: false
     }
   },
 

@@ -1,7 +1,18 @@
 <template>
-  <div class="artwork">
+  <div :class="{'artwork': true, 'error': item.error}">
     <!---- Preview OR Loading ---->
-    <preview :image="item" height="200px" @click="onDetails"/>
+    <preview :image="item.image" 
+             :default="def_artwork"
+             height="200px" 
+             text_color="dimgray"
+             :cover="!(item.image || {}).object"
+             @click="onDetails"
+    >
+      <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+        <div>{{ likes_cnt }}</div>
+        <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
+      </div>
+    </preview>
 
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
@@ -9,24 +20,12 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div v-if="loading" class="title">Loading...</div>
-      <div v-else-if="error" class="title">Failed to load</div>
-      <div v-else class="title">{{ title + title + title + title }}</div>
-      
-      <!---- Likes ----->
-      <!--div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
-        <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
-        <span>{{ likes_cnt }}</span>
-      </div-->
+      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
     </div>
 
     <!---- Second info row, author ---->
-    <div class="info-row">
-      <span v-if="loading" class="author">Loading...</span>
-      <span v-else-if="error" class="author"></span>
-      <span v-else class="author">
-        {{ ['by', author].join(' ') }}
-      </span>
+    <div class="info-row" :class="{'error': item.author_error}">
+      <span class="author" v-html="item.by_author"></span>
     </div>
 
     <!---- Third info row, price/buy/sell ----->
@@ -72,18 +71,6 @@
         flex: 1
       }
 
-      & .likes {
-        display: flex
-        align-items: center
-        cursor: pointer
-        box-sizing: border-box
-        padding-top: 20px
-
-        & > span {
-          padding-left: 5px
-        }
-      }
-
       & .author {
         font-size: 12px
         color: rgba(255, 255, 255, 0.5)
@@ -91,6 +78,26 @@
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
+      }
+    }
+
+    & .likes {
+      display: flex
+      position: absolute
+      bottom: 8px
+      right: 8px
+      align-items: center
+      cursor: pointer
+      box-sizing: border-box
+      background: rgba(0, 0, 0, 0.3)
+      border-radius: 10px
+
+      & > div {
+        padding: 8px 6px 9px 8px
+      }
+      
+      & > img {
+        padding: 8px
       }
     }
 
@@ -106,8 +113,10 @@
 </style>
 
 <script>
-import price from './artwork-price.vue'
-import preview from './image-preview.vue'
+import price from './artwork-price'
+import preview from './image-preview'
+import artsStore from 'stores/artworks'
+import {def_images} from 'utils/consts'
 
 export default {
   components: {
@@ -119,6 +128,12 @@ export default {
     item: {
       type: Object,
       required: true,
+    }
+  },
+
+  data () {
+    return {
+      def_artwork: def_images.artwork,
     }
   },
 
@@ -134,38 +149,16 @@ export default {
     id () {
       return this.item.id
     },
-
-    title () {
-      return this.item.title
+                
+    can_vote () {
+      return !this.item.error && this.$state.balance_reward > 0
     },
-        
-    likes_cnt () {
-      return this.item.impressions
-    },
-
     liked () {
       return !!this.item.my_impression
     },
-        
-    can_vote () {
-      return this.$state.balance_reward > 0
+    likes_cnt () {
+      return this.item.impressions
     },
-
-    loading () {
-      return this.item.loading
-    },
-
-    artists () {
-      return this.$state.artists
-    },
-
-    author () {
-      return (this.artists[this.item.pk_author] || {}).label
-    },
-
-    error () {
-      return !!this.item.error
-    }
   },
 
   methods: {
@@ -175,7 +168,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        this.$store.likeArtwork(this.id)
+        artsStore.likeArtwork(this.id)
       }
     },
 
@@ -185,7 +178,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        this.$store.unlikeArtwork(this.id)
+        artsStore.unlikeArtwork(this.id)
       }
     },
 
@@ -194,7 +187,7 @@ export default {
     },
 
     onDetails(ev) {
-      this.$store.toArtworkDetails(this.id)
+      artsStore.toDetails(this.id)
     }
   }
 }

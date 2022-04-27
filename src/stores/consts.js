@@ -1,3 +1,5 @@
+import {contract} from 'utils/consts'
+
 export const versions = {
   ARTIST_VERSION:     200,
   COLLECTION_VERSION: 200,
@@ -11,3 +13,5 @@ export const types = {
   STRING: 3,
   MAX: 3
 }
+
+export const cid = contract.cid

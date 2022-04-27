@@ -571,10 +571,10 @@ batch@0.6.1:
   resolved "https://registry.npmjs.org/batch/-/batch-0.6.1.tgz"
   integrity sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY=
 
-beam-wasm-client-masternet@^6.2.12071:
-  version "6.2.12137"
-  resolved "https://registry.npmjs.org/beam-wasm-client-masternet/-/beam-wasm-client-masternet-6.2.12137.tgz"
-  integrity sha512-+vCa44nuONheL6B9Rvn7rpX0Mr5KrX/TRXi2qwfs25Aj2qE3t7qtVeByKoUj2QntZBw+IOhWX9BuuzrT7l9wGg==
+beam-wasm-client-masternet@^7.0.12638:
+  version "7.0.12638"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client-masternet/-/beam-wasm-client-masternet-7.0.12638.tgz#0048bb3c29bdd4c8332d468414f39d3ed648b512"
+  integrity sha512-1Yv88NtORrr+6pbM7y99tAEjwJs69KLIbFacjI9WM6pYBWQDJ7xoNydoi9gSBzQ5dtqYGsPb4DyXJzQgBnBPog==
 
 big.js@^5.2.2:
   version "5.2.2"

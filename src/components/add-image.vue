@@ -1,10 +1,12 @@
 <template>
   <div :style="ctrlStyle">
-    <div class="add-image-container" :style="borderStyle" :readonly="readonly">
-      <div v-if="image" class="remove">
+    <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (image || {}).error}">
+      <div v-if="image && !readonly" class="remove">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
-      <img v-if="image" :src="image.object" alt="avatar" class="image" :class="{'error': error}"/>
+      <img v-if="image && image.object" :src="image.object" alt="avatar" class="image"/>
+      <div v-if="image && image.loading" class="text" :readonly="readonly">Loading...</div>
+      <div v-if="image && image.error" class="text" :readonly="readonly">Failed to load image</div>
       <label v-if="!image" class="text" for="image" :readonly="readonly" v-html="title"/>
       <input v-if="!readonly"
              id="image"
@@ -15,7 +17,7 @@
              @change="onUpload"
       />
     </div>
-    <div v-if="error" class="error-text">
+    <div v-if="error" class="error">
       {{ error }}
     </div>
   </div>
@@ -43,6 +45,7 @@
       right: 20px
       border-radius: 9999px
       padding: 7px 7px 3px 7px
+      cursor: pointer
     }
 
     .image {
@@ -51,10 +54,6 @@
       object-fit: cover
       border-radius: 10px
       border: 1px dashed transparent
-
-      &.error {
-        filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-      }
     }
     
     .files {
@@ -66,6 +65,7 @@
       width: 100%
       height: 100%
       display: flex
+      text-align: center
       justify-content: center
       align-items: center
       font-size: 14px
@@ -74,16 +74,19 @@
       &:not([readonly]) {
         cursor: pointer
       }
+
+      &[readonly] {
+        opacity: 0.6
+      }
     }
   }
 
-  .error-text {
+  .error {
     font-size: 12px
     font-weight: 400
     font-style: italic
     text-align: right
     padding-right: 4px
-    color: #c55b61
   }
 </style>
 
@@ -140,8 +143,8 @@ export default {
   },
   methods: {
     onRemove () {
-      this.$emit('update:image', undefined)
       this.$refs.image.value = ''
+      this.$emit('update:image', null)
     },
     onUpload (e) {
       let file = e.target.files[0]

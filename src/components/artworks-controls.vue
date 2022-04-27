@@ -102,10 +102,11 @@
 </style>
 
 <script>
-import {tabs, sort} from '../utils/consts.js'
+import {tabs, sort} from 'utils/consts.js'
 import selector from './selector.vue'
 import btn from './button.vue'
 import btnWallet from './button-wallet.vue'
+import artistsStore from 'stores/artists.js'
 
 export default {
   components: {
@@ -129,17 +130,17 @@ export default {
   
   computed: {
     is_artist () {
-      return this.$state.is_artist
+      return artistsStore.is_artist
     },
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_key]
+      let artist = this.artists[artistsStore.my_id]
       return (artist || {}).label
     },
     active_tab () {
       return this.$state.active_tab
     },
     artists () {
-      return this.$state.artists
+      return artistsStore.artists
     },
     active_sort_by() {
       return this.$state.sort_by
@@ -159,16 +160,16 @@ export default {
         result.push({name: 'Everyone', key: 0})
         for(let aid in this.artists) {
           let artist = this.artists[aid]
-          result.push({name: artist.label, key: artist.key})
+          result.push({name: artist.label, id: artist.id})
         } 
       }
       return result
     },
     active_filter_by_artist () {
-      let key = this.$state.filter_by_artist
+      let id = this.$state.filter_by_artist
       let artists = this.artist_options
       for (let idx = 0; idx <artists.length; ++idx) {
-        if (key == artists[idx].key) {
+        if (id == artists[idx].id) {
           return idx
         }
       }
@@ -194,7 +195,7 @@ export default {
       this.scrollToTop()
     },
     onAuthor(opt) {
-      this.$store.setFilterByArtist(opt.key)
+      this.$store.setFilterByArtist(opt.id)
       this.scrollToTop()
     },
     scrollToTop(){

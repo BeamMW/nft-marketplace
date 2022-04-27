@@ -23,7 +23,6 @@
       />
 
       <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
-      <btn text="add collection" color="green" padding="7px 12px" @click="$store.toNewCollection"/>
       <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"
@@ -32,6 +31,8 @@
       </btn>
     </tabsctrl>
   </div>
+  <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
+  {{ search }} -->
 </template>
 
 <style scoped lang="stylus">
@@ -53,20 +54,28 @@
       }
     }
   }
+  .search_container {
+    display: flex
+    justify-content: flex-end
+    margin-top: 10px
+  }
 </style>
 
 <script>
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
-import {tabs, sort} from '../utils/consts.js'
+//import searchInput from './search-input.vue'
+import {tabs, sort} from 'utils/consts.js'
+import artistsStore from 'stores/artists'
 
 // TODO: headless
 export default {
   components: {
     tabsctrl,
     selector,
-    btn
+    btn,
+    //searchInput
   },
 
   data () {
@@ -75,6 +84,7 @@ export default {
         {id: tabs.COLLECTIONS, name: 'Collections'},
         {id: tabs.NFTS, name: 'NFTs'},
       ],
+      search: '',
       selector_options: [
         {name: 'Added: Oldest to Newest', id: sort.OLDEST_TO_NEWEST},
         {name: 'Added: Newest to Oldest', id: sort.NEWEST_TO_OLDEST},
@@ -109,11 +119,24 @@ export default {
       return this.$state.gallery_tab == tabs.NFTS
     },
     is_artist () {
-      return this.$state.is_artist
+      return artistsStore.is_artist
     },
     my_artist_name () {
-      let artist = this.$state.artists[this.$state.my_artist_key] 
-      return (artist || {}).label
+      let label = (artistsStore.self || {}).label
+      let role = ''
+
+      if (this.$state.is_moderator) {
+        role = '[moderator]'
+      }
+
+      if (this.$state.is_admin) {
+        role = '[admin]'
+      } 
+
+      return label ? [label, role].join(' ') : role
+    },
+    artists_total () {
+      return artistsStore.total
     }
   }
 }

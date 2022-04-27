@@ -1,4 +1,4 @@
-import {types} from './store-consts.js'
+import {types} from 'stores/consts'
 
 export default class Formats {
   //

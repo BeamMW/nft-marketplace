@@ -1,12 +1,15 @@
-import App from './components/app.vue'
-import store from './store/store.js'
-import {router} from './router.js'
-import utils from './utils/utils.js'
-import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import './styles/fonts.css'
 import './styles/global.css'
+
+import App from './components/app.vue'
+import router from 'router'
+import utils from './utils/utils.js'
+import {createApp} from 'vue/dist/vue.esm-bundler.js'
+
+import store from './stores/global.js'
 import artwork from './components/artwork.vue'
 import collection from './components/collection.vue'
+import newCollection from './components/new-collection.vue'
 
 utils.initialize(
   {
@@ -25,6 +28,7 @@ utils.initialize(
     }
     vueApp.component('artwork', artwork)
     vueApp.component('collection', collection)
+    vueApp.component('new-collection', newCollection)
     vueApp.use(router)
     vueApp.mount('body')
 
@@ -60,6 +64,12 @@ utils.initialize(
       return store.setError(err, 'Failed to initialize application', true)
     }
 
-    store.start()
+    try {
+      store.start()
+    }
+    catch(err) {
+      alert(err)
+      return store.setError(err, 'Failed to initialize store', true)
+    }
   }
 )

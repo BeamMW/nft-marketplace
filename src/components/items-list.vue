@@ -1,11 +1,13 @@
 <template>
   <div class="list-container">
-    <template v-if="items.length > 0">
-      <div ref="itemslist" class="list" :style="style" @scroll="onScroll">
-        <component :is="component" v-for="item in visible_items" 
-                   :key="item.id"
-                   :item="item"
-        />
+    <template v-if="items.length > 0 || new_component">
+      <div class="list-wrap">  
+        <div ref="itemslist" class="list" @scroll="onScroll">
+          <component :is="component" v-for="item in items" 
+                     :key="item.id"
+                     :item="item"
+          />
+        </div>
       </div>
       <paginator :current="page"
                  :total="pages"
@@ -25,12 +27,19 @@
     flex-direction: column
     min-height: 0
 
-    & > .list {
-      display: flex
-      flex-wrap: wrap
+    & > .list-wrap {
       overflow-y: auto
       overflow-x: hidden
-      gap: 16px
+
+      & > .list {
+        display: flex
+        flex-wrap: wrap        
+        margin: -8px -8px 0 -8px
+
+        & > * {
+          margin: 8px
+        }
+      }
     }
 
     .empty {
@@ -53,7 +62,6 @@
 </style>
 
 <script>
-import {common} from '../utils/consts.js'
 import paginator from './paginator.vue'
 
 export default {
@@ -62,52 +70,45 @@ export default {
   },
 
   props: {
-    items: {
-      type: Array,
-      default: () => []
+    store: {
+      type: Object,
+      required: true
     },
-    emptymsg: {
+    mode: {
       type: String,
-      default: ''
+      default: 'user'
     },
     component: {
       type: String,
       required: true,
       default: undefined
     },
-    page: {
-      type: Number,
-      default: 1
+    emptymsg: {
+      type: String,
+      default: ''
     },
     gap: {
       type: String,
       default: '16px'
+    },
+    new_component: {
+      type: String,
+      default: ''
     }
   },
 
-  emits: [
-    'update:page'
-  ],
-
   computed: {
-    visible_items () {
-      let all = this.items
-      let result  = []
-      let start = (this.page - 1) * common.ITEMS_PER_PAGE
-      let end   = Math.min(start + common.ITEMS_PER_PAGE, all.length)
-      for (let idx = start; idx < end; ++idx) {
-        result.push(all[idx])
-      }
-      return result
+    items () {
+      return this.store.getItems(this.mode)
+    },
+    total() {
+      return this.store.getTotal(this.mode)
     },
     pages() {
-      let total = this.items.length
-      return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
+      return this.store.getPages(this.mode)
     },
-    style () {
-      return {
-        'gap': this.gap
-      }
+    page() {
+      return this.store.getPage(this.mode)
     }
   },
 
@@ -124,8 +125,8 @@ export default {
     },
 
     onPage(page) {
-      this.$emit('update:page', page)
       this.$refs.itemslist.scrollTop = 0
+      this.store.setPage(this.mode, page)
     } 
   }
 }

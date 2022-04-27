@@ -1,7 +1,10 @@
 <template>
   <div class="preview-container" :style="style">
-    <img v-if="src" :src="src">
-    <loading v-if="!src && show_loading" :error="error"/>
+    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
+    <div v-if="loading && show_text" class="loading">Loading...</div>
+    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
+    <slot></slot>
+    <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
 
@@ -12,28 +15,31 @@
     align-items: center
     justify-content: center
     overflow: hidden
-
+    position: relative
+    
     & > img {
-      max-width: 100%
-      min-width: 100%
-      max-height: 100%
-      object-fit: cover
+      width: 100%
+      height: 100%
+    }
+
+    & > div {
+      position: absolute
+      z-index: 1
+    }
+
+    & > .error {
+      color: black
     }
   }
 </style>
 
 <script>
-import loading from './item-loading.vue'
-
 export default {
-  components: {
-    loading
-  },
-  
   props: {
     image: {
       type: [Object, String],
-      required: true
+      required: false,
+      default: undefined
     },
     height: {
       type: String,
@@ -50,31 +56,43 @@ export default {
       required: false,
       default: '10px 10px 0 0'
     },
-    show_loading: {
+    cover: {
+      type: Boolean,
+      default: false
+    },
+    show_text: {
       type: Boolean,
       default: true
+    },
+    text_color: {
+      type: String,
+      default: '#fff'
+    },
+    default: {
+      type: String,
+      default: ''
     }
   },
 
   computed: {
     src () {
-      if (typeof this.image == 'string' && this.image) {
+      if (typeof this.image == 'string') {
         return this.image
       }
 
-      if (this.image.object) {
+      if (this.image && this.image.object) {
         return this.image.object
       }
-
-      if (this.image.bytes) {
-        return URL.createObjectURL(new Blob([this.image.bytes], {type: this.image.mime_type}))
-      }
       
-      return undefined
+      return (this.default || undefined)
+    },
+
+    loading () {
+      return (this.image || {}).loading
     },
 
     error () {
-      return !!this.image.error
+      return (this.image || {}).error
     },
 
     style () {
@@ -95,6 +113,22 @@ export default {
       }
 
       return res
+    },
+
+    image_style() {
+      let res = {}
+
+      if (this.cover) {
+        res['object-fit'] = 'cover'
+      }
+
+      return res
+    },
+
+    text_style() {
+      return {
+        'color': this.text_color
+      }
     }
   }
 }

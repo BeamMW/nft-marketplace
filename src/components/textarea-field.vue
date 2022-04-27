@@ -1,34 +1,28 @@
 <template>
-  <div class="container">
+  <div class="textarea-container">
     <label v-if="label" class="label">{{ label }}</label>
     <textarea v-bind="$attrs" class="input"
               :value="modelValue"
               :placeholder="placeholder"
               :maxlength="max_length"
               :readonly="readonly"
+              :style="input_style"
               @input="$emit('update:modelValue', $event.target.value)"
     >
-  </textarea>
-    <div :class="{
-      'info': true,
-      'readonly': readonly,
-    }"
-    >
-      <span class="text">{{ max_length }} characters max</span> 
-      <span v-if="show_counter">{{ modelValue.length }} / {{ max_length }} </span>
-    </div>
+    </textarea>
+    <charactersLengthInfo v-if="max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
   </div>
 </template>
 
 <style scoped lang="stylus">
-.container {
+.textarea-container {
   width: 100%
   box-sizing: border-box
 
   .label {
     display: block
-    margin-bottom:10px
-    color: rgba(255, 255, 255, 0.6)
+    margin-bottom: 10px
+    color: rgba(255,255,255,0.6)
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
   }
@@ -41,13 +35,11 @@
     outline-width: 0
     font-size: 14px
     color: white
-    height: 100%
     padding: 0
     border-radius: 10px
-    padding: 12px 13px 
+    padding: 10px 12px 
     width: 100%
     resize: none
-    min-height: 79px
 
     &:read-only {
       background-color: rgba(255, 255, 255, 0.03)
@@ -82,8 +74,12 @@
 </style>
 
 <script>
+import charactersLengthInfo from './characters-length-info.vue'
 
 export default {
+  components: {
+    charactersLengthInfo
+  },
   props: {
     label: {
       type: String,
@@ -115,15 +111,22 @@ export default {
       default: 150,
       required: false
     },
-    show_counter:{
-      type: Boolean,
-      default: true,
-      required: false
+    height: {
+      type: String,
+      default: '79px'
     }
   },
   
   emits: [
     'update:modelValue'
   ],
+
+  computed: {
+    input_style () {
+      return {
+        'min-height': this.height
+      }
+    }
+  }
 }
 </script>
