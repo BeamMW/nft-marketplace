@@ -2,7 +2,7 @@
   <!--selectItem-->
   <div :class="
          {'collection': true, 
-          'pointer-cursor': item.owned && !item.default,
+          'pointer-cursor': item.owned,
           'error': item.error
          }" 
        @click="onDetails"
@@ -13,6 +13,12 @@
              height="140px" 
              cover
     />
+    <div v-if="pending" class="top-message pending">
+      Pending for approval
+    </div>
+    <div v-if="rejected" class="top-message rejected">
+      Rejected by moderator
+    </div>
     <div class="info-row">  
       <div class="avatar" :class="{'error': item.author_error}">
         <preview :image="item.avatar" 
@@ -24,7 +30,7 @@
         />
       </div>
       <div class="text">
-        <div class="label" :class="{'error': item.author_error && item.default}">{{ coll_name }}</div>
+        <div class="label" :class="{'error': item.error}">{{ coll_name }}</div>
         <div class="author" :class="{'error': item.author_error}" v-html="item.by_author"></div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
@@ -47,9 +53,35 @@
     border: none
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
+    position: relative
+    overflow: hidden
 
     & > .preview {
       height: 140px
+    }
+
+    & > .top-message {
+      position: absolute
+      left: 0
+      top: 0
+      font-size: 15px
+      width: 100%
+      height: 40px
+      display: flex
+      justify-content: center
+      align-items: center
+      padding-bottom: 5px
+      backdrop-filter: blur(4px)
+
+      &.pending {
+        background-color: rgba(23, 46, 43, 0.8)
+        color: rgba(255, 255, 255, 0.75)
+      }
+
+      &.rejected {
+        background-color: rgba(255, 116, 107, 0.8)
+        color: rgba(255, 255, 255, 0.9)
+      }
     }
 
     & > .info-row {
@@ -62,12 +94,12 @@
       }
 
       & > .text {
-        font-family: 'SFProDisplay', sans-serif
         flex: 1
         
         & > .label {
           font-weight: 700
           font-size: 16px
+          height: 22px
         }
 
         & > .author {
@@ -156,7 +188,7 @@ export default {
 
   methods: {
     onDetails () {
-      if (!this.item.owned || this.item.default || this.item.error) {
+      if (!this.item.owned || this.item.error) {
         return
       }
       collsStore.toEditItem(this.item.id)

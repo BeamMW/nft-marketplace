@@ -42,28 +42,9 @@ class CollectionsStore extends ItemsStore {
     if (coll.error) {
       coll.cover = {error: true}
     } 
-    
-    if (!coll.error) {  
-      if (!coll.default) {
-        coll.cover = imagesStore.fromContract(coll.cover)
-      }
 
-      if (coll.default) {
-        coll.cover = computed(() => {
-          if(author.loading) return {loading: true}
-          if(author.error) return {error: true}
-          return author.banner
-        })
-        coll.label = computed(() => {
-          if (author.loading) return 'Loading...'
-          if (author.error) return 'Failed to load author'
-          return `${author.label} collection`
-        })
-        coll.description = computed(() => {
-          if (author.loading || author.error) return ''
-          return `This collection includes all artworks by ${author.label} that are not in other collections.`
-        })
-      } 
+    if (!coll.error) {  
+      coll.cover = imagesStore.fromContract(coll.cover)
     }
     
     return coll

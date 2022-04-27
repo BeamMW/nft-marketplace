@@ -23,8 +23,7 @@ class ImagesStore {
     }
     catch(err) {
       console.log('ImagesStore.from_contract', err)
-      this._setError(image, err)
-      return image
+      return this._setError(image, err)
     }
 
     let cached = this._state.images[image.ipfs_hash]
@@ -32,11 +31,19 @@ class ImagesStore {
       return cached
     }
 
-    this._state.images[image.ipfs_hash] = image
-    this._setLoading(image)
     this._ipfsLoad(image)
-
     return this._state.images[image.ipfs_hash]
+  }
+
+  async _fread(file) {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader()
+      reader.onload = () => {
+        resolve(reader.result)
+      }
+      reader.onerror = reject
+      reader.readAsArrayBuffer(file)
+    })
   }
 
   _setImage(image) {
@@ -53,55 +60,48 @@ class ImagesStore {
     return this._state.images[image.ipfs_hash]
   }
 
-  async _fread(file) {
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader()
-      reader.onload = () => {
-        resolve(reader.result)
-      }
-      reader.onerror = reject
-      reader.readAsArrayBuffer(file)
+  _setLoading(image) {
+    return this._setImage({
+      ipfs_hash: image.ipfs_hash,
+      mime_type: image.mime_type,
+      loading: true
     })
   }
 
-  async _setLoading(image) {
-    delete image.error
-    image.loading = true
+  _setError(image, error) {
+    return this._setImage({
+      ipfs_hash: image.ipfs_hash,
+      mime_type: image.mime_type,
+      error
+    })
   }
 
-  async _setError(image, err) {
-    delete image.loading
-    image.error = err
-  }
-
-  async _clearLR(image) {
-    delete image.loading
-    delete image.error
-  }
-
-  async _ipfsLoad(image) {
+  async _ipfsLoad(what) {
     try {
-      this._setLoading(image)
-      
-      let {res} = await utils.callApiAsync('ipfs_get', {hash: image.ipfs_hash})
+      console.log('load image', what.ipfs_hash)
+      this._setLoading(what)
+  
+      let {res} = await utils.callApiAsync('ipfs_get', {hash: what.ipfs_hash})
       utils.ensureField(res, 'data', 'array')
       
       // TODO: can skip u8arr here?
       let u8arr = new Uint8Array(res.data)
-      let blob = new Blob([u8arr], {type: image.mime_type})
+      let blob = new Blob([u8arr], {type: what.mime_type})
       // TODO: revoke object
       // TODO: keep only N images & delete and release old ones
-      image.object = URL.createObjectURL(blob, {oneTimeOnly: false})
+      let object = URL.createObjectURL(blob, {oneTimeOnly: false})
 
-      this._clearLR(image)
-      return image
+      //this._clearLR(image)
+      return this._setImage({
+        ipfs_hash: what.ipfs_hash, 
+        mime_type: what.mime_type,
+        object
+      })
     }
     catch(err) {
-      console.log(`ImagesStore._ipfsLoad for hash ${image.ipfs_hash}`, err)
-      this._setError(image, err)
+      console.log(`ImagesStore._ipfsLoad for hash ${what.ipfs_hash}`, err)
+      return this._setError(what, err)
     }
-
-    return image
   }
 
   async _ipfsStore (image) {
@@ -113,14 +113,11 @@ class ImagesStore {
     let blob = new Blob([u8arr], {type: image.file.type})
     let object =  URL.createObjectURL(blob, {oneTimeOnly: false})
     
-    image = {
+    return this._setImage({
       ipfs_hash: res.hash,
       mime_type: image.file.type,
       object: object
-    }
-
-    this._setImage(image)
-    return image
+    })
   }
 
   async toContract(image) {

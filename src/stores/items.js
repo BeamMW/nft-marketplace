@@ -78,6 +78,10 @@ export default class ItemsStore {
   getItems(mode) {
     return this._state[mode].items
   }
+
+  getTotal(mode) {
+    return this._state[mode].total
+  }
   
   async _loadTotals(mode) {
     let {res} = await utils.invokeContractAsync({
@@ -91,13 +95,15 @@ export default class ItemsStore {
   }
 
   async _loadItems(mode) {
+    let idx0 = (this._state[mode].page - 1) * this._per_page
+    let count = this._per_page
     let {res} = await utils.invokeContractAsync({
       role: mode,
       action: `view_${this._objname}s`,
-      idx0: (this._state[mode].page - 1) * this._per_page,
-      count: this._per_page,
-      cid
+      idx0, count, cid
     })
+
+    console.log('idx0', idx0, 'count', count)
 
     let field = `${this._objname}s`
     utils.ensureField(res,field, 'array')
@@ -108,7 +114,7 @@ export default class ItemsStore {
       
       try {
         [item.label] = formats.fromContract(item.label)
-        if (!item.label && !item.default) {
+        if (!item.label) {
           throw new Error('label cannot be empty')
         }
 
@@ -143,11 +149,9 @@ export default class ItemsStore {
   async loadAsync() {
     await this._loadTotals('user')
     await this._loadItems('user')
-    
-    // TODO: remove test code
-    // await this._loadTotals('artist')
+    // TODO: don't load artist items if user is not an artist
+    await this._loadTotals('artist')
     await this._loadItems('artist')
-    this._state.artist.total = this._state.artist.items.length
     console.log(`ItemsStore.loadAsync artist ${this._objname}: `, this._state.artist.total)
   }
 

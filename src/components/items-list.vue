@@ -6,8 +6,7 @@
           <component :is="component" v-for="item in items" 
                      :key="item.id"
                      :item="item"
-          /> 
-          <component :is="new_component" v-if="new_component"/>
+          />
         </div>
       </div>
       <paginator :current="page"
@@ -101,6 +100,9 @@ export default {
   computed: {
     items () {
       return this.store.getItems(this.mode)
+    },
+    total() {
+      return this.store.getTotal(this.mode)
     },
     pages() {
       return this.store.getPages(this.mode)

@@ -9,6 +9,14 @@
           mode="artist"
           :store="collsStore"
     />
+    <list v-if="show_created"
+          class="list"
+          emptymsg="There are no NFTs at the moment"
+          component="artwork"
+          new_component="new-collection"
+          mode="artist"
+          :store="artsStore"
+    />
   </div>
 </template>
 
@@ -16,9 +24,8 @@
   .gallery-container {
     display: flex
     flex-direction: column
-    width: 100%
-    height: 100%
-
+    min-height: 0
+    
     & > .list {
       margin-top: 20px
       flex: 1

@@ -1,51 +1,65 @@
 <template>
-  <pageTitle title="my page">
-    <div class="options">
-      <btn v-if="is_artist" 
-           :height="height" 
-           :width="width" 
-           :disabled="in_set_artist"
-           padding="0px" 
-           radius="10px" 
-           @click="onEditArtist"
-      >
-        <img src="~assets/icon-pencil.svg">
-      </btn>
+  <div class="my-page">
+    <pageTitle title="my page">
+      <div class="actions">
+        <btn v-if="is_artist" 
+             :height="height" 
+             :width="width" 
+             :disabled="in_set_artist"
+             padding="0px" 
+             radius="10px" 
+             @click="onEditArtist"
+        >
+          <img src="~assets/icon-pencil.svg">
+        </btn>
 
-      <btnWallet/>
-      <btnKey/>
+        <btnWallet/>
+        <btnKey/>
 
-      <btn v-if="!is_artist" 
-           :height="height" 
-           :width="width" 
-           :disabled="in_set_artist"
-           radius="10px" 
-           padding="0px" 
-           tooltip="become an artist" 
-           @click="onBecomeArtist"
-      >
-        <img src="~assets/add-user.svg"/>
-      </btn>
-    </div>
-  </pageTitle>
-  <myGallery/>
+        <btn v-if="!is_artist" 
+             :height="height" 
+             :width="width" 
+             :disabled="in_set_artist"
+             radius="10px" 
+             padding="0px" 
+             tooltip="become an artist" 
+             @click="onBecomeArtist"
+        >
+          <img src="~assets/add-user.svg"/>
+        </btn>
+      </div>
+    </pageTitle>
+    <myGallery class="gallery"/>
+  </div>
 </template>
 
 <style scoped lang="stylus">
-.options {
-  display: flex
-  justify-content: flex-end
-  align-items: center
+  .my-page {
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
 
-  & > * {
-    margin-left: 12px
-    margin-top: 7px
+    & > .gallery {
+      flex: 1
+      box-sizing: border-box
+    }
 
-    &:last-child {
-      margin-right: 7px
+    .actions {
+      display: flex
+      justify-content: flex-end
+      align-items: center
+
+      & > * {
+        margin-left: 12px
+        margin-top: 7px
+
+        &:last-child {
+          margin-right: 7px
+        }
+      }
     }
   }
-}
 </style>
 
 <script>
