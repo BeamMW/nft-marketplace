@@ -1663,6 +1663,10 @@ ON_METHOD(artist, set_artist) {
         return;
     }
 
+    if (nLabelSize < 2) {
+        OnError("label is missing");
+    }
+
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
     nArgSize += d.args.m_LabelLen;
 
@@ -1715,6 +1719,10 @@ ON_METHOD(artist, set_collection) {
     if (nLabelSize > Gallery::Collection::s_LabelMaxLen + 1) { // plus \0
         OnError("label is too long");
         return;
+    }
+
+    if (nLabelSize < 2) {
+        OnError("label is missing");
     }
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);

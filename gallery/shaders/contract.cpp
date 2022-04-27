@@ -4,9 +4,7 @@
 
 #include <algorithm>
 
-struct MyState
-    :public Gallery::State
-{
+struct MyState : public Gallery::State {
     MyState() {
         Env::LoadVar_T((uint8_t) s_Key, *this);
     }
@@ -24,10 +22,8 @@ struct MyState
     }
 };
 
-BEAM_EXPORT void Ctor(const Gallery::Method::Init& r)
-{
-    if (Env::get_CallDepth() > 1)
-    {
+BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
+    if (Env::get_CallDepth() > 1) {
         MyState s(false);
         s.artists_stats = {};
         s.artworks_stats = {};
@@ -40,34 +36,27 @@ BEAM_EXPORT void Ctor(const Gallery::Method::Init& r)
     }
 }
 
-BEAM_EXPORT void Dtor(void*)
-{
+BEAM_EXPORT void Dtor(void*) {
     // ignore
 }
 
-void PayoutMove(const Gallery::Payout::Key& key, Amount val, bool bAdd)
-{
+void PayoutMove(const Gallery::Payout::Key& key, Amount val, bool bAdd) {
     if (!val)
         return;
 
     Gallery::Payout po;
-    if (Env::LoadVar_T(key, po))
-    {
-        if (bAdd)
+    if (Env::LoadVar_T(key, po)) {
+        if (bAdd) {
             Strict::Add(po.m_Amount, val);
-        else
-        {
+        } else {
             Strict::Sub(po.m_Amount, val);
 
-            if (!po.m_Amount)
-            {
+            if (!po.m_Amount) {
                 Env::DelVar_T(key);
                 return;
             }
         }
-    }
-    else
-    {
+    } else {
         Env::Halt_if(!bAdd);
         po.m_Amount = val;
     }
@@ -75,8 +64,7 @@ void PayoutMove(const Gallery::Payout::Key& key, Amount val, bool bAdd)
     Env::SaveVar_T(key, po);
 }
 
-BEAM_EXPORT void Method_2(void*)
-{
+BEAM_EXPORT void Method_2(void*) {
     // called on upgrade
 }
 
@@ -134,36 +122,29 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
 
     bool exists = a.TakeOut(r.m_pkArtist, sizeof(a));
 
+    if (exists) {
+        if (a.status == Gallery::Status::kPending)
+            s.artists_stats.pending--;
+        else if (a.status == Gallery::Status::kApproved)
+            s.artists_stats.approved--;
+    }
+
     if (r.req == ArtistReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist);
-        if (exists) {
-            uint32_t old_data_len = a.data_len;
-            uint32_t old_label_len = a.label_len;
-            uint8_t old_data[old_data_len];
-            if (r.m_LabelLen) {
-                Env::Memcpy(old_data, a.m_szLabelData + old_label_len, old_data_len);
-                a.label_len = r.m_LabelLen;
-                Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen);
-            }
 
-            if (r.m_DataLen) {
-                a.data_len = r.m_DataLen;
-                Env::Memcpy(a.m_szLabelData + a.label_len, reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen, a.data_len);
-            } else {
-                Env::Memcpy(a.m_szLabelData + a.label_len, old_data, old_data_len);
-            }
-        } else {
+        Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+        a.label_len = r.m_LabelLen;
+        a.data_len = r.m_DataLen;
+        a.status = Gallery::Status::kPending;
+        s.artists_stats.pending++;
+
+        if (!exists) {
             // if artist doesn't exist, then label is required
             Env::Halt_if(!r.m_LabelLen); 
 
-            a.status = Gallery::Status::kPending;
-
             a.m_hRegistered = Env::get_Height();
-            a.label_len = r.m_LabelLen;
-            a.data_len = r.m_DataLen;
             a.collections_num = 1; // default
             a.artworks_num = 0;
-            Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
             // create default collection
             struct CollectionPlus : public Gallery::Collection {
@@ -174,11 +155,9 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
             s.collections_stats.total++;
             s.collections_stats.pending++;
             s.artists_stats.total++;
-            s.artists_stats.pending++;
 
             c.is_default = true;
             c.status = Gallery::Status::kPending;
-
             c.label_len = a.label_len;
             c.data_len = 0;
             c.m_pkAuthor = r.m_pkArtist;
@@ -202,11 +181,6 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator || 
                 !exists);
 
-        if (a.status == Gallery::Status::kPending)
-            s.artists_stats.pending--;
-        else if (a.status == Gallery::Status::kApproved)
-            s.artists_stats.approved--;
-
         if (r.req == ArtistReqType::kPending) {
             a.status = Gallery::Status::kPending;
             s.artists_stats.pending++;
@@ -221,8 +195,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
     s.Save();
 }
 
-BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
-{
+BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
     using CollectionReqType = Gallery::Method::ManageCollection::RequestType;
 
     struct CollectionPlus : public Gallery::Collection {
@@ -253,44 +226,36 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
 
     bool exists = c.TakeOut(c_id, sizeof(c));
 
+    if (exists) {
+        if (c.status == Gallery::Status::kPending)
+            s.collections_stats.pending--;
+        else if (c.status == Gallery::Status::kApproved)
+            s.collections_stats.approved--;
+    }
+
     if (r.req == CollectionReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist);
-        if (exists) {
-            uint32_t old_data_len = c.data_len;
-            uint32_t old_label_len = c.label_len;
-            uint8_t old_data[old_data_len];
-            if (r.m_LabelLen) {
-                Env::Memcpy(old_data, c.m_szLabelData + old_label_len, old_data_len);
-                c.label_len = r.m_LabelLen;
-                Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen);
-            }
 
-            if (r.m_DataLen) {
-                c.data_len = r.m_DataLen;
-                Env::Memcpy(c.m_szLabelData + c.label_len, reinterpret_cast<const uint8_t *>(&r + 1) + r.m_LabelLen, c.data_len);
-            } else {
-                Env::Memcpy(c.m_szLabelData + c.label_len, old_data, old_data_len);
-            }
-        } else {
+        Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+        c.label_len = r.m_LabelLen;
+        c.data_len = r.m_DataLen;
+        c.status = Gallery::Status::kPending;
+        s.collections_stats.pending++;
+
+        if (!exists) {
             // if collection doesn't exist, then label is required
             Env::Halt_if(!r.m_LabelLen); 
 
-            c_id = ++s.collections_stats.free_id;
             s.collections_stats.total++;
-            s.collections_stats.pending++;
 
-            c.status = Gallery::Status::kPending;
+            c_id = ++s.collections_stats.free_id;
             c.is_default = false;
-
-            c.label_len = r.m_LabelLen;
-            c.data_len = r.m_DataLen;
             c.m_pkAuthor = r.m_pkArtist;
             c.total_sold = 0;
             c.total_sold_price = 0;
             c.max_sold.artwork_id = 0;
             c.max_sold.price.m_Amount = 0;
             c.max_sold.price.m_Aid = 0;
-            Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
 
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
@@ -308,11 +273,6 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r)
     } else {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator ||
                 !exists);
-
-        if (c.status == Gallery::Status::kPending)
-            s.collections_stats.pending--;
-        else if (c.status == Gallery::Status::kApproved)
-            s.collections_stats.approved--;
 
         if (r.req == CollectionReqType::kPending) {
             c.status = Gallery::Status::kPending;
@@ -450,8 +410,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
     s.Save();
 }
 
-BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
-{
+BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID));
 
@@ -462,8 +421,7 @@ BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
     Env::AddSig(m.m_pkOwner); // would fail if no current owner (i.e. checked out)
 }
 
-BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
-{
+BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID));
 
@@ -513,27 +471,22 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
     //Env::AddSig(r.m_pkUser);
 }
 
-BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r)
-{
+BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r) {
     PayoutMove(r.m_Key, r.m_Value, false);
     Env::FundsUnlock(r.m_Key.m_Aid, r.m_Value);
     Env::AddSig(r.m_Key.m_pkUser);
 }
 
-BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
-{
+BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID));
     Env::AddSig(m.m_pkOwner);
 
-    if (m.m_Aid)
-    {
+    if (m.m_Aid) {
         // destroy it
         Env::Halt_if(!Env::AssetDestroy(m.m_Aid));
         m.m_Aid = 0;
-    }
-    else
-    {
+    } else {
         // 1st call. Don't checkout, only prepare
         static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Artwork;SN=Gall;UN=GALL;NTHUN=unique";
         m.m_Aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
@@ -542,8 +495,7 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
     m.Save(r.m_ID);
 }
 
-BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
-{
+BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID) || !m.m_Aid);
     Env::AddSig(m.m_pkOwner);
@@ -557,8 +509,7 @@ BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
     m.Save(r.m_ID);
 }
 
-BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
-{
+BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
 
@@ -571,14 +522,12 @@ BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
     //Env::AddSig(r.m_pkUser);
 }
 
-BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
-{
+BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
     Gallery::Impression::Key impk;
     _POD_(impk.m_ID) = r.m_ID;
 
     Gallery::Impression imp;
-    if (!Env::LoadVar_T(impk, imp))
-    {
+    if (!Env::LoadVar_T(impk, imp)) {
         imp.m_Value = 0;
 
         MyState s;
@@ -598,8 +547,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
     Env::AddSig(impk.m_ID.m_pkUser);
 }
 
-BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r)
-{
+BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r) {
     MyState s;
     Strict::Add(s.m_VoteBalance, r.m_Amount);
     s.Save();
@@ -607,8 +555,7 @@ BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r)
     Env::FundsLock(s.m_Config.m_VoteReward.m_Aid, r.m_Amount);
 }
 
-BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
-{
+BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r) {
     // ensure the masterpiece doesn't have aid
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
@@ -621,8 +568,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
     s.AddSigAdmin();
 }
 
-BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r)
-{
+BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.TakeOut(r.m_ID));
 
