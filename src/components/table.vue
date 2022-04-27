@@ -1,25 +1,70 @@
 <template>
-  <!-- title to props -->
-  <h1 class="table__title">{{ title }}</h1> 
-  <div class="table" :style="table_style">
-    <div v-for="cell in rows" 
-         :key="cell.value" 
-         :class="cell.isHeaderCell ? 'header' : 'cell'"
-         :style="cellStyle(cell)"
-    >
-      <span v-if="cell.isImage">
-        <img class="icon" src="~assets/icon-beam.svg">
-        {{ cell.value }}
-      </span>
-      <span v-else :class="{ 'bold': cell.isBold }">{{ cell.value }}</span>
-
-      <img v-if="cell.isHeaderCell" class="arrows" src="~assets/sort-arrows.svg">
+  <div v-if="body_rows && body_rows.length" class="table">
+    <h1 class="table-title">{{ title }}</h1> 
+    <!-- columns -->
+    <div class="table-head">
+      <div v-for="(cell, columnIdx) in header_row" 
+           :key="cell.id" 
+           class="header"
+           :style="cellStyle(cell)"
+      >
+        <span :style="sort_params.columnIdx === columnIdx ? active_column : ''" 
+              @click="sort_by(columnIdx)"
+        >
+          {{ cell.caption }}
+          <img v-if="sort_params.ascending && sort_params.columnIdx === columnIdx" src="~/assets/arrow-ascending.svg" class="arrow">
+          <img v-if="!sort_params.ascending && sort_params.columnIdx === columnIdx" src="~/assets/arrow-descending.svg" class="arrow">
+        </span>
+      </div>
     </div>
+
+    <!-- dataset -->
+    <div class="table-body">
+      <div v-for="row in body_rows"
+           :key="row"
+      >
+        <div v-for="(cell, cellIdx) in row"
+             :key="(cell, cellIdx)"
+             class="cell"
+             :style="cellStyle(header_row[cellIdx])"
+        >
+          <span v-if="header_row[cellIdx].render" v-html="header_row[cellIdx].render(cell)"></span>
+          <span v-else>{{ cell }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- empty -->
+  <div v-else-if="body_rows !== undefined && !body_rows.length" class="table-empty">
+    <img src="~assets/icon-wallet-empty.svg"/>
+    <div>{{ empty_message }}</div>
+  </div>  
+
+  <!-- loading -->
+  <div v-else class="table-loading">
+    Loading...
   </div>
 </template>
 
 <style lang="stylus" scoped>
-.table__title {
+.table-empty {
+  padding: 35px 25px 0 25px
+  text-align: center
+  color: rgba(255, 255, 255, 0.5)
+
+  & img {
+    padding-bottom: 10px
+  }
+}
+
+.table-loading {
+  padding: 35px 25px 0 25px
+  text-align: center
+  color: rgba(255, 255, 255, 0.5)
+}
+
+.table-title {
   width: 100%
   font-family: 'SF Pro Display', sans-serif
   font-weight: 700
@@ -33,67 +78,90 @@
 }
 
 .table {
-  border-radius: 10px 10px 0 0
+  min-height: 0
+  width: 100%
+  display: flex
+  flex-direction: column
   font-size: 14px
   font-weight: 100
-  line-height: 24px
   font-family: 'SF Pro Display', sans-serif
-  overflow: hidden
+  line-height: 44px
 
   & span {
     display: flex
     align-items: center
+
+    &:deep(img) {
+      margin-right: 8px
+    }
   }
 
-  & .arrows {
+  & .arrow {
     margin-left: 8px
   }
-  
-  & .icon {
-    margin-right: 8px
-  }
+}
 
-  & .amount {
-    font-weight: 100
-  }
+.table-head {
+  display: flex
+  border-radius: 10px 10px 0 0
+  overflow: hidden
+  min-height: 46px
 
-  & .bold {
-    font-weight: bold
+  & .header {
+    display: flex
+    align-items: center
+    padding-left: 20px
+    color: rgba(255, 255, 255, 0.5)
+    background-color: rgba(255, 255, 255, 0.08)
+    user-select: none
+    
+    &:last-child {
+      padding-right: 31px
+    }
+
+    & span {
+      cursor: pointer
+      line-height: 25px
+    }
   }
 }
 
-.header {
-  height: 46px
+.table-body {
   display: flex
-  align-items: center
-  padding-left: 20px
-  color: rgba(255, 255, 255, 0.5)
+  flex-direction: column
+  overflow-x: hidden
+  overflow-y: auto
 
-  &:last-child {
-    padding-right: 20px
+  & > div:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05)
   }
-}
 
-.cell {
-  height: 56px
-  display: flex
-  align-items: center
-  padding-left: 20px
+  & > div:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.01)
+  }
 
-  &:last-child {
-    padding-right: 20px
+  & > div {
+    display: flex
+    max-height: 56px
+  }
+
+  & .cell {
+    height: 56px
+    display: flex
+    align-items: center
+    padding-left: 20px
+    white-space: nowrap
+    overflow: hidden
+
+    &:last-child {
+      padding-right: 20px
+    }
   }
 }
 </style>
 
 <script>
-// import amount from './amount.vue'
-
 export default {
-  components: {
-    // amount
-  },
-  
   props: {
     title: {
       type: String,
@@ -109,124 +177,45 @@ export default {
       default: undefined,
       required: true
     },
-    image_idx: {
-      type: Number,
-      default: null
+    sort_params: {
+      type: Object,
+      default: () => ({
+        columnIdx: undefined,
+        ascending: false
+      })
     },
-    bold_idx: {
-      type: Number,
-      default: null
-    },
-    ellepsis_idx: {
-      type: Number,
-      default: null
+    empty_message: {
+      type: String,
+      default: 'Trading history is empty'
     }
   },
 
+  emits: ['sort'],
+
   computed: {
-    rows() {
-      const headerCells = this.columns.map(column => ({value: column.name, isHeaderCell: true}))
-      const bodyCells = this.dataset
-        .map((item, rowIdx) => {
-          const row = this.columns.map(column => ({
-            value: item[column.id] || 'n/a',
-            isHeaderCell: false,
-            isEvenRow: rowIdx % 2 === 0,
-            isImage: false,
-            isBold: false
-          }))
-
-          // render cell
-          if (this.image_idx !== null) {
-            row[this.image_idx].isImage = true
-          }
-
-          if (this.bold_idx !== null) {
-            row[this.bold_idx].isBold = true
-          }
-
-          if (this.ellepsis_idx !== null) {
-            const el = row[this.ellepsis_idx].value
-
-            if (el.length <= 12) return row
-            
-            const head = el.slice(0, 6)
-            const tail = el.slice(el.length - 6, el.length)
-            
-            row[this.ellepsis_idx].value = `${head}...${tail}`
-          }
-
-          return row
-        })
-        .flat()
-        
-      // console.log(headerCells, bodyCells)
-      return [...headerCells, ...bodyCells]
+    header_row() {
+      return this.columns
     },
 
-    table_style() {
-      return `display: grid; grid-template-columns: ${this.columns.map(() => 'auto').join(' ')}`
+    body_rows() {
+      return this.dataset
     },
+
+    active_column() {
+      return 'color: white; font-weight: bold'
+    }
   },
-  
+
   methods: {
     cellStyle(cell) {
-      if (cell.isHeaderCell) {
-        return 'background-color: rgba(255, 255, 255, 0.08)'
-      }
+      return cell.width
+        ? `width: ${cell.width}` 
+        : 'flex: 1'
+    },
 
-      if (cell.isEvenRow) {
-        return 'background-color: rgba(255, 255, 255, 0.01)'
-      }
-
-      return 'background-color: rgba(255, 255, 255, 0.05)'
+    sort_by(columnIdx) {
+      this.$emit('sort', columnIdx)
     }
   }
 }
 </script>
-
-  & tr {
-    max-height: 57px
-  }
-  
-  & tr:nth-child(odd) {
-    background-color: rgba(255, 255, 255, 0.05)
-  }
-
-  & tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.01)
-  }
-
-  & th:first-child {
-    padding: 15px 20px
-  }
-
-  & th {
-    min-width: 50px
-    text-align: left
-    padding-right: 20px
-    color: rgba(255, 255, 255, 0.5)
-    background-color: rgba(255, 255, 255, 0.08)
-    white-space: nowrap
-
-    .ardataset {
-      margin-left: 5px
-    }
-  }
-
-  & td:first-child {
-    padding: 20px 20px
-  }
-
-  & td {
-    padding-right: 20px
-    text-align: left
-
-    border: 1px solid cyan
-
-    & img {
-      margin: -20px
-    }
-  }
-
-         :style="cell.isEvenRow && !cell.isHeaderCell ? 'background-color: cyan' : 'background-color: magenta'"

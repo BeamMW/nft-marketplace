@@ -164,7 +164,7 @@ const store = {
       return this.setError(err, 'Failed to verify cid')     
     }
 
-    console.log(this.state.cid)
+    // console.log(this.state.cid)
     if (!res.contracts.some(el => el.cid == this.state.cid)) {
       throw `CID not found '${this.state.cid}'`
     }
@@ -249,7 +249,7 @@ const store = {
   // Artists
   //
   loadArtists () {
-    console.log('loadArtists')
+    // console.log('loadArtists')
     utils.invokeContract(
       `role=manager,action=view_artists,cid=${this.state.cid}`, 
       (...args) => this.onLoadArtists(...args)
@@ -270,7 +270,7 @@ const store = {
       }
 
       artist = aformat.fromContract(artist)
-      console.log('artist', JSON.stringify(artist))
+      // console.log('artist', JSON.stringify(artist))
       this.loadImageAsync(artist.banner).then((image) => {
         //let stateArtist = this.state.artists[artist.id]
         //if (stateArtist) {
@@ -278,9 +278,9 @@ const store = {
         //}
       })
 
-      console.log('load avatar')
+      // console.log('load avatar')
       this.loadImageAsync(artist.avatar)
-      console.log('after load avatar')
+      // console.log('after load avatar')
       artists.push(artist)
     }
     artists.sort((a,b) => a.label > b.label ? 1 : -1)
