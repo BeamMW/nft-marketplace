@@ -613,7 +613,6 @@ struct MyCollection : public Gallery::Collection {
         Env::DocAddBlob_T("author", m_pkAuthor);
         Env::DocAddNum32("artworks_count", artworks_num);
         Env::DocAddText("status", Gallery::status_to_string(status).data());
-        Env::DocAddNum32("default", is_default);
         {
             Env::DocGroup gr_sold("total_sold");
             Env::DocAddNum("count", total_sold);
@@ -1665,6 +1664,7 @@ ON_METHOD(artist, set_artist) {
 
     if (nLabelSize < 2) {
         OnError("label is missing");
+        return;
     }
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
@@ -1723,6 +1723,7 @@ ON_METHOD(artist, set_collection) {
 
     if (nLabelSize < 2) {
         OnError("label is missing");
+        return;
     }
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);

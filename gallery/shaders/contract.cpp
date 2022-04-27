@@ -131,7 +131,6 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
 
     if (r.req == ArtistReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist);
-
         Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
         a.label_len = r.m_LabelLen;
         a.data_len = r.m_DataLen;
@@ -141,46 +140,14 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
         if (!exists) {
             // if artist doesn't exist, then label is required
             Env::Halt_if(!r.m_LabelLen); 
-
             a.m_hRegistered = Env::get_Height();
-            a.collections_num = 1; // default
+            a.collections_num = 0;
             a.artworks_num = 0;
-
-            // create default collection
-            struct CollectionPlus : public Gallery::Collection {
-                char m_szLabelData[s_TotalMaxLen];
-            } c;
-
-            Gallery::Collection::Id c_id = ++s.collections_stats.free_id;
-            s.collections_stats.total++;
-            s.collections_stats.pending++;
             s.artists_stats.total++;
-
-            c.is_default = true;
-            c.status = Gallery::Status::kPending;
-            c.label_len = a.label_len;
-            c.data_len = 0;
-            c.m_pkAuthor = r.m_pkArtist;
-            c.artworks_num = 0;
-            c.total_sold = 0;
-            c.total_sold_price = 0;
-            c.max_sold.price.m_Aid = 0;
-            c.max_sold.price.m_Amount = 0;
-            c.max_sold.artwork_id = 0;
-            Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen);
-
-            Gallery::ArtistCollectionKey ack;
-            ack.pkArtist = c.m_pkAuthor;
-            ack.collection_id = c_id;
-            Env::SaveVar_T(ack, true);
-
-            // assert: collection was not saved before
-            Env::Halt_if(c.Save(c_id, Env::get_Height(), sizeof(Gallery::Collection) + c.label_len + c.data_len));
         }
     } else {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator || 
                 !exists);
-
         if (r.req == ArtistReqType::kPending) {
             a.status = Gallery::Status::kPending;
             s.artists_stats.pending++;
