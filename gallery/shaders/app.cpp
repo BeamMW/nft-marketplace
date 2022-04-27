@@ -387,7 +387,6 @@ struct OwnerInfo {
 
     bool DeduceOwnerRaw(Gallery::Artwork::Id id, const PubKey& pkOwner) {
         PubKey pk;
-
         m_km.m_ID = id;
         m_km.Get(pk);
         return (_POD_(pk) == pkOwner);
@@ -474,7 +473,7 @@ public:
         return "moderators";
     }
 
-    PubKey id(const ContractID& cid) const {
+    static PubKey id(const ContractID& cid) {
         KeyMaterial::Owner km;
         km.SetCid(cid);
         PubKey pk;
@@ -483,8 +482,8 @@ public:
     }
 
     bool is_moderator(const ContractID& cid) {
-        Id id_ = id(cid);
-        return Read(cid, id_);
+        Id id = MyModerator::id(cid);
+        return Read(cid, id);
     }
 
     bool Read(const ContractID& cid, const Id& id) {
@@ -497,7 +496,7 @@ public:
         Env::Key_T<SecondStageKey> ssk0;
         ssk0.m_Prefix.m_Cid = cid;
         _POD_(ssk0.m_KeyInContract) = ssk;
-        if (!Env::VarReader::Read_T(ssk0, *this))
+        if (!Env::VarReader::Read_T(ssk0, Cast::Down<Gallery::Moderator>(*this)))
             return false;
         return approved;
     }
@@ -511,7 +510,7 @@ public:
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<SecondStageKey>& key) {
-        return r.MoveNext_T(key, *this);
+        return r.MoveNext_T(key, Cast::Down<Gallery::Moderator>(*this));
     }
 };
 #pragma pack (pop)
@@ -531,6 +530,14 @@ public:
 
     std::string_view name() const {
         return "artists";
+    }
+
+    static PubKey id(const ContractID& cid) {
+        KeyMaterial::Owner km;
+        km.SetCid(cid);
+        PubKey pk;
+        km.Get(pk);
+        return pk;
     }
 
     // TODO: label_exists
@@ -966,11 +973,7 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label, b
 
     Env::VarReader r(k0, k1);
     MyArtist a;
-
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey my_key;
-    km.Get(my_key);
+    PubKey my_key = a.id(cid);
 
     while (true) {
         if (!a.ReadNext(r, k0))
@@ -988,96 +991,63 @@ bool artist_label_exists(const ContractID& cid, const std::string_view& label, b
 }
 
 ON_METHOD(manager, view_artists_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artists_stats.total);
 }
 
 ON_METHOD(manager, view_collections_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.collections_stats.total);
 }
 
 ON_METHOD(manager, view_artworks_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artworks_stats.total);
 }
 
 ON_METHOD(moderator, view_artists_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artists_stats.pending);
 }
 
 ON_METHOD(moderator, view_collections_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.collections_stats.pending);
 }
 
 ON_METHOD(moderator, view_artworks_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artworks_stats.pending);
 }
 
 ON_METHOD(user, view_artists_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artists_stats.approved);
 }
 
 ON_METHOD(user, view_collections_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.collections_stats.approved);
 }
 
 ON_METHOD(user, view_artworks_stats) {
-    Gallery::State s;
-    Env::Key_T<uint8_t> k;
-    k.m_KeyInContract = 0;
-    k.m_Prefix.m_Cid = cid;
-    Env::VarReader::Read_T(k, s);
+    StatePlus s;
+    s.Init(cid);
     Env::DocAddNum32("total", s.artworks_stats.approved);
 }
 
 ON_METHOD(artist, view_collections_stats) {
-    // TODO: move to MyArtist
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey artist_id;
-    km.Get(artist_id);
-
     Env::Key_T<Gallery::Artist::FirstStageKey> fsk;
     fsk.m_Prefix.m_Cid = cid;
-    fsk.m_KeyInContract.id = artist_id;
+    fsk.m_KeyInContract.id = MyArtist::id(cid);
     Gallery::Artist::SecondStageKey ssk;
     Env::VarReader::Read_T(fsk, ssk);
 
@@ -1092,15 +1062,9 @@ ON_METHOD(artist, view_collections_stats) {
 }
 
 ON_METHOD(artist, view_artworks_stats) {
-    // TODO: move to MyArtist
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey artist_id;
-    km.Get(artist_id);
-
     Env::Key_T<Gallery::Artist::FirstStageKey> fsk;
     fsk.m_Prefix.m_Cid = cid;
-    fsk.m_KeyInContract.id = artist_id;
+    fsk.m_KeyInContract.id = MyArtist::id(cid);
     Gallery::Artist::SecondStageKey ssk;
     Env::VarReader::Read_T(fsk, ssk);
 
@@ -1167,10 +1131,7 @@ ON_METHOD(artist, view_collections) {
     if (buf_len)
         buf[buf_len - 1] = ';';
 
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey artist_id;
-    km.Get(artist_id);
+    PubKey artist_id = MyArtist::id(cid);
 
     auto artist_id_filter = [artist_id](const MyCollection& c) {
         return _POD_(c.m_pkAuthor) == artist_id;
@@ -1778,22 +1739,12 @@ ON_METHOD(artist, set_collection) {
 }
 
 ON_METHOD(artist, view) {
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey pk;
-    km.Get(pk);
-
     GalleryObjectPrinter<MyArtist> a{cid};
-    a.Print(pk);
+    a.Print(MyArtist::id(cid));
 }
 
 ON_METHOD(artist, get_id) {
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey pk;
-    km.Get(pk);
-
-    Env::DocAddBlob_T("id", pk);
+    Env::DocAddBlob_T("id", MyArtist::id(cid));
 }
 
 ON_METHOD(manager, view_artwork_sales) {
@@ -1870,10 +1821,7 @@ ON_METHOD(artist, view_artworks) {
     if (buf_len)
         buf[buf_len - 1] = ';';
 
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey artist_id;
-    km.Get(artist_id);
+    PubKey artist_id = MyArtist::id(cid);
 
     auto only_approved_filter = [artist_id, collection_id](const MyArtwork& a) {
         return (_POD_(a.m_pkAuthor) == artist_id) &&
