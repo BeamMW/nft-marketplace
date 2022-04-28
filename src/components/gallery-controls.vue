@@ -15,6 +15,7 @@
         />
       </div>
       <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
+      <btn text="artist-approve" color="green" @click="artistApprove"/>
       <btn text="add collection" color="green" padding="7px 12px" @click="onNewCollection"/>
       <btn class="user" height="34px"
            :text="my_artist_name"
@@ -55,6 +56,7 @@
 </style>
 
 <script>
+import router from 'router'
 import tabsctrl from './tabs.vue'
 import btn from './button.vue'
 import selector from './selector.vue'
@@ -127,6 +129,12 @@ export default {
     onNewCollection () {
       collsStore.toNewItem()
     },
+
+    artistApprove () {
+      router.push({
+        name: 'artist-approve'
+      })
+    }
   }
 }
 </script>
