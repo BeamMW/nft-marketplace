@@ -1,6 +1,6 @@
 <template>
   <div class="select-container" :style="style" @click="select">
-    <img :src="`../assets/${getImg()}.svg`" alt="icon" :class="[is_admin ? 'admin_img' : '','img']">
+    <img :src="`../assets/${getImg()}.svg`" alt="icon" :style="placeCycle">
     <slot></slot>
   </div>
 </template>
@@ -15,16 +15,6 @@
     position: absolute
     z-index: 999
   }
-
-  .img {
-    right: 8px
-    top: 8px
-  }
-
-  .admin_img {
-    right: 50px
-    top: 8px
-  }
 }
 </style>
 
@@ -35,6 +25,16 @@ export default {
     border_radius: {
       type: String,
       default: '10px',
+    },
+    place: {
+      type: Object,
+      default() {
+        return {
+          right: '8px',
+          top: '8px',
+          left: 'initial',
+        }
+      },
     },
   },
 
@@ -56,9 +56,19 @@ export default {
         'border': this.selected ? '1px solid #00f6d2' : '1px solid transparent',
       }
     },
+
     is_admin() {
-      return this.$state.is_admin
+      return this.$state.admin
     },
+
+    placeCycle() {
+      return {
+        'top': this.place.top,
+        'left': this.is_admin ? '50px': this.place.left,
+        'right': this.is_admin ? '50px': this.place.right,
+      }
+    },
+
   },
 
   methods: {

@@ -1,34 +1,41 @@
 <template>
   <div class="container">
     <div v-for="artist in artists" id="container" :key="artist.id" class="content-wrapper">
-      <div class="details-row"> 
-        <div class="info-container">
-          <div class="col-first">
-            <p v-if="artist.label">Artist name</p>
-            <p v-if="artist.webiste">Website</p>
-            <p v-if="artist.twitter">Twitter</p>
-            <p v-if="artist.instagram">Instagram</p>
-            <p v-if="artist.about">About me</p>
+      <selectItem :place="{
+        left: '20px',
+        top: '20px',
+        right: 'initial',
+      }"
+      >
+        <div class="details-row"> 
+          <div class="info-container">
+            <div class="col-first">
+              <p v-if="artist.label">Artist name</p>
+              <p v-if="artist.webiste">Website</p>
+              <p v-if="artist.twitter">Twitter</p>
+              <p v-if="artist.instagram">Instagram</p>
+              <p v-if="artist.about">About me</p>
+            </div>
+            <div class="col-second">
+              <p>{{ artist.label }}</p>
+              <p>{{ artist.webiste }}</p>   
+              <p>{{ artist.twitter }}</p>
+              <p>{{ artist.instagram }}</p>
+              <p>{{ artist.about }}</p>
+            </div>
           </div>
-          <div class="col-second">
-            <p>{{ artist.label }}</p>
-            <p>{{ artist.webiste }}</p>   
-            <p>{{ artist.twitter }}</p>
-            <p>{{ artist.instagram }}</p>
-            <p>{{ artist.about }}</p>
-          </div>
-        </div>
-        <div class="artist-container">
-          <div class="banner">
-            <img v-if="artist.banner?.object" :src="artist.banner?.object" alt="banner" class="image"/>
-            <img v-else src="~assets/artist-default-banner.svg" alt="banner" class="image"/>
-            <div class="avatar">
-              <img v-if="artist.banner?.object" :src="artist.avatar?.object" alt="avatar"/>
-              <img v-else src="~assets/artist-default-avatar.svg" alt="avatar"/>
+          <div class="artist-container">
+            <div class="banner">
+              <img v-if="artist.banner?.object" :src="artist.banner?.object" alt="banner" class="image"/>
+              <img v-else src="~assets/artist-default-banner.svg" alt="banner" class="image"/>
+              <div class="avatar">
+                <img v-if="artist.banner?.object" :src="artist.avatar?.object" alt="avatar"/>
+                <img v-else src="~assets/artist-default-avatar.svg" alt="avatar"/>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </selectItem>
     </div>
   </div>
 </template>
@@ -142,21 +149,24 @@
 
 <script>
 import artistsStore from 'stores/artists'
+import selectItem from './select-item.vue'
+
 export default {
+  components: {
+    selectItem,
+  },
+
   data () {
     return {
       defaultBannerSrc: '~assets/artist-default-banner.svg',
       defualtAvatarSrc: '~assets/artist-default-avatar.svg'
     }
   },
+
   computed: {
     artists() {
       return artistsStore.artists
     }
   },
-
-  mounted() {
-    console.log(artistsStore.artists )
-  }
 }
 </script>
