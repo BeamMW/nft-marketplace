@@ -12,8 +12,8 @@
               @click="sort_by(columnIdx)"
         >
           {{ cell.caption }}
-          <img v-if="sort_params.ascending && sort_params.columnIdx === columnIdx" src="~/assets/arrow-ascending.svg" class="arrow">
-          <img v-if="!sort_params.ascending && sort_params.columnIdx === columnIdx" src="~/assets/arrow-descending.svg" class="arrow">
+          <img v-if="sort_params.columnIdx === columnIdx && sort_params.ascending" src="~/assets/arrow-ascending.svg" class="arrow">
+          <img v-if="sort_params.columnIdx === columnIdx && !sort_params.ascending" src="~/assets/arrow-descending.svg" class="arrow">
         </span>
       </div>
     </div>
@@ -116,7 +116,7 @@
     user-select: none
     
     &:last-child {
-      padding-right: 31px
+      padding-right: 20px
     }
 
     & span {
@@ -130,7 +130,7 @@
   display: flex
   flex-direction: column
   overflow-x: hidden
-  overflow-y: auto
+  overflow-y: overlay
 
   & > div:nth-child(odd) {
     background-color: rgba(255, 255, 255, 0.05)

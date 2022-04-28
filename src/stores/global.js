@@ -9,9 +9,6 @@ import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
 import artsStore from 'stores/artworks'
 
-// for testing purposes
-// import COLLECTIONS from '../utils/collection-testing.js'
-
 function defaultState() {
   let state = {  
     /// OLD
@@ -679,6 +676,12 @@ const store = {
       name: 'add-nft'
     })
   },
+
+  toTable() {
+    router.push({
+      name: 'table'
+    })
+  }
 }
 
 export default store
