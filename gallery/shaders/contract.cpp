@@ -73,18 +73,13 @@ BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
 
     Gallery::Moderator m;
     // if not exists
-    if (!m.TakeOut(r.id)) {
+    if (!m.TakeOut(r.id))
         m.registered = Env::get_Height();
-    }
 
-    switch (r.req) {
-    case ModeratorReqType::kEnable:
-    case ModeratorReqType::kDisable:
+    if (r.req == ModeratorReqType::kEnable || r.req == ModeratorReqType::kDisable)
         m.approved = (r.req == ModeratorReqType::kEnable);
-        break;
-    defaut:
+    else
         Env::Halt();
-    };
 
     m.Save(r.id);
 
@@ -101,24 +96,18 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
 
     MyState s;
 
-    switch (r.role) {
-    case Gallery::Role::kManager: {
+    if (r.role == Gallery::Role::kManager) {
         s.AddSigAdmin();
-        break;
-    }
-    case Gallery::Role::kModerator: {
+    } else if (r.role == Gallery::Role::kModerator) {
         Gallery::Moderator m;
         Env::Halt_if(!m.Load(r.signer));
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
-        break;
-    }
-    case Gallery::Role::kArtist:
+    } else if (r.role == Gallery::Role::kArtist) {
         Env::AddSig(r.signer);
-        break;
-    default:
+    } else {
         Env::Halt();
-    };
+    }
 
     bool exists = a.TakeOut(r.m_pkArtist, sizeof(a));
 
@@ -172,24 +161,18 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
     Gallery::Collection::Id c_id = r.collection_id;
     MyState s;
 
-    switch (r.role) {
-    case Gallery::Role::kManager: {
+    if (r.role == Gallery::Role::kManager) {
         s.AddSigAdmin();
-        break;
-    }
-    case Gallery::Role::kModerator: {
+    } else if (r.role == Gallery::Role::kModerator) {
         Gallery::Moderator m;
         Env::Halt_if(!m.Load(r.signer));
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
-        break;
-    }
-    case Gallery::Role::kArtist:
+    } else if (r.role == Gallery::Role::kArtist) {
         Env::AddSig(r.signer);
-        break;
-    default:
+    } else {
         Env::Halt();
-    };
+    }
 
     bool exists = c.TakeOut(c_id, sizeof(c));
 
@@ -227,6 +210,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
             Gallery::ArtistCollectionKey ack;
             _POD_(ack.pkArtist) = c.m_pkAuthor;
             ack.collection_id = c_id;
+            //TODO: Save collections_num here instead of artist
             Env::SaveVar_T(ack, true);
 
             struct ArtistPlus : public Gallery::Artist {
@@ -260,34 +244,27 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
 
     MyState s;
     Gallery::Artwork m;
-    Gallery::Artwork::Id m_id = r.artwork_id;
 
-    switch (r.role) {
-    case Gallery::Role::kManager: {
+    if (r.role == Gallery::Role::kManager) {
         s.AddSigAdmin();
-        break;
-    }
-    case Gallery::Role::kModerator: {
+    } else if (r.role == Gallery::Role::kModerator) {
         Gallery::Moderator m;
         Env::Halt_if(!m.Load(r.signer));
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
-        break;
-    }
-    case Gallery::Role::kArtist:
+    } else if (r.role == Gallery::Role::kArtist) {
         Env::AddSig(r.signer);
-        break;
-    default:
+    } else {
         Env::Halt();
-    };
+    }
 
-    bool exists = m.TakeOut(m_id);
+    bool exists = m.TakeOut(r.artwork_id);
 
     if (r.req == ArtworkReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist || exists);
         s.artworks_stats.total++;
         s.artworks_stats.pending++;
-        m_id = ++s.artworks_stats.free_id;
+        m.id = ++s.artworks_stats.free_id;
 
         m.m_pkOwner = r.m_pkArtist;
         m.m_pkAuthor = r.m_pkArtist;
@@ -304,7 +281,8 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
         
         Gallery::CollectionArtworkKey cak;
         cak.collection_id = r.collection_id;
-        cak.artwork_id = m_id;
+        cak.artwork_id = m.id;
+        // TODO: save artworks_num here instead of collection
         // assert: artwork was not saved in the collection before
         Env::Halt_if(Env::SaveVar_T(cak, true));
 
@@ -336,7 +314,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
         uint32_t nLabel = r.label_len;
 
         Gallery::Events::AddArtworkData::Key adk;
-        adk.m_ID = m_id;
+        adk.m_ID = m.id;
         adk.m_pkArtist = m.m_pkOwner;
 
         uint32_t nMaxEventSize = 0x100000;
@@ -351,7 +329,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
         }
 
         Gallery::Events::AddArtworkLabel::Key alk;
-        alk.m_ID = m_id;
+        alk.m_ID = m.id;
         alk.m_pkArtist = m.m_pkOwner;
         Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
     } else {
@@ -373,7 +351,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
             m.status = Gallery::Status::kRejected;
         }
     }
-    m.Save(m_id);
+    m.Save(m.id);
     s.Save();
 }
 

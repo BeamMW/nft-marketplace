@@ -87,7 +87,7 @@
     macro(manager, view_artists) \
     macro(manager, view_collections) \
     macro(manager, view_artworks) \
-    macro(manager, view_artwork_sales) \
+    macro(manager, view_artwork_sales) \ 
     macro(manager, view_collections_stats) \
     macro(manager, view_artworks_stats) \
     macro(manager, view_balance) \
@@ -214,6 +214,13 @@
     macro(Gallery::Artist::Id, artist_id) \
     macro(Gallery::Collection::Id, collection_id) \
 
+#define Gallery_user_view_owned_artworks(macro) \
+    macro(ContractID, cid) \
+    macro(Height, h0) \
+    macro(Amount, count) \
+    macro(uint32_t, idx0) \
+    macro(Gallery::Collection::Id, collection_id) \
+
 #define Gallery_user_view_collections(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
@@ -262,13 +269,18 @@
 #define Gallery_user_view_artworks_stats(macro) \
     macro(ContractID, cid) \
 
+#define Gallery_user_view_owned_artworks_stats(macro) \
+    macro(ContractID, cid) \
+
 #define GalleryRole_user(macro) \
     macro(user, view_artists_stats) \
     macro(user, view_artists) \
     macro(user, view_collections) \
     macro(user, view_collections_stats) \
     macro(user, view_artworks_stats) \
+    macro(user, view_owned_artworks_stats) \
     macro(user, view_artworks) \
+    macro(user, view_owned_artworks) \
     macro(user, set_price) \
     macro(user, transfer) \
     macro(user, buy) \
@@ -896,16 +908,24 @@ public:
         typename T::SecondStageKey ssak;
         Env::DocArray gr0(object_.name().data());
 
-        int cur_idx = 1, cur_cnt = 0;
-        bool printed = false;
+        int cur_idx = 0, cur_cnt = 0;
         while (cur_cnt < count && r.MoveNext_T(fsk0, ssak)) {
+            Env::Key_T<typename T::SecondStageKey> k0;
+            _POD_(k0.m_Prefix.m_Cid) = cid_;
+            _POD_(k0.m_KeyInContract) = ssak;
+ 
+            Env::VarReader r2(k0, k0);
+            if (!object_.ReadNext(r2, k0))
+                break;
+
+            if (!filter_(object_)) continue;
+
             if (cur_idx >= idx0) {
                 if constexpr(std::is_same_v<typename T::Id, PubKey>)
-                    printed = Print(fsk0.m_KeyInContract.id);
+                    object_.Print(k0.m_KeyInContract.id, Utils::FromBE(k0.m_KeyInContract.h_updated));
                 else 
-                    printed = Print(Utils::FromBE(fsk0.m_KeyInContract.id));
-                if (printed)
-                    ++cur_cnt;
+                    object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id), Utils::FromBE(k0.m_KeyInContract.h_updated));
+                ++cur_cnt;
             }
             ++cur_idx;
         }
@@ -953,7 +973,8 @@ ON_METHOD(manager, view_params) {
     MyModerator moder;
     Env::DocAddNum("is_admin", bIsAdmin);
     Env::DocAddNum32("is_moderator", moder.is_moderator(cid));
-    Env::DocAddNum("Exhibits", s.artworks_stats.total);
+    //Env::DocAddNum("Exhibits", s.artworks_stats.total);
+    //TODO: vote_reward {aid, amount, balance}
     Env::DocAddNum("voteReward.aid", s.m_Config.m_VoteReward.m_Aid);
     Env::DocAddNum("voteReward.amount", s.m_Config.m_VoteReward.m_Amount);
     Env::DocAddNum("voteReward_balance", s.m_VoteBalance);
@@ -1043,6 +1064,13 @@ ON_METHOD(user, view_artworks_stats) {
     Env::DocAddNum32("total", s.artworks_stats.approved);
 }
 
+ON_METHOD(user, view_owned_artworks_stats) {
+    //TODO
+    //StatePlus s;
+    //s.Init(cid);
+    //Env::DocAddNum32("total", s.artworks_stats.approved);
+}
+
 ON_METHOD(artist, view_collections_stats) {
     Env::Key_T<Gallery::Artist::FirstStageKey> fsk;
     fsk.m_Prefix.m_Cid = cid;
@@ -1057,7 +1085,7 @@ ON_METHOD(artist, view_collections_stats) {
     Env::VarReader r(k0, k0);
     MyArtist a;
     a.ReadNext(r, k0);
-    Env::DocAddNum32("collections", a.collections_num);
+    Env::DocAddNum32("total", a.collections_num);
 }
 
 ON_METHOD(artist, view_artworks_stats) {
@@ -1092,7 +1120,7 @@ ON_METHOD(user, view_artists) {
 
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1115,7 +1143,7 @@ ON_METHOD(user, view_collections) {
     GalleryObjectPrinter<MyCollection, decltype(only_approved_artist_id_filter)> c{cid, only_approved_artist_id_filter};
     if (count && h0)
         c.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         c.Print(idx0, count);
     else if (buf_len)
         c.Print(buf);
@@ -1137,7 +1165,7 @@ ON_METHOD(artist, view_collections) {
     };
 
     GalleryObjectPrinter<MyCollection, decltype(artist_id_filter)> c{cid, artist_id_filter};
-    if (count && idx0)
+    if (count)
         c.Print(idx0, count);
     else if (buf_len)
         c.Print(buf);
@@ -1155,7 +1183,7 @@ ON_METHOD(manager, view_artists) {
     GalleryObjectPrinter<MyArtist> a{cid};
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1182,7 +1210,7 @@ ON_METHOD(manager, view_collections) {
     GalleryObjectPrinter<MyCollection, decltype(artist_id_filter)> c{cid, artist_id_filter};
     if (count && h0)
         c.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         c.Print(idx0, count);
     else if (buf_len)
         c.Print(buf);
@@ -1205,7 +1233,7 @@ ON_METHOD(moderator, view_artists) {
 
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1228,7 +1256,7 @@ ON_METHOD(moderator, view_collections) {
     GalleryObjectPrinter<MyCollection, decltype(only_pending_artist_id_filter)> c{cid, only_pending_artist_id_filter};
     if (count && h0)
         c.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         c.Print(idx0, count);
     else if (buf_len)
         c.Print(buf);
@@ -1253,7 +1281,7 @@ ON_METHOD(moderator, view_artworks) {
 
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1458,7 +1486,6 @@ struct BalanceWalker {
 
 ON_METHOD(manager, view_balance) {
     BalanceWalker wlk;
-
     {
         Env::DocArray gr0("items");
         for (wlk.Enum(cid); wlk.MoveNext(); ) {
@@ -1792,7 +1819,34 @@ ON_METHOD(user, view_artworks) {
 
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
+        a.Print(idx0, count);
+    else if (buf_len)
+        a.Print(buf);
+    else
+        a.Print();
+}
+
+ON_METHOD(user, view_owned_artworks) {
+    const size_t MAX_IDS = 128;
+    char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
+    int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+
+    PubKey artist_id = MyArtist::id(cid);
+
+    auto owned_filter = [cid, artist_id, collection_id](const MyArtwork& a) {
+        OwnerInfo oi;
+        return oi.DeduceOwner(cid, a.id, artist_id) &&
+            (!collection_id || collection_id == a.collection_id);
+    };
+
+    GalleryObjectPrinter<MyArtwork, decltype(owned_filter)> a{cid, owned_filter};
+
+    if (count && h0)
+        a.Print(h0, count);
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1815,7 +1869,7 @@ ON_METHOD(manager, view_artworks) {
     GalleryObjectPrinter<MyArtwork, decltype(artist_collection_filter)> a{cid, artist_collection_filter};
     if (count && h0)
         a.Print(h0, count);
-    else if (count && idx0)
+    else if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);
@@ -1838,7 +1892,7 @@ ON_METHOD(artist, view_artworks) {
     };
 
     GalleryObjectPrinter<MyArtwork, decltype(only_approved_filter)> a{cid, only_approved_filter};
-    if (count && idx0)
+    if (count)
         a.Print(idx0, count);
     else if (buf_len)
         a.Print(buf);

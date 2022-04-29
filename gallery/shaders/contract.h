@@ -227,6 +227,7 @@ namespace Gallery
             Id id;
         };
 
+        Id id;
         PubKey m_pkAuthor;
         PubKey m_pkOwner;
         AssetID m_Aid; // set when it's taken out of gallery
