@@ -199,22 +199,9 @@ namespace Gallery {
 
         Config m_Config;
 
-        struct Stats {
-            uint32_t total;
-            uint32_t approved;
-            uint32_t pending;
-        };
-
-        struct : public Stats {
-            uint32_t free_id;
-        } artworks_stats;
-
-        struct : public Stats {
-            uint32_t free_id;
-        } collections_stats;
-
-        struct : public Stats {
-        } artists_stats;
+        uint32_t total_artworks;
+        uint32_t total_collections;
+        uint32_t total_artists;
 
         Amount m_VoteBalance;
     };
@@ -308,7 +295,8 @@ namespace Gallery {
         struct ManageArtist {
             static const uint32_t s_iMethod = 10;
 
-            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kSetStatus } req;
+            Gallery::Status status;
             PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
@@ -320,7 +308,8 @@ namespace Gallery {
         struct ManageCollection {
             static const uint32_t s_iMethod = 15;
 
-            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kSetStatus } req;
+            Gallery::Status status;
             PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
@@ -333,7 +322,8 @@ namespace Gallery {
         struct ManageArtwork {
             static const uint32_t s_iMethod = 3;
 
-            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kSetStatus } req;
+            Gallery::Status status;
             Gallery::Role role;
             PubKey m_pkArtist;
             PubKey signer;

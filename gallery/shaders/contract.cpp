@@ -25,9 +25,9 @@ struct MyState : public Gallery::State {
 BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
     if (Env::get_CallDepth() > 1) {
         MyState s(false);
-        s.artists_stats = {};
-        s.artworks_stats = {};
-        s.collections_stats = {};
+        s.total_artworks = 0;
+        s.total_artists = 0;
+        s.total_collections = 0;
 
         s.m_VoteBalance = 0;
         _POD_(s.m_Config) = r.m_Config;
@@ -119,20 +119,12 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
 
     bool exists = a.Load(r.m_pkArtist, sizeof(a));
 
-    if (exists) {
-        if (a.status == Gallery::Status::kPending)
-            s.artists_stats.pending--;
-        else if (a.status == Gallery::Status::kApproved)
-            s.artists_stats.approved--;
-    }
-
     if (r.req == ArtistReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist);
         Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
         a.label_len = r.m_LabelLen;
         a.data_len = r.m_DataLen;
         a.status = Gallery::Status::kPending;
-        s.artists_stats.pending++;
 
         if (!exists) {
             // if artist doesn't exist, then label is required
@@ -141,20 +133,12 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
             a.updated = cur_height;
             a.collections_num = 0;
             a.artworks_num = 0;
-            s.artists_stats.total++;
+            s.total_artists++;
         }
     } else {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator || 
                 !exists);
-        if (r.req == ArtistReqType::kPending) {
-            a.status = Gallery::Status::kPending;
-            s.artists_stats.pending++;
-        } else if (r.req == ArtistReqType::kApprove) {
-            a.status = Gallery::Status::kApproved;
-            s.artists_stats.approved++;
-        } else if (r.req == ArtistReqType::kReject) {
-            a.status = Gallery::Status::kRejected;
-        }
+        a.status = r.status;
     }
 
     Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
@@ -192,13 +176,6 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
 
     bool exists = c.Load(c_id, sizeof(c));
 
-    if (exists) {
-        if (c.status == Gallery::Status::kPending)
-            s.collections_stats.pending--;
-        else if (c.status == Gallery::Status::kApproved)
-            s.collections_stats.approved--;
-    }
-
     if (r.req == CollectionReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist);
 
@@ -206,15 +183,12 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
         c.label_len = r.m_LabelLen;
         c.data_len = r.m_DataLen;
         c.status = Gallery::Status::kPending;
-        s.collections_stats.pending++;
 
         if (!exists) {
             // if collection doesn't exist, then label is required
             Env::Halt_if(!r.m_LabelLen); 
 
-            s.collections_stats.total++;
-
-            c_id = ++s.collections_stats.free_id;
+            c_id = ++s.total_collections;
             c.m_pkAuthor = r.m_pkArtist;
             c.updated = cur_height;
             c.total_sold = 0;
@@ -244,15 +218,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator ||
                 !exists);
 
-        if (r.req == CollectionReqType::kPending) {
-            c.status = Gallery::Status::kPending;
-            s.collections_stats.pending++;
-        } else if (r.req == CollectionReqType::kApprove) {
-            c.status = Gallery::Status::kApproved;
-            s.collections_stats.approved++;
-        } else if (r.req == CollectionReqType::kReject) {
-            c.status = Gallery::Status::kRejected;
-        }
+        c.status = r.status;
     }
 
     Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
@@ -289,9 +255,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
 
     if (r.req == ArtworkReqType::kSet) {
         Env::Halt_if(r.role != Gallery::Role::kArtist || exists);
-        s.artworks_stats.total++;
-        s.artworks_stats.pending++;
-        m.id = ++s.artworks_stats.free_id;
+        m.id = ++s.total_artworks;
 
         m.m_pkOwner = r.m_pkArtist;
         m.m_pkAuthor = r.m_pkArtist;
@@ -365,21 +329,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
     } else {
         Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator ||
                 !exists);
-
-        if (m.status == Gallery::Status::kPending)
-            s.artworks_stats.pending--;
-        else if (m.status == Gallery::Status::kApproved)
-            s.artworks_stats.approved--;
-
-        if (r.req == ArtworkReqType::kPending) {
-            m.status = Gallery::Status::kPending;
-            s.artworks_stats.pending++;
-        } else if (r.req == ArtworkReqType::kApprove) {
-            m.status = Gallery::Status::kApproved;
-            s.artworks_stats.approved++;
-        } else if (r.req == ArtworkReqType::kReject) {
-            m.status = Gallery::Status::kRejected;
-        }
+        m.status = r.status;
     }
     Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
         ::Update(m.updated, cur_height, m.id);
@@ -542,7 +492,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
         Strict::Sub(s.m_VoteBalance, s.m_Config.m_VoteReward.m_Amount);
         s.Save();
 
-        Env::Halt_if(impk.m_ID.m_ArtworkID > s.artworks_stats.free_id);
+        Env::Halt_if(impk.m_ID.m_ArtworkID > s.total_artworks);
 
         Env::FundsUnlock(s.m_Config.m_VoteReward.m_Aid, s.m_Config.m_VoteReward.m_Amount);
     }
