@@ -2,39 +2,36 @@
 
 #include <string_view>
 
-namespace Gallery
-{
+namespace Gallery {
     static const ShaderID s_SID_0 = {0xea,0xda,0x0d,0x52,0x6b,0x03,0xc5,0x03,0x23,0x9f,0x16,0xaa,0x67,0x96,0x94,0x01,0xac,0xb3,0x82,0x5c,0x6d,0x14,0xb8,0xe1,0xe6,0x09,0x60,0x05,0x44,0xde,0xf1,0x4e};
 #pragma pack (push, 1)
 
-    struct Tags
-    {
-        static const uint8_t s_Artist = 1;
-        static const uint8_t s_Payout = 2;
-        static const uint8_t s_Artwork = 4;
-        static const uint8_t s_Impression = 5;
-        static const uint8_t s_ArtworkHeight = 6;
-        static const uint8_t s_ArtistHeight = 7;
-        static const uint8_t s_CollectionHeight = 8;
-        static const uint8_t s_Collection = 9;
-        static const uint8_t s_ArtistCollection = 10;
-        static const uint8_t s_CollectionArtwork = 11;
-        static const uint8_t s_Moderator = 12;
-        static const uint8_t s_ModeratorHeight = 13;
+    enum class Tag : uint8_t {
+        kArtist = 1,
+        kPayout = 2,
+        kArtwork = 3,
+        kModerator = 4,
+        kImpression = 5,
+        kCollection = 6,
+        kArtistCollectionIdx = 7,
+        kCollectionArtworkIdx = 8,
+        kHeightArtistIdx = 9,
+        kHeightModeratorIdx = 10,
+        kHeightArtworkIdx = 11,
+        kHeightCollectionIdx = 12,
     };
 
-    enum class Role {
+    enum class Role : uint8_t {
         kManager,
         kModerator,
         kArtist,
         kUser,
     };
 
-    enum class Status {
+    enum class Status : uint8_t {
         kPending,
         kApproved,
         kRejected,
-
     };
 
     const std::string_view status_to_string(const Status& status) {
@@ -55,117 +52,58 @@ namespace Gallery
         AssetID m_Aid;
     };
 
-    struct ArtistCollectionKey {
-        uint8_t m_Tag = Tags::s_ArtistCollection;
-        PubKey pkArtist;
-        uint32_t collection_id;
-    };
-
-    struct CollectionArtworkKey {
-        uint8_t m_Tag = Tags::s_CollectionArtwork;
-        uint32_t collection_id;
-        uint32_t artwork_id;
-    };
-
     template <class T, class ID>
     struct GalleryObject {
         using Id = ID;
 
         bool Load(const Id& id, size_t object_size = sizeof(T)) {
-            typename T::FirstStageKey fsk;
+            typename T::Key k;
             if constexpr(std::is_same_v<Id, PubKey>)
-                fsk.id = id;
+                k.id = id;
             else
-                fsk.id = Utils::FromBE(id); 
+                k.id = Utils::FromBE(id); 
 
-            typename T::SecondStageKey ssk;
-            if (!Env::LoadVar_T(fsk, ssk))
-                return false;
-            return Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
+            return Env::LoadVar(&k, sizeof(k), this, object_size, KeyTag::Internal);
         }
 
-        bool Save(const Id& id, Height h = Env::get_Height(), size_t object_size = sizeof(T)) {
-            typename T::FirstStageKey fsk;
-            typename T::SecondStageKey ssk;
-            if constexpr(std::is_same_v<Id, PubKey>) {
-                ssk.id = id;
-                fsk.id = id;
-            } else {
-                fsk.id = Utils::FromBE(id); 
-                ssk.id = Utils::FromBE(id); 
-            }
-            ssk.h_updated = Utils::FromBE(h);
-            Env::SaveVar_T(fsk, ssk);
-            return Env::SaveVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal);
-        }
-
-        bool TakeOut(const Id& id, size_t object_size = sizeof(T)) {
-            typename T::FirstStageKey fsk;
+        bool Save(const Id& id, size_t object_size = sizeof(T)) {
+            typename T::Key k;
             if constexpr(std::is_same_v<Id, PubKey>)
-                fsk.id = id; 
+                k.id = id;
             else
-                fsk.id = Utils::FromBE(id); 
-            typename T::SecondStageKey ssk;
-            if (!Env::LoadVar_T(fsk, ssk))
-                return false;
-            if (!Env::LoadVar(&ssk, sizeof(ssk), this, object_size, KeyTag::Internal))
-                return false;
-            Env::DelVar_T(ssk);
-            return true;
+                k.id = Utils::FromBE(id); 
+            return Env::SaveVar(&k, sizeof(k), this, object_size, KeyTag::Internal);
         }
 
         void Delete(const Id& id) {
-            typename T::FirstStageKey fsk;
+            typename T::Key k;
             if constexpr(std::is_same_v<Id, PubKey>)
-                fsk.id = id; 
+                k.id = id; 
             else
-                fsk.id = Utils::FromBE(id); 
-            typename T::SecondStageKey ssk;
-            Env::LoadVar_T(fsk, ssk);
-            Env::DelVar_T(ssk);
-            Env::DelVar_T(fsk);
-        }
-
-        bool Exists(const Id& id) {
-            typename T::FirstStageKey fsk;
-            if constexpr(std::is_same_v<Id, PubKey>)
-                fsk.id = id; 
-            else
-                fsk.id = Utils::FromBE(id); 
-            typename T::SecondStageKey ssk;
-            return Env::LoadVar_T(fsk, ssk);
+                k.id = Utils::FromBE(id); 
+            Env::DelVar_T(k);
         }
     };
 
-    struct Moderator : GalleryObject<Moderator, PubKey> {
-        struct FirstStageKey {
-            uint8_t m_Tag = Tags::s_ModeratorHeight;
-            Id id;
-        };
-
-        struct SecondStageKey {
-            uint8_t m_Tag = Tags::s_Moderator;
-            Height h_updated;
+    struct Moderator : public GalleryObject<Moderator, PubKey> {
+        struct Key {
+            Tag tag = Tag::kModerator;
             Id id;
         };
 
         Height registered;
+        Height updated;
         bool approved;
     };
 
     struct Artist : public GalleryObject<Artist, PubKey> {
-        struct FirstStageKey {
-            uint8_t m_Tag = Tags::s_ArtistHeight;
-            Id id;
-        };
-
-        struct SecondStageKey {
-            uint8_t m_Tag = Tags::s_Artist;
-            Height h_updated;
+        struct Key {
+            Tag tag = Tag::kArtist;
             Id id;
         };
 
         Height m_hRegistered;
+        Height updated;
         Status status;
         uint32_t data_len;
         uint32_t label_len;
@@ -179,19 +117,13 @@ namespace Gallery
     };
 
     struct Collection : public GalleryObject<Collection, uint32_t> {
-        struct FirstStageKey {
-            uint8_t m_Tag = Tags::s_CollectionHeight;
-            Id id;
-        };
-
-        struct SecondStageKey {
-            uint8_t m_Tag = Tags::s_Collection;
-            Height h_updated;
+        struct Key {
+            Tag tag = Tag::kCollection;
             Id id;
         };
 
         Status status;
-        bool is_default;
+        Height updated;
         uint32_t artworks_num;
         uint32_t data_len;
         uint32_t label_len;
@@ -213,21 +145,13 @@ namespace Gallery
     };
 
     struct Artwork : public GalleryObject<Artwork, uint32_t> {
-        // By this key masterpiece's height with specified ID is accessed 
-        // ID ---FistStageKey---> h_updated ---SecondStageKey---> Artwork
-        // This is done in order to be able to search for masterpieces updated since specified block
-        struct FirstStageKey {
-            uint8_t m_Tag = Tags::s_ArtworkHeight;
-            Id id;
-        };
-
-        struct SecondStageKey {
-            uint8_t m_Tag = Tags::s_Artwork;
-            Height h_updated;
+        struct Key {
+            Tag tag = Tag::kArtwork;
             Id id;
         };
 
         Id id;
+        Height updated;
         PubKey m_pkAuthor;
         PubKey m_pkOwner;
         AssetID m_Aid; // set when it's taken out of gallery
@@ -240,27 +164,23 @@ namespace Gallery
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
 
-    struct Impression
-    {
-        struct ID
-        {
+    struct Impression {
+        struct ID {
             Artwork::Id m_ArtworkID;
             PubKey m_pkUser;
         };
 
-        struct Key
-        {
-            uint8_t m_Tag = Tags::s_Impression;
+        struct Key {
+            Tag tag = Tag::kImpression;
             ID m_ID;
         };
 
         uint32_t m_Value; // 0 = none, 1 = like, etc.
     };
 
-    struct Payout
-    {
+    struct Payout {
         struct Key {
-            uint8_t m_Tag = Tags::s_Payout;
+            Tag tag = Tag::kPayout;
             PubKey m_pkUser;
             AssetID m_Aid;
             Artwork::Id m_ID;
@@ -269,14 +189,12 @@ namespace Gallery
         Amount m_Amount;
     };
 
-    struct Config
-    {
+    struct Config {
         PubKey m_pkAdmin;
         AmountWithAsset m_VoteReward;
     };
 
-    struct State
-    {
+    struct State {
         static const uint8_t s_Key = 0;
 
         Config m_Config;
@@ -301,8 +219,7 @@ namespace Gallery
         Amount m_VoteBalance;
     };
 
-    struct Events
-    {
+    struct Events {
         struct AddArtworkData {
             struct Key {
                 uint8_t m_Prefix = 0;
@@ -332,26 +249,66 @@ namespace Gallery
         };
     };
 
-    namespace Method
-    {
-        struct Init
-        {
+    template <Tag tg, class Idx, class T>
+    struct Index {
+        struct Key {
+            Tag tag = tg;
+            Idx id;
+            typename T::Id t_id;
+        };
+
+        static bool Save(const Idx& id, const typename T::Id& t_id) {
+            return Env::SaveVar_T(InitKey_(id, t_id), true);
+        }
+
+        static bool Load(const Idx& id, const typename T::Id& t_id) {
+            bool placeholder;
+            return Env::LoadVar_T(InitKey_(id, t_id), placeholder);
+        }
+
+        static void Delete(const Idx& id, const typename T::Id& t_id) {
+            Env::DelVar_T(InitKey_(id, t_id));
+        }
+
+        static bool Update(const Idx& old_id, const Idx& new_id, const typename T::Id& t_id) {
+            Delete(old_id, t_id);
+            return Save(new_id, t_id);
+        }
+
+        bool placeholder;
+    private:
+        static Key InitKey_(const Idx& id, const typename T::Id& t_id) {
+            Key k;
+            if constexpr(std::is_same_v<Idx, PubKey>)
+                k.id = id;
+            else
+                k.id = Utils::FromBE(id); 
+
+            if constexpr(std::is_same_v<typename T::Id, PubKey>)
+                k.t_id = t_id;
+            else
+                k.t_id = Utils::FromBE(t_id); 
+            return k;
+        }
+    };
+
+    namespace Method {
+        struct Init {
             static const uint32_t s_iMethod = 0;
             Config m_Config;
         };
 
-        struct ManageModerator
-        {
+        struct ManageModerator {
             static const uint32_t s_iMethod = 16;
 
-            enum class RequestType { kDisable, kEnable } req;
+            enum class RequestType : uint8_t { kDisable, kEnable } req;
             Gallery::Moderator::Id id;
         };
 
         struct ManageArtist {
             static const uint32_t s_iMethod = 10;
 
-            enum class RequestType { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
             PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
@@ -360,11 +317,10 @@ namespace Gallery
             // followed by label and data without delimiter
         };
 
-        struct ManageCollection
-        {
+        struct ManageCollection {
             static const uint32_t s_iMethod = 15;
 
-            enum class RequestType { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
             PubKey signer;
             Gallery::Role role;
             PubKey m_pkArtist;
@@ -377,7 +333,7 @@ namespace Gallery
         struct ManageArtwork {
             static const uint32_t s_iMethod = 3;
 
-            enum class RequestType { kSet, kReject, kApprove, kPending } req;
+            enum class RequestType : uint8_t { kSet, kReject, kApprove, kPending } req;
             Gallery::Role role;
             PubKey m_pkArtist;
             PubKey signer;
@@ -389,16 +345,14 @@ namespace Gallery
             // followed by the data and label
         };
 
-        struct SetPrice
-        {
+        struct SetPrice {
             static const uint32_t s_iMethod = 4;
 
             Artwork::Id m_ID;
             AmountWithAsset m_Price;
         };
 
-        struct Buy
-        {
+        struct Buy {
             static const uint32_t s_iMethod = 5;
 
             Artwork::Id m_ID;
@@ -407,57 +361,49 @@ namespace Gallery
             Amount m_PayMax;
         };
 
-        struct Withdraw
-        {
+        struct Withdraw {
             static const uint32_t s_iMethod = 6;
 
             Payout::Key m_Key;
             Amount m_Value;
         };
 
-        struct CheckPrepare
-        {
+        struct CheckPrepare {
             static const uint32_t s_iMethod = 7;
 
             Artwork::Id m_ID;
         };
 
-        struct CheckOut
-        {
+        struct CheckOut {
             static const uint32_t s_iMethod = 8;
 
             Artwork::Id m_ID;
         };
 
-        struct CheckIn
-        {
+        struct CheckIn {
             static const uint32_t s_iMethod = 9;
 
             Artwork::Id m_ID;
             PubKey m_pkUser;
         };
 
-        struct Vote
-        {
+        struct Vote {
             static const uint32_t s_iMethod = 11;
             Impression::ID m_ID;
             Impression m_Impression;
         };
 
-        struct AddVoteRewards
-        {
+        struct AddVoteRewards {
             static const uint32_t s_iMethod = 12;
             Amount m_Amount;
         };
 
-        struct AdminDelete
-        {
+        struct AdminDelete {
             static const uint32_t s_iMethod = 13;
             Artwork::Id m_ID;
         };
 
-        struct Transfer
-        {
+        struct Transfer {
             static const uint32_t s_iMethod = 14;
             Artwork::Id m_ID;
             PubKey m_pkNewOwner;
