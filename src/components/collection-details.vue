@@ -178,11 +178,7 @@ export default {
       return this.id !== undefined
     },
     collection () {
-      if (this.id) {
-        let coll = collsStore.user_items.find(c => c.id == this.id)
-        return coll
-      }
-      return undefined
+      return this.id ? collsStore.getItem(this.id) : undefined
     },
     label: {
       get () {
@@ -194,7 +190,7 @@ export default {
     },
     label_valid() {
       let value = this.label
-      return !value || value.length <= 100
+      return !value || value.length <= 40
     },
     website: {
       get () {
@@ -243,7 +239,7 @@ export default {
     },
     description_valid() {
       let value = this.description
-      return !value || value.length <= 150
+      return !value || value.length <= 1000
     },
     cover: {
       get () {

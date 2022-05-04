@@ -2,11 +2,11 @@
   <div class="tabs-container">
     <div v-for="tab of tabs"
          :key="tab.id"
-         :class="[ active === tab.id ? 'tab-active' : '','tab-item']" 
-         @click="$emit('update:active', tab.id)"
+         :class="[ modelValue === tab.id ? 'tab-active' : '','tab-item']" 
+         @click="$emit('update:modelValue', tab.id)"
     >
       <div class="title">{{ tab.name }}</div>
-      <div v-if="active === tab.id" class="bottom-line"></div>
+      <div v-if="modelValue === tab.id" class="bottom-line"></div>
     </div>
     <div class="slot">
       <slot></slot>
@@ -61,14 +61,15 @@ export default {
       type: Array,
       required: true
     },
-    active: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: Number,
       required: true
     }
   },
 
   emits: [
-    'update:active'
+    'update:modelValue'
   ]
 }
 </script>

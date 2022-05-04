@@ -120,6 +120,9 @@ class ImagesStore {
     })
   }
 
+  async loadAsync() {
+  }
+
   async toContract(image) {
     if (!image) {
       return

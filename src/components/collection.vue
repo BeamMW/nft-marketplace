@@ -1,24 +1,30 @@
 <template>
   <!--selectItem-->
   <div :class="
-         {'collection': true, 
-          'pointer-cursor': item.owned,
-          'error': item.error
-         }" 
-       @click="onDetails"
+    {'collection': true, 
+     'error': item.error
+    }"
   >
     <preview class="preview" 
              :image="item.cover"
              :default="def_banner"
              height="140px" 
              cover
-    />
-    <div v-if="pending" class="top-message pending">
-      Pending for approval
-    </div>
-    <div v-if="rejected" class="top-message rejected">
-      Rejected by moderator
-    </div>
+    >
+      <btn v-if="item.owned" 
+           padding="0px" 
+           radius="6px" 
+           class="btn-edit"
+           width="35px"
+           height="35px"
+           color="rgba(0, 0, 0, 0.6)"
+           :hover="false"
+           @click="onDetails"
+      >
+        <img width="18" src="~assets/icon-pencil.svg">
+      </btn>
+    </preview>
+    <moderationStatus :item="item"/>
     <div class="info-row">  
       <div class="avatar" :class="{'error': item.author_error}">
         <preview :image="item.avatar" 
@@ -36,8 +42,8 @@
         <hr class="line"/>
         <div class="items-info" :class="{'error': item.error}">
           <div class="count">
-            <div class="text">{{ item.artworks.length }}</div>
-            <div>{{ item.artworks.length == 1 ? 'item' : 'items' }}</div>
+            <div class="text">{{ item.artworks_count }}</div>
+            <div>{{ item.artworks_count == 1 ? 'item' : 'items' }}</div>
           </div>
           <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>
@@ -57,30 +63,10 @@
     overflow: hidden
 
     & > .preview {
-      height: 140px
-    }
-
-    & > .top-message {
-      position: absolute
-      left: 0
-      top: 0
-      font-size: 15px
-      width: 100%
-      height: 40px
-      display: flex
-      justify-content: center
-      align-items: center
-      padding-bottom: 5px
-      backdrop-filter: blur(4px)
-
-      &.pending {
-        background-color: rgba(23, 46, 43, 0.8)
-        color: rgba(255, 255, 255, 0.75)
-      }
-
-      &.rejected {
-        background-color: rgba(255, 116, 107, 0.8)
-        color: rgba(255, 255, 255, 0.9)
+      .btn-edit {
+        position: absolute
+        bottom: 8px
+        right: 10px
       }
     }
 
@@ -110,6 +96,7 @@
           font-size: 12px
           color: rgba(255, 255, 255, 0.5)
           margin-top: 6px
+          height: 32px
           display: -webkit-box
           -webkit-line-clamp: 2
           -webkit-box-orient: vertical
@@ -153,11 +140,15 @@ import preview from './image-preview'
 import amount from './amount'
 import collsStore from 'stores/collections'
 import {def_images} from 'utils/consts'
+import btn from './button'
+import moderationStatus from './moderation-status'
 
 export default {
   components: {
     preview,
     amount,
+    btn,
+    moderationStatus
   },
 
   props: {
@@ -177,12 +168,6 @@ export default {
   computed: {
     coll_name () {
       return [this.$state.debug ? `[${this.item.id}] - ` : '', this.item.label].join('')
-    },
-    pending () {
-      return this.item.status === 'pending'
-    },
-    rejected () {
-      return this.item.status === 'rejected'
     }
   },
 

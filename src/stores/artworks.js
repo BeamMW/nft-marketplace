@@ -6,7 +6,7 @@ import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
-
+ 
 class ArtworksStore extends ItemsStore {
   constructor () {
     super('artwork', [versions.ARTWORK_VERSION])
@@ -165,6 +165,12 @@ class ArtworksStore extends ItemsStore {
       params: {
         id
       }
+    })
+  }
+
+  toNewItem() {
+    router.push({
+      name: 'new-nft'
     })
   }
 }

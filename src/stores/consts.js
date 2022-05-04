@@ -1,6 +1,7 @@
 import {contract} from 'utils/consts'
 
 export const versions = {
+  DATABASE_VERSION:   200,
   ARTIST_VERSION:     200,
   COLLECTION_VERSION: 200,
   ARTWORK_VERSION:    200,

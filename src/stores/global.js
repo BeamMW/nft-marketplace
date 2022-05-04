@@ -1,4 +1,4 @@
-import {tabs, common, contract, sort} from 'utils/consts.js'
+import {tabs, common, contract, sort, my_tabs} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
@@ -8,17 +8,20 @@ import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
 import artsStore from 'stores/artworks'
+import database from 'stores/database'
 
 function defaultState() {
   let state = {  
     /// OLD
-    loading: true,
+    loading: 'BEAM Gallery is loading',
     error: undefined,
     shader: undefined,
     cid: contract.cid,
     cid_checked: false,
     is_admin: false,
     is_moderator: false,
+    is_artist: false,
+    my_active_tab: my_tabs.OWNED_NFTS,
     artworks: [],
     all_artworks: {
       [tabs.ALL]:   [],
@@ -98,18 +101,20 @@ const store = {
   start () {
     Object.assign(this.state, defaultState())
     this.state.is_headless = utils.isHeadless()
+
+    artsStore.reset(this)
     collsStore.reset(this)
     artistsStore.reset(this)
-    artsStore.reset(this)
     imagesStore.reset(this)
-    router.push({name: 'gallery'})
+    database.reset(this)
 
+    router.push({name: 'gallery'})
     nextTick(() => {
       utils.download('./galleryManager.wasm', (err, bytes) => {
         if (err) return this.setError(err, 'Failed to download shader')
         this.state.shader = bytes
 
-        //tils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
+        // utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
         utils.callApi('ev_subunsub', {ev_system_state: true}, (err) => this.checkError(err))
         utils.invokeContract('role=manager,action=view', (...args) => this.onCheckCID(...args), this.state.shader)
       })
@@ -129,7 +134,9 @@ const store = {
 
     if (full.id == 'ev_system_state') {
       // we update our data on each block
-      this.refreshAllData()
+      if (!this.state.loading) {
+        this.refreshAllData()
+      }
       return
     }
 
@@ -164,11 +171,12 @@ const store = {
     
     utils.ensureField(res, 'is_admin', 'number')
     utils.ensureField(res, 'is_moderator', 'number')  
-    utils.ensureField(res, 'voteReward_balance', 'number')
+    utils.ensureField(res, 'vote_reward', 'object')
+    utils.ensureField(res.vote_reward, 'balance', 'number')
    
     this.state.is_admin = !!res.is_admin
     this.state.is_moderator = !!res.is_moderator
-    this.state.balance_reward = res.voteReward_balance
+    this.state.balance_reward = res.vote_reward.balance
     utils.invokeContract(
       `role=user,action=view_balance,cid=${this.state.cid}`, 
       (...args) => this.onLoadBalance(...args)
@@ -196,9 +204,56 @@ const store = {
 
     this.state.balance_beam = newBeam
     try {
+      let stores = {}
+      Object.assign(stores, collsStore.getDBStores())
+      Object.assign(stores, artsStore.getDBStores())
+      await database.loadAsync(stores)
+    }
+    catch(err) 
+    {
+      this.setError(err)
+    }
+
+    try {
+      await imagesStore.loadAsync()
+    }
+    catch(err) 
+    {
+      this.setError(err)
+    }
+
+    try {
+      if (this.state.loading) {
+        this.state.loading = 'Loading Artists'
+      }
+      
       await artistsStore.loadAsync()
-      await collsStore.loadAsync()
-      await artsStore.loadAsync()
+
+      if (this.state.loading) {
+        this.state.my_active_tab = my_tabs.COLLECTIONS
+      }
+    }
+    catch(err) 
+    {
+      this.setError(err)
+    }
+
+    try {
+      if (this.state.loading) {
+        this.state.loading = 'Loading Collections'
+      }
+      await collsStore.loadAsync(database)
+    }
+    catch(err) 
+    {
+      this.setError(err)
+    }
+
+    try {
+      if (this.state.loading) {
+        this.state.loading = 'Loading Artworks'
+      }
+      await artsStore.loadAsync(database)
       this.state.loading = false
     }
     catch(err) 
@@ -231,7 +286,7 @@ const store = {
 
     let oldstart = 0, oartworks = this.state.all_artworks[tabs.ALL]
     let all = [], sale = [], liked = [], mine = [], sold = []
-    let mykey = artistsStore.my_id
+    let mykey = this.state.my_id
 
     for (let awork of res.artworks) {
       let oawork = null
@@ -458,7 +513,7 @@ const store = {
       }
 
       // We receive author only now, so add what's missing to SOLD
-      let mykey = artistsStore.my_id
+      let mykey = this.state.my_id
       if (artwork.pk_author === mykey && !artwork.owned) {
         this.state.all_artworks[tabs.SOLD].push(artwork)
         if (this.state.active_tab == tabs.SOLD) {
@@ -651,6 +706,10 @@ const store = {
     this.setGalleryArtworksPage(1)
   },
 
+  setMyTab(id) {
+    this.state.my_active_tab = id
+  },
+
   setGalleryTab(id) {
     this.state.gallery_tab = id
   },
@@ -669,13 +728,7 @@ const store = {
     router.push({
       name: 'balance'
     })
-  },
-
-  toNewNFT() {
-    router.push({
-      name: 'add-nft'
-    })
-  },
+  }
 }
 
 export default store

@@ -9,7 +9,8 @@ import {createApp} from 'vue/dist/vue.esm-bundler.js'
 import store from './stores/global.js'
 import artwork from './components/artwork.vue'
 import collection from './components/collection.vue'
-import newCollection from './components/new-collection.vue'
+import createCollection from './components/create-collection'
+import createNFT  from './components/create-nft'
 
 utils.initialize(
   {
@@ -28,7 +29,8 @@ utils.initialize(
     }
     vueApp.component('artwork', artwork)
     vueApp.component('collection', collection)
-    vueApp.component('new-collection', newCollection)
+    vueApp.component('create-collection', createCollection)
+    vueApp.component('create-nft', createNFT)
     vueApp.use(router)
     vueApp.mount('body')
 

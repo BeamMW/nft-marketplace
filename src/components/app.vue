@@ -2,7 +2,7 @@
   <span id="modals"/>
   <error v-if="error && debug" :text="errtext"/>
   <errorModal v-if="error && !debug" :text="errtext" @copy="onCopy"/>
-  <loading v-if="loading"/>
+  <loading v-if="loading" :text="loading"/>
   <div v-else-if="!loading" id="app-container" class="app-container">
     <router-view></router-view>
   </div>

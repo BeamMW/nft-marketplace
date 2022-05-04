@@ -209,7 +209,7 @@ export default {
 
     button_style() {
       return {
-        'background-color': this.button_colors[this.color],
+        'background-color': this.button_colors[this.color] || this.color,
         'padding': this.padding,
         'height': this.height,
         'width': this.width,

@@ -94,7 +94,7 @@ export default {
     },
 
     my_artist_name () {
-      let artist = artistsStore.artists[artistsStore.my_id]
+      let artist = artistsStore.self
       return (artist || {}).label
     }
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="gallery-controls">
-    <tabsctrl v-model:active="active_tab" :tabs="tabs">
+    <tabsctrl v-model="active_tab" :tabs="tabs">
       <div v-if="show_nfts" class="selectors">
         <!-- <selector
                 v-on:selected="onAuthor"
@@ -14,7 +14,6 @@
                   title="Sort by"
         />
       </div>
-      <btn text="nft" color="green" padding="7px 12px" @click="$store.toNewNFT"/>
       <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"

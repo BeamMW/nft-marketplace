@@ -15,6 +15,7 @@
     "beam-wasm-client-masternet": "^7.0.12638",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.0",
+    "dexie": "^3.2.2",
     "eslint": "^8.11.0",
     "eslint-plugin-vue": "^8.5.0",
     "eslint-webpack-plugin": "^3.1.1",

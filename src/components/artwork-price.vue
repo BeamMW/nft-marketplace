@@ -94,8 +94,8 @@ import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
 import artworkPriceModal from './price-dialog.vue'
 import amount from './amount.vue'
-import artistsStore from 'stores/artists'
 import artsStore from 'stores/artworks'
+import artistsStore from 'stores/artists'
 
 export default {
   components: {
@@ -130,7 +130,7 @@ export default {
     },
 
     author () {
-      return artistsStore.my_id === this.artwork.author
+      return artistsStore.my_id === artistsStore.author
     },
 
     price () {

@@ -7,6 +7,7 @@
                      :key="item.id"
                      :item="item"
           />
+          <component :is="new_component" v-if="show_new"/>
         </div>
       </div>
       <paginator :current="page"
@@ -99,7 +100,12 @@ export default {
 
   computed: {
     items () {
-      return this.store.getItems(this.mode)
+      let items = this.store.getPageItems(this.mode)
+      if (!items) {
+        // eslint-disable-next-line no-debugger
+        debugger
+      }
+      return items
     },
     total() {
       return this.store.getTotal(this.mode)
@@ -109,6 +115,9 @@ export default {
     },
     page() {
       return this.store.getPage(this.mode)
+    },
+    show_new() {
+      return this.new_component && this.page == this.pages
     }
   },
 

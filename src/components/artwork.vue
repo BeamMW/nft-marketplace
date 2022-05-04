@@ -8,6 +8,7 @@
              :cover="!(item.image || {}).object"
              @click="onDetails"
     >
+      <moderationStatus :item="item"/>
       <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
@@ -44,6 +45,7 @@
     background-color: rgba(240, 205, 205, 0.05)
     border-radius: 10px
     position:relative
+    overflow: hidden
 
     & > .delete {
       position: absolute
@@ -89,7 +91,7 @@
       align-items: center
       cursor: pointer
       box-sizing: border-box
-      background: rgba(0, 0, 0, 0.3)
+      background-color: rgba(0, 0, 0, 0.6)
       border-radius: 10px
 
       & > div {
@@ -117,11 +119,13 @@ import price from './artwork-price'
 import preview from './image-preview'
 import artsStore from 'stores/artworks'
 import {def_images} from 'utils/consts'
+import moderationStatus from './moderation-status'
 
 export default {
   components: {
     price,
-    preview
+    preview,
+    moderationStatus
   },
 
   props: {

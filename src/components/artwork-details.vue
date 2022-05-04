@@ -1,6 +1,6 @@
 <template>
   <div id="container" class="container">
-    <backBtn/>
+    <pageTitle/>
     <div class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
         <div class="artwork-container">
@@ -260,12 +260,12 @@
 
 <script>
 import artPrice from './artwork-price'
-import backBtn from './back-btn.vue'
 import preview from './image-preview'
 import artistsStore from 'stores/artists'
 import artsStore from 'stores/artworks'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
+import pageTitle from './page-title'
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -276,7 +276,7 @@ export default {
   components: {
     artPrice,
     preview,
-    backBtn
+    pageTitle
   },
 
   props: {

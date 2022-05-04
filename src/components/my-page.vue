@@ -97,7 +97,7 @@ export default {
 
   methods: {
     onEditArtist() {
-      artistsStore.toEditArtist()
+      artistsStore.toEditSelf()
     },
     onBecomeArtist() {
       artistsStore.toBecomeArtist()

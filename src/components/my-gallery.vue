@@ -1,11 +1,11 @@
 <template>
   <div class="gallery-container">
-    <tabsctrl v-model:active="active_tab" :tabs="tabs"/>
+    <tabsctrl v-model="active_tab" :tabs="tabs"/>
     <list v-if="show_collections"
           class="list"
           emptymsg="There are no collections at the moment"
           component="collection"
-          new_component="new-collection"
+          new_component="create-collection"
           mode="artist"
           :store="collsStore"
     />
@@ -13,7 +13,7 @@
           class="list"
           emptymsg="There are no NFTs at the moment"
           component="artwork"
-          new_component="new-collection"
+          new_component="create-nft"
           mode="artist"
           :store="artsStore"
     />
@@ -25,6 +25,7 @@
     display: flex
     flex-direction: column
     min-height: 0
+    margin-top: 15px
     
     & > .list {
       margin-top: 20px
@@ -35,6 +36,7 @@
 
 <script>
 import collsStore from 'stores/collections'
+import artsStore from 'stores/artworks'
 import artistsStore from 'stores/artists'
 import {my_tabs} from 'utils/consts.js'
 import tabsctrl from './tabs.vue'
@@ -46,20 +48,20 @@ export default {
     list
   },
 
-  data() {
-    return {
-      active_tab: my_tabs.COLLECTIONS,
-      tabs: [
-        {id: my_tabs.COLLECTIONS, name: 'Collections'},
-        {id: my_tabs.CREATED_NFTS, name: 'NFTs'},
-        {id: my_tabs.OWNED_NFTS, name: 'Owned NFTs'},
-      ],
-    }
-  },
-
   computed: {
+    active_tab: {
+      get() {
+        return this.$state.my_active_tab
+      },
+      set(value) {
+        this.$store.setMyTab(value)
+      }
+    },
     collsStore() {
       return collsStore
+    },
+    artsStore() {
+      return artsStore
     },
     is_artist() {
       return artistsStore.is_artist
@@ -72,7 +74,16 @@ export default {
     },
     show_owned() {
       return this.active_tab == my_tabs.OWNED_NFTS
-    }
+    },
+    tabs() {
+      let res = []
+      if (this.is_artist) {
+        res.push({id: my_tabs.COLLECTIONS, name: 'Collections'})
+        res.push({id: my_tabs.CREATED_NFTS, name: 'NFTs'})
+      }
+      res.push({id: my_tabs.OWNED_NFTS, name: 'All'})
+      return res
+    },
   }
 }
 </script>

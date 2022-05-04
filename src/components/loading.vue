@@ -1,7 +1,7 @@
 <template>
   <div class="app-loading">
-    <div class="title">BEAM Gallery is loading</div>
-    <p>Please wait...</p>
+    <div class="title">{{ text }}</div>
+    <span>Please wait...</span>
   </div>
 </template>
 
@@ -12,9 +12,21 @@
   margin-top: 50px
 
   .title {
-    font-size: 25px
+    font-size: 22px
     font-weight: 400
     user-select: none
+    margin-bottom: 8px
   }
 }
 </style>
+
+<script>
+export default {
+  props: {
+    text: {
+      type: String,
+      default: 'BEAM Gallery is loading'
+    }
+  }
+}
+</script>

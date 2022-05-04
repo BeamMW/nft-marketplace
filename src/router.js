@@ -16,9 +16,9 @@ const router = createRouter({
     {path: '/balance', component: balance, name: 'balance'},
     {path: '/artwork/:id', component: artworkDetails, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/artist/:id?', component: artistDetails, name: 'artist', props: true},
-    {path: '/new-collection', component: collDetails, name: 'new-collection'},
     {path: '/edit-collection/:id', component: collDetails, name: 'edit-collection', props: (route) => {return {id: Number(route.params.id)}}},
-    {path:'/add-nft', component: newNft, name: 'add-nft'}
+    {path: '/new-collection', component: collDetails, name: 'new-collection'},
+    {path: '/new-nft', component: newNft, name: 'new-nft'}
   ]
 })
 

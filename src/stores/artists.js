@@ -21,10 +21,6 @@ class ArtistsStore {
     })
   }
 
-  get my_id() {
-    return this._state.my_id
-  }
-
   get total() {
     return this._state.total
   }
@@ -43,6 +39,10 @@ class ArtistsStore {
 
   get artists () {
     return this._state.artists
+  }
+
+  get my_id() {
+    return this._state.my_id
   }
 
   get self () {
@@ -75,8 +75,11 @@ class ArtistsStore {
   }
 
   async _loadSelf() {
-    let self = await this._loadArtistAsync(this.my_id, false)
-    
+    if (!this._state.my_id) {
+      return
+    }
+
+    let self = await this._loadArtistAsync(this._state.my_id, false)
     if (self === null) {
       this._state.is_artist = false
       return
@@ -110,19 +113,19 @@ class ArtistsStore {
         cid
       })
 
-      utils.ensureField(res, 'artists', 'array')
-      if (res.artists.length > 1) {
+      utils.ensureField(res, 'items', 'array')
+      if (res.items.length > 1) {
         throw new Error('artists.length > 1')
       }
 
-      if (res.artists.length == 0) {
+      if (res.items.length == 0) {
         if (fail) {
           throw new Error('artist not found')
         }
         return null
       }
 
-      let artist = this._fromContract(res.artists[0])
+      let artist = this._fromContract(res.items[0])
       this._setArtist(id, artist)
     } 
     catch (err) {
@@ -226,14 +229,14 @@ class ArtistsStore {
     })
   }
 
-  toEditArtist() {
+  toEditSelf() {
     if (!this.is_artist) {
       throw new Error('Unexpected EditArtist, not an artist yet')
     }
     router.push({
       name: 'artist',
       params: {
-        id: this.my_id
+        id: this._state.my_id
       }
     })
   }

@@ -58,7 +58,7 @@
 <script>
 import modal from './modal.vue'
 import btn from './button.vue'
-import artistsStore from 'stores/artists.js'
+import artistsStore from 'stores/artists'
 
 export default {
   components: { 
