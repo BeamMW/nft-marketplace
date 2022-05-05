@@ -14,8 +14,9 @@ class ArtworksStore extends ItemsStore {
 
   _fromContract(awork) {
     awork = Object.assign({}, awork)
+    awork.description = awork.data.description
+
     let author = artistsStore.loadArtist(awork.author)
-    
     awork.author_error = computed(() => {
       return author.error
     })
@@ -37,7 +38,7 @@ class ArtworksStore extends ItemsStore {
     }
 
     if (!awork.error) {
-      awork.image = imagesStore.fromContract(awork.image)
+      awork.image = imagesStore.fromContract(awork.data.image)
     }
 
     // TODO: convert to true js object

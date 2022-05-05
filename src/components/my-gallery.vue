@@ -17,6 +17,13 @@
           mode="artist"
           :store="artsStore"
     />
+    <list v-if="show_owned"
+          class="list"
+          emptymsg="There are no NFTs at the moment"
+          component="artwork"
+          mode="owner"
+          :store="artsStore"
+    />
   </div>
 </template>
 

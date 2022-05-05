@@ -13,6 +13,7 @@ class CollectionsStore extends ItemsStore {
 
   _fromContract (coll) {
     coll = Object.assign({}, coll)
+    coll.description = coll.data.description
 
     let author = artistsStore.loadArtist(coll.author)
     coll.owned = computed(() => artistsStore.my_id == coll.author)
@@ -44,7 +45,7 @@ class CollectionsStore extends ItemsStore {
     } 
 
     if (!coll.error) {  
-      coll.cover = imagesStore.fromContract(coll.cover)
+      coll.cover = imagesStore.fromContract(coll.data.cover)
     }
     
     return coll

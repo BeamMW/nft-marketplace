@@ -13,6 +13,7 @@ export default class ItemsStore {
     this._versions = versions
     this._per_page = perPage || common.ITEMS_PER_PAGE
     this._modes = ['user', 'moderator', 'artist', 'owner']
+    this._my_key = ''
     this._loading = false
   }
 
@@ -24,8 +25,8 @@ export default class ItemsStore {
 
     let makeMode = (mode) => {
       return {
-        items: [],
         all_items: [],
+        page_items: [],
         total: 0,
         page: 1,
         pages: computed(() => {
@@ -38,17 +39,37 @@ export default class ItemsStore {
     for (let mode of this._modes) {
       this._state[mode] = makeMode(mode)
     }
+
+    this._state['artist'].loader = async () => {
+      let my_key = this._my_key
+      let page = this._state['artist'].page
+      this._state['artist'].page_items = await this._db[this._store_name]
+        .where('author')
+        .equals(my_key)
+        .offset((page - 1) * this._per_page)
+        .limit(this._per_page)
+        .toArray(arr => arr.map(item => this._fromContract(item)))
+    }
+
+    this._state['owner'].loader = async () => {
+      let page = this._state['owner'].page
+      this._state['owner'].page_items = await this._db[this._store_name]
+        .where('owned')
+        .equals(1)
+        .offset((page - 1) * this._per_page)
+        .limit(this._per_page)
+        .toArray(arr => arr.map(item => this._fromContract(item)))
+    }
   }
 
   getItem(id) {
     for (let mode of this._modes) {
-      for (let item of this._state[mode].all_items) {
+      for (let item of this._state[mode].page_items) {
         if (item.id == id) {
           return item
         }
       }
     }
-   
     throw new Error(`ItemsStore::getItem - item ${this._objname}-${id} not found`)
   }
 
@@ -61,8 +82,16 @@ export default class ItemsStore {
   }
 
   setPage(mode, page) {
-    this._state[mode].page = page
-    //this._loadItems(mode)
+    this._state[mode].page = page;
+    (async () => {
+      try
+      {
+        await this._loadPageItemsAsync(mode)
+      }
+      catch(err) {
+        this._global.setError(err)
+      }
+    })()
   }
 
   getPages(mode) {
@@ -74,8 +103,7 @@ export default class ItemsStore {
   }
 
   getPageItems(mode) {
-    let page = this.getPage(mode)
-    return this._state[mode].all_items.slice((page-1) * this._per_page, page * this._per_page)  
+    return this._state[mode].page_items
   }
 
   getTotal(mode) {
@@ -84,12 +112,19 @@ export default class ItemsStore {
 
   getDBStores() {
     let res = {} 
-    res[this._store_name] = 'id, status'
+    res[this._store_name] = 'id, status, author, owned'
     res[this._metastore_name] = 'name'
     return res
   }
 
-  async _loadKey () {
+  async _loadPageItemsAsync(mode) {
+    let loader = this._state[mode].loader
+    if (loader) {
+      await loader()
+    }
+  }
+
+  async _loadKeyAsync () {
     let {res} = await utils.invokeContractAsync({
       role: 'artist',
       action: 'get_id',
@@ -101,7 +136,13 @@ export default class ItemsStore {
   }
 
   async loadAsync(db) {
-    if(this._loading) return
+    if(this._loading) {
+      return
+    }
+
+    if (!this._my_key) {
+      this._my_key = await this._loadKeyAsync()
+    }
 
     this._db = db
     let {res} = await utils.invokeContractAsync({
@@ -112,38 +153,31 @@ export default class ItemsStore {
 
     utils.ensureField(res, 'items', 'array')
 
-    let mykey = await this._loadKey()
-    let approved = []
-    let pending = []
-    let rejected = []
-    let author = []
-    let owned = []
-    let liked = []
+    let approved = 0
+    let pending = 0
+    let rejected = 0
+    let artist = 0
+    let owned = 0
+    let liked = 0
 
     for(let item of res.items) {
-      item = Object.assign({}, item)
       try {
         [item.label] = formats.fromContract(item.label)
         if (!item.label) {
           throw new Error('label cannot be empty')
         }
 
-        if (item.data) {
-          let [version, data] = formats.fromContract(item.data)
-          Object.assign(item, data)
-          item.version = version
-        
-          if (!this._versions.includes(version)) {
-            throw new Error(`item version mismatch:  ${version}`) 
-          }
-        } 
-
         if (!item.data) {
-          item.version = this.version
-          item.data = {}
+          throw new Error('empty data on item') 
+        }
+
+        [item.version, item.data] = formats.fromContract(item.data)
+        if (!this._versions.includes(item.version)) {
+          throw new Error(`item version mismatch:  ${item.version}`) 
         }
 
         item = this._fromContract(item)
+        item = Object.assign({}, item)
         console.log('item loaded with label', item.label)
       }
       catch(err) {
@@ -153,55 +187,49 @@ export default class ItemsStore {
       }
 
       if (item.status === 'approved') {
-        approved.push(item)
+        approved++
       }
 
       if (item.status === 'pending') {
-        pending.push(item)
+        pending++
       }
 
       if (item.status === 'rejected') {
-        rejected.push(item)
+        rejected++
       }
 
-      if (item.author == mykey) {
-        author.push(item)
+      if (item.author == this._my_key) {
+        artist++
       }
 
-      // TODO: this is until we have a proper owned flag
-      if (this._objname == 'collection') {
-        if (item.author == mykey) {
-          owned.push(item)
-        }
-      }
-
-      if (item.owner) {
-        owned.push(item)
+      if (item.owned) {
+        owned++
       }
 
       if (item.my_impression) {
-        liked.push(item)
+        liked++
       }
     }
 
     await db.transaction('rw!', db[this._store_name], db[this._metastore_name], async () => {
-      await db[this._metastore_name].put({name: 'approved', value: approved.length})
-      await db[this._metastore_name].put({name: 'rejected', value: rejected.length})
-      await db[this._metastore_name].put({name: 'pending', value: pending.length})
-      await db[this._metastore_name].put({name: 'author', value: author.length})
-      await db[this._metastore_name].put({name: 'owned', value: owned.length})
-      await db[this._metastore_name].put({name: 'liked', value: liked.length})
+      await db[this._metastore_name].put({name: 'approved', value: approved})
+      await db[this._metastore_name].put({name: 'rejected', value: rejected})
+      await db[this._metastore_name].put({name: 'pending', value: pending})
+      await db[this._metastore_name].put({name: 'artist', value: artist})
+      await db[this._metastore_name].put({name: 'owned', value: owned})
+      await db[this._metastore_name].put({name: 'liked', value: liked})
       await db[this._store_name].bulkPut(res.items)
     })
 
-    this._state['user'].all_items = approved
-    this._state['user'].total = approved.length
-    this._state['artist'].all_items = author
-    this._state['artist'].total = author.length
-    this._state['owner'].all_items = owned
-    this._state['owner'].total = owned.length
-    this._state['moderator'].all_items = [...pending, ...rejected]
-    this._state['moderator'].total = pending.length + rejected.length
+    this._state['user'].total = approved
+    this._state['artist'].total = artist
+    this._state['owner'].total = owned
+    this._state['moderator'].total = pending + rejected
+
+    for (let mode of this._modes) {
+      await this._loadPageItemsAsync(mode)
+    }
+
     this._loading = false
   }
 
