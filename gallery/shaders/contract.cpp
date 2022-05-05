@@ -28,6 +28,7 @@ BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
         s.total_artworks = 0;
         s.total_artists = 0;
         s.total_collections = 0;
+        s.total_moderators = 0;
 
         s.m_VoteBalance = 0;
         _POD_(s.m_Config) = r.m_Config;
@@ -71,11 +72,13 @@ BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
     using ModeratorReqType = Gallery::Method::ManageModerator::RequestType;
 
     Gallery::Moderator m;
+    MyState s;
     Height cur_height = Env::get_Height();
 
     if (!m.Load(r.id)) {
         m.registered = cur_height;
         m.updated = cur_height;
+        s.total_moderators++;
     }
 
     if (r.req == ModeratorReqType::kEnable || r.req == ModeratorReqType::kDisable)
@@ -88,8 +91,8 @@ BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
 
     m.updated = cur_height;
     m.Save(r.id);
+    s.Save();
 
-    MyState s;
     s.AddSigAdmin();
 }
 
@@ -112,7 +115,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
     } else if (r.role == Gallery::Role::kArtist) {
-        Env::AddSig(r.signer);
+        Env::AddSig(r.m_pkArtist);
     } else {
         Env::Halt();
     }
@@ -169,7 +172,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
     } else if (r.role == Gallery::Role::kArtist) {
-        Env::AddSig(r.signer);
+        Env::AddSig(r.m_pkArtist);
     } else {
         Env::Halt();
     }
@@ -245,8 +248,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
         Env::Halt_if(!m.approved);
         Env::AddSig(r.signer);
     } else if (r.role == Gallery::Role::kArtist) {
-        //bug?
-        Env::AddSig(r.signer);
+        Env::AddSig(r.m_pkArtist);
     } else {
         Env::Halt();
     }

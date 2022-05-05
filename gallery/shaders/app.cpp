@@ -25,6 +25,9 @@
 #define Gallery_manager_view_artists_stats(macro) \
     macro(ContractID, cid) \
 
+#define Gallery_manager_view_moderators_stats(macro) \
+    macro(ContractID, cid) \
+
 #define Gallery_manager_view_collections_stats(macro) \
     macro(ContractID, cid) \
 
@@ -83,6 +86,7 @@
     macro(manager, view) \
     macro(manager, view_params) \
     macro(manager, view_artists_stats) \
+    macro(manager, view_moderators_stats) \
     macro(manager, view_artists) \
     macro(manager, view_collections) \
     macro(manager, view_artworks) \
@@ -390,7 +394,7 @@ public:
         return true;
     }
 
-    void Print(const Id& id) {
+    void Print(const ContractID& cid, const Id& id) {
         Env::DocGroup gr1("");
         Env::DocAddBlob_T("id", id);
         Env::DocAddNum32("updated", updated);
@@ -427,7 +431,7 @@ public:
 
     // TODO: label_exists
 
-    void Print(const Id& id) {
+    void Print(const ContractID& cid, const Id& id) {
         // DocAddText prints char[] until it meets \0 symbol, but
         // m_szLabelData contains label + data without \0 symbol between them
         char label[label_len + 1];
@@ -444,6 +448,61 @@ public:
         Env::DocAddText("data", data);
         Env::DocAddNum("hReg", m_hRegistered);
         Env::DocAddText("status", Gallery::status_to_string(status).data());
+
+        uint32_t print_artworks{};
+        Env::DocGetNum32("artworks", &print_artworks);
+
+        uint32_t print_collections{};
+        Env::DocGetNum32("collections", &print_collections);
+
+        if (!print_artworks && !print_collections)
+            return;
+
+        using ACKey = Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
+            Gallery::Artist::Id, Gallery::Collection>::Key;
+
+        using CAKey = Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
+            Gallery::Collection::Id, Gallery::Artwork>::Key;
+
+        Env::Key_T<ACKey> ack0, ack1;
+        _POD_(ack0.m_Prefix.m_Cid) = cid;
+        _POD_(ack1.m_Prefix.m_Cid) = cid;
+        ack0.m_KeyInContract.id = id;
+        ack1.m_KeyInContract.id = id;
+        ack0.m_KeyInContract.t_id = 0;
+        ack1.m_KeyInContract.t_id = static_cast<Gallery::Collection::Id>(-1);
+
+        if (print_collections) {
+            Env::VarReader rac(ack0, ack1);
+            Env::DocArray gr2("collections");
+            bool exists;
+            while (rac.MoveNext_T(ack0, exists)) {
+                Env::DocAddNum32("", Utils::FromBE(ack0.m_KeyInContract.t_id));
+            }
+        }
+
+        if (print_artworks) {
+            ack0.m_KeyInContract.id = id;
+            ack0.m_KeyInContract.t_id = 0;
+            Env::VarReader rac(ack0, ack1);
+
+            bool exists;
+            Env::DocArray gr2("artworks");
+            while (rac.MoveNext_T(ack0, exists)) {
+                Env::Key_T<CAKey> cak0, cak1;
+                _POD_(cak0.m_Prefix.m_Cid) = cid;
+                _POD_(cak1.m_Prefix.m_Cid) = cid;
+                cak0.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
+                cak1.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
+                cak0.m_KeyInContract.t_id = 0;
+                cak1.m_KeyInContract.t_id = static_cast<Gallery::Artwork::Id>(-1);
+                Env::VarReader rca(cak0, cak1);
+
+                while (rca.MoveNext_T(cak0, exists)) {
+                    Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.t_id));
+                }
+            }
+        }
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Key>& key) {
@@ -518,8 +577,8 @@ struct MyCollection : public Gallery::Collection {
         Env::Key_T<CAKey> cak0, cak1;
         _POD_(cak0.m_Prefix.m_Cid) = cid;
         _POD_(cak1.m_Prefix.m_Cid) = cid;
-        cak0.m_KeyInContract.id = id;
-        cak1.m_KeyInContract.id = id;
+        cak0.m_KeyInContract.id = Utils::FromBE(id);
+        cak1.m_KeyInContract.id = Utils::FromBE(id);
         cak0.m_KeyInContract.t_id = 0;
         cak1.m_KeyInContract.t_id = static_cast<Gallery::Artwork::Id>(-1);
         Env::VarReader rca(cak0, cak1);
@@ -527,7 +586,7 @@ struct MyCollection : public Gallery::Collection {
         Env::DocArray gr2("artworks");
         bool exists;
         while (rca.MoveNext_T(cak0, exists)) {
-            Env::DocAddNum32("", cak0.m_KeyInContract.t_id);
+            Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.t_id));
         }
     }
 
@@ -700,7 +759,7 @@ public:
 
         while (object_.ReadNext(r, k0)) {
             if constexpr(std::is_same_v<typename T::Id, PubKey>)
-                object_.Print(k0.m_KeyInContract.id);
+                object_.Print(cid_, k0.m_KeyInContract.id);
             else 
                 object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id));
         }
@@ -749,7 +808,7 @@ public:
             return false;
 
         if constexpr(std::is_same_v<typename T::Id, PubKey>)
-            object_.Print(k.m_KeyInContract.id);
+            object_.Print(cid_, k.m_KeyInContract.id);
         else 
             object_.Print(cid_, Utils::FromBE(k.m_KeyInContract.id));
         return true;
@@ -765,18 +824,23 @@ public:
         _POD_(k1.m_KeyInContract.t_id).SetObject(0xff);
  
         Env::VarReader r(k0, k1);
-        Env::DocArray gr0("items");
  
         int cur_cnt = 0;
-        Height prev_h = -1;
+        Height prev_h = -1, last_printed_h = -1;
         bool exists;
-        while (r.MoveNext_T(k0, exists) && (cur_cnt++ < count || prev_h == k0.m_KeyInContract.id)) {
-            if constexpr(std::is_same_v<typename T::Id, PubKey>)
-                object_.Print(k0.m_KeyInContract.t_id);
-            else 
-                object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.t_id));
-            prev_h = k0.m_KeyInContract.id;
+        {
+            Env::DocArray gr0("items");
+            while (r.MoveNext_T(k0, exists) && (cur_cnt++ < count || prev_h == k0.m_KeyInContract.id)) {
+                if constexpr(std::is_same_v<typename T::Id, PubKey>)
+                    Print(k0.m_KeyInContract.t_id);
+                else 
+                    Print(Utils::FromBE(k0.m_KeyInContract.t_id));
+                last_printed_h = Utils::FromBE(k0.m_KeyInContract.id);
+                prev_h = k0.m_KeyInContract.id;
+            }
         }
+        if (last_printed_h != -1)
+            Env::DocAddNum("processed_height", last_printed_h);
     }
 private:
     T object_;
@@ -797,10 +861,12 @@ ON_METHOD(manager, view_params) {
     Env::DocAddNum("is_admin", bIsAdmin);
     Env::DocAddNum32("is_moderator", moder.is_moderator(cid));
 
-    Env::DocGroup("vote_reward");
-    Env::DocAddNum("aid", s.m_Config.m_VoteReward.m_Aid);
-    Env::DocAddNum("amount", s.m_Config.m_VoteReward.m_Amount);
-    Env::DocAddNum("balance", s.m_VoteBalance);
+    {
+        Env::DocGroup gr1("vote_reward");
+        Env::DocAddNum("aid", s.m_Config.m_VoteReward.m_Aid);
+        Env::DocAddNum("amount", s.m_Config.m_VoteReward.m_Amount);
+        Env::DocAddNum("balance", s.m_VoteBalance);
+    }
 }
 
 bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists) {
@@ -835,6 +901,12 @@ ON_METHOD(manager, view_artists_stats) {
     StatePlus s;
     s.Init(cid);
     Env::DocAddNum32("total", s.total_artists);
+}
+
+ON_METHOD(manager, view_moderators_stats) {
+    StatePlus s;
+    s.Init(cid);
+    Env::DocAddNum32("total", s.total_moderators);
 }
 
 ON_METHOD(manager, view_collections_stats) {
@@ -1509,7 +1581,7 @@ ON_METHOD(user, buy) {
     fc.m_Amount = m.m_Price.m_Amount;
     fc.m_Aid = m.m_Price.m_Aid;
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Buy item", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, nullptr, 0, "Buy item", 2500000);
 }
 
 struct BalanceWalkerOwner : public BalanceWalker {
