@@ -40,25 +40,17 @@ export default class ItemsStore {
       this._state[mode] = makeMode(mode)
     }
 
-    this._state['artist'].loader = async () => {
+    this._state['artist'].loader = () => {
       let my_key = this._my_key
-      let page = this._state['artist'].page
-      this._state['artist'].page_items = await this._db[this._store_name]
+      return this._db[this._store_name]
         .where('author')
         .equals(my_key)
-        .offset((page - 1) * this._per_page)
-        .limit(this._per_page)
-        .toArray(arr => arr.map(item => this._fromContract(item)))
     }
 
-    this._state['owner'].loader = async () => {
-      let page = this._state['owner'].page
-      this._state['owner'].page_items = await this._db[this._store_name]
+    this._state['owner'].loader = () => {
+      return this._db[this._store_name]
         .where('owned')
         .equals(1)
-        .offset((page - 1) * this._per_page)
-        .limit(this._per_page)
-        .toArray(arr => arr.map(item => this._fromContract(item)))
     }
   }
 
@@ -120,7 +112,12 @@ export default class ItemsStore {
   async _loadPageItemsAsync(mode) {
     let loader = this._state[mode].loader
     if (loader) {
-      await loader()
+      let page = this._state[mode].page
+      let promise = loader()
+        .offset((page - 1) * this._per_page)
+        .limit(this._per_page)
+        .toArray(arr => arr.map(item => this._fromContract(item)))
+      this._state[mode].page_items = await promise
     }
   }
 
