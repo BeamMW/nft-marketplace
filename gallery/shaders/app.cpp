@@ -548,6 +548,7 @@ struct MyCollection : public Gallery::Collection {
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
         Env::DocAddNum32("updated", updated);
+        Env::DocAddNum32("owned", _POD_(m_pkAuthor) == MyArtist::id(cid));
         Env::DocAddText("label", label);
         Env::DocAddText("data", data);
         Env::DocAddBlob_T("author", m_pkAuthor);
