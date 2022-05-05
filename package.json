@@ -12,6 +12,7 @@
     "build": "webpack --mode=production"
   },
   "devDependencies": {
+    "@vueuse/rxjs": "^8.4.2",
     "beam-wasm-client-masternet": "^7.0.12638",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.0",
@@ -24,6 +25,7 @@
     "html-webpack-plugin": "^5.5.0",
     "install": "^0.13.0",
     "mini-css-extract-plugin": "^2.4.3",
+    "rxjs": "^7.5.5",
     "stylelint": "^14.5.3",
     "stylelint-plugin-stylus": "^0.13.1",
     "stylelint-processor-html": "^1.0.0",

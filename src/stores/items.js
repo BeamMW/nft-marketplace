@@ -4,6 +4,7 @@ import {cid} from 'stores/consts'
 import {common} from 'utils/consts'
 import formats from 'stores/formats'
 import router from 'router'
+import {liveQuery} from 'dexie'
 
 export default class ItemsStore {
   constructor(objname, versions, perPage) {
@@ -17,8 +18,9 @@ export default class ItemsStore {
     this._loading = false
   }
 
-  reset (global) {
+  reset (global, db) {
     this._global = global
+    this._db = db
     this._state = reactive({
       artist_key: undefined
     })
@@ -26,7 +28,15 @@ export default class ItemsStore {
     let makeMode = (mode) => {
       return {
         all_items: [],
-        page_items: [],
+        /*page_items: computed(() => {
+          let res = useLiveQuery(async () => {
+            let loader = this._state[mode].loader
+            let promise = loader()
+              .toArray(arr => arr.map(item => this._fromContract(item)))
+            return await promise
+          })
+          return res ? res : []
+        }),*/
         total: 0,
         page: 1,
         pages: computed(() => {
@@ -38,6 +48,26 @@ export default class ItemsStore {
 
     for (let mode of this._modes) {
       this._state[mode] = makeMode(mode)
+      /*this._state[mode].page_items = computed(() => {
+        let loader = this._state[mode].loader
+        if (!loader) {
+          return []
+        }
+
+        return useObservable(
+          liveQuery(() => this._db[this._store_name].toArray())
+        )
+      })*/
+      // Reference
+      // this._state[mode].page_items = useObservable(
+      //  liveQuery(() => this._db[this._store_name].toArray())
+      //)
+      //this._state[mode].page_items = computed(() => {
+      //  return useObservable(
+      //    liveQuery(() => this._db[this._store_name].toArray())
+      //  )
+      //})
+      
     }
 
     this._state['artist'].loader = () => {
@@ -95,7 +125,11 @@ export default class ItemsStore {
   }
 
   getPageItems(mode) {
-    return this._state[mode].page_items
+    console.log('getPageItems for', this._store_name)
+    return liveQuery(() => {
+      console.log('live query for', this._store_name)
+      return this._db[this._store_name].toArray()
+    })
   }
 
   getTotal(mode) {
@@ -110,7 +144,7 @@ export default class ItemsStore {
   }
 
   async _loadPageItemsAsync(mode) {
-    let loader = this._state[mode].loader
+    /*let loader = this._state[mode].loader
     if (loader) {
       let page = this._state[mode].page
       let promise = loader()
@@ -118,7 +152,7 @@ export default class ItemsStore {
         .limit(this._per_page)
         .toArray(arr => arr.map(item => this._fromContract(item)))
       this._state[mode].page_items = await promise
-    }
+    }*/
   }
 
   async _loadKeyAsync () {
@@ -132,7 +166,7 @@ export default class ItemsStore {
     return res.id
   }
 
-  async loadAsync(db) {
+  async loadAsync() {
     if(this._loading) {
       return
     }
@@ -141,7 +175,6 @@ export default class ItemsStore {
       this._my_key = await this._loadKeyAsync()
     }
 
-    this._db = db
     let {res} = await utils.invokeContractAsync({
       role: 'manager',
       action: `view_${this._objname}s`,
@@ -175,6 +208,8 @@ export default class ItemsStore {
 
         item = this._fromContract(item)
         item = Object.assign({}, item)
+
+        // TODO: remove when finished
         console.log('item loaded with label', item.label)
       }
       catch(err) {
@@ -208,6 +243,7 @@ export default class ItemsStore {
       }
     }
 
+    let db = this._db
     await db.transaction('rw!', db[this._store_name], db[this._metastore_name], async () => {
       await db[this._metastore_name].put({name: 'approved', value: approved})
       await db[this._metastore_name].put({name: 'rejected', value: rejected})
@@ -222,11 +258,6 @@ export default class ItemsStore {
     this._state['artist'].total = artist
     this._state['owner'].total = owned
     this._state['moderator'].total = pending + rejected
-
-    for (let mode of this._modes) {
-      await this._loadPageItemsAsync(mode)
-    }
-
     this._loading = false
   }
 

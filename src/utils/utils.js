@@ -468,29 +468,34 @@ export default class Utils {
     Utils.getById(id).classList.add('hidden')
   }
 
-  static download(url, cback) {
-    var xhr = new XMLHttpRequest()
-    xhr.onreadystatechange = function() {
-      if(xhr.readyState === XMLHttpRequest.DONE) {
+  static downloadAsync(url, cback) {
+    return new Promise((resolve, reject) => {
+      var xhr = new XMLHttpRequest()
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          return
+        }
+        
         if (xhr.status === 200) {
           let buffer    = xhr.response
           let byteArray = new Uint8Array(buffer)
           let array     = Array.from(byteArray)
 
-          if (!array || !array.length) {
-            return cback('empty shader')
+          if (array && array.length) {
+            return resolve(array)            
           }
-                
-          return cback(null, array)
-        } else {
-          let errMsg = ['code', xhr.status].join(' ')
-          return cback(errMsg)
-        }
+            
+          return reject(new Error(`Empty data for ${url}`))
+        } 
+        
+        let errMsg = `Code ${xhr.status} for ${url}`
+        reject(new Error(errMsg))
       }
-    }
-    xhr.open('GET', url, true)
-    xhr.responseType = 'arraybuffer'
-    xhr.send(null)
+
+      xhr.open('GET', url, true)
+      xhr.responseType = 'arraybuffer'
+      xhr.send(null)
+    })
   }
 
   static handleString(next) {

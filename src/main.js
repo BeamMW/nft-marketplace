@@ -34,6 +34,13 @@ utils.initialize(
     vueApp.use(router)
     vueApp.mount('body')
 
+    //
+    // Catch all unhandled errors in promises/async functions
+    //
+    window.addEventListener('unhandledrejection', ev => { 
+      store.setError(ev.reason)
+    })
+
     const {validator_error,
       content_main,
       appsGradientTop,
@@ -67,6 +74,7 @@ utils.initialize(
     }
 
     try {
+      // TODO handle async error
       store.start()
     }
     catch(err) {

@@ -1,6 +1,6 @@
 <template>
   <div class="list-container">
-    <template v-if="items.length > 0 || new_component">
+    <template v-if="items && items.length > 0 || new_component">
       <div class="list-wrap">  
         <div ref="itemslist" class="list" @scroll="onScroll">
           <component :is="component" v-for="item in items" 
@@ -64,6 +64,8 @@
 
 <script>
 import paginator from './paginator.vue'
+import {useObservable} from '@vueuse/rxjs'
+import {computed} from 'vue'
 
 export default {
   components: {
@@ -98,26 +100,28 @@ export default {
     }
   },
 
-  computed: {
-    items () {
-      let items = this.store.getPageItems(this.mode)
-      if (!items) {
-        // eslint-disable-next-line no-debugger
-        debugger
-      }
-      return items
-    },
-    total() {
-      return this.store.getTotal(this.mode)
-    },
-    pages() {
-      return this.store.getPages(this.mode)
-    },
-    page() {
-      return this.store.getPage(this.mode)
-    },
-    show_new() {
-      return this.new_component && this.page == this.pages
+  setup (props) {
+    const itemsObservable = computed(() => useObservable(props.store.getPageItems(props.mode)))
+    const items = computed(() => itemsObservable.value.value ? itemsObservable.value.value : [])
+    const page = computed(() => props.store.getPage(props.mode))
+    const pages = computed(() => props.store.getPage(props.mode))
+    const show_new = computed(() => props.new_component && page.value === pages.value)
+
+    return {
+      items,
+      page,
+      pages,
+      show_new,
+      
+      onScroll(ev) {
+        let pos = ev.target.scrollTop
+        this.$router.replace({name: this.$route.name, hash: `#${pos}`})
+      },
+
+      onPage(page) {
+        this.$refs.itemslist.scrollTop = 0
+        this.store.setPage(this.mode, page)
+      } 
     }
   },
 
@@ -125,18 +129,16 @@ export default {
     if(this.items.length && this.$route.hash) {
       this.$refs.itemslist.scrollTop = this.$route.hash.substr(1)
     }
+  }
+}
+
+/*
+  mounted() {
+    
   },
 
   methods: {
-    onScroll(ev) {
-      let pos = ev.target.scrollTop
-      this.$router.replace({name: this.$route.name, hash: `#${pos}`})
-    },
-
-    onPage(page) {
-      this.$refs.itemslist.scrollTop = 0
-      this.store.setPage(this.mode, page)
-    } 
+    
   }
-}
+}*/
 </script>
