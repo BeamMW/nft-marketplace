@@ -1,6 +1,6 @@
 <template>
   <list v-model:page="page"
-        emptymsg="There are no NFTs at the moment"
+        items_name="NFTs"
         component="artwork"
         mode="user"
         :store="store"

@@ -5,6 +5,7 @@ import {common} from 'utils/consts'
 import formats from 'stores/formats'
 import router from 'router'
 import {liveQuery} from 'dexie'
+import {Observable} from 'rxjs'
 
 export default class ItemsStore {
   constructor(objname, versions, perPage) {
@@ -28,15 +29,6 @@ export default class ItemsStore {
     let makeMode = (mode) => {
       return {
         all_items: [],
-        /*page_items: computed(() => {
-          let res = useLiveQuery(async () => {
-            let loader = this._state[mode].loader
-            let promise = loader()
-              .toArray(arr => arr.map(item => this._fromContract(item)))
-            return await promise
-          })
-          return res ? res : []
-        }),*/
         total: 0,
         page: 1,
         pages: computed(() => {
@@ -48,29 +40,10 @@ export default class ItemsStore {
 
     for (let mode of this._modes) {
       this._state[mode] = makeMode(mode)
-      /*this._state[mode].page_items = computed(() => {
-        let loader = this._state[mode].loader
-        if (!loader) {
-          return []
-        }
-
-        return useObservable(
-          liveQuery(() => this._db[this._store_name].toArray())
-        )
-      })*/
-      // Reference
-      // this._state[mode].page_items = useObservable(
-      //  liveQuery(() => this._db[this._store_name].toArray())
-      //)
-      //this._state[mode].page_items = computed(() => {
-      //  return useObservable(
-      //    liveQuery(() => this._db[this._store_name].toArray())
-      //  )
-      //})
-      
     }
 
     this._state['artist'].loader = () => {
+      console.log(`loader for artist:${this._store_name}`)
       let my_key = this._my_key
       return this._db[this._store_name]
         .where('author')
@@ -78,6 +51,7 @@ export default class ItemsStore {
     }
 
     this._state['owner'].loader = () => {
+      console.log(`loader for owner:${this._store_name}`)
       return this._db[this._store_name]
         .where('owned')
         .equals(1)
@@ -104,16 +78,7 @@ export default class ItemsStore {
   }
 
   setPage(mode, page) {
-    this._state[mode].page = page;
-    (async () => {
-      try
-      {
-        await this._loadPageItemsAsync(mode)
-      }
-      catch(err) {
-        this._global.setError(err)
-      }
-    })()
+    this._state[mode].page = page
   }
 
   getPages(mode) {
@@ -124,12 +89,22 @@ export default class ItemsStore {
     return this._state[mode].all_items
   }
 
-  getPageItems(mode) {
-    console.log('getPageItems for', this._store_name)
-    return liveQuery(() => {
-      console.log('live query for', this._store_name)
-      return this._db[this._store_name].toArray()
-    })
+  getLazyPageItems(mode) {
+    let loader = this._state[mode].loader
+
+    if (loader) {
+      let page = this.getPage(mode)
+      let qloader = () => loader()
+        .offset((page -1) * this._per_page)
+        .limit(this._per_page)
+        .toArray(items => items.map(item => this._fromContract(item)))
+
+      // TODO: check what happens if there is an error in loader, ensure that it caught & handled at the top level
+      // TODO: handle all throws/errors that possible at the top level / remove all setError calls
+      return liveQuery(qloader)
+    }
+
+    return new Observable(subscriber => subscriber.next(null))
   }
 
   getTotal(mode) {
@@ -141,18 +116,6 @@ export default class ItemsStore {
     res[this._store_name] = 'id, status, author, owned'
     res[this._metastore_name] = 'name'
     return res
-  }
-
-  async _loadPageItemsAsync(mode) {
-    /*let loader = this._state[mode].loader
-    if (loader) {
-      let page = this._state[mode].page
-      let promise = loader()
-        .offset((page - 1) * this._per_page)
-        .limit(this._per_page)
-        .toArray(arr => arr.map(item => this._fromContract(item)))
-      this._state[mode].page_items = await promise
-    }*/
   }
 
   async _loadKeyAsync () {
@@ -182,6 +145,10 @@ export default class ItemsStore {
     })
 
     utils.ensureField(res, 'items', 'array')
+    if (this._objname == 'collection') {
+      // eslint-disable-next-line no-debugger
+      // debugger
+    }
 
     let approved = 0
     let pending = 0
@@ -259,6 +226,7 @@ export default class ItemsStore {
     this._state['owner'].total = owned
     this._state['moderator'].total = pending + rejected
     this._loading = false
+    // TODO: check if page is correct
   }
 
   toNewItem() {

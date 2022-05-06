@@ -3,7 +3,7 @@
     <tabsctrl v-model="active_tab" :tabs="tabs"/>
     <list v-if="show_collections"
           class="list"
-          emptymsg="There are no collections at the moment"
+          items_name="collections"
           component="collection"
           new_component="create-collection"
           mode="artist"
@@ -11,7 +11,7 @@
     />
     <list v-if="show_created"
           class="list"
-          emptymsg="There are no NFTs at the moment"
+          items_name="NFTs"
           component="artwork"
           new_component="create-nft"
           mode="artist"
@@ -19,7 +19,7 @@
     />
     <list v-if="show_owned"
           class="list"
-          emptymsg="There are no NFTs at the moment"
+          items_name="NFTs"
           component="artwork"
           mode="owner"
           :store="artsStore"

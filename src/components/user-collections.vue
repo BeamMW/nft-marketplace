@@ -1,6 +1,6 @@
 <template>
   <list v-model:page="page"
-        emptymsg="There are no collections at the moment"
+        items_name="collections"
         component="collection"
         mode="user"
         :store="store"

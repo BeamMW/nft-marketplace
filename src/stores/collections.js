@@ -4,9 +4,9 @@ import utils from 'utils/utils'
 import formats from 'stores/formats'
 import artistsStore from 'stores/artists'
 import imagesStore from 'stores/images'
-import ItemsStore from 'stores/items'
+import LazyItems from 'stores/lazy-items'
 
-class CollectionsStore extends ItemsStore {
+class CollectionsStore extends LazyItems {
   constructor () {
     super('collection', [versions.COLLECTION_VERSION])
   }

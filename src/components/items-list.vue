@@ -1,6 +1,11 @@
 <template>
   <div class="list-container">
-    <template v-if="items && items.length > 0 || new_component">
+    <div v-if="items === undefined" class="empty">
+      <img src="~assets/icon-empty-gallery.svg"/>
+      <!-- TODO: delay showing text a bit, otherwise it blinks on every page switch -->
+      <div class="text">Loading {{ items_name }}...</div>
+    </div>
+    <template v-else-if="items && items.length > 0 || new_component">
       <div class="list-wrap">  
         <div ref="itemslist" class="list" @scroll="onScroll">
           <component :is="component" v-for="item in items" 
@@ -17,7 +22,7 @@
     </template>
     <div v-else class="empty">
       <img src="~assets/icon-empty-gallery.svg"/>
-      <div class="text">{{ emptymsg }}</div>
+      <div class="text">There are no {{ items_name }} at the moment</div>
     </div>
   </div>
 </template>
@@ -86,9 +91,9 @@ export default {
       required: true,
       default: undefined
     },
-    emptymsg: {
+    items_name: {
       type: String,
-      default: ''
+      default: 'items'
     },
     gap: {
       type: String,
@@ -101,44 +106,36 @@ export default {
   },
 
   setup (props) {
-    const itemsObservable = computed(() => useObservable(props.store.getPageItems(props.mode)))
-    const items = computed(() => itemsObservable.value.value ? itemsObservable.value.value : [])
+    const itemsObservable = computed(() => useObservable(props.store.getLazyPageItems(props.mode)))
+    const items = computed(() => itemsObservable.value.value)
     const page = computed(() => props.store.getPage(props.mode))
-    const pages = computed(() => props.store.getPage(props.mode))
+    const pages = computed(() => props.store.getPages(props.mode))
     const show_new = computed(() => props.new_component && page.value === pages.value)
 
     return {
       items,
       page,
       pages,
-      show_new,
-      
-      onScroll(ev) {
-        let pos = ev.target.scrollTop
-        this.$router.replace({name: this.$route.name, hash: `#${pos}`})
-      },
-
-      onPage(page) {
-        this.$refs.itemslist.scrollTop = 0
-        this.store.setPage(this.mode, page)
-      } 
+      show_new
     }
   },
 
   mounted() {
-    if(this.items.length && this.$route.hash) {
+    if(this.items && this.items.length && this.$route.hash) {
       this.$refs.itemslist.scrollTop = this.$route.hash.substr(1)
     }
-  }
-}
-
-/*
-  mounted() {
-    
   },
 
   methods: {
-    
+    onScroll(ev) {
+      let pos = ev.target.scrollTop
+      this.$router.replace({name: this.$route.name, hash: `#${pos}`})
+    },
+
+    onPage(page) {
+      this.$refs.itemslist.scrollTop = 0
+      this.store.setPage(this.mode, page)
+    } 
   }
-}*/
+}
 </script>

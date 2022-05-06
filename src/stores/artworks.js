@@ -1,4 +1,4 @@
-import ItemsStore from 'stores/items'
+import LazyItems from 'stores/lazy-items'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import formats from 'stores/formats'
@@ -7,7 +7,7 @@ import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
  
-class ArtworksStore extends ItemsStore {
+class ArtworksStore extends LazyItems {
   constructor () {
     super('artwork', [versions.ARTWORK_VERSION])
   }
