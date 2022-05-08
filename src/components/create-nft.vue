@@ -12,7 +12,7 @@
 <style lang="stylus" scoped>
 .new-box {
   width: 213px
-  height: 301px
+  height: 294px
   border-radius: 10px
   border: 1px dashed rgba(26, 246, 214, 0.5)
   background-color: rgba(26, 246, 214, 0.1)
@@ -34,7 +34,7 @@ import artsStore from 'stores/artworks'
 export default {
   computed: {
     has_collections() {
-      return collsStore.getAllItems('artist').length > 0
+      return collsStore.getAllItemsCount('artist') > 0
     }
   },
 
@@ -42,6 +42,7 @@ export default {
     onNewArtwork () {
       artsStore.toNewItem()
     },
+    
     onNewCollection() {
       collsStore.toNewItem()
     }

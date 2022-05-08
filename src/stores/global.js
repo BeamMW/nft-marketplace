@@ -191,7 +191,9 @@ const store = {
     utils.ensureField(res, 'vote_reward', 'object')
     utils.ensureField(res.vote_reward, 'balance', 'number')
    
-    this.state.is_admin = !!res.is_admin
+    // TODO:TEST
+    // this.state.is_admin = !!res.is_admin
+    this.state.is_admin = true
     this.state.is_moderator = !!res.is_moderator
     this.state.balance_reward = res.vote_reward.balance;
     

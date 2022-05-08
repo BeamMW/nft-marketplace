@@ -40,7 +40,8 @@
       <btn v-if="compact" 
            text="sell" 
            color="transparent" 
-           padding="2px 7px 5px 7px"
+           padding="0px 7px 0px 7px"
+           height="31px"
            text_color="blue"
            @click="onSell"
       />

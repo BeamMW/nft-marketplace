@@ -24,6 +24,27 @@
           mode="owner"
           :store="artsStore"
     />
+    <list v-if="show_sale"
+          class="list"
+          items_name="on sale NFTs"
+          component="artwork"
+          mode="owner:sale"
+          :store="artsStore"
+    />
+    <list v-if="show_sold"
+          class="list"
+          items_name="sold NFTs"
+          component="artwork"
+          mode="artist:sold"
+          :store="artsStore"
+    />
+    <list v-if="show_liked"
+          class="list"
+          items_name="liked NFTs"
+          component="artwork"
+          mode="liker:liked"
+          :store="artsStore"
+    />
   </div>
 </template>
 
@@ -73,6 +94,9 @@ export default {
     is_artist() {
       return artistsStore.is_artist
     },
+    is_admin() {
+      return this.$state.is_admin
+    },
     show_collections() {
       return this.active_tab === my_tabs.COLLECTIONS
     },
@@ -82,13 +106,35 @@ export default {
     show_owned() {
       return this.active_tab == my_tabs.OWNED_NFTS
     },
+    show_sale() {
+      return this.active_tab == my_tabs.SALE_NFTS
+    },
+    show_sold() {
+      return this.active_tab == my_tabs.SOLD_NFTS
+    },
+    show_liked() {
+      return this.active_tab == my_tabs.LIKED_NFTS
+    },
     tabs() {
       let res = []
+
       if (this.is_artist) {
-        res.push({id: my_tabs.COLLECTIONS, name: 'Collections'})
-        res.push({id: my_tabs.CREATED_NFTS, name: 'NFTs'})
+        res.push({id: my_tabs.COLLECTIONS, name: 'Created Collections'})
+        res.push({id: my_tabs.CREATED_NFTS, name: 'Created NFTs'})
+        res.push({id: my_tabs.OWNED_NFTS, name: 'Owned NFTs'})
       }
-      res.push({id: my_tabs.OWNED_NFTS, name: 'All'})
+
+      if (!this.is_artist) {
+        res.push({id: my_tabs.OWNED_NFTS, name: 'All'})
+      }
+
+      res.push({id: my_tabs.SALE_NFTS,  name: 'On Sale'})
+
+      if (this.is_artist) {
+        res.push({id: my_tabs.SOLD_NFTS,  name: 'Sold'})
+      }
+
+      res.push({id: my_tabs.LIKED_NFTS, name: 'Liked'})
       return res
     },
   }

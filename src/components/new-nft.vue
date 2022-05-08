@@ -1,5 +1,8 @@
 <template>
-  <div class="nft-container">
+  <loading v-if="!collections" 
+           text="Loading collections"
+  />
+  <div v-else class="nft-container">
     <pageTitle title="add nft"/>
     <div class="fields">
       <div class="col-first">
@@ -88,6 +91,9 @@ import artsStore from 'stores/artworks'
 import validators from 'utils/validators'
 import router from 'router'
 import {common} from 'utils/consts'
+import {useObservable} from '@vueuse/rxjs'
+import {computed} from 'vue'
+import loading from './loading.vue'
 
 export default {
   components: {
@@ -98,8 +104,31 @@ export default {
     addImage,
     priceInput,
     switchInput,
-    formSelect
+    formSelect,
+    loading
   },
+
+  setup () {
+    const collsObservable = computed(() => useObservable(collsStore.getLazyAllItems('artist')))
+    const collections = computed(() => {
+      let colls = collsObservable.value.value
+      if (!colls) {
+        return undefined
+      }
+      let res = []
+      for (let coll of colls) {
+        res.push({
+          name: coll.label,
+          id: coll.id
+        })
+      }
+      return res
+    })
+    return {
+      collections
+    }
+  },
+
   data () {
     return {
       name: '',
@@ -130,17 +159,6 @@ export default {
       return this.name && this.name_valid &&
              this.description_valid &&
              this.image && this.image_valid
-    },
-    collections () {
-      let colls = collsStore.artist_items
-      let res = []
-      for (let coll of colls) {
-        res.push({
-          name: coll.label,
-          id: coll.id
-        })
-      }
-      return res
     }
   },
 

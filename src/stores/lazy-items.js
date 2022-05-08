@@ -14,7 +14,7 @@ export default class ItemsStore {
     this._metastore_name = `${objname}s_meta`
     this._versions = versions
     this._per_page = perPage || common.ITEMS_PER_PAGE
-    this._modes = ['user', 'moderator', 'artist', 'owner']
+    this._modes = ['user', 'moderator', 'artist', 'owner', 'owner:sale', 'artist:sold', 'liker:liked']
     this._my_key = ''
     this._loading = false
   }
@@ -46,16 +46,42 @@ export default class ItemsStore {
       console.log(`loader for artist:${this._store_name}`)
       let my_key = this._my_key
       return this._db[this._store_name]
-        .where('author')
-        .equals(my_key)
+        .where({'author': my_key})
     }
 
     this._state['owner'].loader = () => {
       console.log(`loader for owner:${this._store_name}`)
       return this._db[this._store_name]
-        .where('owned')
-        .equals(1)
+        .where({'owned': 1})
     }
+
+    this._state['owner:sale'].loader = () => {
+      console.log(`loader for owner:sale:${this._store_name}`)
+      return this._db[this._store_name]
+        .where(['owned', 'price.amount'])
+        .above([0, 0])
+    }
+
+    this._state['artist:sold'].loader = () => {
+      console.log(`loader for artist:sold:${this._store_name}`)
+      let my_key = this._my_key
+      return this._db[this._store_name]
+        // TODO: compound index?
+        .where({'author': my_key, 'owned': 0})
+    }
+
+    this._state['liker:liked'].loader = () => {
+      console.log(`loader for liker:liked:${this._store_name}`)
+      return this._db[this._store_name]
+        .where({'my_impression': 1})
+    }
+  }
+
+  getDBStores() {
+    let res = {} 
+    res[this._store_name] = 'id, status, author, owned, my_impression, [owned+price.amount]'
+    res[this._metastore_name] = 'name'
+    return res
   }
 
   getItem(id) {
@@ -85,10 +111,16 @@ export default class ItemsStore {
     return this._state[mode].pages
   }
 
-  getAllItems(mode) {
-    return this._state[mode].all_items
+  getAllItemsCount(mode) {
+    return this._state[mode].total
   }
 
+  getLazyAllItems(mode) {
+    let loader = this._state[mode].loader
+    let qloader = () => loader().toArray(items => items.map(item => this._fromContract(item)))
+    return liveQuery(qloader)
+  }
+  
   getLazyPageItems(mode) {
     let loader = this._state[mode].loader
 
@@ -109,13 +141,6 @@ export default class ItemsStore {
 
   getTotal(mode) {
     return this._state[mode].total
-  }
-
-  getDBStores() {
-    let res = {} 
-    res[this._store_name] = 'id, status, author, owned'
-    res[this._metastore_name] = 'name'
-    return res
   }
 
   async _loadKeyAsync () {

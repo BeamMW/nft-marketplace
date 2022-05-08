@@ -9,7 +9,7 @@
              @click="onDetails"
     >
       <moderationStatus :item="item"/>
-      <div class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+      <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
       </div>
@@ -50,7 +50,7 @@
     & > .delete {
       position: absolute
       left: 190px
-      top: 5px
+      top: 8px
       width: 15px
       cursor: pointer
     }
@@ -153,20 +153,28 @@ export default {
     id () {
       return this.item.id
     },
+
+    is_approved() {
+      return this.state === 'approved'
+    },
                 
     can_vote () {
-      return !this.item.error && this.$state.balance_reward > 0
+      // TODO:test
+      // return !this.item.error && this.$state.balance_reward > 0
+      return true
     },
+
     liked () {
       return !!this.item.my_impression
     },
+
     likes_cnt () {
       return this.item.impressions
     },
   },
 
   methods: {
-    onLike () {
+    onLike (ev) {
       if (this.is_headless) {
         return this.$store.switchToHeaded()  
       } 
@@ -174,9 +182,12 @@ export default {
       if (this.can_vote) {
         artsStore.likeArtwork(this.id)
       }
+
+      ev.stopPropagation()
+      return false
     },
 
-    onUnlike () {
+    onUnlike (ev) {
       if (this.is_headless) {
         return this.$store.switchToHeaded()  
       } 
@@ -184,6 +195,9 @@ export default {
       if (this.can_vote) {
         artsStore.unlikeArtwork(this.id)
       }
+
+      ev.stopPropagation()
+      return false
     },
 
     onDelete (id) {

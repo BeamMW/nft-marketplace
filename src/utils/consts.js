@@ -18,6 +18,9 @@ export const my_tabs = {
   COLLECTIONS: 0,
   CREATED_NFTS: 1,
   OWNED_NFTS: 2,
+  SALE_NFTS: 3,
+  SOLD_NFTS: 4,
+  LIKED_NFTS: 5,
 }
 
 export const sort = {
