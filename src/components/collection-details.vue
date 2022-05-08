@@ -1,10 +1,16 @@
 <template>
-  <div class="container">
+  <loading v-if="collection == undefined" 
+           text="Loading collection"
+  />
+  <div v-if="collection == null">
+    Collection Not Found  
+  </div>
+  <div v-else class="container">
     <template v-if="edit_mode">
       <pageTitle title="Edit collection"/>
       <p class="description">
-        After collection is changed it would not be visible until<br> 
-        <i>After your collection is changed it would not be visible until reviewed by a moderator.</i>
+        After collection is changed it would not be visible until reviewed by a moderator.<br> 
+        NFTs from collection would still appear in gallery.
       </p>
     </template>
     <template v-else>
@@ -144,6 +150,9 @@ import addImage from './add-image.vue'
 import collsStore from 'stores/collections'
 import router from 'router'
 import validators from 'utils/validators'
+import loading from './loading.vue'
+import {useObservable} from '@vueuse/rxjs'
+import {computed} from 'vue'
 
 export default {
   components: {
@@ -151,7 +160,8 @@ export default {
     textAreaField, 
     pageTitle,
     btn,
-    addImage
+    addImage,
+    loading
   },
 
   props: {
@@ -160,6 +170,21 @@ export default {
       required: false,
       default: undefined
     },
+  },
+
+  setup(props) {
+    const collsObservable = computed(() => useObservable(collsStore.getLazyItem('artist', props.id)))
+    const collection = computed(() => {
+      let result = collsObservable.value.value
+      if (!result) {
+        return result
+      }
+      return result.length == 0 ? null : result[0]
+    })
+      
+    return {
+      collection
+    }
   },
 
   data () {
@@ -176,9 +201,6 @@ export default {
   computed: {
     edit_mode () {
       return this.id !== undefined
-    },
-    collection () {
-      return this.id ? collsStore.getItem(this.id) : undefined
     },
     label: {
       get () {

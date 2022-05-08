@@ -66,8 +66,8 @@ export default class ItemsStore {
       console.log(`loader for artist:sold:${this._store_name}`)
       let my_key = this._my_key
       return this._db[this._store_name]
-        // TODO: compound index?
-        .where({'author': my_key, 'owned': 0})
+        .where(['author', 'owned'])
+        .equals([my_key, 0])
     }
 
     this._state['liker:liked'].loader = () => {
@@ -79,24 +79,9 @@ export default class ItemsStore {
 
   getDBStores() {
     let res = {} 
-    res[this._store_name] = 'id, status, author, owned, my_impression, [owned+price.amount]'
+    res[this._store_name] = 'id, status, author, owned, my_impression, [author+owned], [owned+price.amount]'
     res[this._metastore_name] = 'name'
     return res
-  }
-
-  getItem(id) {
-    for (let mode of this._modes) {
-      for (let item of this._state[mode].page_items) {
-        if (item.id == id) {
-          return item
-        }
-      }
-    }
-    throw new Error(`ItemsStore::getItem - item ${this._objname}-${id} not found`)
-  }
-
-  get artist_items() {
-    return this._state.artist.all_items
   }
 
   getPage(mode) {
@@ -117,8 +102,12 @@ export default class ItemsStore {
 
   getLazyAllItems(mode) {
     let loader = this._state[mode].loader
-    let qloader = () => loader().toArray(items => items.map(item => this._fromContract(item)))
-    return liveQuery(qloader)
+    if (loader) {
+      let qloader = () => loader()
+        .toArray(items => items.map(item => this._fromContract(item)))
+      return liveQuery(qloader)
+    }
+    return new Observable(subscriber => subscriber.next(null))
   }
   
   getLazyPageItems(mode) {
@@ -137,6 +126,14 @@ export default class ItemsStore {
     }
 
     return new Observable(subscriber => subscriber.next(null))
+  }
+
+  getLazyItem(mode, id) {
+    let loader = () => this._db[this._store_name]
+      .where('id')
+      .equals(id)
+      .toArray(items => items.map(item => this._fromContract(item)))
+    return liveQuery(loader)
   }
 
   getTotal(mode) {

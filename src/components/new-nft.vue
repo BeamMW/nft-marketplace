@@ -4,6 +4,10 @@
   />
   <div v-else class="nft-container">
     <pageTitle title="add nft"/>
+    <p class="description">
+      After NFT is created it would not be visible<br>
+      until reviewed by a moderator.
+    </p>
     <div class="fields">
       <div class="col-first">
         <inputField v-model="name"
@@ -46,8 +50,16 @@
 
 <style scoped lang="stylus">
   .nft-container {
+    .description {
+      font-size: 14px
+      text-align: center
+      color: #fff
+      margin: 10px 0px 20px 0px
+      font-family: 'SFProDisplay', sans-serif
+    }
+
     .fields {
-      padding: 50px 30px 0px 30px
+      padding: 0px 30px 0px 30px
       display: flex
       
       .col-first {
