@@ -2,7 +2,7 @@
   <hdr title="collection name"/>
   <div class="collection">
     <!-- banner -->
-    <imagePreview :image="banner" width="100vw" height="200px"/>
+    <imagePreview :image="banner" width="100vw" height="200px" cover/>
 
     <div :class="!full_text ? 'block' : 'block--transformed'">
       <div class="left">
