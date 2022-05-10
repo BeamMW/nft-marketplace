@@ -225,7 +225,7 @@ class ArtistsStore {
       throw new Error('Unexpected toBecomeArtist, already an artist')
     }
     router.push({
-      name: 'artist'
+      name: 'become-artist'
     })
   }
 
@@ -234,7 +234,7 @@ class ArtistsStore {
       throw new Error('Unexpected EditArtist, not an artist yet')
     }
     router.push({
-      name: 'artist',
+      name: 'edit-artist',
       params: {
         id: this._state.my_id
       }
