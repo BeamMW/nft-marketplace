@@ -100,11 +100,8 @@ export default {
     show_collections() {
       return this.active_tab === my_tabs.COLLECTIONS
     },
-    show_created() {
-      return this.active_tab === my_tabs.CREATED_NFTS
-    },
     show_owned() {
-      return this.active_tab == my_tabs.OWNED_NFTS
+      return this.active_tab === my_tabs.OWNED_NFTS
     },
     show_sale() {
       return this.active_tab == my_tabs.SALE_NFTS
@@ -119,15 +116,10 @@ export default {
       let res = []
 
       if (this.is_artist) {
-        res.push({id: my_tabs.COLLECTIONS, name: 'Created Collections'})
-        res.push({id: my_tabs.CREATED_NFTS, name: 'Created NFTs'})
-        res.push({id: my_tabs.OWNED_NFTS, name: 'Owned NFTs'})
+        res.push({id: my_tabs.COLLECTIONS, name: 'Collections'})
       }
 
-      if (!this.is_artist) {
-        res.push({id: my_tabs.OWNED_NFTS, name: 'All'})
-      }
-
+      res.push({id: my_tabs.OWNED_NFTS, name: 'NFTs'})
       res.push({id: my_tabs.SALE_NFTS,  name: 'On Sale'})
 
       if (this.is_artist) {
