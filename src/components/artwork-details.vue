@@ -25,9 +25,9 @@
             <div class="description" :class="{'error': error}">{{ description }}</div>
             <div class="bottom">
               <div class="separator"/>
-              <div class="author" :class="{'error': error}">Creator: <span>{{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }}{{ author_name }}{{ author_name }}{{ author_name }} 22</span></div>
+              <div class="author" :class="{'error': error}">Creator: <span>{{ author_name }}</span></div>
               <!-- TODO: make collection clickable and navigate to it on click -->
-              <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }} {{ collection_name }} {{ collection_name }} {{ collection_name }}</span></div>
+              <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }}</span></div>
               <div class="separator"/>
               <artPrice :artwork="artwork"/>
             </div>
