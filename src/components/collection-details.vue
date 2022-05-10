@@ -1,9 +1,9 @@
 <template>
   <hdr title="collection name"/>
   <div class="container__collection">
-    <img class="banner" src="~assets/collection-banner.svg">
-    
-    <div class="info-block">
+    <img class="banner" :src="banner">
+
+    <div :class="!full_text ? 'info-block' : 'info-block--transformed'">
       <div class="left">
         <!-- artist info -->
         <div class="artist">
@@ -42,7 +42,7 @@
         </div>
 
         <!-- collection info -->
-        <div class="collection__details">
+        <div v-if="!full_text" class="collection__details">
           <div>
             <span class="value">{{ items }}</span>
             <span>items</span>
@@ -87,7 +87,7 @@
 .container__collection {
   display: grid
   grid-template-columns: 1fr 1fr
-  grid-template-rows: repeat(3, minmax(min-content, max-content))
+  grid-template-rows: repeat(4, minmax(min-content, max-content))
   border-radius: 10px
   overflow: hidden
 }
@@ -105,118 +105,140 @@
   column-gap: 30px
   padding: 20px
   background-color: rgba(255, 255, 255, 0.05)
-  
-  .left {
-    .artist {
-      display: flex
-      margin-bottom: 20px
+}
 
-      img {
-        margin-right: 16px
-      }
+.info-block--transformed {
+  grid-column: 1 / 3
+  grid-row: 2 / 4
+  display: grid
+  padding: 20px
+  background-color: rgba(255, 255, 255, 0.05)
+}
 
-      &__info {
-        display: flex
-        flex-direction: column
-        justify-content: center
-      }
+.artist {
+  display: flex
+  margin-bottom: 20px
 
-      &__name {
-        font-weight: bold
-        font-size: 16px
-        margin-bottom: 4px
-      }
-
-      &__description {
-        font-size: 14px
-      }
-    }
-
-    .collection__description {
-      color: #8897a8
-      font-size: 14px
-
-      .desc {
-        overflow: hidden
-        text-overflow: ellipsis
-        display: -moz-box
-        -moz-box-orient: vertical
-        display: -webkit-box
-        -webkit-line-clamp: 3
-        -webkit-box-orient: vertical
-        line-clamp: 3
-      }
-
-      .button-more {
-        cursor: pointer
-        color: #00f6d2
-        right: 0
-      }
-    }
+  .image {
+    margin-right: 16px
+    min-width: 72px
+    min-height: 72px
+    max-width: 72px
+    max-height: 72px
   }
 
-  .right {
-    .social {
-      height: 16px
-      display: flex
-      justify-content: flex-end
-      align-items: center
-      margin-bottom: 20px
-
-      & > * {
-        margin-left: 6px
-      }
-    }
-
-    .collection__details {
-      width: 100%
-      height: 60px
-      padding-top: 16px
-      padding-bottom: 16px
-      border-radius: 10px
-      background-color: rgba(255, 255, 255, 0.05)
-      display: grid
-      grid-template-columns: 1fr 1fr 1fr 1fr
-
-      & > div {
-        display: grid
-        grid-template-rows: 1fr 1fr
-        align-items: center
-        justify-items: center
-        
-        & > div {
-          display: flex
-          
-          & img {
-            margin-right: 10px
-          }
-        }
-        
-        & > span:not(.value) {
-          font-size: 14px
-        }
-
-        & .value {
-          display: flex
-          font-size: 16px
-        }
-      }
-
-      & > *:not(:last-child) {
-        border-right: 1px solid rgba(255, 255, 255, 0.1)
-      }
-    }
-  }
-
-  .footer {
-    grid-column: 1 / 3
-    height: min-content
+  &__info {
     display: flex
+    flex-direction: column
     justify-content: center
-    align-items: center
-    margin-top: 20px
-    color: red
+    padding-right: 20px
+
+    & > * {
+      overflow: hidden
+      text-overflow: ellipsis
+      display: -moz-box
+      -moz-box-orient: vertical
+      display: -webkit-box
+      -webkit-line-clamp: 1
+      -webkit-box-orient: vertical
+      line-clamp: 1
+    }
   }
+
+  &__name {
+    font-weight: bold
+    font-size: 16px
+    margin-bottom: 4px
+  }
+
+  &__description {
+    font-size: 14px
+  }
+}
+
+.collection__description {
+  color: #8897a8
+  font-size: 14px
+  display: flex
+  flex-direction: column
+
+  .desc {
+    overflow: hidden
+    text-overflow: ellipsis
+    display: -moz-box
+    -moz-box-orient: vertical
+    display: -webkit-box
+    -webkit-line-clamp: 3
+    -webkit-box-orient: vertical
+    line-clamp: 3
+  }
+
+  .button-more {
+    cursor: pointer
+    color: #00f6d2
+    align-self: flex-end
+  }
+}
+
+.social {
+  height: 16px
+  display: flex
+  justify-content: flex-end
+  align-items: center
+  margin-bottom: 20px
+
+  & > * {
+    margin-left: 6px
+  }
+}
+
+.collection__details {
+  width: 100%
+  height: 60px
+  padding-top: 16px
+  padding-bottom: 16px
+  border-radius: 10px
+  background-color: rgba(255, 255, 255, 0.05)
+  display: grid
+  grid-template-columns: 1fr 1fr 1fr 1fr
+
+  & > div {
+    display: grid
+    grid-template-rows: 1fr 1fr
+    align-items: center
+    justify-items: center
+    
+    & > div {
+      display: flex
+      
+      & img {
+        margin-right: 10px
+      }
+    }
+    
+    & > span:not(.value) {
+      font-size: 14px
+    }
+
+    & .value {
+      display: flex
+      font-size: 16px
+    }
+  }
+
+  & > *:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.1)
+  }
+}
+
+.footer {
+  grid-column: 1 / 3
+  height: min-content
+  display: flex
+  justify-content: center
+  align-items: center
+  margin-top: 20px
+  color: red
 }
 </style>
 
