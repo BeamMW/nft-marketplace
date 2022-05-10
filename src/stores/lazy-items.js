@@ -268,4 +268,13 @@ export default class ItemsStore {
       }
     })
   }
+
+  toDetails(id) {
+    router.push({
+      name: this._objname,
+      params: {
+        id
+      }
+    })
+  }
 }

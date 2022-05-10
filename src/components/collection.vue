@@ -1,15 +1,12 @@
 <template>
   <!--selectItem-->
-  <div :class="
-    {'collection': true, 
-     'error': item.error
-    }"
-  >
+  <div :class="{'collection': true, 'error': item.error}">
     <preview class="preview" 
              :image="item.cover"
              :default="def_banner"
              height="140px" 
              cover
+             @click="onDetails"
     >
       <btn v-if="item.owned" 
            padding="0px" 
@@ -19,12 +16,12 @@
            height="35px"
            color="rgba(0, 0, 0, 0.6)"
            :hover="false"
-           @click="onDetails"
+           @click="onEdit"
       >
         <img width="18" src="~assets/icon-pencil.svg">
       </btn>
+      <moderationStatus :item="item"/>
     </preview>
-    <moderationStatus :item="item"/>
     <div class="info-row">  
       <div class="avatar" :class="{'error': item.author_error}">
         <preview :image="item.avatar" 
@@ -172,11 +169,15 @@ export default {
   },
 
   methods: {
-    onDetails () {
+    onEdit (ev) {
       if (!this.item.owned || this.item.error) {
         return
       }
       collsStore.toEditItem(this.item.id)
+      ev.stopPropagation()
+    },
+    onDetails (ev) {
+      collsStore.toDetails(this.item.id)
     }
   }
 }

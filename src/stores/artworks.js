@@ -160,15 +160,6 @@ class ArtworksStore extends LazyItems {
     }
   }
 
-  toDetails(id) {
-    router.push({
-      name: 'artwork',
-      params: {
-        id
-      }
-    })
-  }
-
   toNewItem() {
     router.push({
       name: 'new-nft'

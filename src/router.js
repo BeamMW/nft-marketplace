@@ -21,7 +21,7 @@ const router = createRouter({
     {path: '/edit-collection/:id', component: editCollection, name: 'edit-collection', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/new-collection', component: editCollection, name: 'new-collection'},
     {path: '/new-nft', component: newNft, name: 'new-nft'},
-    {path: '/collection-details', component: collectionDetails, name: 'collection-details'}
+    {path: '/collection/:id', component: collectionDetails, name: 'collection', props: (route) => {return {id: Number(route.params.id)}}}
   ]
 })
 

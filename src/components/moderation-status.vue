@@ -1,9 +1,6 @@
 <template>
-  <div v-if="pending" class="top-message pending">
-    Pending for approval
-  </div>
-  <div v-if="rejected" class="top-message rejected">
-    Rejected by moderator
+  <div :class="{'top-message': true, 'pending': pending, 'rejected': rejected}">
+    {{ rejected ? 'Rejected by moderator' : 'Pending for approval' }}
   </div>
 </template>
 
