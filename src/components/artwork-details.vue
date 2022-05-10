@@ -1,5 +1,11 @@
 <template>
-  <div id="container" class="container">
+  <loading v-if="artwork === undefined" 
+           text="Loading NFT"
+  />
+  <div v-else-if="artwork == null">
+    NFT Not Found  
+  </div>
+  <div v-else id="container" class="artwork-details-container">
     <pageTitle/>
     <div class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
@@ -16,9 +22,12 @@
         <div class="info-container">
           <div class="info-box">
             <div class="title" :class="{'error': error}">{{ title }}</div>
-            <div class="author" :class="{'error': error}" v-html="by_author"></div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
-            <div class="price">
+            <div class="bottom">
+              <div class="separator"/>
+              <div class="author" :class="{'error': error}">Creator: <span>{{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }} {{ author_name }}{{ author_name }}{{ author_name }}{{ author_name }} 22</span></div>
+              <!-- TODO: make collection clickable and navigate to it on click -->
+              <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }} {{ collection_name }} {{ collection_name }} {{ collection_name }}</span></div>
               <div class="separator"/>
               <artPrice :artwork="artwork"/>
             </div>
@@ -59,11 +68,10 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
+  .artwork-details-container {
     display: flex
     flex-direction: column
     box-sizing: border-box
-    padding-top: 15px
     width: 100%
     height: 100%
 
@@ -193,7 +201,7 @@
 
         .separator {
           height: 1px
-          margin: 20px 0
+          margin: 20px 0 15px 0
           opacity: 0.2
           border-top: solid 1px #fff
         }
@@ -224,11 +232,11 @@
             border-radius: 10px
             height: 100%
             box-sizing: border-box
-            padding: 35px 40px 
+            padding: 20px 27px 
             display: flex
             flex-direction: column
 
-            & .title {
+            & > .title {
               font-size: 20px
               font-weight: bold
               color: #fff
@@ -237,19 +245,45 @@
               overflow: hidden
             }
 
-            & .author {
+            & > .description {
+              color: white
+              margin-top: 20px
               font-size: 16px
-              color: #fff
-              margin-top: 8px
-
-              & > span {
-                color: #00f6d2
-                margin-left: 4px
-              }
             }
 
-            & .price {
+            & .bottom {
               margin-top: auto
+              
+              & > .author {
+                font-size: 16px
+                color: #fff
+                display: flex
+                flex-direction: row
+
+                & > span {
+                  color: #00f6d2
+                  margin-left: 4px
+                  white-space: nowrap
+                  text-overflow: ellipsis
+                  overflow: hidden
+                }
+              }
+
+              & > .collection {
+                font-size: 16px
+                color: #fff
+                margin-top: 6px
+                display: flex
+                flex-direction: row
+
+                & > span {
+                  color: #00f6d2
+                  margin-left: 4px
+                  white-space: nowrap
+                  text-overflow: ellipsis
+                  overflow: hidden
+                }
+              }
             }
           }
         }
@@ -263,9 +297,14 @@ import artPrice from './artwork-price'
 import preview from './image-preview'
 import artistsStore from 'stores/artists'
 import artsStore from 'stores/artworks'
+import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
 import pageTitle from './page-title'
+import {useObservable} from '@vueuse/rxjs'
+import {Observable} from 'rxjs'
+import {computed} from 'vue'
+
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"
@@ -286,9 +325,35 @@ export default {
     }
   },
 
-  emits: [
-    'back'
-  ], 
+  setup(props) {
+    let artworkObservable = computed(() => useObservable(artsStore.getLazyItem('manager', props.id)))
+    let artwork = computed(() => {
+      let result = artworkObservable.value.value
+      if (!result) {
+        return result
+      }
+      return result.length == 0 ? null : result[0]
+    })
+
+    let collsObservable = computed(() => {
+      if (!artwork.value) return new Observable(subscriber => subscriber.next(artwork.value))
+      if (!artwork.value.collection) return new Observable(subscriber => subscriber(null))
+      return useObservable(collsStore.getLazyItem('manager', artwork.value.collection))
+    })  
+     
+    let collection = computed(() => {
+      let result = collsObservable.value.value
+      if (!result) {
+        return result
+      }
+      return result.length == 0 ? null : result[0]
+    })
+    
+    return {
+      artwork,
+      collection
+    }
+  },
 
   data () {
     return {
@@ -298,10 +363,6 @@ export default {
   },
 
   computed: {
-    artwork () {
-      return artsStore.getItem(this.id)
-    },
-
     error () {
       return !!this.artwork.error
     },
@@ -314,8 +375,18 @@ export default {
       return this.artwork.description
     },
 
-    by_author () {
-      return this.artwork.by_author
+    author_name () {
+      return this.artwork.author_name
+    },
+
+    collection_name() {
+      if (this.collection === null) return 'Error: not found'
+      if (this.collection === undefined) return 'Loading...'
+      return this.collection.label
+    },
+
+    collection_error() {
+      return this.collection === null || (this.collection && this.collection.error)
     },
 
     image () {
@@ -341,9 +412,7 @@ export default {
       return utils.formatHeight(height)
     },
     onAuthor () {
-      // TODO: enable in the future 
-      // this.$store.setFilterByArtist(this.artwork.pk_author)
-      // this.$emit('back')
+      // FUTURE
     }
   }
 }

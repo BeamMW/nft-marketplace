@@ -1,8 +1,8 @@
 <template>
-  <loading v-if="collection == undefined" 
+  <loading v-if="edit_mode && collection === undefined" 
            text="Loading collection"
   />
-  <div v-if="collection == null">
+  <div v-else-if="edit_mode && collection == null">
     Collection Not Found  
   </div>
   <div v-else class="container">
@@ -173,14 +173,18 @@ export default {
   },
 
   setup(props) {
-    const collsObservable = computed(() => useObservable(collsStore.getLazyItem('artist', props.id)))
-    const collection = computed(() => {
-      let result = collsObservable.value.value
-      if (!result) {
-        return result
-      }
-      return result.length == 0 ? null : result[0]
-    })
+    let collection = undefined
+
+    if (props.id !== undefined) {
+      const collsObservable = computed(() => useObservable(collsStore.getLazyItem('artist', props.id)))
+      collection = computed(() => {
+        let result = collsObservable.value.value
+        if (!result) {
+          return result
+        }
+        return result.length == 0 ? null : result[0]
+      })
+    }
       
     return {
       collection

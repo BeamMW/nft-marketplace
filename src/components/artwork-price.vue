@@ -28,7 +28,12 @@
            text_color="magenta"
            @click="onBuy"
       />
-      <btn v-else text="buy" color="magenta" @click="onBuy">
+      <btn v-else 
+           text="buy" 
+           color="magenta"
+           height="33px" 
+           @click="onBuy"
+      >
         <img src="~assets/icon-button.svg">
       </btn>
     </template>  
@@ -45,7 +50,12 @@
            text_color="blue"
            @click="onSell"
       />
-      <btn v-else text="sell" color="blue" @click="onSell">
+      <btn v-else 
+           text="sell" 
+           color="blue" 
+           height="33px"
+           @click="onSell"
+      >
         <img src="~assets/icon-button.svg">
       </btn>
     </template>
@@ -65,7 +75,6 @@
 <style scoped lang="stylus">
 .price-container {
   display: flex
-  line-height: 2
   flex-wrap: wrap
   align-items: center
   width: 100%

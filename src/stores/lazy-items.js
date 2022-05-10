@@ -101,6 +101,7 @@ export default class ItemsStore {
   }
 
   getLazyAllItems(mode) {
+    // TODO: convert to computed with error + loading flags
     let loader = this._state[mode].loader
     if (loader) {
       let qloader = () => loader()
@@ -111,6 +112,7 @@ export default class ItemsStore {
   }
   
   getLazyPageItems(mode) {
+    // TODO: convert to computed with error + loading flags
     let loader = this._state[mode].loader
 
     if (loader) {
@@ -129,6 +131,7 @@ export default class ItemsStore {
   }
 
   getLazyItem(mode, id) {
+    // TODO: convert to computed with error + loading flags
     let loader = () => this._db[this._store_name]
       .where('id')
       .equals(id)

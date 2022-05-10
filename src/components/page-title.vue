@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="page-title-container">
     <backBtn/>
     <div class="title">{{ title }}</div>
     <div>
@@ -9,7 +9,7 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
+  .page-title-container {
     min-height: 45px 
     display: flex
     flex-flow: row

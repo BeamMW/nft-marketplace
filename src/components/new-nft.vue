@@ -158,11 +158,11 @@ export default {
   computed: {
     name_valid() {
       let value = this.name
-      return !value || value.length <= 100
+      return !value || value.length <= 35
     },
     description_valid() {
       let value = this.description
-      return !value || value.length <= 150
+      return !value || value.length <= 300
     },
     image_valid() {
       return !this.image || validators.image(this.image)
