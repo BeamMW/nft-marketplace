@@ -22,6 +22,7 @@
           items_name="NFTs"
           component="artwork"
           mode="owner"
+          :new_component="is_artist? 'create-nft' : ''"
           :store="artsStore"
     />
     <list v-if="show_sale"

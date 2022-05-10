@@ -1,13 +1,9 @@
 <template>
-  <loading v-if="artwork === undefined" 
-           text="Loading NFT"
-  />
-  <div v-else-if="artwork == null">
-    NFT Not Found  
-  </div>
-  <div v-else id="container" class="artwork-details-container">
+  <div id="container" class="artwork-details-container">
     <pageTitle/>
-    <div class="content-wrapper" :class="{'error': error}">
+    <loading v-if="artwork === undefined" text="Loading NFT"/>
+    <notFound v-else-if="artwork == null" text="NFT Not Found"/>
+    <div v-else class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
         <div class="artwork-container">
           <div>
@@ -295,6 +291,8 @@
 <script>
 import artPrice from './artwork-price'
 import preview from './image-preview'
+import loading from './loading'
+import notFound from './not-found'
 import artistsStore from 'stores/artists'
 import artsStore from 'stores/artworks'
 import collsStore from 'stores/collections'
@@ -315,7 +313,9 @@ export default {
   components: {
     artPrice,
     preview,
-    pageTitle
+    pageTitle,
+    loading,
+    notFound
   },
 
   props: {
@@ -335,14 +335,14 @@ export default {
       return result.length == 0 ? null : result[0]
     })
 
-    let collsObservable = computed(() => {
+    let collObservable = computed(() => {
       if (!artwork.value) return new Observable(subscriber => subscriber.next(artwork.value))
       if (!artwork.value.collection) return new Observable(subscriber => subscriber(null))
       return useObservable(collsStore.getLazyItem('manager', artwork.value.collection))
     })  
      
     let collection = computed(() => {
-      let result = collsObservable.value.value
+      let result = collObservable.value.value
       if (!result) {
         return result
       }

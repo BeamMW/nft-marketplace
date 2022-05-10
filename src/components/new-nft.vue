@@ -1,42 +1,43 @@
 <template>
-  <loading v-if="!collections" 
-           text="Loading collections"
-  />
-  <div v-else class="nft-container">
+  <div class="nft-container">
     <pageTitle title="add nft"/>
-    <p class="description">
-      After NFT is created it would not be visible<br>
-      until reviewed by a moderator.
-    </p>
-    <div class="fields">
-      <div class="col-first">
-        <inputField v-model="name"
-                    label="NFT Name*"
-                    :valid="name_valid"
-                    :max_length="35"
-        />
-        <textAreaField v-model="description"
-                       label="Description"
-                       :valid="description_valid"
-                       :max_length="300"
-        />
-        <formSelect v-model="collection"
-                    :options="collections"
-        />
-        <priceInput v-model="price"
-                    label="Price"
-        />
-        <switchInput v-model="dontsell" label="Not for sale"/>
+    <loading v-if="collections === undefined" text="Loading collections"/>
+    <notFound v-else-if="collections == null" text="Failed to load collections" error/>
+    <template v-else>
+      <p class="description">
+        After NFT is created it would not be visible<br>
+        until reviewed by a moderator.
+      </p>
+      <div class="fields">
+        <div class="col-first">
+          <inputField v-model="name"
+                      label="NFT Name*"
+                      :valid="name_valid"
+                      :max_length="35"
+          />
+          <textAreaField v-model="description"
+                         label="Description"
+                         :valid="description_valid"
+                         :max_length="300"
+          />
+          <formSelect v-model="collection"
+                      :options="collections"
+          />
+          <priceInput v-model="price"
+                      label="Price"
+          />
+          <switchInput v-model="dontsell" label="Not for sale"/>
+        </div>
+        <div class="col-second">
+          <addImage v-model:image="image"
+                    :error="image_valid ? '' : 'image cannot be larger than 250kb'"
+                    accept="image/*"
+                    title="Add NFT here<br>(any image, including animated)"
+                    height="374px"
+          />
+        </div>
       </div>
-      <div class="col-second">
-        <addImage v-model:image="image"
-                  :error="image_valid ? '' : 'image cannot be larger than 250kb'"
-                  accept="image/*"
-                  title="Add NFT here<br>(any image, including animated)"
-                  height="374px"
-        />
-      </div>
-    </div>
+    </template>  
   </div>
   <div class="actions">
     <btn text="cancel" @click="$router.go(-1)">
@@ -93,6 +94,7 @@
 import inputField from './input-field.vue'
 import textAreaField from './textarea-field.vue'
 import pageTitle from './page-title.vue'
+import notFound from './not-found.vue'
 import btn from './button.vue'
 import addImage from './add-image.vue'
 import priceInput from './price-input.vue'
@@ -117,7 +119,8 @@ export default {
     priceInput,
     switchInput,
     formSelect,
-    loading
+    loading,
+    notFound
   },
 
   setup () {

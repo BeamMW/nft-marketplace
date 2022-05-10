@@ -1,14 +1,8 @@
 <template>
-  <loading v-if="edit_mode && collection === undefined" 
-           text="Loading collection"
-  />
-  <div v-else-if="edit_mode && collection == null">
-    Collection Not Found  
-  </div>
-  <div v-else class="container">
+  <div class="container">
     <template v-if="edit_mode">
       <pageTitle title="Edit collection"/>
-      <p class="description">
+      <p v-if="collection" class="description">
         After collection is changed it would not be visible until reviewed by a moderator.<br> 
         NFTs from collection would still appear in gallery.
       </p>
@@ -20,7 +14,9 @@
         <i>After your collection is created it would not be visible until reviewed by a moderator.</i>
       </p>
     </template>
-    <div class="fields">
+    <loading v-if="edit_mode && collection === undefined" text="Loading Collection"/>
+    <notFound v-else-if="edit_mode && collection == null" text="Collection Not Found" error/>
+    <div v-else class="fields">
       <div class="col-first">
         <inputField v-model="label"
                     label="Collection Name*"
@@ -151,6 +147,7 @@ import collsStore from 'stores/collections'
 import router from 'router'
 import validators from 'utils/validators'
 import loading from './loading.vue'
+import notFound from './not-found.vue'
 import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
 
@@ -161,7 +158,8 @@ export default {
     pageTitle,
     btn,
     addImage,
-    loading
+    loading,
+    notFound
   },
 
   props: {
@@ -186,6 +184,7 @@ export default {
       })
     }
       
+    collection = computed(() => null)
     return {
       collection
     }

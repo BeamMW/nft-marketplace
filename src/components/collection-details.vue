@@ -1,6 +1,8 @@
 <template>
-  <hdr title="collection name"/>
-  <div class="collection">
+  <pageTitle title="collection name"/>
+  <loading v-if="collection_new === undefined" text="Loading collection..."/>
+  <div v-else-if="collection_new === null">Collection Not Found</div>
+  <div v-else class="collection">
     <!-- banner -->
     <imagePreview :image="banner" width="100vw" height="200px" cover/>
 
@@ -279,16 +281,19 @@
 </style>
 
 <script>
-import hdr from './page-title.vue'
+import pageTitle from './page-title.vue'
 import btn from './button.vue'
 import imagePreview from './image-preview.vue'
+import collsStore from 'stores/collections'
 import collections from 'utils/collection-testing.js'
 import {binary_search} from '../utils/search.js'
 import formatter from '../utils/formatter.js'
+import {useObservable} from '@vueuse/rxjs'
+import {computed} from 'vue'
 
 export default {
   components: {
-    hdr,
+    pageTitle,
     btn,
     imagePreview
   },
@@ -298,6 +303,27 @@ export default {
       type: Number,
       required: true
     },
+  },
+
+  setup (props) {
+    let collObservable = computed(() => {
+      return useObservable(collsStore.getLazyItem('manager', props.id))
+    })
+
+    let collection_new_2 = computed(() => {
+      let result = collObservable.value.value
+      if (!result) {
+        return result
+      }
+      return result.length == 0 ? null : result[0]
+    })  
+
+    //let collection_new = computed(() => null)
+
+    return {
+      collection_new: collection_new_2,
+      //collection_new
+    }
   },
 
   data() {
@@ -358,12 +384,13 @@ export default {
   },
 
   mounted() {
-    const scrollHeight = this.$refs.desc.scrollHeight
+    /*const scrollHeight = this.$refs.desc.scrollHeight
     const offsetHeight = this.$refs.desc.offsetHeight
 
     if (scrollHeight > offsetHeight) {
       this.is_long_text = true
     }
+    */
   }
 }
 </script>
