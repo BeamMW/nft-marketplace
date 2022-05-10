@@ -1,17 +1,13 @@
 <template>
   <hdr title="collection name"/>
-  <div class="collection">
-    <!-- banner -->
-    <imagePreview :image="banner" width="100vw" height="200px"/>
+  <div class="container__collection">
+    <img class="banner" :src="banner">
 
-    <div :class="!full_text ? 'block' : 'block--transformed'">
+    <div :class="!full_text ? 'info-block' : 'info-block--transformed'">
       <div class="left">
         <!-- artist info -->
         <div class="artist">
-          <div class="image">
-            <imagePreview :image="author_image" radius="36px 36px"/>
-          </div>
-
+          <img src="~assets/artist-image.svg">
           <div class="artist__info">
             <span class="artist__name">Master_Splinter</span>
             <span class="artist__description">NFT creator since 1898</span>
@@ -88,10 +84,10 @@
 </template>
 
 <style lang="stylus" scoped>
-.collection {
+.container__collection {
   display: grid
   grid-template-columns: 1fr 1fr
-  grid-template-rows: repeat(3, minmax(min-content, max-content))
+  grid-template-rows: repeat(4, minmax(min-content, max-content))
   border-radius: 10px
   overflow: hidden
 }
@@ -101,7 +97,7 @@
   grid-column: 1 / 3
 }
 
-.block {
+.info-block {
   grid-column: 1 / 3
   display: grid
   grid-template-columns: 1fr 1fr
@@ -111,9 +107,9 @@
   background-color: rgba(255, 255, 255, 0.05)
 }
 
-.block--transformed {
+.info-block--transformed {
   grid-column: 1 / 3
-  grid-row: 2 / 3
+  grid-row: 2 / 4
   display: grid
   padding: 20px
   background-color: rgba(255, 255, 255, 0.05)
