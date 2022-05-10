@@ -5,6 +5,7 @@ import artworkDetails from './components/artwork-details.vue'
 import editArtist from './components/edit-artist'
 import editCollection from './components/edit-collection'
 import newNft from './components/new-nft.vue'
+import collectionDetails from './components/collection-details.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 // TODO:review routes
@@ -19,7 +20,8 @@ const router = createRouter({
     {path: '/become-artist', component: editArtist, name: 'become-artist'},
     {path: '/edit-collection/:id', component: editCollection, name: 'edit-collection', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/new-collection', component: editCollection, name: 'new-collection'},
-    {path: '/new-nft', component: newNft, name: 'new-nft'}
+    {path: '/new-nft', component: newNft, name: 'new-nft'},
+    {path: '/collection-details', component: collectionDetails, name: 'collection-details'}
   ]
 })
 

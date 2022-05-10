@@ -14,6 +14,10 @@
                   title="Sort by"
         />
       </div>
+
+      <!-- for testing purposes -->
+      <btn text="collection details" color="blue" @click="onCollectionDetails"/>
+
       <btn class="user" height="34px"
            :text="my_artist_name"
            @click="$store.toMyPage"
@@ -128,6 +132,12 @@ export default {
     },
     artists_total () {
       return artistsStore.total
+    }
+  },
+
+  methods: {
+    onCollectionDetails() {
+      this.$router.push({name: 'collection-details'})
     }
   }
 }
