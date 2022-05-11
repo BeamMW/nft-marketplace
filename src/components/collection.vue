@@ -1,25 +1,13 @@
 <template>
   <!--selectItem-->
   <div :class="{'collection': true, 'error': item.error}">
-    <preview class="preview" 
-             :image="item.cover"
+    <preview :image="item.cover"
              :default="def_banner"
              height="140px" 
              cover
              @click="onDetails"
     >
-      <btn v-if="item.owned" 
-           padding="0px" 
-           radius="6px" 
-           class="btn-edit"
-           width="35px"
-           height="35px"
-           color="rgba(0, 0, 0, 0.6)"
-           :hover="false"
-           @click="onEdit"
-      >
-        <img width="18" src="~assets/icon-pencil.svg">
-      </btn>
+      <btnEdit :item="item"/> 
       <moderationStatus :item="item"/>
     </preview>
     <div class="info-row">  
@@ -40,7 +28,7 @@
         <div class="items-info" :class="{'error': item.error}">
           <div class="count">
             <div class="text">{{ item.artworks_count }}</div>
-            <div>{{ item.artworks_count == 1 ? 'item' : 'items' }}</div>
+            <div>{{ item.artworks_count == 1 ? 'NFT' : 'NFTs' }}</div>
           </div>
           <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>
@@ -58,14 +46,6 @@
     border-radius: 10px
     position: relative
     overflow: hidden
-
-    & > .preview {
-      .btn-edit {
-        position: absolute
-        bottom: 8px
-        right: 10px
-      }
-    }
 
     & > .info-row {
       display: flex
@@ -137,14 +117,14 @@ import preview from './image-preview'
 import amount from './amount'
 import collsStore from 'stores/collections'
 import {def_images} from 'utils/consts'
-import btn from './button'
 import moderationStatus from './moderation-status'
+import btnEdit from './btn-edit'
 
 export default {
   components: {
     preview,
     amount,
-    btn,
+    btnEdit,
     moderationStatus
   },
 
@@ -165,17 +145,10 @@ export default {
   computed: {
     coll_name () {
       return [this.$state.debug ? `[${this.item.id}] - ` : '', this.item.label].join('')
-    }
+    },
   },
 
   methods: {
-    onEdit (ev) {
-      if (!this.item.owned || this.item.error) {
-        return
-      }
-      collsStore.toEditItem(this.item.id)
-      ev.stopPropagation()
-    },
     onDetails (ev) {
       collsStore.toDetails(this.item.id)
     }

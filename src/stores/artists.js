@@ -213,6 +213,7 @@ class ArtistsStore {
     artist.label = label
     artist.version = version
     
+    // TODO: this is bad
     Object.assign(artist, data)
     artist.avatar = imagesStore.fromContract(artist.avatar)
     artist.banner = imagesStore.fromContract(artist.banner)

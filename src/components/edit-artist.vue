@@ -56,7 +56,7 @@
         <textAreaField v-model="about"
                        label="About me"
                        :valid="about_valid"
-                       :max_length="300"
+                       :max_length="150"
                        :readonly="in_set_artist"
         />
         <div class="uploads-container" style="margin-top:45px;">

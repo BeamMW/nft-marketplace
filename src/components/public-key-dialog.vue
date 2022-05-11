@@ -1,9 +1,9 @@
 <template>
   <modal ref="modal">
     <div class="content">
-      <div class="title">Artist key</div>
+      <div class="title">{{ name }} Artist Key</div>
       <div class="data">
-        <span>{{ artist_key }}</span>
+        <span>{{ computed_key }}</span>
         <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
           <img src="~assets/icon-copy.svg"/>
         </btn>
@@ -65,9 +65,20 @@ export default {
     modal, btn
   },
 
+  props: {
+    name: {
+      type: String,
+      default: 'Your'
+    },
+    artist_key: {
+      type: String,
+      default: undefined
+    }
+  },
+
   computed: {
-    artist_key () {
-      return artistsStore.my_id
+    computed_key () {
+      return this.artist_key || artistsStore.my_id
     },
   },
 

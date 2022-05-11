@@ -1,6 +1,6 @@
 <template>
   <div class="nft-container">
-    <pageTitle title="add nft"/>
+    <pageTitle title="Add NFT"/>
     <loading v-if="collections === undefined" text="Loading collections"/>
     <notFound v-else-if="collections == null" text="Failed to load collections" error/>
     <template v-else>

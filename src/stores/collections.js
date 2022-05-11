@@ -13,7 +13,12 @@ class CollectionsStore extends LazyItems {
 
   _fromContract (coll) {
     coll = Object.assign({}, coll)
+    coll.store = this
+
     coll.description = coll.data.description
+    coll.instagram = coll.data.instagram
+    coll.twitter = coll.data.twitter
+    coll.website = coll.data.website
 
     let author = artistsStore.loadArtist(coll.author)
     coll.owned = computed(() => artistsStore.my_id == coll.author)
@@ -33,6 +38,29 @@ class CollectionsStore extends LazyItems {
       if (author.error) return 'Failed to load author'
       return `by <span style="color:#00f6d2">${author.label}</span>`
     })
+
+    // TODO: review all author props, may be there is a better way to do this
+    // 1. move to author{props}
+    coll.author_about = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      return author.about
+    }) 
+
+    coll.author_instagram = computed(() => {
+      if (author.loading || author.error) return undefined
+      return author.instagram
+    }) 
+
+    coll.author_twitter = computed(() => {
+      if (author.loading || author.error) return undefined
+      return author.twitter
+    }) 
+
+    coll.author_website = computed(() => {
+      if (author.loading || author.error) return undefined
+      return author.website
+    }) 
     
     coll.avatar = computed(() => {
       if(author.loading) return {loading: true}

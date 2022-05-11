@@ -183,8 +183,7 @@ export default {
         return result.length == 0 ? null : result[0]
       })
     }
-      
-    collection = computed(() => null)
+
     return {
       collection
     }
