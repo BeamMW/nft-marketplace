@@ -56,7 +56,7 @@
 
     <div :class="{'block': true, 'block-long': long_text}">
       <span ref="desc" :class="{'desc-short': !full_text}">
-        {{ description }} {{ description }} {{ description }} {{ description }} {{ description }}
+        {{ description }} {{ description }} {{ description }} {{ description }}
       </span>
       <btn v-if="long_text && !full_text"
            class="btn-right"
@@ -257,7 +257,7 @@ import loading from './loading'
 import notFound from './not-found'
 import utils from 'utils/utils'
 import {useObservable} from '@vueuse/rxjs'
-import {computed} from 'vue'
+import {computed, nextTick} from 'vue'
 import publicKeyModal from './public-key-dialog'
 import {coll_tabs} from 'utils/consts'
 
@@ -299,6 +299,7 @@ export default {
 
   data() {
     return {
+      observer: undefined,
       full_text: false,
       long_text: false,
       tabs: [
@@ -371,14 +372,29 @@ export default {
   },
 
   updated() {
-    if (!this.full_text) {
-      const scrollHeight = this.$refs.desc.scrollHeight
-      const offsetHeight = this.$refs.desc.offsetHeight
-      this.long_text = scrollHeight > offsetHeight
+    if (!this.observer) {
+      let desc = this.$refs.desc
+      this.observer = new ResizeObserver(() => {
+        this.calcLongText()
+      })
+      this.observer.observe(desc)
+    }
+  },
+
+  unmounted() {
+    if (this.observer) {
+      this.observer.disconnect()
     }
   },
 
   methods: {
+    calcLongText() {
+      if (!this.full_text) {
+        const scrollHeight = this.$refs.desc.scrollHeight
+        const offsetHeight = this.$refs.desc.offsetHeight
+        this.long_text = scrollHeight > offsetHeight
+      }
+    },
     onKey() {
       this.$refs.keyModal.open()
     },
