@@ -794,8 +794,47 @@ export default class Utils {
     return res == '{}' ? obj.toString() : res
   }
 
-  static formatAmount(amount) {
+  static formatAmount8(amount) {
     return (amount / 100000000).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+  }
+
+  static formatAmount3(amount) {
+    const fixedNum = amount.toFixed(3)
+  
+    if (amount == 0) {
+      return '0'
+    }
+    
+    if (amount < 0.01) {
+      return '< 0.01'
+    }
+
+    if (amount >= 0.01 && fixedNum < 1000) {
+      return +amount.toFixed(2)
+    }
+
+    if (fixedNum >= 1000 && fixedNum < 1000000) {
+      const head = fixedNum.slice(0, -7)
+      const tail = fixedNum.slice(-7, -5)
+      const n = +(head + '.' + tail)
+      return n + ' k'
+    }
+
+    if (fixedNum >= 1000000 && fixedNum < 1000000000) {
+      const head = fixedNum.slice(0, -10)
+      const tail = fixedNum.slice(-10, -8)
+      const n = +(head + '.' + tail)
+      return n + ' m'
+    }
+
+    if (fixedNum >= 1000000000) {
+      const head = fixedNum.slice(0, -13)
+      const tail = fixedNum.slice(-13, -11)
+      const n = +(head + '.' + tail)
+      return n + ' b'
+    }
+
+    return 'error'
   }
 
   static formatHeight(height) {

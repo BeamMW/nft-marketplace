@@ -9,14 +9,6 @@
           mode="artist"
           :store="collsStore"
     />
-    <list v-if="show_created"
-          class="list"
-          items_name="NFTs"
-          component="artwork"
-          new_component="create-nft"
-          mode="artist"
-          :store="artsStore"
-    />
     <list v-if="show_owned"
           class="list"
           items_name="NFTs"

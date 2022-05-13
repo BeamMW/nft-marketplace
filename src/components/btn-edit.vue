@@ -33,10 +33,6 @@ export default {
     item: {
       type: Object,
       required: true
-    },
-    store: {
-      type: Object,
-      required: true
     }
   },
 

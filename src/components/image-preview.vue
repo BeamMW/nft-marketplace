@@ -3,8 +3,8 @@
     <!--div v-if="error && show_text" class="error">Failed to load image</div-->
     <div v-if="loading && show_text" class="loading">Loading...</div>
     <!--div v-if="error && show_text" class="error">Failed to load image</div-->
+    <img v-if="src" class="preview" :src="src" :style="image_style"/>
     <slot></slot>
-    <img v-if="src" :src="src" :style="image_style">
   </div>  
 </template>
 
@@ -17,18 +17,20 @@
     overflow: hidden
     position: relative
     
-    & > img {
+    &>.preview {
       width: 100%
       height: 100%
-    }
-
-    & > div {
       position: absolute
-      z-index: 1
     }
 
-    & > .error {
+    &>.loading {
+      position: absolute
+      z-index: 100
+    }
+
+    &>.error {
       color: black
+      z-index: 100
     }
   }
 </style>

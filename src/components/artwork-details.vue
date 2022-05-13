@@ -48,7 +48,7 @@
             <img src="~assets/icon-beam.svg"/>
             <span class="curr">BEAM</span>
           </div>
-          <div class="text">{{ formatAmount(sale.amount) }}</div>
+          <div class="text">{{ formatAmount8(sale.amount) }}</div>
           <div class="text">{{ formatHeight(sale.height) }}</div>
         </div>
       </div>
@@ -193,7 +193,7 @@
       & .details-row {
         display: flex
         flex-direction: row
-        margin-top: 15px
+        margin-top: 5px
 
         .separator {
           height: 1px
@@ -405,8 +405,8 @@ export default {
   },
 
   methods: {  
-    formatAmount(amount) {
-      return utils.formatAmount(amount)
+    formatAmount8(amount) {
+      return utils.formatAmount8(amount)
     },
     formatHeight(height) {
       return utils.formatHeight(height)

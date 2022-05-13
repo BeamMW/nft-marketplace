@@ -22,6 +22,12 @@ export const my_tabs = {
   LIKED_NFTS: 4,
 }
 
+export const coll_tabs = {
+  ALL_NFTS: 0,
+  SALE_NFTS: 1,
+  LIKED_NFTS: 2,
+}
+
 export const sort = {
   OLDEST_TO_NEWEST: 0,
   NEWEST_TO_OLDEST: 1,

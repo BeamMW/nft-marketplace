@@ -1,4 +1,4 @@
-import {tabs, common, contract, sort, my_tabs} from 'utils/consts.js'
+import {tabs, common, contract, sort, my_tabs, coll_tabs} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
@@ -20,6 +20,7 @@ function defaultState() {
     is_moderator: false,
     is_artist: false,
     my_active_tab: my_tabs.OWNED_NFTS,
+    coll_active_tab: coll_tabs.ALL_NFTS,
     artworks: [],
     all_artworks: {
       [tabs.ALL]:   [],
@@ -436,6 +437,10 @@ const store = {
 
   setMyTab(id) {
     this.state.my_active_tab = id
+  },
+
+  setCollTab(id) {
+    this.state.coll_active_tab = id
   },
 
   setGalleryTab(id) {

@@ -42,7 +42,7 @@ export default {
 
   computed: {
     value () {
-      return utils.formatAmount(this.amount)
+      return utils.formatAmount8(this.amount)
     },
     text_style () {
       return {
