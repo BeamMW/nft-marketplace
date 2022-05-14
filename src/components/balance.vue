@@ -1,6 +1,11 @@
 <template>
   <publicKeyModal ref="keyModal"/>
-  <pageTitle title="balance"/>
+  <pageTitle title="balance">
+    <div class="actions">
+      <btnEditArtist/>
+      <btnKey/>
+    </div>
+  </pageTitle>
   <div class="balance-container">
     <div class="balance">
       <div>
@@ -29,19 +34,33 @@
 
       <div>
         <div class="description">NFT sold</div>
-        <div>{{ nft_sold }}</div>
+        <div>{{ total_sold }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
+.actions {
+  display: flex
+  justify-content: flex-end
+  align-items: center
+
+  & > * {
+    margin-left: 12px
+    margin-top: 7px
+
+    &:last-child {
+      margin-right: 7px
+    }
+  }
+}
 .balance-container {
   display: grid
   grid-template-columns: 1fr 1fr
   column-gap: 20px
   margin-bottom: 10px
-  margin-top: 5px
+  margin-top: 20px
 
   .balance {
     background-color: rgba(255, 255, 255, 0.1)
@@ -72,13 +91,17 @@ import btn from './button.vue'
 import pageTitle from './page-title.vue'
 import amount from './amount.vue'
 import artistsStore from 'stores/artists.js'
+import btnEditArtist from './btn-edit-artist'
+import btnKey from './button-key'
 
 export default {
   components: {
     publicKeyModal,
     btn,
     pageTitle,
-    amount
+    amount,
+    btnEditArtist,
+    btnKey
   },
 
   props: {
@@ -90,12 +113,17 @@ export default {
 
   computed: {
     balance () {
-      return this.$state.balance
+      return this.$state.balance_beam
     },
 
-    my_artist_name () {
-      let artist = artistsStore.self
-      return (artist || {}).label
+    my_name () {
+      let self = artistsStore.self
+      return (self || {}).label
+    },
+
+    total_sold () {
+      let self = artistsStore.self
+      return (self || {}).total_sold || 0
     }
   },
 

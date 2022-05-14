@@ -78,11 +78,29 @@
       /> 
     </div>
     <tabsctrl v-model="active_tab" :tabs="tabs"/>
+    <!--- TODO: set collection to the current one when opening 'new-nft' -->
     <list v-if="show_all"
           class="list"
           items_name="NFTs"
           component="artwork"
+          :new_component="owned ? 'create-nft' : ''"
           :mode="`artist:collection:${id}`"
+          :store="artsStore"
+    />
+    <list v-if="show_sale"
+          class="list"
+          items_name="NFTs"
+          component="artwork"
+          :new_component="owned ? 'create-nft' : ''"
+          :mode="`artist:collection:sale:${id}`"
+          :store="artsStore"
+    />
+    <list v-if="show_liked"
+          class="list"
+          items_name="NFTs"
+          component="artwork"
+          :new_component="owned ? 'create-nft' : ''"
+          :mode="`artist:collection:liked:${id}`"
           :store="artsStore"
     />
   </div>
@@ -118,7 +136,7 @@
 
       & .desc-short {
         display: -webkit-box
-        -webkit-line-clamp: 3
+        -webkit-line-clamp: 2
         -webkit-box-orient: vertical
         overflow: hidden
       }
@@ -312,6 +330,9 @@ export default {
   },
 
   computed: {
+    owned() {
+      return this.collection.owned
+    },
     title () {
       return this.collection && !this.collection.error ? this.collection.label : ''
     },

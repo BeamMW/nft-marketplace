@@ -6,45 +6,95 @@ import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
+import {liveQuery} from 'dexie'
+import {useObservable} from '@vueuse/rxjs'
 
+// TODO: modes a:b:c -> make c rely on loader of a and b
+// TODO: the same in LazyItems
 class ArtworksStore extends LazyItems {
   constructor () {
     super({
       objname: 'artwork', 
       versions: [versions.ARTWORK_VERSION],
-      dbKeys: 'collection'
+      dbKeys: 'collection, my_impression, [owned+price.amount]'
     })
     
+    this._current_coll_mode = undefined
     this._coll_modes = [
-      {name: 'artist:collection:',
+      {name: 'artist:collection:liked:',
         make_loader(collid) {
           return (store) => {
-            console.log(`loader for artist:collection:${collid}:${this._store_name}`)
+            console.log(`loader for artist:collection:liked:${collid}`)
             return store
-              .where({'collection': parseInt(collid)})
+              .where({
+                'collection': collid
+              })
+              .and(item => item.impressions > 0)
           }
         }
       }, 
-      {name: 'user:collection',
+      {name: 'artist:collection:sale:', 
         make_loader(collid) {
           return (store) => {
-            console.log(`loader for artist:collection:${collid}:${this._store_name}`)
+            console.log(`loader for artist:collection:sale:${collid}`)
             return store
               .where({
-                'collection': parseInt(collid),
-                'state': 'approved'
+                'collection': collid,
+                'owned': 1
+              })
+              .and(item => item.price && item.price.amount > 0)
+          }
+        }
+      },
+      {name: 'artist:collection:',
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for artist:collection:${collid}`)
+            return store
+              .where({
+                'collection': collid
               })
           }
         }
       }, 
+      {name: 'user:collection:liked:',
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for artist:collection:${collid}`)
+            return store
+              .where({
+                'collection': collid,
+                'state': 'approved'
+              })
+              .and(item => item.impressions > 0)
+          }
+        }
+      }, 
+      {name: 'user:collection:',
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for user:collection:${collid}:${this._store_name}`)
+            return store
+              .where({
+                'collection': collid,
+                'state': 'approved'
+              })
+          }
+        }
+      }
     ]
   }
 
   _getMode(mode) {
-    // TODO:remove all previous collection modes
     let result = super._getMode(mode) 
 
     if (!result) {
+      if (this._current_coll_mode) {
+        delete this._state[this._current_coll_mode]
+        console.log('delete ' + this._current_coll_mode)
+      }
+
+      // create the requested mode
       let collid = -1
       let cmode  = undefined
       for(cmode of this._coll_modes) {
@@ -55,8 +105,14 @@ class ArtworksStore extends LazyItems {
       }
 
       if (cmode && collid != -1) {
-        result = this._allocMode(mode, cmode.make_loader(collid))
+        let loader = cmode.make_loader(collid)
+        result = this._allocMode(mode, loader)
+        // MAYBE: this is ineffective though OK since collections do not have a lot of items
+        let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
+        result.total = computed(() => observable.value)
       }  
+
+      this._current_coll_mode = mode
     }
 
     return result
@@ -89,14 +145,6 @@ class ArtworksStore extends LazyItems {
 
     if (!awork.error) {
       awork.image = imagesStore.fromContract(awork.data.image)
-    }
-
-    // TODO: convert to true js object
-    if (awork['price.aid'] != undefined) {
-      awork.price = {
-        aid: awork['price.aid'],
-        amount: awork['price.amount']
-      }
     }
     
     return awork

@@ -2,31 +2,9 @@
   <div class="my-page">
     <pageTitle title="my page">
       <div class="actions">
-        <btn v-if="is_artist" 
-             :height="height" 
-             :width="width" 
-             :disabled="in_set_artist"
-             padding="0px" 
-             radius="10px" 
-             @click="onEditArtist"
-        >
-          <img src="~assets/icon-pencil.svg">
-        </btn>
-
+        <btnEditArtist/>
         <btnWallet/>
         <btnKey/>
-
-        <btn v-if="!is_artist" 
-             :height="height" 
-             :width="width" 
-             :disabled="in_set_artist"
-             radius="10px" 
-             padding="0px" 
-             tooltip="become an artist" 
-             @click="onBecomeArtist"
-        >
-          <img src="~assets/add-user.svg"/>
-        </btn>
       </div>
     </pageTitle>
     <myGallery class="gallery"/>
@@ -64,44 +42,18 @@
 
 <script>
 import pageTitle from './page-title.vue'
-import btn from './button.vue'
-import btnWallet from './button-wallet.vue'
-import btnKey from './button-key.vue'
-import artistsStore from 'stores/artists.js'
+import btnWallet from './button-wallet'
+import btnEditArtist from './btn-edit-artist'
+import btnKey from './button-key'
 import myGallery from './my-gallery'
 
 export default {
   components: {
     pageTitle,
-    btn,
+    btnEditArtist,
     btnWallet,
     btnKey,
     myGallery
-  },
-
-  data() {
-    return {
-      width: '36px',
-      height: '36px'
-    }
-  },
-
-  computed: {
-    is_artist() {
-      return artistsStore.is_artist
-    },
-    in_set_artist() {
-      return !!artistsStore.artist_tx
-    }
-  },
-
-  methods: {
-    onEditArtist() {
-      artistsStore.toEditSelf()
-    },
-    onBecomeArtist() {
-      artistsStore.toBecomeArtist()
-    }
-  },
+  }
 }
 </script>

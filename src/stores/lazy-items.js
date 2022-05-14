@@ -26,6 +26,7 @@ export default class ItemsStore {
       artist_key: undefined
     })
 
+    // TODO: move artwork-specific loaders to artworks. For example all with likes
     this._allocMode('user')
     this._allocMode('moderator')
 
@@ -82,7 +83,7 @@ export default class ItemsStore {
 
   getDBStores() {
     let res = {} 
-    let keys = 'id, status, author, owned, my_impression, [author+owned], [owned+price.amount]'
+    let keys = 'id, status, author, owned, [author+owned]'
     if (this._extra_dbkeys) {
       keys = [keys, this._extra_dbkeys].join(', ')
     }

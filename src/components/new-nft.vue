@@ -5,8 +5,8 @@
     <notFound v-else-if="collections == null" text="Failed to load collections" error/>
     <template v-else>
       <p class="description">
-        After NFT is created it would not be visible<br>
-        until reviewed by a moderator.
+        <i>After NFT is created it would not be visible<br>
+          until reviewed by a moderator.</i>
       </p>
       <div class="fields">
         <div class="col-first">
@@ -57,6 +57,12 @@
       color: #fff
       margin: 10px 0px 20px 0px
       font-family: 'SFProDisplay', sans-serif
+
+      & > i {
+        opacity: 0.7
+        display: block
+        margin-top: 6px
+      }
     }
 
     .fields {
