@@ -6,10 +6,60 @@ import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
- 
+
 class ArtworksStore extends LazyItems {
   constructor () {
-    super('artwork', [versions.ARTWORK_VERSION])
+    super({
+      objname: 'artwork', 
+      versions: [versions.ARTWORK_VERSION],
+      dbKeys: 'collection'
+    })
+    
+    this._coll_modes = [
+      {name: 'artist:collection:',
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for artist:collection:${collid}:${this._store_name}`)
+            return store
+              .where({'collection': parseInt(collid)})
+          }
+        }
+      }, 
+      {name: 'user:collection',
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for artist:collection:${collid}:${this._store_name}`)
+            return store
+              .where({
+                'collection': parseInt(collid),
+                'state': 'approved'
+              })
+          }
+        }
+      }, 
+    ]
+  }
+
+  _getMode(mode) {
+    // TODO:remove all previous collection modes
+    let result = super._getMode(mode) 
+
+    if (!result) {
+      let collid = -1
+      let cmode  = undefined
+      for(cmode of this._coll_modes) {
+        if (mode.startsWith(cmode.name)) {
+          collid = parseInt(mode.slice(cmode.name.length))
+          break
+        }
+      }
+
+      if (cmode && collid != -1) {
+        result = this._allocMode(mode, cmode.make_loader(collid))
+      }  
+    }
+
+    return result
   }
 
   _fromContract(awork) {

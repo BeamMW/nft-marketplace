@@ -8,13 +8,13 @@ import {liveQuery} from 'dexie'
 import {Observable} from 'rxjs'
 
 export default class ItemsStore {
-  constructor(objname, versions, perPage) {
+  constructor({objname, versions, perPage, dbKeys}) {
     this._objname = objname
+    this._extra_dbkeys = dbKeys
     this._store_name = `${objname}s`
     this._metastore_name = `${objname}s_meta`
     this._versions = versions
     this._per_page = perPage || common.ITEMS_PER_PAGE
-    this._modes = ['user', 'moderator', 'artist', 'owner', 'owner:sale', 'artist:sold', 'liker:liked']
     this._my_key = ''
     this._loading = false
   }
@@ -26,85 +26,92 @@ export default class ItemsStore {
       artist_key: undefined
     })
 
-    let makeMode = (mode) => {
-      return {
-        all_items: [],
-        total: 0,
-        page: 1,
-        pages: computed(() => {
-          let total = this._state[mode].total
-          return total ? Math.ceil(total / this._per_page) : 1
-        })
-      }
-    }
+    this._allocMode('user')
+    this._allocMode('moderator')
 
-    for (let mode of this._modes) {
-      this._state[mode] = makeMode(mode)
-    }
-
-    this._state['artist'].loader = () => {
+    this._allocMode('artist', (store, mykey) => {
       console.log(`loader for artist:${this._store_name}`)
-      let my_key = this._my_key
-      return this._db[this._store_name]
-        .where({'author': my_key})
-    }
+      return store
+        .where({'author': mykey})
+    })
 
-    this._state['owner'].loader = () => {
+    this._allocMode('owner', (store) => {
       console.log(`loader for owner:${this._store_name}`)
-      return this._db[this._store_name]
+      return store
         .where({'owned': 1})
-    }
+    })
 
-    this._state['owner:sale'].loader = () => {
+    this._allocMode('owner:sale', (store) => {
       console.log(`loader for owner:sale:${this._store_name}`)
-      return this._db[this._store_name]
+      return store
         .where(['owned', 'price.amount'])
         .above([0, 0])
-    }
+    })
 
-    this._state['artist:sold'].loader = () => {
+    this._allocMode('artist:sold', (store, mykey) => {
       console.log(`loader for artist:sold:${this._store_name}`)
-      let my_key = this._my_key
-      return this._db[this._store_name]
+      return store
         .where(['author', 'owned'])
-        .equals([my_key, 0])
-    }
+        .equals([mykey, 0])
+    })
 
-    this._state['liker:liked'].loader = () => {
+    this._allocMode('liker:liked', (store) => {
       console.log(`loader for liker:liked:${this._store_name}`)
-      return this._db[this._store_name]
+      return store
         .where({'my_impression': 1})
+    })
+  }
+
+  _allocMode(mode, loader) {
+    let result = {
+      loader,
+      total: 0,
+      page: 1,
+      pages: computed(() => {
+        let total = this._getMode(mode).total
+        return total ? Math.ceil(total / this._per_page) : 1
+      })
     }
+    this._state[mode] = result
+    return result
+  }
+
+  _getMode(mode) {
+    return this._state[mode]
   }
 
   getDBStores() {
     let res = {} 
-    res[this._store_name] = 'id, status, author, owned, my_impression, [author+owned], [owned+price.amount]'
+    let keys = 'id, status, author, owned, my_impression, [author+owned], [owned+price.amount]'
+    if (this._extra_dbkeys) {
+      keys = [keys, this._extra_dbkeys].join(', ')
+    }
+    res[this._store_name] = keys
     res[this._metastore_name] = 'name'
     return res
   }
 
   getPage(mode) {
-    return this._state[mode].page
+    return this._getMode(mode).page
   }
 
   setPage(mode, page) {
-    this._state[mode].page = page
+    this._getMode(mode).page = page
   }
 
   getPages(mode) {
-    return this._state[mode].pages
+    return this._getMode(mode).pages
   }
 
   getAllItemsCount(mode) {
-    return this._state[mode].total
+    return this._getMode(mode).total
   }
 
   getLazyAllItems(mode) {
     // TODO: convert to computed with error + loading flags
-    let loader = this._state[mode].loader
+    let loader = this._getMode(mode).loader
     if (loader) {
-      let qloader = () => loader()
+      let qloader = () => loader(this._db[this._store_name], this._my_key)
         .toArray(items => items.map(item => this._fromContract(item)))
       return liveQuery(qloader)
     }
@@ -113,11 +120,11 @@ export default class ItemsStore {
   
   getLazyPageItems(mode) {
     // TODO: convert to computed with error + loading flags
-    let loader = this._state[mode].loader
+    let loader = this._getMode(mode).loader
 
     if (loader) {
       let page = this.getPage(mode)
-      let qloader = () => loader()
+      let qloader = () => loader(this._db[this._store_name], this._my_key)
         .offset((page -1) * this._per_page)
         .limit(this._per_page)
         .toArray(items => items.map(item => this._fromContract(item)))
@@ -140,7 +147,7 @@ export default class ItemsStore {
   }
 
   getTotal(mode) {
-    return this._state[mode].total
+    return this._getMode(mode).total
   }
 
   async _loadKeyAsync () {
@@ -246,10 +253,10 @@ export default class ItemsStore {
       await db[this._store_name].bulkPut(res.items)
     })
 
-    this._state['user'].total = approved
-    this._state['artist'].total = artist
-    this._state['owner'].total = owned
-    this._state['moderator'].total = pending + rejected
+    this._getMode('user').total = approved
+    this._getMode('artist').total = artist
+    this._getMode('owner').total = owned
+    this._getMode('moderator').total = pending + rejected
     this._loading = false
     // TODO: check if page is correct
   }

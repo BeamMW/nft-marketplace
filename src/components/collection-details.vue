@@ -1,7 +1,7 @@
 <template>
   <pageTitle :title="title"/>
-  <loading v-if="collection_new === undefined" text="Loading Collection"/>
-  <notFound v-else-if="collection_new === null" text="Collection Not Found"/>
+  <loading v-if="collection === undefined" text="Loading Collection"/>
+  <notFound v-else-if="collection === null" text="Collection Not Found"/>
   <div v-else class="collection-container">
     <publicKeyModal ref="keyModal" :name="author_name" :artist_key="author_key"/>
     <imagePreview :image="cover" width="100%" height="170px" cover>
@@ -55,9 +55,7 @@
     </imagePreview>  
 
     <div :class="{'block': true, 'block-long': long_text}">
-      <span ref="desc" :class="{'desc-short': !full_text}">
-        {{ description }} {{ description }} {{ description }} {{ description }}
-      </span>
+      <span ref="desc" :class="{'desc-short': !full_text}">{{ description }}</span>
       <btn v-if="long_text && !full_text"
            class="btn-right"
            text="See more" 
@@ -79,19 +77,14 @@
            @click="full_text = false"
       /> 
     </div>
-    <!--div :class="{'block': true, 'block-long': long_text}">
-      <div class="left">
-        <div class="artist">
-          <imagePreview :image="avatar" radius="36px 36px" class="avatar"/>
-          <div class="info">
-            <span class="name">{{ author_name }}</span>
-            <span class="about">{{ author_about }}</span>
-          </div>
-        </div>
-        
-      </div>
-    </div-->
     <tabsctrl v-model="active_tab" :tabs="tabs"/>
+    <list v-if="show_all"
+          class="list"
+          items_name="NFTs"
+          component="artwork"
+          :mode="`artist:collection:${id}`"
+          :store="artsStore"
+    />
   </div>
 </template>
 
@@ -106,6 +99,11 @@
     width: 100%
     height: 100%
     overflow: hidden
+
+    & > .list {
+      margin-top: 20px
+      flex: 1
+    }
 
     & > .block {
       display: flex
@@ -253,13 +251,15 @@ import btn from './button'
 import tabsctrl from './tabs'
 import imagePreview from './image-preview.vue'
 import collsStore from 'stores/collections'
+import artsStore from 'stores/artworks'
 import loading from './loading'
 import notFound from './not-found'
+import list from './items-list'
 import utils from 'utils/utils'
 import {useObservable} from '@vueuse/rxjs'
-import {computed, nextTick} from 'vue'
 import publicKeyModal from './public-key-dialog'
 import {coll_tabs} from 'utils/consts'
+import {computed} from 'vue'
 
 export default {
   components: {
@@ -269,7 +269,8 @@ export default {
     loading,
     notFound,
     publicKeyModal,
-    tabsctrl
+    tabsctrl,
+    list
   },
 
   props: {
@@ -284,7 +285,7 @@ export default {
       return useObservable(collsStore.getLazyItem('manager', props.id))
     })
 
-    let collection_new = computed(() => {
+    let collection = computed(() => {
       let result = collObservable.value.value
       if (!result) {
         return result
@@ -293,7 +294,7 @@ export default {
     })  
 
     return {
-      collection_new
+      collection
     }
   },
 
@@ -312,44 +313,44 @@ export default {
 
   computed: {
     title () {
-      return this.collection_new && !this.collection_new.error ? this.collection_new.label : ''
+      return this.collection && !this.collection.error ? this.collection.label : ''
     },
     cover() {
-      return this.collection_new.cover
+      return this.collection.cover
     },
     avatar() {
-      return this.collection_new.avatar
+      return this.collection.avatar
     },
     author_name() {
-      return this.collection_new.author_name
+      return this.collection.author_name
     },
     author_about() {
-      return this.collection_new.author_about
+      return this.collection.author_about
     },
     author_key() {
-      return this.collection_new.author
+      return this.collection.author
     },
     instagram() {
-      return this.collection_new.instagram || this.collection_new.author_instagram
+      return this.collection.instagram || this.collection.author_instagram
     },
     twitter() {
-      return this.collection_new.twitter || this.collection_new.author_twitter
+      return this.collection.twitter || this.collection.author_twitter
     },
     website() {
-      return this.collection_new.website || this.collection_new.author_website
+      return this.collection.website || this.collection.author_website
     },
     description() {
-      return this.collection_new.description
+      return this.collection.description
     },
     artworks_count() {
-      return this.collection_new.artworks_count
+      return this.collection.artworks_count
     },
     min_price() {
-      let value = this.collection_new.min_price ? this.collection_new.min_price.value : 0
+      let value = this.collection.min_price ? this.collection.min_price.value : 0
       return utils.formatAmount3(value)
     },
     trade_volume() {
-      let value = this.collection_new.total_sold ? this.collection_new.total_sold.volume : 0
+      let value = this.collection.total_sold ? this.collection.total_sold.volume : 0
       return utils.formatAmount3(value)
     },
     active_tab: {
@@ -368,7 +369,10 @@ export default {
     },
     show_liked() {
       return this.active_tab === coll_tabs.LIKED_NFTS
-    }
+    },
+    artsStore() {
+      return artsStore
+    },
   },
 
   updated() {

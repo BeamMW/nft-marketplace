@@ -8,7 +8,11 @@ import LazyItems from 'stores/lazy-items'
 
 class CollectionsStore extends LazyItems {
   constructor () {
-    super('collection', [versions.COLLECTION_VERSION])
+    super({
+      objname: 'collection', 
+      versions: [versions.COLLECTION_VERSION],
+      dbKeys: 'collection'
+    })
   }
 
   _fromContract (coll) {

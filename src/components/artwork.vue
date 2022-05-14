@@ -9,10 +9,10 @@
              @click="onDetails"
     >
       <moderationStatus :item="item"/>
-      <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+      <!--div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
         <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
-      </div>
+      </div-->
     </preview>
 
     <!---- Delete Artwork Button ---->
