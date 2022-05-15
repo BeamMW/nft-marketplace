@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO: handle author loading error (first collection) -->
   <pageTitle :title="title"/>
   <loading v-if="collection === undefined" text="Loading Collection"/>
   <notFound v-else-if="collection === null" text="Collection Not Found"/>

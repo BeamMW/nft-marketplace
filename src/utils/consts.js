@@ -14,6 +14,11 @@ export const tabs = {
   NFTS: 6,
 }
 
+export const admin_tabs = {
+  COLLECTIONS: 0,
+  NFTS: 1
+}
+
 export const my_tabs = {
   COLLECTIONS: 0,
   OWNED_NFTS: 1,

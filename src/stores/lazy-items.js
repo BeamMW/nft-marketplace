@@ -28,7 +28,13 @@ export default class ItemsStore {
 
     // TODO: move artwork-specific loaders to artworks. For example all with likes
     this._allocMode('user')
-    this._allocMode('moderator')
+    
+    this._allocMode('moderator', (store) => {
+      // TODO: sort by height in reverse order
+      console.log(`loader for moderator:${this._store_name}`)
+      return store.where('status')
+        .notEqual('approved')
+    })
 
     this._allocMode('artist', (store, mykey) => {
       console.log(`loader for artist:${this._store_name}`)

@@ -1,33 +1,31 @@
 <template>
   <div class="gallery-container">
-    <div class="gallery-controls">
-      <tabsctrl v-model="active_tab" :tabs="tabs">
-        <!-- div v-if="show_nfts" class="selectors">
-          <selector
-                v-on:selected="onAuthor"
-                :options="artist_options"
-                :selected="active_filter_by_artist"
-                title="Author"
-                v-if="artist_options.length"
-          />
-          <selector v-model:selected="nfts_sort_by"
-                    :options="selector_options"
-                    title="Sort by"
-          />
-        </div -->
-        <btn v-if="can_admin" 
-             :text="admin_btn_text"
-             class="slotted-button"
-             text_color="green"
-             color="transparent"
-             padding="11px 10px"
-             @click="onAdmin"
+    <tabsctrl v-model="active_tab" class="tabs" :tabs="tabs">
+      <!-- div v-if="show_nfts" class="selectors">
+        <selector
+              v-on:selected="onAuthor"
+              :options="artist_options"
+              :selected="active_filter_by_artist"
+              title="Author"
+              v-if="artist_options.length"
         />
-        <btnWallet class="slotted-button"/>
-        <btnKey class="slotted-button"/>
-        <btnProfile class="slotted-button"/>
-      </tabsctrl>
-    </div>
+        <selector v-model:selected="nfts_sort_by"
+                  :options="selector_options"
+                  title="Sort by"
+        />
+      </div -->
+      <btn v-if="can_admin" 
+           :text="admin_btn_text"
+           class="slotted-button"
+           text_color="green"
+           color="transparent"
+           padding="11px 10px"
+           @click="onAdmin"
+      />
+      <btnWallet class="slotted-button"/>
+      <btnKey class="slotted-button"/>
+      <btnProfile class="slotted-button"/>
+    </tabsctrl>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
     {{ search }} -->
     <collections v-if="show_collections" class="list"/>
@@ -36,10 +34,7 @@
 </template>
 
 <style lang="stylus">
-.gallery-controls {
-  width: 100%
-  display: flex
-
+.tabs {
   & > .selectors {
     padding-right: 12px
     margin-top: 4px

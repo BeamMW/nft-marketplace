@@ -178,7 +178,8 @@ export default {
         blue: '#0bccf7',
         green: '#00f6d2',
         transparent: 'transparent',
-        carnation:'#F9605B'
+        carnation:'#F9605B',
+        red: '#ff746b',
       }
     }
   },
