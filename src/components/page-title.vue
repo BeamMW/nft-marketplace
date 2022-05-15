@@ -2,7 +2,7 @@
   <div class="page-title-container">
     <backBtn/>
     <div class="title">{{ title }}</div>
-    <div>
+    <div class="title-slot">
       <slot></slot>
     </div>
   </div>
@@ -21,7 +21,7 @@
       flex-basis: 0
     }
 
-    .title {
+    & > .title {
       display: flex
       justify-content: center
       align-items: center
@@ -33,11 +33,26 @@
       letter-spacing: 3.1px
       color: #fff
     }
+
+    & > .title-slot {
+      display: flex
+      justify-content: flex-end
+      align-items: center
+
+      & > :slotted(*) {
+        margin-left: 12px
+        margin-top: 7px
+
+        &:last-child {
+          margin-right: 6px
+        }
+      }
+    }
   }
 </style>
 
 <script>
-import backBtn from './back-btn.vue'
+import backBtn from './btn-back.vue'
 
 export default {
   components: {

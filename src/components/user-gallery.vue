@@ -15,14 +15,17 @@
                     title="Sort by"
           />
         </div -->
-        <btnWallet/>
-        <btnKey/>
-        <btn class="user" height="34px"
-             :text="my_name"
-             @click="$store.toMyPage"
-        >
-          <img src="~assets/icon-user.svg">
-        </btn>
+        <btn v-if="can_admin" 
+             :text="admin_btn_text"
+             class="slotted-button"
+             text_color="green"
+             color="transparent"
+             padding="11px 10px"
+             @click="onAdmin"
+        />
+        <btnWallet class="slotted-button"/>
+        <btnKey class="slotted-button"/>
+        <btnProfile class="slotted-button"/>
       </tabsctrl>
     </div>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
@@ -42,13 +45,13 @@
     margin-top: 4px
   }
 
-  & button {
+  & .slotted-button {
     margin-left: 12px
     margin-top: 7px
-  }
 
-  & .user {
-    margin-right: 6px
+    &:last-child {
+      margin-right: 6px
+    }
   }
 }
 </style>
@@ -79,10 +82,10 @@ import artworks from './user-artworks.vue'
 import collections from './user-collections.vue'
 import tabsctrl from './tabs'
 import {tabs, sort} from 'utils/consts'
-import artistsStore from 'stores/artists'
 import btn from './button'
-import btnKey from './button-key'
-import btnWallet from './button-wallet'
+import btnKey from './btn-key'
+import btnWallet from './btn-wallet'
+import btnProfile from './btn-profile'
 
 export default {
   components: {
@@ -91,7 +94,8 @@ export default {
     tabsctrl,
     btn,
     btnKey,
-    btnWallet
+    btnWallet,
+    btnProfile
   },
 
   data () {
@@ -121,22 +125,29 @@ export default {
         this.$store.setGalleryTab(value)
       }
     },
-    my_name () {
-      let label = (artistsStore.self || {}).label
+    can_admin () {
+      return this.$state.is_moderator || this.$state.is_admin
+    },
+    admin_btn_text () {
       let role = ''
 
       if (this.$state.is_moderator) {
-        role = '[moderator]'
+        role = 'moderator'
       }
 
       if (this.$state.is_admin) {
-        role = '[admin]'
+        role = 'admin'
       } 
 
-      return label ? [label, role].join(' ') : role
+      return `Open ${role} panel`
     },
     show_collections () {
       return this.$state.gallery_tab == tabs.COLLECTIONS
+    }
+  },
+  methods: {
+    onAdmin() {
+      this.$store.toAdmin()
     }
   }
 }

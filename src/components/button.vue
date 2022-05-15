@@ -144,7 +144,7 @@ export default {
     },
     padding: {
       type: String,
-      default: '11px 22px'
+      default: '11px 25px 11px 22px'
     },
     height: {
       type: String,

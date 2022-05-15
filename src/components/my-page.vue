@@ -1,13 +1,50 @@
 <template>
   <div class="my-page">
     <pageTitle title="my page">
-      <div class="actions">
-        <btnEditArtist/>
-        <btnWallet/>
-        <btnKey/>
-      </div>
+      <btnEditArtist/>
+      <btnWallet/>
+      <btnKey/>
     </pageTitle>
-    <myGallery class="gallery"/>
+    <div class="gallery-container">
+      <tabsctrl v-model="active_tab" :tabs="tabs"/>
+      <list v-if="show_collections"
+            class="list"
+            items_name="collections"
+            component="collection"
+            new_component="create-collection"
+            mode="artist"
+            :store="collsStore"
+      />
+      <list v-if="show_owned"
+            class="list"
+            items_name="NFTs"
+            component="artwork"
+            mode="owner"
+            :new_component="is_artist? 'create-nft' : ''"
+            :store="artsStore"
+      />
+      <list v-if="show_sale"
+            class="list"
+            items_name="on sale NFTs"
+            component="artwork"
+            mode="owner:sale"
+            :store="artsStore"
+      />
+      <list v-if="show_sold"
+            class="list"
+            items_name="sold NFTs"
+            component="artwork"
+            mode="artist:sold"
+            :store="artsStore"
+      />
+      <list v-if="show_liked"
+            class="list"
+            items_name="liked NFTs"
+            component="artwork"
+            mode="liker:liked"
+            :store="artsStore"
+      />
+    </div>
   </div>
 </template>
 
@@ -18,23 +55,17 @@
     display: flex
     flex-direction: column
 
-    & > .gallery {
+    & > .gallery-container {
       flex: 1
       box-sizing: border-box
-    }
-
-    .actions {
       display: flex
-      justify-content: flex-end
-      align-items: center
+      flex-direction: column
+      min-height: 0
+      margin-top: 15px
 
-      & > * {
-        margin-left: 12px
-        margin-top: 7px
-
-        &:last-child {
-          margin-right: 7px
-        }
+      & > .list {
+        margin-top: 20px
+        flex: 1
       }
     }
   }
@@ -42,10 +73,15 @@
 
 <script>
 import pageTitle from './page-title.vue'
-import btnWallet from './button-wallet'
+import btnWallet from './btn-wallet'
 import btnEditArtist from './btn-edit-artist'
-import btnKey from './button-key'
-import myGallery from './my-gallery'
+import btnKey from './btn-key'
+import collsStore from 'stores/collections'
+import artsStore from 'stores/artworks'
+import artistsStore from 'stores/artists'
+import {my_tabs} from 'utils/consts.js'
+import tabsctrl from './tabs.vue'
+import list from './items-list.vue'
 
 export default {
   components: {
@@ -53,7 +89,63 @@ export default {
     btnEditArtist,
     btnWallet,
     btnKey,
-    myGallery
+    tabsctrl,
+    list
+  },
+
+  computed: {
+    active_tab: {
+      get() {
+        return this.$state.my_active_tab
+      },
+      set(value) {
+        this.$store.setMyTab(value)
+      }
+    },
+    collsStore() {
+      return collsStore
+    },
+    artsStore() {
+      return artsStore
+    },
+    is_artist() {
+      return artistsStore.is_artist
+    },
+    is_admin() {
+      return this.$state.is_admin
+    },
+    show_collections() {
+      return this.active_tab === my_tabs.COLLECTIONS
+    },
+    show_owned() {
+      return this.active_tab === my_tabs.OWNED_NFTS
+    },
+    show_sale() {
+      return this.active_tab == my_tabs.SALE_NFTS
+    },
+    show_sold() {
+      return this.active_tab == my_tabs.SOLD_NFTS
+    },
+    show_liked() {
+      return this.active_tab == my_tabs.LIKED_NFTS
+    },
+    tabs() {
+      let res = []
+
+      if (this.is_artist) {
+        res.push({id: my_tabs.COLLECTIONS, name: 'Collections'})
+      }
+
+      res.push({id: my_tabs.OWNED_NFTS, name: 'NFTs'})
+      res.push({id: my_tabs.SALE_NFTS,  name: 'On Sale'})
+
+      if (this.is_artist) {
+        res.push({id: my_tabs.SOLD_NFTS,  name: 'Sold'})
+      }
+
+      res.push({id: my_tabs.LIKED_NFTS, name: 'Liked'})
+      return res
+    }
   }
 }
 </script>

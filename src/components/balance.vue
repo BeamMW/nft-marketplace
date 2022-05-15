@@ -1,10 +1,8 @@
 <template>
   <publicKeyModal ref="keyModal"/>
   <pageTitle title="balance">
-    <div class="actions">
-      <btnEditArtist/>
-      <btnKey/>
-    </div>
+    <btnEditArtist/>
+    <btnKey/>
   </pageTitle>
   <div class="balance-container">
     <div class="balance">
@@ -41,20 +39,6 @@
 </template>
 
 <style lang="stylus" scoped>
-.actions {
-  display: flex
-  justify-content: flex-end
-  align-items: center
-
-  & > * {
-    margin-left: 12px
-    margin-top: 7px
-
-    &:last-child {
-      margin-right: 7px
-    }
-  }
-}
 .balance-container {
   display: grid
   grid-template-columns: 1fr 1fr
@@ -92,7 +76,7 @@ import pageTitle from './page-title.vue'
 import amount from './amount.vue'
 import artistsStore from 'stores/artists.js'
 import btnEditArtist from './btn-edit-artist'
-import btnKey from './button-key'
+import btnKey from './btn-key'
 
 export default {
   components: {

@@ -1,0 +1,24 @@
+<template>
+  <btn height="34px"
+       :text="my_name"
+       @click="$store.toMyPage"
+  >
+    <img src="~assets/icon-user.svg">
+  </btn>
+</template>
+
+<script>
+import artistsStore from 'stores/artists'
+import btn from './button'
+
+export default {
+  components: {
+    btn
+  },
+  computed: {
+    my_name () {
+      return (artistsStore.self || {}).label
+    },
+  }
+}
+</script>

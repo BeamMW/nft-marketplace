@@ -461,6 +461,12 @@ const store = {
     router.push({
       name: 'balance'
     })
+  },
+
+  toAdmin() {
+    router.push({
+      name: 'moderator'
+    })
   }
 }
 

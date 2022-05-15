@@ -7,6 +7,7 @@ import editCollection from './components/edit-collection'
 import newNft from './components/new-nft.vue'
 import collectionDetails from './components/collection-details.vue'
 import {createRouter, createWebHistory} from 'vue-router'
+import moderatorPage from './components/moderator-page.vue'
 
 // TODO:review routes
 const router = createRouter({
@@ -21,7 +22,8 @@ const router = createRouter({
     {path: '/edit-collection/:id', component: editCollection, name: 'edit-collection', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/new-collection', component: editCollection, name: 'new-collection'},
     {path: '/new-nft', component: newNft, name: 'new-nft'},
-    {path: '/collection/:id', component: collectionDetails, name: 'collection', props: (route) => {return {id: Number(route.params.id)}}}
+    {path: '/collection/:id', component: collectionDetails, name: 'collection', props: (route) => {return {id: Number(route.params.id)}}},
+    {path: '/moderator', component: moderatorPage, name: 'moderator'} 
   ]
 })
 
