@@ -1002,24 +1002,19 @@ ON_METHOD(manager, view_collections) {
 }
 
 ON_METHOD(artist, set_artwork) {
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey pkArtist;
-    km.Get(pkArtist);
-
     struct {
-        Gallery::Method::ManageArtwork args;
+        Gallery::Method::SetArtwork args;
         char m_szLabelData[Gallery::Artwork::s_TotalMaxLen];
     } d;
 
-    d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageArtwork::RequestType::kSet;
-    d.args.role = Gallery::Role::kArtist;
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    PubKey pkArtist;
+    km.Get(d.args.m_pkArtist);
+
     d.args.collection_id = collection_id;
     d.args.m_Price.m_Amount = amount;
     d.args.m_Price.m_Aid = aid;
-    d.args.signer = pkArtist;
-    d.args.artwork_id = 0;
 
     if (!collection_id) {
         OnError("collection_id must be specified");
@@ -1217,7 +1212,7 @@ ON_METHOD(manager, set_artwork_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
 
-    Gallery::Method::ManageArtwork args;
+    Gallery::Method::SetArtworkStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1229,8 +1224,6 @@ ON_METHOD(manager, set_artwork_status) {
         return;
     }
 
-    args.req = Gallery::Method::ManageArtwork::RequestType::kSetStatus;
-    args.role = Gallery::Role::kManager;
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
     args.artwork_id = id;
@@ -1243,7 +1236,7 @@ ON_METHOD(moderator, set_artwork_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
     
-    Gallery::Method::ManageArtwork args;
+    Gallery::Method::SetArtworkStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1259,8 +1252,6 @@ ON_METHOD(moderator, set_artwork_status) {
     km.SetCid(cid);
     km.Get(args.signer);
 
-    args.req = Gallery::Method::ManageArtwork::RequestType::kSetStatus;
-    args.role = Gallery::Role::kModerator;
     args.artwork_id = id;
 
     SigRequest sig;

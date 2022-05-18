@@ -301,7 +301,7 @@ namespace Gallery {
         struct SetModerator {
             static const uint32_t s_iMethod = 16;
             bool approved;
-            Gallery::Moderator::Id id;
+            Moderator::Id id;
         };
 
         struct SetArtist {
@@ -314,14 +314,14 @@ namespace Gallery {
 
         struct SetArtistStatus {
             static const uint32_t s_iMethod = 17;
-            Gallery::Status status;
+            Status status;
             PubKey signer;
             PubKey m_pkArtist;
         };
 
         struct SetCollectionStatus {
             static const uint32_t s_iMethod = 15;
-            Gallery::Status status;
+            Status status;
             PubKey signer;
             PubKey m_pkArtist;
             Collection::Id collection_id;
@@ -335,21 +335,21 @@ namespace Gallery {
             uint32_t m_DataLen;
             // followed by label and data without delimiter
         };
-        struct ManageArtwork {
+        struct SetArtwork {
             static const uint32_t s_iMethod = 3;
-
-            enum class RequestType : uint8_t { kSet, kSetStatus } req;
-            Gallery::Status status;
-            Gallery::Role role;
             PubKey m_pkArtist;
-            PubKey signer;
             uint32_t data_len;
             uint32_t label_len;
             uint32_t collection_id;
-            uint32_t artwork_id;
-            uint32_t impressions_num;
             AmountWithAsset m_Price;
             // followed by the data and label
+        };
+
+        struct SetArtworkStatus {
+            static const uint32_t s_iMethod = 19;
+            PubKey signer;
+            uint32_t artwork_id;
+            Status status;
         };
 
         struct SetPrice {

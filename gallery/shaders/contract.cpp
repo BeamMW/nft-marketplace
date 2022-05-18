@@ -237,115 +237,112 @@ BEAM_EXPORT void Method_18(const Gallery::Method::SetCollection& r) {
 
     c.updated = cur_height;
     c.Save(c_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
-    using ArtworkReqType = Gallery::Method::ManageArtwork::RequestType;
-
+BEAM_EXPORT void Method_3(const Gallery::Method::SetArtwork& r) {
     Height cur_height = Env::get_Height();
 
-    MyState s;
     Gallery::Artwork m;
 
-    if (r.role == Gallery::Role::kManager) {
-        s.AddSigAdmin();
-    } else if (r.role == Gallery::Role::kModerator) {
-        Gallery::Moderator m;
-        Env::Halt_if(!m.Load(r.signer));
-        Env::Halt_if(!m.approved);
-        Env::AddSig(r.signer);
-    } else if (r.role == Gallery::Role::kArtist) {
-        Env::AddSig(r.m_pkArtist);
-    } else {
-        Env::Halt();
-    }
+    MyState s;
+    m.id = ++s.total_artworks;
+    m.m_pkOwner = r.m_pkArtist;
+    m.m_pkAuthor = r.m_pkArtist;
+    m.collection_id = r.collection_id;
+    m.status = Gallery::Status::kPending;
+    _POD_(m.m_Price) = r.m_Price;
 
-    bool exists = m.Load(r.artwork_id);
+    // assert: artist owns collection
+    Env::Halt_if(!Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
+        Gallery::Artist::Id, Gallery::Collection>
+            ::Load(r.m_pkArtist, r.collection_id));
 
-    if (r.req == ArtworkReqType::kSet) {
-        Env::Halt_if(r.role != Gallery::Role::kArtist || exists);
-        m.id = ++s.total_artworks;
-
-        m.m_pkOwner = r.m_pkArtist;
-        m.m_pkAuthor = r.m_pkArtist;
-        m.collection_id = r.collection_id;
-        m.status = Gallery::Status::kPending;
-        _POD_(m.m_Price) = r.m_Price;
-
-        // assert: artist owns collection
-        Env::Halt_if(!Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
-            Gallery::Artist::Id, Gallery::Collection>
-                ::Load(r.m_pkArtist, r.collection_id));
-
-        Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
-            Gallery::Collection::Id, Gallery::Artwork>
-                ::Save(r.collection_id, m.id);
+    Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
+        Gallery::Collection::Id, Gallery::Artwork>
+            ::Save(r.collection_id, m.id);
         
-        struct CollectionPlus : public Gallery::Collection {
-            char m_szLabelData[s_TotalMaxLen];
-        } c;
+    struct CollectionPlus : public Gallery::Collection {
+        char m_szLabelData[s_TotalMaxLen];
+    } c;
 
-        // assert: collection exists
-        Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
-        c.artworks_num++;
-        Env::Halt_if(c.artworks_num > c.s_MaxArtworks);
+    // assert: collection exists
+    Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
+    c.artworks_num++;
+    Env::Halt_if(c.artworks_num > c.s_MaxArtworks);
 
-        Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
-            ::Update(c.updated, cur_height, r.collection_id);
-        c.updated = cur_height;
-        c.Save(r.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+        ::Update(c.updated, cur_height, r.collection_id);
+    c.updated = cur_height;
+    c.Save(r.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
 
-        // verify artist
-        struct ArtistPlus : public Gallery::Artist {
-            char m_szLabelData[s_TotalMaxLen];
-        } a;
+    // verify artist
+    struct ArtistPlus : public Gallery::Artist {
+        char m_szLabelData[s_TotalMaxLen];
+    } a;
 
-        // assert: artist exists
-        Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
-        ++a.artworks_num;
+    // assert: artist exists
+    Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
+    ++a.artworks_num;
 
-        Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
-            ::Update(a.updated, cur_height, r.m_pkArtist);
+    Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
+        ::Update(a.updated, cur_height, r.m_pkArtist);
 
-        a.updated = cur_height;
-        a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    a.updated = cur_height;
+    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
 
-        auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
-        uint32_t nData = r.data_len;
+    auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
+    uint32_t nData = r.data_len;
 
-        auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1);
-        uint32_t nLabel = r.label_len;
+    auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1);
+    uint32_t nLabel = r.label_len;
 
-        Gallery::Events::AddArtworkData::Key adk;
-        adk.m_ID = m.id;
-        adk.m_pkArtist = m.m_pkOwner;
+    Gallery::Events::AddArtworkData::Key adk;
+    adk.m_ID = m.id;
+    adk.m_pkArtist = m.m_pkOwner;
 
-        uint32_t nMaxEventSize = 0x100000;
+    uint32_t nMaxEventSize = 0x100000;
 
-        while (true) {
-            Env::EmitLog(&adk, sizeof(adk), pData, std::min(nData, nMaxEventSize), KeyTag::Internal);
-            if (nData <= nMaxEventSize)
-                break;
+    while (true) {
+        Env::EmitLog(&adk, sizeof(adk), pData, std::min(nData, nMaxEventSize), KeyTag::Internal);
+        if (nData <= nMaxEventSize)
+            break;
 
-            nData -= nMaxEventSize;
-            pData += nMaxEventSize;
-        }
-
-        Gallery::Events::AddArtworkLabel::Key alk;
-        alk.m_ID = m.id;
-        alk.m_pkArtist = m.m_pkOwner;
-        Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
-    } else {
-        Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator ||
-                !exists);
-        m.status = r.status;
+        nData -= nMaxEventSize;
+        pData += nMaxEventSize;
     }
+
+    Gallery::Events::AddArtworkLabel::Key alk;
+    alk.m_ID = m.id;
+    alk.m_pkArtist = m.m_pkOwner;
+    Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
 
     Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
         ::Update(m.updated, cur_height, m.id);
     m.updated = cur_height;
     m.Save(m.id);
     s.Save();
+    Env::AddSig(r.m_pkArtist);
+}
+
+BEAM_EXPORT void Method_19(const Gallery::Method::SetArtworkStatus& r) {
+    Height cur_height = Env::get_Height();
+
+    Gallery::Moderator m;
+    MyState s;
+    if (!m.Load(r.signer) || !m.approved)
+        s.AddSigAdmin();
+    else
+        Env::AddSig(r.signer);
+
+    Gallery::Artwork a;
+    Env::Halt_if(!a.Load(r.artwork_id));
+    a.status = r.status;
+
+    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+        ::Update(a.updated, cur_height, a.id);
+    a.updated = cur_height;
+    a.Save(a.id);
 }
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r) {
