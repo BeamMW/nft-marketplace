@@ -304,17 +304,19 @@ namespace Gallery {
             Gallery::Moderator::Id id;
         };
 
-        struct ManageArtist {
+        struct SetArtist {
             static const uint32_t s_iMethod = 10;
-
-            enum class RequestType : uint8_t { kSet, kSetStatus } req;
-            Gallery::Status status;
-            PubKey signer;
-            Gallery::Role role;
             PubKey m_pkArtist;
             uint32_t m_LabelLen;
             uint32_t m_DataLen;
             // followed by label and data without delimiter
+        };
+
+        struct SetArtistStatus {
+            static const uint32_t s_iMethod = 17;
+            Gallery::Status status;
+            PubKey signer;
+            PubKey m_pkArtist;
         };
 
         struct ManageCollection {

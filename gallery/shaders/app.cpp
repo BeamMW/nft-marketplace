@@ -1275,7 +1275,7 @@ ON_METHOD(moderator, set_artist_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
     
-    Gallery::Method::ManageArtist args;
+    Gallery::Method::SetArtistStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1291,8 +1291,6 @@ ON_METHOD(moderator, set_artist_status) {
     km.SetCid(cid);
     km.Get(args.signer);
 
-    args.req = Gallery::Method::ManageArtist::RequestType::kSetStatus;
-    args.role = Gallery::Role::kModerator;
     args.m_pkArtist = id;
 
     SigRequest sig;
@@ -1307,7 +1305,7 @@ ON_METHOD(manager, set_artist_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
     
-    Gallery::Method::ManageArtist args;
+    Gallery::Method::SetArtistStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1319,8 +1317,6 @@ ON_METHOD(manager, set_artist_status) {
         return;
     }
 
-    args.req = Gallery::Method::ManageArtist::RequestType::kSetStatus;
-    args.role = Gallery::Role::kManager;
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
     args.m_pkArtist = id;
@@ -1402,20 +1398,14 @@ ON_METHOD(moderator, set_fee_base) {
 }
 
 ON_METHOD(artist, set_artist) {
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    PubKey pkArtist;
-    km.Get(pkArtist);
-
     struct {
-        Gallery::Method::ManageArtist args;
+        Gallery::Method::SetArtist args;
         char m_szLabelData[Gallery::Artist::s_TotalMaxLen + 1];
     } d;
 
-    d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageArtist::RequestType::kSet;
-    d.args.role = Gallery::Role::kArtist;
-    d.args.signer = pkArtist;
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    km.Get(d.args.m_pkArtist);
 
     uint32_t nArgSize = sizeof(d.args);
     uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artist::s_LabelMaxLen + 1); // including 0-term

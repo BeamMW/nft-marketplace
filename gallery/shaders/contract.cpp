@@ -101,60 +101,60 @@ BEAM_EXPORT void Method_16(const Gallery::Method::SetModerator& r) {
     s.AddSigAdmin();
 }
 
-BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r) {
-    using ArtistReqType = Gallery::Method::ManageArtist::RequestType;
-
+BEAM_EXPORT void Method_17(const Gallery::Method::SetArtistStatus& r) {
     Height cur_height = Env::get_Height();
 
     struct ArtistPlus : public Gallery::Artist {
         char m_szLabelData[s_TotalMaxLen];
     } a;
 
+    Gallery::Moderator m;
     MyState s;
-
-    if (r.role == Gallery::Role::kManager) {
+    if (!m.Load(r.signer) || !m.approved)
         s.AddSigAdmin();
-    } else if (r.role == Gallery::Role::kModerator) {
-        Gallery::Moderator m;
-        Env::Halt_if(!m.Load(r.signer));
-        Env::Halt_if(!m.approved);
+    else
         Env::AddSig(r.signer);
-    } else if (r.role == Gallery::Role::kArtist) {
-        Env::AddSig(r.m_pkArtist);
-    } else {
-        Env::Halt();
-    }
 
-    bool exists = a.Load(r.m_pkArtist, sizeof(a));
-
-    if (r.req == ArtistReqType::kSet) {
-        Env::Halt_if(r.role != Gallery::Role::kArtist);
-        Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
-        a.label_len = r.m_LabelLen;
-        a.data_len = r.m_DataLen;
-        a.status = Gallery::Status::kPending;
-
-        if (!exists) {
-            // if artist doesn't exist, then label is required
-            Env::Halt_if(!r.m_LabelLen); 
-            a.m_hRegistered = cur_height;
-            a.updated = cur_height;
-            a.collections_num = 0;
-            a.artworks_num = 0;
-            s.total_artists++;
-        }
-    } else {
-        Env::Halt_if(r.role != Gallery::Role::kManager && r.role != Gallery::Role::kModerator || 
-                !exists);
-        a.status = r.status;
-    }
+    Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
+    a.status = r.status;
 
     Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
         ::Update(a.updated, cur_height, r.m_pkArtist);
 
     a.updated = cur_height;
     a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
-    s.Save();
+}
+
+BEAM_EXPORT void Method_10(const Gallery::Method::SetArtist& r) {
+    Height cur_height = Env::get_Height();
+
+    struct ArtistPlus : public Gallery::Artist {
+        char m_szLabelData[s_TotalMaxLen];
+    } a;
+
+    if (a.Load(r.m_pkArtist, sizeof(a))) {
+        MyState s;
+        // if artist doesn't exist, then label is required
+        Env::Halt_if(!r.m_LabelLen); 
+        a.m_hRegistered = cur_height;
+        a.updated = cur_height;
+        a.collections_num = 0;
+        a.artworks_num = 0;
+        s.total_artists++;
+        s.Save();
+    }
+
+    Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+    a.label_len = r.m_LabelLen;
+    a.data_len = r.m_DataLen;
+    a.status = Gallery::Status::kPending;
+
+    Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
+        ::Update(a.updated, cur_height, r.m_pkArtist);
+
+    a.updated = cur_height;
+    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    Env::AddSig(r.m_pkArtist);
 }
 
 BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
