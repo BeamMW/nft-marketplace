@@ -427,16 +427,13 @@ export default {
       this.$refs.keyModal.open()
     },
     onInstagram() {
-      let link = `https://www.instagram.com/${this.instagram.substring(1)}`
-      window.open(link, '_blank')
+      this.$store.openInstagram(this.instagram)
     },
     onTwitter() {
-      let link = `https://www.twitter.com/${this.twitter.substring(1)}`
-      window.open(link, '_blank')
+      this.$store.openUrl(this.twitter)
     },
     onWebsite() {
-      let link = this.website
-      window.open(link, '_blank')
+      this.$store.openUrl(this.website)
     }
   }
 }

@@ -486,6 +486,20 @@ const store = {
     router.go(-1)
   },
 
+  openUrl(url) {
+    window.open(url, '_blank')
+  },
+
+  openTwitter(nick) {
+    let link = `https://www.twitter.com/${nick.substring(1)}`
+    window.open(link, '_blank')
+  },
+
+  openInstagram(nick) {
+    let link = `https://www.instagram.com/${nick.substring(1)}`
+    window.open(link, '_blank')
+  },
+
   toMyPage() {
     router.push({
       name: 'my-page'
