@@ -111,8 +111,8 @@ namespace Gallery {
         uint32_t artworks_num;
 
         // followed by label and data without delimiter
-        static const uint32_t s_LabelMaxLen = 120;
-        static const uint32_t s_DataMaxLen = 1024;
+        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
 
@@ -143,8 +143,8 @@ namespace Gallery {
         //Id id;
 
         // followed by label and data without delimiter
-        static const uint32_t s_LabelMaxLen = 120;
-        static const uint32_t s_DataMaxLen = 1024;
+        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
         static const uint32_t s_MaxArtworks = 500;
     };
@@ -164,8 +164,8 @@ namespace Gallery {
         Status status;
         AmountWithAsset m_Price;
 
-        static const uint32_t s_LabelMaxLen = 120;
-        static const uint32_t s_DataMaxLen = 1024;
+        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
 
