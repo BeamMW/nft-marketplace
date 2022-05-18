@@ -70,15 +70,15 @@
     //macro(ContractID, cid) \
     //macro(Gallery::Artwork::Id, id)
 
-#define Gallery_manager_set_artwork(macro) \
+#define Gallery_manager_set_artwork_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Artwork::Id, id) \
 
-#define Gallery_manager_set_collection(macro) \
+#define Gallery_manager_set_collection_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Collection::Id, id) \
 
-#define Gallery_manager_set_artist(macro) \
+#define Gallery_manager_set_artist_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Artist::Id, id) \
 
@@ -99,22 +99,22 @@
     macro(manager, explicit_upgrade) \
     macro(manager, set_moderator) \
     macro(manager, view_moderators) \
-    macro(manager, set_artwork) \
-    macro(manager, set_artist) \
-    macro(manager, set_collection) \
+    macro(manager, set_artwork_status) \
+    macro(manager, set_artist_status) \
+    macro(manager, set_collection_status) \
     //macro(manager, admin_delete) \
 
 // MODERATOR
 
-#define Gallery_moderator_set_artwork(macro) \
+#define Gallery_moderator_set_artwork_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Artwork::Id, id) \
 
-#define Gallery_moderator_set_collection(macro) \
+#define Gallery_moderator_set_collection_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Collection::Id, id) \
 
-#define Gallery_moderator_set_artist(macro) \
+#define Gallery_moderator_set_artist_status(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Artist::Id, id) \
 
@@ -123,9 +123,9 @@
     macro(Amount, amount) \
 
 #define GalleryRole_moderator(macro) \
-    macro(moderator, set_artwork) \
-    macro(moderator, set_artist) \
-    macro(moderator, set_collection) \
+    macro(moderator, set_artwork_status) \
+    macro(moderator, set_artist_status) \
+    macro(moderator, set_collection_status) \
     macro(moderator, set_fee_base) \
 
 // ARTIST
@@ -1217,7 +1217,7 @@ ON_METHOD(manager, view_balance) {
     wlk.PrintTotals();
 }
 
-ON_METHOD(manager, set_artwork) {
+ON_METHOD(manager, set_artwork_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
@@ -1243,7 +1243,7 @@ ON_METHOD(manager, set_artwork) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
 }
 
-ON_METHOD(moderator, set_artwork) {
+ON_METHOD(moderator, set_artwork_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
@@ -1275,7 +1275,7 @@ ON_METHOD(moderator, set_artwork) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artwork's status", 2500000);
 }
 
-ON_METHOD(moderator, set_artist) {
+ON_METHOD(moderator, set_artist_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
@@ -1307,7 +1307,7 @@ ON_METHOD(moderator, set_artist) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artist's status", 2500000);
 }
 
-ON_METHOD(manager, set_artist) {
+ON_METHOD(manager, set_artist_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
@@ -1333,7 +1333,7 @@ ON_METHOD(manager, set_artist) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artist's status", 2500000);
 }
 
-ON_METHOD(manager, set_collection) {
+ON_METHOD(manager, set_collection_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
@@ -1359,7 +1359,7 @@ ON_METHOD(manager, set_collection) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update collection's status", 2500000);
 }
 
-ON_METHOD(moderator, set_collection) {
+ON_METHOD(moderator, set_collection_status) {
     char buf[128];
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
