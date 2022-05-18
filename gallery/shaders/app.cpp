@@ -1329,7 +1329,7 @@ ON_METHOD(manager, set_collection_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
     
-    Gallery::Method::ManageCollection args;
+    Gallery::Method::SetCollectionStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1341,8 +1341,6 @@ ON_METHOD(manager, set_collection_status) {
         return;
     }
 
-    args.req = Gallery::Method::ManageCollection::RequestType::kSetStatus;
-    args.role = Gallery::Role::kManager;
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
     args.collection_id = id;
@@ -1355,7 +1353,7 @@ ON_METHOD(moderator, set_collection_status) {
     size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
     std::string_view status(buf);
     
-    Gallery::Method::ManageCollection args;
+    Gallery::Method::SetCollectionStatus args;
     if (status == "pending") {
         args.status = Gallery::Status::kPending;
     } else if (status == "approved") {
@@ -1371,8 +1369,6 @@ ON_METHOD(moderator, set_collection_status) {
     km.SetCid(cid);
     km.Get(args.signer);
 
-    args.req = Gallery::Method::ManageCollection::RequestType::kSetStatus;
-    args.role = Gallery::Role::kModerator;
     args.collection_id = id;
 
     SigRequest sig;
@@ -1453,20 +1449,15 @@ ON_METHOD(artist, set_artist) {
 
 ON_METHOD(artist, set_collection) {
     struct {
-        Gallery::Method::ManageCollection args;
+        Gallery::Method::SetCollection args;
         char m_szLabelData[Gallery::Collection::s_TotalMaxLen + 2];
     } d;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
-    PubKey pkArtist;
-    km.Get(pkArtist);
+    km.Get(d.args.m_pkArtist);
 
-    d.args.m_pkArtist = pkArtist;
-    d.args.req = Gallery::Method::ManageCollection::RequestType::kSet;
-    d.args.role = Gallery::Role::kArtist;
     d.args.collection_id = id;
-    d.args.signer = pkArtist;
 
     uint32_t nArgSize = sizeof(d.args);
 

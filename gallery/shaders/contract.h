@@ -319,20 +319,22 @@ namespace Gallery {
             PubKey m_pkArtist;
         };
 
-        struct ManageCollection {
+        struct SetCollectionStatus {
             static const uint32_t s_iMethod = 15;
-
-            enum class RequestType : uint8_t { kSet, kSetStatus } req;
             Gallery::Status status;
             PubKey signer;
-            Gallery::Role role;
+            PubKey m_pkArtist;
+            Collection::Id collection_id;
+        };
+
+        struct SetCollection {
+            static const uint32_t s_iMethod = 18;
             PubKey m_pkArtist;
             Collection::Id collection_id;
             uint32_t m_LabelLen;
             uint32_t m_DataLen;
             // followed by label and data without delimiter
         };
-
         struct ManageArtwork {
             static const uint32_t s_iMethod = 3;
 
