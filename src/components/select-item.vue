@@ -9,6 +9,7 @@
 .select-container {
   position: relative
   cursor: pointer
+  width: 100%
 
   & > img {
     position: absolute

@@ -55,6 +55,7 @@
       </div>
     </imagePreview>  
 
+    <!-- TODO: same layout as in approve containers -->
     <div :class="{'block': true, 'block-long': long_text}">
       <span ref="desc" :class="{'desc-short': !full_text}">{{ description }}</span>
       <btn v-if="long_text && !full_text"
