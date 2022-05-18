@@ -10,7 +10,9 @@ import store from './stores/global.js'
 import artwork from './components/artwork.vue'
 import collection from './components/collection.vue'
 import createCollection from './components/create-collection'
-import createNFT  from './components/create-nft'
+import approveCollection from './components/approve-collection'
+import createNFT from './components/create-nft'
+import approveNFT from './components/approve-nft'
 
 utils.initialize(
   {
@@ -30,7 +32,9 @@ utils.initialize(
     vueApp.component('artwork', artwork)
     vueApp.component('collection', collection)
     vueApp.component('create-collection', createCollection)
+    vueApp.component('approve-collection', approveCollection)
     vueApp.component('create-nft', createNFT)
+    vueApp.component('approve-nft', approveNFT)
     vueApp.use(router)
     vueApp.mount('body')
 

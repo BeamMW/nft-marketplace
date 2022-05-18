@@ -41,7 +41,8 @@ function defaultState() {
     use_ipfs: true,
     gallery_tab: tabs.COLLECTIONS,
     gallery_artworks_page: 1,
-    debug: true
+    debug: true,
+    approve_tx: undefined
   }
   
   return state
@@ -257,6 +258,35 @@ const store = {
       `role=user,action=withdraw,nMaxCount=10,cid=${this.state.cid}`, 
       (...args) => this.onMakeTx(...args)
     )
+  },
+
+  async approveArtworks(aids, approve) {
+    this.state.approve_tx = await utils.invokeContractAsyncAndMakeTx({
+      role: 'moderator',
+      action: 'set_artwork',
+      id: aids[0],
+      status: approve ? 'approved' : 'rejected',
+      cid: this.state.cid
+    })
+
+    if (!this.state.approve_tx) {
+      return
+    }
+
+    let interval = setInterval(async () => {
+      try {
+        let {res} = await utils.callApiAsync('tx_status', {txId: this.state.approve_tx})
+        if ([0, 1, 5].indexOf(res.status) == -1) {
+          clearInterval(interval)
+          this.state.approve_tx = undefined
+        }
+      }
+      catch(err) {
+        // TODO: check if error is caught
+        this.state.approve_tx = ''
+        this.global.setError(err)
+      }
+    }, 1000)
   },
 
   //

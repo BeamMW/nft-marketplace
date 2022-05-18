@@ -8,10 +8,25 @@
     <template v-else-if="items && items.length > 0 || new_component">
       <div class="list-wrap">  
         <div ref="itemslist" class="list" @scroll="onScroll">
-          <component :is="component" v-for="item in items" 
-                     :key="item.id"
-                     :item="item"
-          />
+          <template v-if="selectable">
+            <selectItem v-for="item in items" 
+                        :key="item.id" 
+                        :left="selector_left" 
+                        :top="selector_top" 
+                        :selected="selected.includes(item.id)"
+                        @click="onSelected(item.id)"
+            >
+              <component :is="component" 
+                         :item="item"
+              />
+            </selectitem>
+          </template>
+          <template v-else>
+            <component :is="component" v-for="item in items"
+                       :key="item.id"
+                       :item="item"
+            />
+          </template>
           <component :is="new_component" v-if="show_new"/>
         </div>
       </div>
@@ -20,7 +35,7 @@
                  @page-changed="onPage"
       />
     </template>
-    <div v-else class="empty">
+    <div v-else class="empty"> 
       <img src="~assets/icon-empty-gallery.svg"/>
       <div class="text">There are no {{ items_name }} at the moment</div>
     </div>
@@ -68,13 +83,15 @@
 </style>
 
 <script>
-import paginator from './paginator.vue'
+import paginator from './paginator'
+import selectItem from './select-item'
 import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
 
 export default {
   components: {
-    paginator
+    paginator,
+    selectItem
   },
 
   props: {
@@ -102,8 +119,24 @@ export default {
     new_component: {
       type: String,
       default: ''
+    },
+    selected: {
+      type: Array,
+      default: undefined
+    },
+    selector_left: {
+      type: String,
+      default: '0px'
+    },
+    selector_top: {
+      type: String,
+      default: '0px'
     }
   },
+
+  emits: [
+    'selected'
+  ],
 
   setup (props) {
     const itemsObservable = computed(() => useObservable(props.store.getLazyPageItems(props.mode)))
@@ -111,12 +144,14 @@ export default {
     const page = computed(() => props.store.getPage(props.mode))
     const pages = computed(() => props.store.getPages(props.mode))
     const show_new = computed(() => props.new_component && page.value === pages.value)
+    const selectable = computed(() => !!props.selected)
 
     return {
       items,
       page,
       pages,
-      show_new
+      show_new,
+      selectable
     }
   },
 
@@ -135,7 +170,10 @@ export default {
     onPage(page) {
       this.$refs.itemslist.scrollTop = 0
       this.store.setPage(this.mode, page)
-    } 
+    },
+    onSelected(id) {
+      this.$emit('selected', id)
+    }
   }
 }
 </script>

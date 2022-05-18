@@ -178,7 +178,7 @@ export default {
         blue: '#0bccf7',
         green: '#00f6d2',
         transparent: 'transparent',
-        carnation:'#F9605B',
+        carnation:'#f9605b',
         red: '#ff746b',
       }
     }
@@ -194,15 +194,27 @@ export default {
         return
       }
 
-      let tcolor = this.text_color || (this.color == 'transparent' || this.color == undefined ? 'white' : 'dark-blue')
+      let tcolor = this.text_color 
+      if (!tcolor) {
+        tcolor = this.color == 'transparent' || this.color == undefined ? 'white' : 'dark_blue'
+      }
+      
+      if (this.text_colors[tcolor]) {
+        tcolor = this.text_colors[tcolor]
+      }
+
       let res = {
-        'color': this.text_colors[tcolor],
+        'color': tcolor,
         'font-weight': this.text_bold ? 'bold' : 'normal'
       }
   
       if (this.has_icon) {
         let tgap_pos = this.reverse ? 'right' : 'left'
         res[`margin-${tgap_pos}`] = this.gap
+      }
+
+      if (this.disabled) {
+        res['opacity'] = 0.3
       }
 
       return res

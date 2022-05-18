@@ -5,10 +5,10 @@
   <notFound v-else-if="collection === null" text="Collection Not Found"/>
   <div v-else class="collection-container">
     <publicKeyModal ref="keyModal" :name="author_name" :artist_key="author_key"/>
-    <imagePreview :image="cover" width="100%" height="170px" cover>
+    <imagePreview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
       <div class="info-container">
         <div class="left">
-          <imagePreview :image="avatar" radius="36px 36px" class="avatar"/>
+          <imagePreview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
             <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
@@ -277,7 +277,7 @@ import list from './items-list'
 import utils from 'utils/utils'
 import {useObservable} from '@vueuse/rxjs'
 import publicKeyModal from './public-key-dialog'
-import {coll_tabs} from 'utils/consts'
+import {coll_tabs, def_images} from 'utils/consts'
 import {computed} from 'vue'
 
 export default {
@@ -326,7 +326,9 @@ export default {
         {id: coll_tabs.ALL_NFTS, name: 'All'},
         {id: coll_tabs.SALE_NFTS, name: 'On Sale'},
         {id: coll_tabs.LIKED_NFTS, name: 'Liked'},
-      ]
+      ],
+      def_avatar: def_images.artist_avatar,
+      def_banner: def_images.artist_banner
     }
   },
 

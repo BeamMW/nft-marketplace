@@ -1,6 +1,6 @@
 <template>
-  <div class="select-container" :style="style" @click="select">
-    <img :src="`../assets/${getImg()}.svg`" alt="icon" :style="placeCycle">
+  <div class="select-container" :style="style">
+    <img :src="`../assets/${icon}.svg`" alt="icon" :style="icon_style">
     <slot></slot>
   </div>
 </template>
@@ -26,26 +26,17 @@ export default {
       type: String,
       default: '10px',
     },
-    place: {
-      type: Object,
-      default() {
-        return {
-          right: '8px',
-          top: '8px',
-          left: 'initial',
-        }
-      },
+    left: {
+      type: String,
+      required: true
     },
-  },
-
-  emits: [
-    'select-item'
-  ],
-
-  data () {
-    return {
-      selected: false,
-      img: 'icon-unselected',
+    top: {
+      type: String,
+      required: true
+    },
+    selected: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -57,27 +48,16 @@ export default {
       }
     },
 
-    is_admin() {
-      return this.$state.admin
-    },
-
-    placeCycle() {
+    icon_style() {
       return {
-        'top': this.place.top,
-        'left': this.is_admin ? '50px': this.place.left,
-        'right': this.is_admin ? '50px': this.place.right,
+        'top': this.top,
+        'left': this.left,
       }
     },
 
-  },
-
-  methods: {
-    select () {
-      this.selected = !this.selected
-    },
-    getImg () {
+    icon() {
       return this.selected ? 'icon-selected' : 'icon-unselected'
-    },
+    }
   }
 }
 </script>

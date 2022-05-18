@@ -10,28 +10,45 @@
       <list v-if="show_collections"
             class="list"
             items_name="collections"
-            component="collection"
+            component="approve-collection"
             mode="moderator"
+            selectable
+            selector_left="6px"
+            selector_top="6px"
             :store="collsStore"
+            :selected="selected_collections"
+            @selected="onCollectionSelected"
       />
       <list v-if="show_nfts"
             class="list"
             items_name="NFTs"
-            component="artwork"
+            component="approve-nft"
             mode="moderator"
+            selectable
+            selector_left="20px"
+            selector_top="18px"
             :store="artsStore"
+            :selected="selected_artworks"
+            @selected="onArtworkSelected"
       />
       <div class="buttons">
-        <btn text="cancel">
+        <btn text="cancel" 
+             :disabled="!any_selected"
+             @click="onCancel"
+        >
           <img src="~assets/icon-cancel.svg"/>
         </btn>
         <btn text="reject"
              color="red"
+             :disabled="!any_selected"
+             @click="onReject"
         >
           <img src="~assets/icon-reject.svg"/>
         </btn>
         <btn text="publish"
              color="green"
+             :disabled="!any_selected"
+             @click="onPublish"
         >
           <img src="~assets/icon-ok.svg"/>
         </btn>
@@ -103,6 +120,8 @@ export default {
         {id: admin_tabs.COLLECTIONS, name: 'Collections'},
         {id: admin_tabs.NFTS, name: 'NFTs'}
       ],
+      selected_artworks: [],
+      selected_collections: []
     }
   },
 
@@ -129,6 +148,41 @@ export default {
     },
     artsStore() {
       return artsStore
+    },
+    active_selected() {
+      return this.show_collections ? this.selected_collections : this.selected_artworks
+    },
+    any_selected() {
+      return this.active_selected.length > 0
+    },
+    active_approve() {
+      return this.show_collections ? this.$store.approveCollections : this.$store.approveArtworks
+    }
+  },
+
+  methods: {
+    onCollectionSelected(id) {
+      if (this.selected_collections.includes(id)) {
+        this.selected_collections = this.selected_collections.filter(item => item != id)
+      } else {
+        this.selected_collections.push(id)
+      }
+    },
+    onArtworkSelected(id) {
+      if (this.selected_artworks.includes(id)) {
+        this.selected_artworks = this.selected_artworks.filter(item => item != id)
+      } else {
+        this.selected_artworks.push(id)
+      }
+    },
+    onCancel() {
+      this.active_selected.length = 0
+    },
+    onReject() {
+      this.active_approve.call(this.$store, this.active_selected, false)
+    },
+    onPublish() {
+      this.active_approve.call(this.$store, this.active_selected, true)
     }
   }
 }
