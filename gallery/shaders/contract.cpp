@@ -79,9 +79,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::SetFeeBase& r) {
     Env::AddSig(r.signer);
 }
 
-BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
-    using ModeratorReqType = Gallery::Method::ManageModerator::RequestType;
-
+BEAM_EXPORT void Method_16(const Gallery::Method::SetModerator& r) {
     Gallery::Moderator m;
     MyState s;
     Height cur_height = Env::get_Height();
@@ -92,10 +90,7 @@ BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
         s.total_moderators++;
     }
 
-    if (r.req == ModeratorReqType::kEnable || r.req == ModeratorReqType::kDisable)
-        m.approved = (r.req == ModeratorReqType::kEnable);
-    else
-        Env::Halt();
+    m.approved = r.approved;
 
     Gallery::Index<Gallery::Tag::kHeightModeratorIdx, Height, Gallery::Moderator>
         ::Update(m.updated, cur_height, r.id);
@@ -103,7 +98,6 @@ BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
     m.updated = cur_height;
     m.Save(r.id);
     s.Save();
-
     s.AddSigAdmin();
 }
 

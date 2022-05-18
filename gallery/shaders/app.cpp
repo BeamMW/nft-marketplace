@@ -332,14 +332,9 @@ struct StatePlus : public Gallery::State {
 };
 
 ON_METHOD(manager, set_moderator) {
-    Gallery::Method::ManageModerator args;
-
+    Gallery::Method::SetModerator args;
     args.id = id;
-
-    args.req = enable ?
-        Gallery::Method::ManageModerator::RequestType::kEnable :
-        Gallery::Method::ManageModerator::RequestType::kDisable;
-
+    args.approved = enable;
     KeyMaterial::MyAdminKey kid;
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Set moderator", 500000);
 }
@@ -1097,7 +1092,7 @@ ON_METHOD(artist, set_artwork) {
     StatePlus s;
     s.Init(cid);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 2500000 + s.fee_base / 10);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 25000000 + s.fee_base / 10);
 }
 
 /*
@@ -1463,7 +1458,7 @@ ON_METHOD(artist, set_artist) {
     StatePlus s;
     s.Init(cid);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 2500000 + (artist_exists ? 0 : s.fee_base / 10));
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 25000000 + (artist_exists ? 0 : s.fee_base / 10));
 }
 
 ON_METHOD(artist, set_collection) {
@@ -1518,7 +1513,7 @@ ON_METHOD(artist, set_collection) {
     StatePlus s;
     s.Init(cid);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000 + (id ? 0 : s.fee_base / 10));
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 25000000 + (id ? 0 : s.fee_base / 10));
 }
 
 ON_METHOD(artist, view) {

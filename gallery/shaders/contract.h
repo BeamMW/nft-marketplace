@@ -298,10 +298,9 @@ namespace Gallery {
             PubKey signer;
         };
 
-        struct ManageModerator {
+        struct SetModerator {
             static const uint32_t s_iMethod = 16;
-
-            enum class RequestType : uint8_t { kDisable, kEnable } req;
+            bool approved;
             Gallery::Moderator::Id id;
         };
 
