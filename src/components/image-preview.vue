@@ -16,6 +16,7 @@
     justify-content: center
     overflow: hidden
     position: relative
+    user-select: none
     
     &>.preview {
       width: 100%

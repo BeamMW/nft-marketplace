@@ -13,8 +13,6 @@
             component="approve-collection"
             mode="moderator"
             selectable
-            selector_left="6px"
-            selector_top="6px"
             :store="collsStore"
             :selected="selected_collections"
             @selected="onCollectionSelected"
@@ -25,8 +23,6 @@
             component="approve-nft"
             mode="moderator"
             selectable
-            selector_left="20px"
-            selector_top="18px"
             :store="artsStore"
             :selected="selected_artworks"
             @selected="onArtworkSelected"
@@ -45,10 +41,10 @@
         >
           <img src="~assets/icon-reject.svg"/>
         </btn>
-        <btn text="publish"
+        <btn text="approve"
              color="green"
              :disabled="!any_selected"
-             @click="onPublish"
+             @click="onApprove"
         >
           <img src="~assets/icon-ok.svg"/>
         </btn>
@@ -181,7 +177,7 @@ export default {
     onReject() {
       this.active_approve.call(this.$store, this.active_selected, false)
     },
-    onPublish() {
+    onApprove() {
       this.active_approve.call(this.$store, this.active_selected, true)
     }
   }

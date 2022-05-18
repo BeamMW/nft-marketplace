@@ -2,7 +2,7 @@
   <!--selectItem-->
   <div :class="{'collection': true, 'error': item.error}">
     <preview :image="item.cover"
-             :default="def_banner"
+             :default="def_cover"
              height="140px" 
              cover
              @click="onDetails"
@@ -138,7 +138,7 @@ export default {
   data () {
     return {
       def_avatar: def_images.artist_avatar,
-      def_banner: def_images.artist_banner
+      def_cover: def_images.artist_banner
     }
   },
 

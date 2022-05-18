@@ -14,6 +14,8 @@
   & > img {
     position: absolute
     z-index: 999
+    user-select: none
+    opacity: 0.9
   }
 }
 </style>
@@ -28,11 +30,13 @@ export default {
     },
     left: {
       type: String,
-      required: true
+      required: false,
+      default: '20px'
     },
     top: {
       type: String,
-      required: true
+      required: false,
+      default: '18px'
     },
     selected: {
       type: Boolean,
@@ -44,7 +48,7 @@ export default {
     style() {
       return {
         'border-radius': this.border_radius,
-        'border': this.selected ? '1px solid #00f6d2' : '1px solid transparent',
+        'border': this.selected ? '1px solid rgba(0, 246, 210, 0.6)' : '1px solid transparent',
       }
     },
 

@@ -126,11 +126,11 @@ export default {
     },
     selector_left: {
       type: String,
-      default: '0px'
+      default: '20px'
     },
     selector_top: {
       type: String,
-      default: '0px'
+      default: '18px'
     }
   },
 

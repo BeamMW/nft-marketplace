@@ -33,7 +33,7 @@ export default class ItemsStore {
       // TODO: sort by height in reverse order
       console.log(`loader for moderator:${this._store_name}`)
       return store.where('status')
-        .notEqual('approved')
+        .equals('pending')
     })
 
     this._allocMode('artist', (store, mykey) => {

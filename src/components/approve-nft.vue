@@ -1,6 +1,9 @@
 <template>
   <div class="approve-nft" :class="{'error': item.error}">
-    <div class="info">
+    <div v-if="item.error" class="info-error">
+      Failed to load NFT<br>NFT ID: {{ item.id }}<br>{{ item.error }}
+    </div>
+    <div v-else class="info">
       <div class="type">Name</div>
       <div class="value">{{ item.label }}</div>
       <div v-if="item.description" class="type">Description</div>
@@ -9,8 +12,8 @@
     <imagePreivew :image="item.image" 
                   :default="def_artwork"
                   radius="10px"
-                  width="100px"
-                  height="100px"
+                  width="200px"
+                  height="200px"
                   cover
     >
       <moderationStatus :item="item" short/>
@@ -21,13 +24,17 @@
 <style lang="stylus" scoped>
 .approve-nft {
   width: 912px
-  min-height: 140px
   background-color: rgba(255, 255, 255, 0.05)
   border-radius: 10px
   box-sizing: border-box
   padding: 20px 20px 20px 70px
   display:flex
   flex-direction: row
+  font-size: 14px
+
+  & > .info-error {
+    flex: 1
+  }
 
   & > .info {
     flex: 1
@@ -37,13 +44,12 @@
     align-content: start
 
     & > .type {
-      font-size: 14px
       color: #8da1ad
       margin-bottom: 16px
+      user-select: none
     }
 
     & > .value {
-      font-size: 14px
       color: #fff
     }
   }
