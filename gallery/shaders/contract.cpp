@@ -29,6 +29,7 @@ BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
         s.total_artists = 0;
         s.total_collections = 0;
         s.total_moderators = 0;
+        s.fee_base = 0;
 
         s.m_VoteBalance = 0;
         _POD_(s.m_Config) = r.m_Config;
@@ -66,6 +67,16 @@ void PayoutMove(const Gallery::Payout::Key& key, Amount val, bool bAdd) {
 
 BEAM_EXPORT void Method_2(void*) {
     // called on upgrade
+}
+
+BEAM_EXPORT void Method_13(const Gallery::Method::SetFeeBase& r) {
+    Gallery::Moderator m;
+    MyState s;
+    Env::Halt_if(!m.Load(r.signer));
+    Env::Halt_if(!m.approved);
+    s.fee_base = r.amount;
+    s.Save();
+    Env::AddSig(r.signer);
 }
 
 BEAM_EXPORT void Method_16(const Gallery::Method::ManageModerator& r) {
@@ -199,6 +210,9 @@ BEAM_EXPORT void Method_15(const Gallery::Method::ManageCollection& r) {
             c.max_sold.artwork_id = 0;
             c.max_sold.price.m_Amount = 0;
             c.max_sold.price.m_Aid = 0;
+            c.min_sold.artwork_id = 0;
+            c.min_sold.price.m_Amount = 0;
+            c.min_sold.price.m_Aid = 0;
 
             Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
                 Gallery::Artist::Id, Gallery::Collection>
@@ -333,6 +347,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::ManageArtwork& r) {
                 !exists);
         m.status = r.status;
     }
+
     Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
         ::Update(m.updated, cur_height, m.id);
     m.updated = cur_height;
@@ -404,6 +419,10 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r) {
     if (m.m_Price.m_Amount > c.max_sold.price.m_Amount) {
         c.max_sold.price = m.m_Price;
         c.max_sold.artwork_id = r.m_ID;
+    }
+    if (!c.min_sold.artwork_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
+        c.min_sold.price = m.m_Price;
+        c.min_sold.artwork_id = r.m_ID;
     }
     Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
         ::Update(c.updated, cur_height, m.collection_id);
@@ -483,6 +502,11 @@ BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r) {
 }
 
 BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
+    Gallery::Artwork m;
+
+    Env::Halt_if(!m.Load(r.m_ID.m_ArtworkID));
+    //Env::Halt_if(m.status != Gallery::Status::kApproved);
+    
     Gallery::Impression::Key impk;
     _POD_(impk.m_ID) = r.m_ID;
 
@@ -493,8 +517,6 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
         MyState s;
         Strict::Sub(s.m_VoteBalance, s.m_Config.m_VoteReward.m_Amount);
         s.Save();
-
-        Env::Halt_if(impk.m_ID.m_ArtworkID > s.total_artworks);
 
         Env::FundsUnlock(s.m_Config.m_VoteReward.m_Aid, s.m_Config.m_VoteReward.m_Amount);
     }
@@ -515,7 +537,7 @@ BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r) {
     Env::FundsLock(s.m_Config.m_VoteReward.m_Aid, r.m_Amount);
 }
 
-BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r) {
+/*BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r) {
     // ensure the masterpiece doesn't have aid
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
@@ -529,6 +551,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r) {
     MyState s;
     s.AddSigAdmin();
 }
+*/
 
 BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r) {
     Gallery::Artwork m;

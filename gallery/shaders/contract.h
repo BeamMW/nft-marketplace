@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0xc2,0xc6,0x8d,0x93,0x0b,0xa3,0x88,0x43,0x35,0xd6,0x3c,0x8f,0x0f,0xcf,0x12,0xd1,0x76,0x5a,0x49,0x00,0x16,0x83,0xa5,0xcb,0x00,0xb3,0xe7,0xf8,0xc0,0xbf,0xdc,0xb4};
+    static const ShaderID s_SID_0 = {0xc9,0xdd,0xb6,0x91,0xa0,0xa2,0xfd,0xc8,0x51,0x8c,0x20,0xc0,0x02,0x6d,0x82,0x7e,0x56,0x19,0xe7,0x8a,0x78,0x31,0xb3,0x27,0x13,0x34,0x00,0xcf,0x6a,0xc5,0x5e,0x80};
 #pragma pack (push, 1)
 
     enum class Tag : uint8_t {
@@ -134,6 +134,11 @@ namespace Gallery {
             AmountWithAsset price;
             uint32_t artwork_id;
         } max_sold;
+
+        struct {
+            AmountWithAsset price;
+            uint32_t artwork_id;
+        } min_sold;
         
         //Id id;
 
@@ -165,14 +170,14 @@ namespace Gallery {
     };
 
     struct Impression {
-        struct ID {
+        struct Id {
             Artwork::Id m_ArtworkID;
             PubKey m_pkUser;
         };
 
         struct Key {
             Tag tag = Tag::kImpression;
-            ID m_ID;
+            Id m_ID;
         };
 
         uint32_t m_Value; // 0 = none, 1 = like, etc.
@@ -203,6 +208,7 @@ namespace Gallery {
         uint32_t total_collections;
         uint32_t total_artists;
         uint32_t total_moderators;
+        Amount fee_base;
 
         Amount m_VoteBalance;
     };
@@ -286,6 +292,12 @@ namespace Gallery {
             Config m_Config;
         };
 
+        struct SetFeeBase {
+            static const uint32_t s_iMethod = 13;
+            Amount amount;
+            PubKey signer;
+        };
+
         struct ManageModerator {
             static const uint32_t s_iMethod = 16;
 
@@ -332,6 +344,7 @@ namespace Gallery {
             uint32_t label_len;
             uint32_t collection_id;
             uint32_t artwork_id;
+            uint32_t impressions_num;
             AmountWithAsset m_Price;
             // followed by the data and label
         };
@@ -380,7 +393,7 @@ namespace Gallery {
 
         struct Vote {
             static const uint32_t s_iMethod = 11;
-            Impression::ID m_ID;
+            Impression::Id m_ID;
             Impression m_Impression;
         };
 
@@ -389,10 +402,11 @@ namespace Gallery {
             Amount m_Amount;
         };
 
-        struct AdminDelete {
+        /*struct AdminDelete {
             static const uint32_t s_iMethod = 13;
             Artwork::Id m_ID;
         };
+        */
 
         struct Transfer {
             static const uint32_t s_iMethod = 14;

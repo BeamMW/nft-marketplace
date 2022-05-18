@@ -118,10 +118,15 @@
     macro(ContractID, cid) \
     macro(Gallery::Artist::Id, id) \
 
+#define Gallery_moderator_set_fee_base(macro) \
+    macro(ContractID, cid) \
+    macro(Amount, amount) \
+
 #define GalleryRole_moderator(macro) \
     macro(moderator, set_artwork) \
     macro(moderator, set_artist) \
     macro(moderator, set_collection) \
+    macro(moderator, set_fee_base) \
 
 // ARTIST
 
@@ -566,6 +571,12 @@ struct MyCollection : public Gallery::Collection {
             Env::DocAddNum("aid", max_sold.price.m_Aid);
             Env::DocAddNum32("artwork_id", max_sold.artwork_id);
         }
+        {
+            Env::DocGroup gr_price("min_price");
+            Env::DocAddNum("value", min_sold.price.m_Amount);
+            Env::DocAddNum("aid", min_sold.price.m_Aid);
+            Env::DocAddNum32("artwork_id", min_sold.artwork_id);
+        }
 
         uint32_t print_artworks{};
         Env::DocGetNum32("artworks", &print_artworks);
@@ -632,8 +643,24 @@ struct MyArtwork : public Gallery::Artwork {
         OwnerInfo oi;
 
         if (!_POD_(m_pkOwner).IsZero()) {
+            uint32_t owned = !!oi.DeduceOwner(cid, iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID, m_pkOwner);
             Env::DocAddBlob_T("owner", m_pkOwner);
-            Env::DocAddNum("owned", (uint32_t) !!oi.DeduceOwner(cid, iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID, m_pkOwner));
+            Env::DocAddNum("owned", owned);
+
+            if (owned) {
+                Env::Key_T<Gallery::Events::Sell::Key> key;
+                _POD_(key.m_Prefix.m_Cid) = cid;
+                key.m_KeyInContract.m_ID = id;
+
+                Env::LogReader r(key, key);
+                Gallery::Events::Sell evt;
+                if (r.MoveNext_T(key, evt)) {
+                    Env::DocGroup gr("first_sale");
+                    Env::DocAddNum("height", r.m_Pos.m_Height);
+                    Env::DocAddNum("amount", evt.m_Price.m_Amount);
+                    Env::DocAddNum("aid", evt.m_Price.m_Aid);
+                }
+            }
 
             if (m_Price.m_Amount) {
                 Env::DocGroup gr_price("price");
@@ -679,7 +706,6 @@ struct MyArtwork : public Gallery::Artwork {
         if (bMyImpressionSet)
             Env::DocAddNum("my_impression", nMyImpression);
     }
-    
 
     // TODO: ReadItem
 
@@ -861,6 +887,7 @@ ON_METHOD(manager, view_params) {
     MyModerator moder;
     Env::DocAddNum("is_admin", bIsAdmin);
     Env::DocAddNum32("is_moderator", moder.is_moderator(cid));
+    Env::DocAddNum("fee_base", s.fee_base);
 
     {
         Env::DocGroup gr1("vote_reward");
@@ -1067,7 +1094,10 @@ ON_METHOD(artist, set_artwork) {
     if (nDataSize)
         nCharge += Env::Cost::Log_For(nDataSize) + Env::Cost::Cycle * 50;
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 2500000);
+    StatePlus s;
+    s.Init(cid);
+
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 2500000 + s.fee_base / 10);
 }
 
 /*
@@ -1361,6 +1391,21 @@ ON_METHOD(moderator, set_collection) {
     Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update collection's status", 2500000);
 }
 
+ON_METHOD(moderator, set_fee_base) {
+    Gallery::Method::SetFeeBase args;
+    args.amount = amount;
+
+    KeyMaterial::Owner km;
+    km.SetCid(cid);
+    km.Get(args.signer);
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Set fee base", 0);
+}
+
 ON_METHOD(artist, set_artist) {
     KeyMaterial::Owner km;
     km.SetCid(cid);
@@ -1415,7 +1460,10 @@ ON_METHOD(artist, set_artist) {
 
     const char* comment = artist_exists ? "Updating artist's info" : "Becoming an artist";
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 2500000);
+    StatePlus s;
+    s.Init(cid);
+
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 2500000 + (artist_exists ? 0 : s.fee_base / 10));
 }
 
 ON_METHOD(artist, set_collection) {
@@ -1467,7 +1515,10 @@ ON_METHOD(artist, set_collection) {
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000);
+    StatePlus s;
+    s.Init(cid);
+
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 2500000 + (id ? 0 : s.fee_base / 10));
 }
 
 ON_METHOD(artist, view) {
@@ -1676,7 +1727,7 @@ ON_METHOD(user, vote) {
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, "Vote", 0);
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), &fc, 1, &sig, 1, "Vote", 1000000);
 }
 
 #undef ON_METHOD
