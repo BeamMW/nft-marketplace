@@ -286,7 +286,6 @@ namespace Gallery {
         struct SetFeeBase {
             static const uint32_t s_iMethod = 3;
             Amount amount;
-            PubKey signer;
         };
 
         struct SetModerator {

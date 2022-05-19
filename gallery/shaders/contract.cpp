@@ -70,13 +70,10 @@ BEAM_EXPORT void Method_2(void*) {
 }
 
 BEAM_EXPORT void Method_3(const Gallery::Method::SetFeeBase& r) {
-    Gallery::Moderator m;
     MyState s;
-    Env::Halt_if(!m.Load(r.signer));
-    Env::Halt_if(!m.approved);
     s.fee_base = r.amount;
     s.Save();
-    Env::AddSig(r.signer);
+    s.AddSigAdmin();
 }
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetModerator& r) {

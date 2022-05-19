@@ -76,6 +76,10 @@
 #define Gallery_manager_set_artist_status(macro) \
     macro(ContractID, cid) \
 
+#define Gallery_manager_set_fee_base(macro) \
+    macro(ContractID, cid) \
+    macro(Amount, amount) \
+
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
     macro(manager, view_params) \
@@ -96,6 +100,7 @@
     macro(manager, set_artwork_status) \
     macro(manager, set_artist_status) \
     macro(manager, set_collection_status) \
+    macro(manager, set_fee_base) \
 
 // MODERATOR
 
@@ -108,15 +113,10 @@
 #define Gallery_moderator_set_artist_status(macro) \
     macro(ContractID, cid) \
 
-#define Gallery_moderator_set_fee_base(macro) \
-    macro(ContractID, cid) \
-    macro(Amount, amount) \
-
 #define GalleryRole_moderator(macro) \
     macro(moderator, set_artwork_status) \
     macro(moderator, set_artist_status) \
     macro(moderator, set_collection_status) \
-    macro(moderator, set_fee_base) \
 
 // ARTIST
 
@@ -1366,19 +1366,11 @@ ON_METHOD(moderator, set_collection_status) {
     Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update collection's status", 2500000);
 }
 
-ON_METHOD(moderator, set_fee_base) {
+ON_METHOD(manager, set_fee_base) {
     Gallery::Method::SetFeeBase args;
     args.amount = amount;
-
-    KeyMaterial::Owner km;
-    km.SetCid(cid);
-    km.Get(args.signer);
-
-    SigRequest sig;
-    sig.m_pID = &km;
-    sig.m_nID = sizeof(km);
-
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Set fee base", 0);
+    KeyMaterial::MyAdminKey kid;
+    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Set fee base", 0);
 }
 
 ON_METHOD(artist, set_artist) {
