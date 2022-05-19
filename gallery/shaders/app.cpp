@@ -5,6 +5,7 @@
 #include "Shaders/upgradable2/app_common_impl.h"
 
 #include <string_view>
+#include <vector>
 
 // MANAGER
 
@@ -218,6 +219,37 @@ BEAM_EXPORT void Method_0() {
 
 void OnError(const char* sz) {
     Env::DocAddText("error", sz);
+}
+
+template <class Id>
+std::vector<Id> ParseIds(const std::string_view& ids) {
+    int cur_pos = 0;
+    int next_pos;
+
+    union {
+        Id id;
+        uint8_t a[sizeof(Id)];
+    } blob;
+
+    std::vector<Id> res;
+    while ((next_pos = ids.find(';', cur_pos)) != ids.npos) {
+        _POD_(blob.id).SetZero();
+        if constexpr(std::is_same_v<Id, PubKey>) {
+            for (int i = cur_pos; i < next_pos; ++i) {
+                if (isdigit(ids[i])) {
+                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - '0') << (4 * !((i - cur_pos) & 1)));
+                } else {
+                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - 'a' + 10) << (4 * !((i - cur_pos) & 1)));
+                }
+            }
+        } else {
+            for (int i = cur_pos; i < next_pos; ++i)
+                blob.id = blob.id * 10 + ids[i] - '0';
+        }
+        cur_pos = next_pos + 1;
+        res.push_back(blob.id);
+    }
+    return res;
 }
 
 Gallery::Status StringToStatus(const std::string_view& str_status) {
@@ -803,32 +835,11 @@ public:
     }
 
     void Print(const std::string_view& ids) {
-        int cur_pos = 0;
-        int next_pos;
         Env::DocArray gr0("items");
 
-        union {
-            typename T::Id id;
-            uint8_t a[sizeof(typename T::Id)];
-        } blob;
-
-        while ((next_pos = ids.find(';', cur_pos)) != ids.npos) {
-            _POD_(blob.id).SetZero();
-            if constexpr(std::is_same_v<typename T::Id, PubKey>) {
-                for (int i = cur_pos; i < next_pos; ++i) {
-                    if (isdigit(ids[i])) {
-                        blob.a[(i - cur_pos) / 2] |= ((ids[i] - '0') << (4 * !((i - cur_pos) & 1)));
-                    } else {
-                        blob.a[(i - cur_pos) / 2] |= ((ids[i] - 'a' + 10) << (4 * !((i - cur_pos) & 1)));
-                    }
-                }
-            } else {
-                for (int i = cur_pos; i < next_pos; ++i)
-                    blob.id = blob.id * 10 + ids[i] - '0';
-            }
-            cur_pos = next_pos + 1;
- 
-            Print(blob.id);
+        std::vector<typename T::Id> ids_vec(ParseIds<typename T::Id>(ids));
+        for (auto id : ids_vec) {
+            Print(id);
         }
     }
 
@@ -1223,117 +1234,162 @@ ON_METHOD(manager, view_balance) {
 }
 
 ON_METHOD(manager, set_artwork_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Artwork::Id> ids_vec(ParseIds<Gallery::Artwork::Id>(buf));
 
-    Gallery::Method::SetArtworkStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    size_t args_size = sizeof(Gallery::Method::SetArtworkStatus) + sizeof(Gallery::Artwork::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetArtworkStatus> args(
+            static_cast<Gallery::Method::SetArtworkStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
-    kid.get_Pk(args.signer);
-    args.artwork_id = id;
-    
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
+    kid.get_Pk(args->signer);
+
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artwork::Id) * ids_vec.size());
+
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
 }
 
 ON_METHOD(moderator, set_artwork_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
-    
-    Gallery::Method::SetArtworkStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Artwork::Id> ids_vec(ParseIds<Gallery::Artwork::Id>(buf));
+
+    size_t args_size = sizeof(Gallery::Method::SetArtworkStatus) + sizeof(Gallery::Artwork::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetArtworkStatus> args(
+            static_cast<Gallery::Method::SetArtworkStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
-    km.Get(args.signer);
+    km.Get(args->signer);
 
-    args.artwork_id = id;
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artwork::Id) * ids_vec.size());
 
     SigRequest sig;
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artwork's status", 2500000);
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update artwork's status", 2500000);
 }
 
 ON_METHOD(moderator, set_artist_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
-    
-    Gallery::Method::SetArtistStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Artist::Id> ids_vec(ParseIds<Gallery::Artist::Id>(buf));
+
+    size_t args_size = sizeof(Gallery::Method::SetArtistStatus) + sizeof(Gallery::Artist::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetArtistStatus> args(
+            static_cast<Gallery::Method::SetArtistStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
-    km.Get(args.signer);
+    km.Get(args->signer);
 
-    args.m_pkArtist = id;
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artist::Id) * ids_vec.size());
 
     SigRequest sig;
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update artist's status", 2500000);
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update artist's status", 2500000);
 }
 
 ON_METHOD(manager, set_artist_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
-    
-    Gallery::Method::SetArtistStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Artist::Id> ids_vec(ParseIds<Gallery::Artist::Id>(buf));
+
+    size_t args_size = sizeof(Gallery::Method::SetArtistStatus) + sizeof(Gallery::Artist::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetArtistStatus> args(
+            static_cast<Gallery::Method::SetArtistStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
-    kid.get_Pk(args.signer);
-    args.m_pkArtist = id;
+    kid.get_Pk(args->signer);
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update artist's status", 2500000);
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artist::Id) * ids_vec.size());
+
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update artist's status", 2500000);
 }
 
 ON_METHOD(manager, set_collection_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
-    
-    Gallery::Method::SetCollectionStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Collection::Id> ids_vec(ParseIds<Gallery::Collection::Id>(buf));
+
+    size_t args_size = sizeof(Gallery::Method::SetCollectionStatus) + sizeof(Gallery::Collection::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetCollectionStatus> args(
+            static_cast<Gallery::Method::SetCollectionStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
-    kid.get_Pk(args.signer);
-    args.collection_id = id;
+    kid.get_Pk(args->signer);
 
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Update collection's status", 2500000);
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Collection::Id) * ids_vec.size());
+
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update collection's status", 2500000);
 }
 
 ON_METHOD(moderator, set_collection_status) {
-    char buf[128];
-    size_t buf_len = Env::DocGetText("status", buf, sizeof(buf));
-    std::string_view status(buf);
-    
-    Gallery::Method::SetCollectionStatus args;
-    args.status = StringToStatus(status);
-    if (args.status == Gallery::Status::kNone) return;
+    char buf[256];
+    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
+    if (buf_len)
+        buf[buf_len - 1] = ';';
+    std::vector<Gallery::Collection::Id> ids_vec(ParseIds<Gallery::Collection::Id>(buf));
+
+    size_t args_size = sizeof(Gallery::Method::SetCollectionStatus) + sizeof(Gallery::Collection::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetCollectionStatus> args(
+            static_cast<Gallery::Method::SetCollectionStatus*>(::operator new(args_size)));
+
+    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    args->status = StringToStatus(buf);
+    if (args->status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
-    km.Get(args.signer);
-
-    args.collection_id = id;
+    km.Get(args->signer);
 
     SigRequest sig;
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
-    
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &sig, 1, "Update collection's status", 2500000);
+
+    args->ids_num = ids_vec.size();
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Collection::Id) * ids_vec.size());
+
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update collection's status", 2500000);
 }
 
 ON_METHOD(moderator, set_fee_base) {
@@ -1402,7 +1458,7 @@ ON_METHOD(artist, set_artist) {
     StatePlus s;
     s.Init(cid);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, comment, 25000000 + (artist_exists ? 0 : s.fee_base / 10));
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, comment, 25000000 + (artist_exists ? 0 : s.fee_base / 10));
 }
 
 ON_METHOD(artist, set_collection) {

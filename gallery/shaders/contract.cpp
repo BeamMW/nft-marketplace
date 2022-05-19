@@ -69,7 +69,7 @@ BEAM_EXPORT void Method_2(void*) {
     // called on upgrade
 }
 
-BEAM_EXPORT void Method_13(const Gallery::Method::SetFeeBase& r) {
+BEAM_EXPORT void Method_3(const Gallery::Method::SetFeeBase& r) {
     Gallery::Moderator m;
     MyState s;
     Env::Halt_if(!m.Load(r.signer));
@@ -79,7 +79,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::SetFeeBase& r) {
     Env::AddSig(r.signer);
 }
 
-BEAM_EXPORT void Method_16(const Gallery::Method::SetModerator& r) {
+BEAM_EXPORT void Method_4(const Gallery::Method::SetModerator& r) {
     Gallery::Moderator m;
     MyState s;
     Height cur_height = Env::get_Height();
@@ -101,7 +101,7 @@ BEAM_EXPORT void Method_16(const Gallery::Method::SetModerator& r) {
     s.AddSigAdmin();
 }
 
-BEAM_EXPORT void Method_17(const Gallery::Method::SetArtistStatus& r) {
+BEAM_EXPORT void Method_6(const Gallery::Method::SetArtistStatus& r) {
     Height cur_height = Env::get_Height();
 
     struct ArtistPlus : public Gallery::Artist {
@@ -115,24 +115,26 @@ BEAM_EXPORT void Method_17(const Gallery::Method::SetArtistStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
-    a.status = r.status;
+    for (int i = 0; i < r.ids_num; ++i) {
+        Env::Halt_if(!a.Load(r.ids[i], sizeof(a)));
+        a.status = r.status;
 
-    Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
-        ::Update(a.updated, cur_height, r.m_pkArtist);
+        Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
+            ::Update(a.updated, cur_height, r.ids[i]);
 
-    a.updated = cur_height;
-    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+        a.updated = cur_height;
+        a.Save(r.ids[i], sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    }
 }
 
-BEAM_EXPORT void Method_10(const Gallery::Method::SetArtist& r) {
+BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
     Height cur_height = Env::get_Height();
 
     struct ArtistPlus : public Gallery::Artist {
         char m_szLabelData[s_TotalMaxLen];
     } a;
 
-    if (a.Load(r.m_pkArtist, sizeof(a))) {
+    if (!a.Load(r.m_pkArtist, sizeof(a))) {
         MyState s;
         // if artist doesn't exist, then label is required
         Env::Halt_if(!r.m_LabelLen); 
@@ -157,7 +159,7 @@ BEAM_EXPORT void Method_10(const Gallery::Method::SetArtist& r) {
     Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_15(const Gallery::Method::SetCollectionStatus& r) {
+BEAM_EXPORT void Method_7(const Gallery::Method::SetCollectionStatus& r) {
     Height cur_height = Env::get_Height();
 
     struct CollectionPlus : public Gallery::Collection {
@@ -171,18 +173,20 @@ BEAM_EXPORT void Method_15(const Gallery::Method::SetCollectionStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
+    for (int i = 0; i < r.ids_num; ++i) {
+        Env::Halt_if(!c.Load(r.ids[i], sizeof(c)));
 
-    c.status = r.status;
+        c.status = r.status;
 
-    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
-        ::Update(c.updated, cur_height, r.collection_id);
+        Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+            ::Update(c.updated, cur_height, r.ids[i]);
 
-    c.updated = cur_height;
-    c.Save(r.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+        c.updated = cur_height;
+        c.Save(r.ids[i], sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    }
 }
 
-BEAM_EXPORT void Method_18(const Gallery::Method::SetCollection& r) {
+BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
     Height cur_height = Env::get_Height();
 
     struct CollectionPlus : public Gallery::Collection {
@@ -240,7 +244,7 @@ BEAM_EXPORT void Method_18(const Gallery::Method::SetCollection& r) {
     Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_3(const Gallery::Method::SetArtwork& r) {
+BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
     Height cur_height = Env::get_Height();
 
     Gallery::Artwork m;
@@ -325,7 +329,7 @@ BEAM_EXPORT void Method_3(const Gallery::Method::SetArtwork& r) {
     Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_19(const Gallery::Method::SetArtworkStatus& r) {
+BEAM_EXPORT void Method_10(const Gallery::Method::SetArtworkStatus& r) {
     Height cur_height = Env::get_Height();
 
     Gallery::Moderator m;
@@ -336,16 +340,17 @@ BEAM_EXPORT void Method_19(const Gallery::Method::SetArtworkStatus& r) {
         Env::AddSig(r.signer);
 
     Gallery::Artwork a;
-    Env::Halt_if(!a.Load(r.artwork_id));
-    a.status = r.status;
-
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
-        ::Update(a.updated, cur_height, a.id);
-    a.updated = cur_height;
-    a.Save(a.id);
+    for (int i = 0; i < r.ids_num; ++i) {
+        Env::Halt_if(!a.Load(r.ids[i]));
+        a.status = r.status;
+        Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+            ::Update(a.updated, cur_height, a.id);
+        a.updated = cur_height;
+        a.Save(a.id);
+    }
 }
 
-BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r) {
+BEAM_EXPORT void Method_11(const Gallery::Method::SetPrice& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 
@@ -360,7 +365,7 @@ BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r) {
     Env::AddSig(m.m_pkOwner); // would fail if no current owner (i.e. checked out)
 }
 
-BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r) {
+BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
     Height cur_height = Env::get_Height();
 
     Gallery::Artwork m;
@@ -421,13 +426,13 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r) {
     //Env::AddSig(r.m_pkUser);
 }
 
-BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r) {
+BEAM_EXPORT void Method_13(const Gallery::Method::Withdraw& r) {
     PayoutMove(r.m_Key, r.m_Value, false);
     Env::FundsUnlock(r.m_Key.m_Aid, r.m_Value);
     Env::AddSig(r.m_Key.m_pkUser);
 }
 
-BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r) {
+BEAM_EXPORT void Method_14(const Gallery::Method::CheckPrepare& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
     Env::AddSig(m.m_pkOwner);
@@ -451,7 +456,7 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r) {
     m.Save(r.m_ID);
 }
 
-BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r) {
+BEAM_EXPORT void Method_15(const Gallery::Method::CheckOut& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID) || !m.m_Aid);
     Env::AddSig(m.m_pkOwner);
@@ -471,7 +476,7 @@ BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r) {
     m.Save(r.m_ID);
 }
 
-BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r) {
+BEAM_EXPORT void Method_16(const Gallery::Method::CheckIn& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
 
@@ -491,7 +496,7 @@ BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r) {
     //Env::AddSig(r.m_pkUser);
 }
 
-BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
+BEAM_EXPORT void Method_17(const Gallery::Method::Vote& r) {
     Gallery::Artwork m;
 
     Env::Halt_if(!m.Load(r.m_ID.m_ArtworkID));
@@ -519,7 +524,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r) {
     Env::AddSig(impk.m_ID.m_pkUser);
 }
 
-BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r) {
+BEAM_EXPORT void Method_18(const Gallery::Method::AddVoteRewards& r) {
     MyState s;
     Strict::Add(s.m_VoteBalance, r.m_Amount);
     s.Save();
@@ -543,7 +548,7 @@ BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r) {
 }
 */
 
-BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r) {
+BEAM_EXPORT void Method_19(const Gallery::Method::Transfer& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
 

@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0xb6,0xe5,0x8c,0x15,0x44,0x73,0x75,0xba,0xf4,0xdf,0x99,0xbe,0xbc,0x69,0x37,0x41,0xf7,0xa7,0xca,0x54,0x19,0xab,0xb2,0x96,0x87,0x39,0x6a,0x98,0x9e,0x6e,0x93,0x3c};
+    static const ShaderID s_SID_0 = {0xec,0x76,0xdd,0x50,0x8b,0xd0,0x55,0x15,0x79,0xd2,0x9f,0xbf,0xc3,0x15,0x63,0xe8,0xf3,0xb5,0x02,0x49,0xa1,0x5f,0x6d,0x82,0x6a,0x93,0x6a,0x92,0xf3,0xe1,0xfe,0xab};
 #pragma pack (push, 1)
 
     enum class Tag : uint8_t {
@@ -317,15 +317,18 @@ namespace Gallery {
             static const uint32_t s_iMethod = 6;
             Status status;
             PubKey signer;
-            PubKey m_pkArtist;
+            uint32_t ids_num;
+            Artist::Id ids[];
+            static const uint32_t kMaxIds = 128;
         };
 
         struct SetCollectionStatus {
             static const uint32_t s_iMethod = 7;
             Status status;
             PubKey signer;
-            PubKey m_pkArtist;
-            Collection::Id collection_id;
+            uint32_t ids_num;
+            Collection::Id ids[];
+            static const uint32_t kMaxIds = 128;
         };
 
         struct SetCollection {
@@ -349,8 +352,10 @@ namespace Gallery {
         struct SetArtworkStatus {
             static const uint32_t s_iMethod = 10;
             PubKey signer;
-            uint32_t artwork_id;
             Status status;
+            uint32_t ids_num;
+            Artwork::Id ids[];
+            static const uint32_t kMaxIds = 128;
         };
 
         struct SetPrice {
