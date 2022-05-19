@@ -32,6 +32,7 @@ namespace Gallery {
         kPending,
         kApproved,
         kRejected,
+        kNone,
     };
 
     const std::string_view status_to_string(const Status& status) {

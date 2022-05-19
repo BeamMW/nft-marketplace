@@ -220,6 +220,21 @@ void OnError(const char* sz) {
     Env::DocAddText("error", sz);
 }
 
+Gallery::Status StringToStatus(const std::string_view& str_status) {
+    Gallery::Status ret_status;
+    if (str_status == "pending") {
+        ret_status = Gallery::Status::kPending;
+    } else if (str_status == "approved") {
+        ret_status = Gallery::Status::kApproved;
+    } else if (str_status == "rejected") {
+        ret_status = Gallery::Status::kRejected;
+    } else {
+        OnError("Invalid status");
+        ret_status = Gallery::Status::kNone;
+    }
+    return ret_status;
+}
+
 namespace KeyMaterial {
     const char g_szAdmin[] = "Gallery-key-admin";
 
@@ -1213,16 +1228,8 @@ ON_METHOD(manager, set_artwork_status) {
     std::string_view status(buf);
 
     Gallery::Method::SetArtworkStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
@@ -1237,16 +1244,8 @@ ON_METHOD(moderator, set_artwork_status) {
     std::string_view status(buf);
     
     Gallery::Method::SetArtworkStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
@@ -1267,16 +1266,8 @@ ON_METHOD(moderator, set_artist_status) {
     std::string_view status(buf);
     
     Gallery::Method::SetArtistStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
@@ -1297,16 +1288,8 @@ ON_METHOD(manager, set_artist_status) {
     std::string_view status(buf);
     
     Gallery::Method::SetArtistStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
@@ -1321,16 +1304,8 @@ ON_METHOD(manager, set_collection_status) {
     std::string_view status(buf);
     
     Gallery::Method::SetCollectionStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::MyAdminKey kid;
     kid.get_Pk(args.signer);
@@ -1345,16 +1320,8 @@ ON_METHOD(moderator, set_collection_status) {
     std::string_view status(buf);
     
     Gallery::Method::SetCollectionStatus args;
-    if (status == "pending") {
-        args.status = Gallery::Status::kPending;
-    } else if (status == "approved") {
-        args.status = Gallery::Status::kApproved;
-    } else if (status == "rejected") {
-        args.status = Gallery::Status::kRejected;
-    } else {
-        OnError("Invalid status");
-        return;
-    }
+    args.status = StringToStatus(status);
+    if (args.status == Gallery::Status::kNone) return;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);
