@@ -27,7 +27,11 @@ export default class ItemsStore {
     })
 
     // TODO: move artwork-specific loaders to artworks. For example all with likes
-    this._allocMode('user')
+    this._allocMode('user', (store) => {
+      console.log(`loader for user:${this._store_name}`)
+      return store.where('status')
+        .equals('approved')
+    })
     
     this._allocMode('moderator', (store) => {
       // TODO: sort by height in reverse order
@@ -184,11 +188,7 @@ export default class ItemsStore {
     })
 
     utils.ensureField(res, 'items', 'array')
-    if (this._objname == 'collection') {
-      // eslint-disable-next-line no-debugger
-      // debugger
-    }
-
+   
     let approved = 0
     let pending = 0
     let rejected = 0
@@ -215,8 +215,9 @@ export default class ItemsStore {
         item = this._fromContract(item)
         item = Object.assign({}, item)
 
-        // TODO: remove when finished
-        console.log('item loaded with label', item.label)
+        if (this._global.debug) {
+          console.log('item loaded with label', item.label)
+        }
       }
       catch(err) {
         console.log(`ItemsStore._loadItems for ${this._objname}-${item.id}`, err)
@@ -263,9 +264,8 @@ export default class ItemsStore {
     this._getMode('user').total = approved
     this._getMode('artist').total = artist
     this._getMode('owner').total = owned
-    this._getMode('moderator').total = pending + rejected
+    this._getMode('moderator').total = pending
     this._loading = false
-    // TODO: check if page is correct
   }
 
   toNewItem() {

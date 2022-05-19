@@ -28,8 +28,20 @@
     </tabsctrl>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
     {{ search }} -->
-    <collections v-if="show_collections" class="list"/>
-    <artworks v-else class="list"/>
+    <list v-if="show_collections"
+          class="list"
+          items_name="collections"
+          component="collection"
+          mode="user"
+          :store="collsStore"
+    />
+    <list v-if="show_nfts"
+          class="list"
+          items_name="NFTs"
+          component="artwork"
+          mode="user"
+          :store="artsStore"
+    />
   </div>
 </template>
 
@@ -73,31 +85,31 @@
 
 <script>
 // TODO: headless
-import artworks from './user-artworks.vue'
-import collections from './user-collections.vue'
 import tabsctrl from './tabs'
-import {tabs, sort} from 'utils/consts'
+import {user_tabs, sort} from 'utils/consts'
 import btn from './button'
 import btnKey from './btn-key'
 import btnWallet from './btn-wallet'
 import btnProfile from './btn-profile'
+import list from './items-list.vue'
+import artsStore from 'stores/artworks'
+import collsStore from 'stores/collections'
 
 export default {
   components: {
-    artworks,
-    collections,
     tabsctrl,
     btn,
     btnKey,
     btnWallet,
-    btnProfile
+    btnProfile,
+    list
   },
 
   data () {
     return {
       tabs: [
-        {id: tabs.COLLECTIONS, name: 'Collections'},
-        {id: tabs.NFTS, name: 'NFTs'},
+        {id: user_tabs.COLLECTIONS, name: 'Collections'},
+        {id: user_tabs.NFTS, name: 'NFTs'},
       ],
       search: '',
       selector_options: [
@@ -114,10 +126,10 @@ export default {
   computed: {
     active_tab: {
       get () {
-        return this.$state.gallery_tab
+        return this.$state.user_active_tab
       },
       set (value) {
-        this.$store.setGalleryTab(value)
+        this.$store.setUserTab(value)
       }
     },
     can_admin () {
@@ -137,7 +149,16 @@ export default {
       return `Open ${role} panel`
     },
     show_collections () {
-      return this.$state.gallery_tab == tabs.COLLECTIONS
+      return this.$state.user_active_tab == user_tabs.COLLECTIONS
+    },
+    show_nfts () {
+      return this.$state.user_active_tab == user_tabs.NFTS
+    },
+    artsStore () {
+      return artsStore
+    },
+    collsStore () {
+      return collsStore
     }
   },
   methods: {

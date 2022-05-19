@@ -12,7 +12,9 @@
                      :cover="!(image || {}).object"
                      height="360px" 
                      radius="0"
-            />
+            >
+              <moderationStatus :item="artwork"/>
+            </preview>
           </div>
         </div>
         <div class="info-container">
@@ -302,6 +304,7 @@ import pageTitle from './page-title'
 import {useObservable} from '@vueuse/rxjs'
 import {Observable} from 'rxjs'
 import {computed} from 'vue'
+import moderationStatus from './moderation-status'
 
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
@@ -315,7 +318,8 @@ export default {
     preview,
     pageTitle,
     loading,
-    notFound
+    notFound,
+    moderationStatus
   },
 
   props: {

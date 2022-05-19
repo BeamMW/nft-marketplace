@@ -1,4 +1,4 @@
-import {tabs, common, contract, sort, my_tabs, coll_tabs, admin_tabs} from 'utils/consts.js'
+import {common, contract, my_tabs} from 'utils/consts.js'
 import utils from 'utils/utils.js'
 import {reactive, nextTick, computed} from 'vue'
 
@@ -11,7 +11,6 @@ import Database from 'stores/database'
 
 function defaultState() {
   let state = {  
-    /// OLD
     loading: 'BEAM Gallery is loading',
     error: undefined,
     shader: undefined,
@@ -19,28 +18,13 @@ function defaultState() {
     is_admin: false,
     is_moderator: false,
     is_artist: false,
-    my_active_tab: my_tabs.OWNED_NFTS,
-    coll_active_tab: coll_tabs.ALL_NFTS,
-    admin_active_tab: admin_tabs.COLLECTIONS,
-    artworks: [],
-    all_artworks: {
-      [tabs.ALL]:   [],
-      [tabs.MINE]:  [],
-      [tabs.SALE]:  [],
-      [tabs.LIKED]: [],
-      [tabs.SOLD]:  [],
-    },
+    my_active_tab: 0,
+    coll_active_tab: 0,
+    admin_active_tab: 0,
+    user_active_tab: 0,
     balance_beam: 0,
     balance_reward: 0,
-    selected_artist: undefined,
-    active_tab: tabs.ALL,
-    sort_by: sort.OLDEST_TO_NEWEST,
-    filter_by_artist: 0,
-    pending_artworks: 0,
     is_headless: false,
-    use_ipfs: true,
-    gallery_tab: tabs.COLLECTIONS,
-    gallery_artworks_page: 1,
     debug: true,
     approve_tx: undefined
   }
@@ -81,20 +65,6 @@ const store = {
       /// TODO: start is async, handle error
       reload ? utils.reload() : this.start()
     }
-  },
-
-  setSortBy(val) {
-    this.state.sort_by = val
-    this.state.gallery_artworks_page = 1
-    this.applySortAndFilters()
-    this.loadCurrentArtworks()
-  },
-
-  setFilterByArtist(val) {
-    this.state.filter_by_artist = val
-    this.state.gallery_artworks_page = 1
-    this.applySortAndFilters()
-    this.loadCurrentArtworks()
   },
 
   //
@@ -194,9 +164,7 @@ const store = {
     utils.ensureField(res, 'vote_reward', 'object')
     utils.ensureField(res.vote_reward, 'balance', 'number')
    
-    // TODO:TEST
     this.state.is_admin = !!res.is_admin
-    //this.state.is_admin = true
     this.state.is_moderator = !!res.is_moderator
     this.state.balance_reward = res.vote_reward.balance;
     
@@ -330,6 +298,7 @@ const store = {
   },
 
   showStats() {
+    /*
     let total = this.state.all_artworks[tabs.ALL].length
     let left  = total
 
@@ -354,9 +323,11 @@ const store = {
         }
       )
     }
+    */
   },
 
   __showStats() {
+    /*
     const cnt_stats = 12
     let artworks = this.state.all_artworks[tabs.ALL]
     let artists = artistsStore.artists
@@ -431,6 +402,7 @@ const store = {
 
     let message = [sliked, slikes, ssold, stvb, snum].join('\n\n')
     alert(message)
+    */
   },
 
   async switchToHeaded () {
@@ -444,28 +416,6 @@ const store = {
     }
   },
 
-  setGalleryArtworksPage(page) {
-    this.state.gallery_artworks_page = page
-    this.loadCurrentArtworks()
-  },
-
-  loadCurrentArtworks () {
-    let start = (this.state.gallery_artworks_page - 1) * common.ITEMS_PER_PAGE
-    let end = Math.min(start + common.ITEMS_PER_PAGE, this.state.artworks.length)
-    for (let idx = start; idx < end; ++idx) {
-      let art = this.state.artworks[idx]
-      if (!art.bytes) {
-        this.loadArtwork(this.state.active_tab, idx, art.id)
-      }
-    }
-  },
-
-  setActiveTab(id) {
-    this.state.active_tab = id
-    this.applySortAndFilters()
-    this.setGalleryArtworksPage(1)
-  },
-
   setMyTab(id) {
     this.state.my_active_tab = id
   },
@@ -474,8 +424,8 @@ const store = {
     this.state.coll_active_tab = id
   },
 
-  setGalleryTab(id) {
-    this.state.gallery_tab = id
+  setUserTab(id) {
+    this.state.user_active_tab = id
   },
 
   setAdminTab(id) {

@@ -4,14 +4,9 @@ export const common = {
   MAX_IMAGE_SIZE: 250 * 1024
 }
 
-export const tabs = {
-  ALL: 0,
-  MINE: 1,
-  SALE: 2,
-  LIKED: 3,
-  SOLD: 4,
-  COLLECTIONS: 5,
-  NFTS: 6,
+export const user_tabs = {
+  COLLECTIONS: 0,
+  NFTS: 1
 }
 
 export const admin_tabs = {

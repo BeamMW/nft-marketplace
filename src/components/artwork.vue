@@ -9,12 +9,12 @@
              @click="onDetails"
     >
       <moderationStatus :item="item"/>
-      <!--div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+      <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
-        <img :src="'./assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
-      </div-->
+        <img :src="'/assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
+      </div>
     </preview>
-
+    
     <!---- Delete Artwork Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
 
@@ -86,7 +86,7 @@
     & .likes {
       display: flex
       position: absolute
-      bottom: 8px
+      bottom: 9px
       right: 8px
       align-items: center
       cursor: pointer
@@ -155,13 +155,11 @@ export default {
     },
 
     is_approved() {
-      return this.state === 'approved'
+      return this.item.status === 'approved'
     },
                 
     can_vote () {
-      // TODO:test
-      // return !this.item.error && this.$state.balance_reward > 0
-      return true
+      return !this.item.error && this.$state.balance_reward > 0
     },
 
     liked () {

@@ -23,7 +23,7 @@
           <moderationStatus :item="item" short/>
         </imagePreivew>
         <div>{{ item.label }}</div>
-        <div v-if="item.website"><span class="link" @click="onWebsite">{{ item.website }} {{ item.website }} {{ item.website }} {{ item.website }}</span></div>
+        <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
         <div v-if="item.twitter"><span class="link" @click="onTwitter">{{ item.twitter }}</span></div>
         <div v-if="item.instagram"><span class="link" @click="onInstagram">{{ item.instagram }}</span></div>
         <div v-if="item.description">
@@ -75,10 +75,13 @@
         & > .link {
           cursor: pointer
           color: rgba(0, 246, 210, 1)
-          display: -webkit-box
-          -webkit-line-clamp: 1
-          -webkit-box-orient: vertical
-          overflow: hidden
+          
+          &.clamp {
+            display: -webkit-box
+            -webkit-line-clamp: 1
+            -webkit-box-orient: vertical
+            overflow: hidden
+          }
 
           &:hover {
             text-decoration: underline

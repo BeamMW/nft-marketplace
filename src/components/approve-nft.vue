@@ -3,21 +3,23 @@
     <div v-if="item.error" class="info-error">
       Failed to load NFT<br>NFT ID: {{ item.id }}<br>{{ item.error }}
     </div>
-    <div v-else class="info">
-      <div class="type">Name</div>
-      <div class="value">{{ item.label }}</div>
-      <div v-if="item.description" class="type">Description</div>
-      <div v-if="item.description" class="value">{{ item.description }}</div>
-    </div>
-    <imagePreivew :image="item.image" 
-                  :default="def_artwork"
-                  radius="10px"
-                  width="200px"
-                  height="200px"
-                  cover
-    >
-      <moderationStatus :item="item" short/>
-    </imagePreivew>
+    <template v-else>
+      <div class="info">
+        <div class="type">Name</div>
+        <div class="value">{{ item.label }}</div>
+        <div v-if="item.description" class="type">Description</div>
+        <div v-if="item.description" class="value">{{ item.description }}</div>
+      </div>
+      <imagePreivew :image="item.image" 
+                    :default="def_artwork"
+                    radius="10px"
+                    width="200px"
+                    height="200px"
+                    cover
+      >
+        <moderationStatus :item="item" short/>
+      </imagePreivew>
+    </template>
   </div>
 </template>
 

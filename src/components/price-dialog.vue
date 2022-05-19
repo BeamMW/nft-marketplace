@@ -5,10 +5,10 @@
         Set the price
       </div>
       <priceInput v-model="price" color="#0bccf7" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
-      <div class="fee">
+      <!-- div class="fee">
         <span class="title">Fee</span>
         <span class="value">0.011 BEAM</span>
-      </div>
+      </div -->
       <div class="info">
         Small transaction fee must be paid
       </div>

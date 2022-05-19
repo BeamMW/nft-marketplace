@@ -9,7 +9,7 @@
       <tabsctrl v-model="active_tab" class="tabs" :tabs="tabs"/>
       <list v-if="show_collections"
             class="list"
-            items_name="collections"
+            items_name="collections to be reviewed"
             component="approve-collection"
             mode="moderator"
             selectable
@@ -19,7 +19,7 @@
       />
       <list v-if="show_nfts"
             class="list"
-            items_name="NFTs"
+            items_name="NFTs to be reviewed"
             component="approve-nft"
             mode="moderator"
             selectable
