@@ -293,19 +293,19 @@ namespace Gallery {
         };
 
         struct SetFeeBase {
-            static const uint32_t s_iMethod = 13;
+            static const uint32_t s_iMethod = 3;
             Amount amount;
             PubKey signer;
         };
 
         struct SetModerator {
-            static const uint32_t s_iMethod = 16;
+            static const uint32_t s_iMethod = 4;
             bool approved;
             Moderator::Id id;
         };
 
         struct SetArtist {
-            static const uint32_t s_iMethod = 10;
+            static const uint32_t s_iMethod = 5;
             PubKey m_pkArtist;
             uint32_t m_LabelLen;
             uint32_t m_DataLen;
@@ -313,14 +313,14 @@ namespace Gallery {
         };
 
         struct SetArtistStatus {
-            static const uint32_t s_iMethod = 17;
+            static const uint32_t s_iMethod = 6;
             Status status;
             PubKey signer;
             PubKey m_pkArtist;
         };
 
         struct SetCollectionStatus {
-            static const uint32_t s_iMethod = 15;
+            static const uint32_t s_iMethod = 7;
             Status status;
             PubKey signer;
             PubKey m_pkArtist;
@@ -328,7 +328,7 @@ namespace Gallery {
         };
 
         struct SetCollection {
-            static const uint32_t s_iMethod = 18;
+            static const uint32_t s_iMethod = 8;
             PubKey m_pkArtist;
             Collection::Id collection_id;
             uint32_t m_LabelLen;
@@ -336,7 +336,7 @@ namespace Gallery {
             // followed by label and data without delimiter
         };
         struct SetArtwork {
-            static const uint32_t s_iMethod = 3;
+            static const uint32_t s_iMethod = 9;
             PubKey m_pkArtist;
             uint32_t data_len;
             uint32_t label_len;
@@ -346,21 +346,21 @@ namespace Gallery {
         };
 
         struct SetArtworkStatus {
-            static const uint32_t s_iMethod = 19;
+            static const uint32_t s_iMethod = 10;
             PubKey signer;
             uint32_t artwork_id;
             Status status;
         };
 
         struct SetPrice {
-            static const uint32_t s_iMethod = 4;
+            static const uint32_t s_iMethod = 11;
 
             Artwork::Id m_ID;
             AmountWithAsset m_Price;
         };
 
         struct Buy {
-            static const uint32_t s_iMethod = 5;
+            static const uint32_t s_iMethod = 12;
 
             Artwork::Id m_ID;
             PubKey m_pkUser;
@@ -369,39 +369,39 @@ namespace Gallery {
         };
 
         struct Withdraw {
-            static const uint32_t s_iMethod = 6;
+            static const uint32_t s_iMethod = 13;
 
             Payout::Key m_Key;
             Amount m_Value;
         };
 
         struct CheckPrepare {
-            static const uint32_t s_iMethod = 7;
+            static const uint32_t s_iMethod = 14;
 
             Artwork::Id m_ID;
         };
 
         struct CheckOut {
-            static const uint32_t s_iMethod = 8;
+            static const uint32_t s_iMethod = 15;
 
             Artwork::Id m_ID;
         };
 
         struct CheckIn {
-            static const uint32_t s_iMethod = 9;
+            static const uint32_t s_iMethod = 16;
 
             Artwork::Id m_ID;
             PubKey m_pkUser;
         };
 
         struct Vote {
-            static const uint32_t s_iMethod = 11;
+            static const uint32_t s_iMethod = 17;
             Impression::Id m_ID;
             Impression m_Impression;
         };
 
         struct AddVoteRewards {
-            static const uint32_t s_iMethod = 12;
+            static const uint32_t s_iMethod = 18;
             Amount m_Amount;
         };
 
@@ -412,7 +412,7 @@ namespace Gallery {
         */
 
         struct Transfer {
-            static const uint32_t s_iMethod = 14;
+            static const uint32_t s_iMethod = 19;
             Artwork::Id m_ID;
             PubKey m_pkNewOwner;
         };
