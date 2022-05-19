@@ -67,21 +67,14 @@
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
 
-//#define Gallery_manager_admin_delete(macro) \
-    //macro(ContractID, cid) \
-    //macro(Gallery::Artwork::Id, id)
-
 #define Gallery_manager_set_artwork_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
 
 #define Gallery_manager_set_collection_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Collection::Id, id) \
 
 #define Gallery_manager_set_artist_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artist::Id, id) \
 
 #define GalleryRole_manager(macro) \
     macro(manager, view) \
@@ -103,21 +96,17 @@
     macro(manager, set_artwork_status) \
     macro(manager, set_artist_status) \
     macro(manager, set_collection_status) \
-    //macro(manager, admin_delete) \
 
 // MODERATOR
 
 #define Gallery_moderator_set_artwork_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
 
 #define Gallery_moderator_set_collection_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Collection::Id, id) \
 
 #define Gallery_moderator_set_artist_status(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artist::Id, id) \
 
 #define Gallery_moderator_set_fee_base(macro) \
     macro(ContractID, cid) \
@@ -131,7 +120,6 @@
 
 // ARTIST
 
-#define Gallery_artist_view(macro) macro(ContractID, cid)
 #define Gallery_artist_get_id(macro) macro(ContractID, cid)
 
 #define Gallery_artist_set_artist(macro) \
@@ -148,7 +136,6 @@
     macro(AssetID, aid)
 
 #define GalleryRole_artist(macro) \
-    macro(artist, view) \
     macro(artist, get_id) \
     macro(artist, set_artwork) \
     macro(artist, set_artist) \
@@ -1116,19 +1103,6 @@ ON_METHOD(artist, set_artwork) {
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 25000000 + s.fee_base / 10);
 }
 
-/*
-ON_METHOD(manager, admin_delete)
-{
-    auto id_ = Utils::FromBE(id);
-
-    Gallery::Method::AdminDelete args;
-    args.m_ID = id_;
-
-    KeyMaterial::MyAdminKey kid;
-    Env::GenerateKernel(&cid, args.s_iMethod, &args, sizeof(args), nullptr, 0, &kid, 1, "Delete artwork", 0);
-}
-*/
-
 ON_METHOD(manager, add_rewards) {
     StatePlus s;
     if (!s.Init(cid))
@@ -1509,14 +1483,6 @@ ON_METHOD(artist, set_collection) {
     s.Init(cid);
 
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d.args, nArgSize, nullptr, 0, &sig, 1, "Set collection", 25000000 + (id ? 0 : s.fee_base / 10));
-}
-
-ON_METHOD(artist, view) {
-    using HeightArtistIdx = 
-        Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>;
-
-    GalleryObjectPrinter<MyArtist, HeightArtistIdx> a{cid};
-    a.Print(MyArtist::id(cid));
 }
 
 ON_METHOD(artist, get_id) {

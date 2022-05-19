@@ -63,7 +63,6 @@ namespace Gallery {
                 k.id = id;
             else
                 k.id = Utils::FromBE(id); 
-
             return Env::LoadVar(&k, sizeof(k), this, object_size, KeyTag::Internal);
         }
 
@@ -141,8 +140,6 @@ namespace Gallery {
             uint32_t artwork_id;
         } min_sold;
         
-        //Id id;
-
         // followed by label and data without delimiter
         static const uint32_t s_LabelMaxLen = 10 * 1024;
         static const uint32_t s_DataMaxLen = 10 * 1024;
@@ -175,12 +172,10 @@ namespace Gallery {
             Artwork::Id m_ArtworkID;
             PubKey m_pkUser;
         };
-
         struct Key {
             Tag tag = Tag::kImpression;
             Id m_ID;
         };
-
         uint32_t m_Value; // 0 = none, 1 = like, etc.
     };
 
@@ -191,7 +186,6 @@ namespace Gallery {
             AssetID m_Aid;
             Artwork::Id m_ID;
         };
-
         Amount m_Amount;
     };
 
@@ -202,15 +196,12 @@ namespace Gallery {
 
     struct State {
         static const uint8_t s_Key = 0;
-
         Config m_Config;
-
         uint32_t total_artworks;
         uint32_t total_collections;
         uint32_t total_artists;
         uint32_t total_moderators;
         Amount fee_base;
-
         Amount m_VoteBalance;
     };
 
@@ -238,7 +229,6 @@ namespace Gallery {
                 uint8_t m_Prefix = 1;
                 Artwork::Id m_ID;
             };
-
             AmountWithAsset m_Price;
             uint8_t m_HasAid;
         };
@@ -339,6 +329,7 @@ namespace Gallery {
             uint32_t m_DataLen;
             // followed by label and data without delimiter
         };
+
         struct SetArtwork {
             static const uint32_t s_iMethod = 9;
             PubKey m_pkArtist;
@@ -360,14 +351,12 @@ namespace Gallery {
 
         struct SetPrice {
             static const uint32_t s_iMethod = 11;
-
             Artwork::Id m_ID;
             AmountWithAsset m_Price;
         };
 
         struct Buy {
             static const uint32_t s_iMethod = 12;
-
             Artwork::Id m_ID;
             PubKey m_pkUser;
             uint8_t m_HasAid;
@@ -376,26 +365,22 @@ namespace Gallery {
 
         struct Withdraw {
             static const uint32_t s_iMethod = 13;
-
             Payout::Key m_Key;
             Amount m_Value;
         };
 
         struct CheckPrepare {
             static const uint32_t s_iMethod = 14;
-
             Artwork::Id m_ID;
         };
 
         struct CheckOut {
             static const uint32_t s_iMethod = 15;
-
             Artwork::Id m_ID;
         };
 
         struct CheckIn {
             static const uint32_t s_iMethod = 16;
-
             Artwork::Id m_ID;
             PubKey m_pkUser;
         };
@@ -411,19 +396,11 @@ namespace Gallery {
             Amount m_Amount;
         };
 
-        /*struct AdminDelete {
-            static const uint32_t s_iMethod = 13;
-            Artwork::Id m_ID;
-        };
-        */
-
         struct Transfer {
             static const uint32_t s_iMethod = 19;
             Artwork::Id m_ID;
             PubKey m_pkNewOwner;
         };
-
     } // namespace Method
-
 #pragma pack (pop)
 }

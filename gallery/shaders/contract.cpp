@@ -532,22 +532,6 @@ BEAM_EXPORT void Method_18(const Gallery::Method::AddVoteRewards& r) {
     Env::FundsLock(s.m_Config.m_VoteReward.m_Aid, r.m_Amount);
 }
 
-/*BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r) {
-    // ensure the masterpiece doesn't have aid
-    Gallery::Artwork m;
-    Env::Halt_if(!m.Load(r.m_ID));
-
-    Env::Halt_if(m.m_Aid);
-
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
-        ::Delete(m.updated, r.m_ID);
-    m.Delete(r.m_ID);
-
-    MyState s;
-    s.AddSigAdmin();
-}
-*/
-
 BEAM_EXPORT void Method_19(const Gallery::Method::Transfer& r) {
     Gallery::Artwork m;
     Env::Halt_if(!m.Load(r.m_ID));
