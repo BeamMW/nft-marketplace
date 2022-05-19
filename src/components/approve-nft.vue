@@ -11,7 +11,7 @@
         <div v-if="item.description" class="value">{{ item.description }}</div>
       </div>
       <imagePreivew :image="item.image" 
-                    :default="def_artwork"
+                    :default="def_nft"
                     radius="10px"
                     width="200px"
                     height="200px"
@@ -78,7 +78,7 @@ export default {
 
   data () {
     return {
-      def_artwork: def_images.artwork,
+      def_nft: def_images.nft,
     }
   },
 }

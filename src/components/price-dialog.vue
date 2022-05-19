@@ -100,7 +100,7 @@ export default {
   }, 
   
   emits:[
-    'sell-artwork'
+    'sell-nft'
   ],
 
   data() {  
@@ -151,7 +151,7 @@ export default {
         return
       }
       let price = parseFloat(this.price) * common.GROTHS_IN_BEAM
-      this.$emit('sell-artwork',price)
+      this.$emit('sell-nft',price)
       this.close()
     },
 

@@ -1,25 +1,25 @@
 <template>
-  <div id="container" class="artwork-details-container">
+  <div id="container" class="nft-details-container">
     <pageTitle/>
-    <loading v-if="artwork === undefined" text="Loading NFT"/>
-    <notFound v-else-if="artwork == null" text="NFT Not Found"/>
+    <loading v-if="nft === undefined" text="Loading NFT"/>
+    <notFound v-else-if="nft == null" text="NFT Not Found"/>
     <div v-else class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
-        <div class="artwork-container">
+        <div class="nft-container">
           <div>
             <preview :image="image" 
-                     :default="def_artwork" 
+                     :default="def_nft" 
                      :cover="!(image || {}).object"
                      height="360px" 
                      radius="0"
             >
-              <moderationStatus :item="artwork"/>
+              <moderationStatus :item="nft"/>
             </preview>
           </div>
         </div>
         <div class="info-container">
           <div class="info-box">
-            <div class="title" :class="{'error': error}">{{ title }}</div>
+            <div class="title" :class="{'error': error}">{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}</div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
             <div class="bottom">
               <div class="separator"/>
@@ -27,7 +27,7 @@
               <!-- TODO: make collection clickable and navigate to it on click -->
               <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }}</span></div>
               <div class="separator"/>
-              <artPrice :artwork="artwork"/>
+              <artPrice :nft="nft"/>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@
 </template>
 
 <style scoped lang="stylus">
-  .artwork-details-container {
+  .nft-details-container {
     display: flex
     flex-direction: column
     box-sizing: border-box
@@ -204,8 +204,8 @@
           border-top: solid 1px #fff
         }
 
-        & .artwork-container {
-          flex: 0 0 50%
+        & .nft-container {
+          width: 370px
           box-sizing: border-box
           max-width: 50%
           padding-right: 10px
@@ -219,10 +219,9 @@
         }
 
         & .info-container {
-          flex: 0 0 50%
+          flex: 1
           box-sizing: border-box
           padding-left: 10px
-          max-width: 50%
           
           & .info-box {
             background-color: rgba(255, 255, 255, 0.05)
@@ -291,12 +290,12 @@
 </style>
 
 <script>
-import artPrice from './artwork-price'
+import artPrice from './nft-price'
 import preview from './image-preview'
 import loading from './loading'
 import notFound from './not-found'
 import artistsStore from 'stores/artists'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
@@ -330,9 +329,9 @@ export default {
   },
 
   setup(props) {
-    let artworkObservable = computed(() => useObservable(artsStore.getLazyItem('manager', props.id)))
-    let artwork = computed(() => {
-      let result = artworkObservable.value.value
+    let nftObservable = computed(() => useObservable(nftsStore.getLazyItem('manager', props.id)))
+    let nft = computed(() => {
+      let result = nftObservable.value.value
       if (!result) {
         return result
       }
@@ -340,9 +339,9 @@ export default {
     })
 
     let collObservable = computed(() => {
-      if (!artwork.value) return new Observable(subscriber => subscriber.next(artwork.value))
-      if (!artwork.value.collection) return new Observable(subscriber => subscriber(null))
-      return useObservable(collsStore.getLazyItem('manager', artwork.value.collection))
+      if (!nft.value) return new Observable(subscriber => subscriber.next(nft.value))
+      if (!nft.value.collection) return new Observable(subscriber => subscriber(null))
+      return useObservable(collsStore.getLazyItem('manager', nft.value.collection))
     })  
      
     let collection = computed(() => {
@@ -354,7 +353,7 @@ export default {
     })
     
     return {
-      artwork,
+      nft,
       collection
     }
   },
@@ -362,25 +361,25 @@ export default {
   data () {
     return {
       sales: undefined,
-      def_artwork: def_images.artwork
+      def_nft: def_images.nft
     }
   },
 
   computed: {
     error () {
-      return !!this.artwork.error
+      return !!this.nft.error
     },
     
     title () {
-      return this.artwork.label
+      return this.nft.label
     },
 
     description () {
-      return this.artwork.description
+      return this.nft.description
     },
 
     author_name () {
-      return this.artwork.author_name
+      return this.nft.author_name
     },
 
     collection_name() {
@@ -394,7 +393,7 @@ export default {
     },
 
     image () {
-      return this.artwork.image
+      return this.nft.image
     },
 
     artists () {
@@ -404,7 +403,7 @@ export default {
   
   created() {
     (async () => {
-      this.sales = await artsStore.getSales(this.id)
+      this.sales = await nftsStore.getSales(this.id)
     })()
   },
 

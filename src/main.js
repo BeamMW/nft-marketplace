@@ -7,7 +7,7 @@ import utils from './utils/utils.js'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'
 
 import store from './stores/global.js'
-import artwork from './components/artwork.vue'
+import nft from './components/nft'
 import collection from './components/collection.vue'
 import createCollection from './components/create-collection'
 import approveCollection from './components/approve-collection'
@@ -29,7 +29,7 @@ utils.initialize(
       // TODO error context
       store.setError(err)
     }
-    vueApp.component('artwork', artwork)
+    vueApp.component('nft', nft)
     vueApp.component('collection', collection)
     vueApp.component('create-collection', createCollection)
     vueApp.component('approve-collection', approveCollection)

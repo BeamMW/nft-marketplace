@@ -6,7 +6,7 @@ import router from 'router'
 import imagesStore from 'stores/images'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import Database from 'stores/database'
 
 function defaultState() {
@@ -25,8 +25,7 @@ function defaultState() {
     balance_beam: 0,
     balance_reward: 0,
     is_headless: false,
-    debug: true,
-    approve_tx: undefined
+    debug: true
   }
   
   return state
@@ -36,7 +35,7 @@ function appstate() {
   let state = reactive({
     ...defaultState(),
     total_pages: computed(() => {
-      let total = state.artworks.length
+      let total = state.nfts.length
       return total ? Math.ceil(total / common.ITEMS_PER_PAGE) : 1
     })
   })
@@ -88,13 +87,13 @@ const store = {
     this._database = new Database()
     await this._database.initAsync({
       ...collsStore.getDBStores(),
-      ...artsStore.getDBStores()
+      ...nftsStore.getDBStores()
     })
 
     //
     // Reset stores
     //
-    artsStore.reset(this, this._database)
+    nftsStore.reset(this, this._database)
     collsStore.reset(this, this._database)
     artistsStore.reset(this, this._database)
     imagesStore.reset(this, this._database)
@@ -203,10 +202,10 @@ const store = {
     await collsStore.loadAsync()
   
     if (this.state.loading) {
-      this.state.loading = 'Loading Artworks'
+      this.state.loading = 'Loading NFTs'
     }
 
-    await artsStore.loadAsync()
+    await nftsStore.loadAsync()
 
     if (this.state.loading) { 
       this.state.loading = false
@@ -228,37 +227,28 @@ const store = {
     )
   },
 
-  async approveArtworks(aids, approve) {
-    this.state.approve_tx = await utils.invokeContractAsyncAndMakeTx({
+  async approveNFTs(ids, approve) {
+    return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
-      action: 'set_artwork',
-      id: aids[0],
+      action: 'set_nft',
+      id: ids[0],
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
+  },
 
-    if (!this.state.approve_tx) {
-      return
-    }
-
-    let interval = setInterval(async () => {
-      try {
-        let {res} = await utils.callApiAsync('tx_status', {txId: this.state.approve_tx})
-        if ([0, 1, 5].indexOf(res.status) == -1) {
-          clearInterval(interval)
-          this.state.approve_tx = undefined
-        }
-      }
-      catch(err) {
-        // TODO: check if error is caught
-        this.state.approve_tx = ''
-        this.global.setError(err)
-      }
-    }, 1000)
+  async approveCollections(ids, approve) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'moderator',
+      action: 'set_collection',
+      id: ids[0],
+      status: approve ? 'approved' : 'rejected',
+      cid: this.state.cid
+    })
   },
 
   //
-  // Artwork actions, Buy, Sell, Like &c.
+  // NFT actions, Buy, Sell, Like &c.
   //
   onMakeTx (err, sres, full) {
     if (err) {
@@ -295,114 +285,6 @@ const store = {
       `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
       (...args) => this.onMakeTx(...args)
     )
-  },
-
-  showStats() {
-    /*
-    let total = this.state.all_artworks[tabs.ALL].length
-    let left  = total
-
-    for (let idx = 0; idx < total; ++idx) {
-      let curridx = idx
-      let currid  = this.state.all_artworks[tabs.ALL][curridx].id
-      utils.invokeContract(`role=user,action=view_item,cid=${this.state.cid},id=${currid}`, 
-        (err, res) => {
-          if (err) {
-            return this.setError(err)
-          }
-
-          if (res.sales.length) {
-            let artwork = this.state.all_artworks[tabs.ALL][curridx]
-            artwork.sales = res.sales
-          } 
-                    
-          if (--left == 0) {
-            // this is the last artwork
-            this.__showStats()
-          }
-        }
-      )
-    }
-    */
-  },
-
-  __showStats() {
-    /*
-    const cnt_stats = 12
-    let artworks = this.state.all_artworks[tabs.ALL]
-    let artists = artistsStore.artists
-
-    let likes = [], likes_total = 0
-    let sales = [], tvb = 0
-
-    let likes_compare = (l1, l2) => l2.impressions - l1.impressions
-    let sells_compare = (s1, s2) => s2.amount - s1.amount
-
-    for (let idx = 0; idx < artworks.length; idx++) {
-      let artwork = artworks[idx]
-            
-      likes.push({idx, impressions: artwork.impressions})
-      likes_total += artwork.impressions
-
-      likes.sort(likes_compare)
-      if (likes.length > cnt_stats) {
-        likes.pop()
-      }
-
-      if (artwork.sales) {
-        let max_this = 0
-        for (let sale of artwork.sales) {
-          tvb += sale.amount
-          if (sale.amount > max_this) max_this = sale.amount
-        }
-
-        sales.push({
-          idx, 
-          amount: max_this
-        })
-
-        sales.sort(sells_compare)
-        if (sales.length > cnt_stats) {
-          sales.pop()
-        }
-      }
-    }
-        
-    let formatter = function (arr, title, extra) {
-      let result = [title, '\n'].join('')
-      let cntr = 1
-
-      for (let data of arr) {
-        let artwork = artworks[data.idx]
-        let eres = extra ? extra(artwork, data) : []
-        result = [
-          result, '\n  ', cntr, '. "', 
-          artwork.title, '" by "', (artists[artwork.pk_author] || {}).label,
-          '" id ', data.idx + 1
-        ].join('')
-
-        if (eres.length) {
-          result = [result, ', ', ...eres].join('')
-        }         
-
-        cntr++
-      }
-
-      return result
-    }
-
-    let sliked = formatter(likes, 'Most liked:', (artwork) => [artwork.impressions, 'likes'].join(' '))
-    let slikes = ['Total likes: ', likes_total].join('')
-    let ssold  = formatter(sales, 'Top sales (one per artwork):', (artwork, data) => {
-      let price = data.amount
-      return [price / common.GROTHS_IN_BEAM, ' BEAM'].join('')
-    })
-    let stvb   = ['Total value of sales: ', tvb / common.GROTHS_IN_BEAM, ' BEAM'].join('')
-    let snum   = ['Total artworks: ', artworks.length].join('')
-
-    let message = [sliked, slikes, ssold, stvb, snum].join('\n\n')
-    alert(message)
-    */
   },
 
   async switchToHeaded () {

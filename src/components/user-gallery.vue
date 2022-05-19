@@ -38,9 +38,23 @@
     <list v-if="show_nfts"
           class="list"
           items_name="NFTs"
-          component="artwork"
+          component="nft"
           mode="user"
-          :store="artsStore"
+          :store="nftsStore"
+    />
+    <list v-if="show_sale"
+          class="list"
+          items_name="NFTs om sale"
+          component="nft"
+          mode="user:sale"
+          :store="nftsStore"
+    />
+    <list v-if="show_liked"
+          class="list"
+          items_name="liked NFTs"
+          component="nft"
+          mode="user:liked"
+          :store="nftsStore"
     />
   </div>
 </template>
@@ -92,7 +106,7 @@ import btnKey from './btn-key'
 import btnWallet from './btn-wallet'
 import btnProfile from './btn-profile'
 import list from './items-list.vue'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
 
 export default {
@@ -110,6 +124,8 @@ export default {
       tabs: [
         {id: user_tabs.COLLECTIONS, name: 'Collections'},
         {id: user_tabs.NFTS, name: 'NFTs'},
+        {id: user_tabs.SALE_NFTS, name: 'On Sale'},
+        {id: user_tabs.LIKED_NFTS, name: 'Liked'},
       ],
       search: '',
       selector_options: [
@@ -154,8 +170,14 @@ export default {
     show_nfts () {
       return this.$state.user_active_tab == user_tabs.NFTS
     },
-    artsStore () {
-      return artsStore
+    show_sale () {
+      return this.$state.user_active_tab == user_tabs.SALE_NFTS
+    },
+    show_liked () {
+      return this.$state.user_active_tab == user_tabs.LIKED_NFTS
+    },
+    nftsStore () {
+      return nftsStore
     },
     collsStore () {
       return collsStore

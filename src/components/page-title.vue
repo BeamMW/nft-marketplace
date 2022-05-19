@@ -15,6 +15,7 @@
     flex-flow: row
     justify-content: center
     align-items: center
+    user-select: none
 
     & > * {
       flex-grow: 1

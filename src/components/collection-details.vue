@@ -33,8 +33,8 @@
           </div>
           <div class="stats">
             <div>
-              <div class="value">{{ artworks_count }}</div>
-              <span>{{ artworks_count == 1 ? 'NFT' : 'NFTs' }}</span>
+              <div class="value">{{ nfts_count }}</div>
+              <span>{{ nfts_count == 1 ? 'NFT' : 'NFTs' }}</span>
             </div>
             <div>
               <div>
@@ -84,26 +84,26 @@
     <list v-if="show_all"
           class="list"
           items_name="NFTs"
-          component="artwork"
+          component="nft"
           :new_component="owned ? 'create-nft' : ''"
           :mode="`artist:collection:${id}`"
-          :store="artsStore"
+          :store="nftsStore"
     />
     <list v-if="show_sale"
           class="list"
           items_name="NFTs"
-          component="artwork"
+          component="nft"
           :new_component="owned ? 'create-nft' : ''"
           :mode="`artist:collection:sale:${id}`"
-          :store="artsStore"
+          :store="nftsStore"
     />
     <list v-if="show_liked"
           class="list"
           items_name="NFTs"
-          component="artwork"
+          component="nft"
           :new_component="owned ? 'create-nft' : ''"
           :mode="`artist:collection:liked:${id}`"
-          :store="artsStore"
+          :store="nftsStore"
     />
   </div>
 </template>
@@ -271,7 +271,7 @@ import btn from './button'
 import tabsctrl from './tabs'
 import imagePreview from './image-preview.vue'
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import loading from './loading'
 import notFound from './not-found'
 import list from './items-list'
@@ -367,7 +367,7 @@ export default {
     description() {
       return this.collection.description
     },
-    artworks_count() {
+    nfts_count() {
       return this.collection.artworks_count
     },
     min_price() {
@@ -395,8 +395,8 @@ export default {
     show_liked() {
       return this.active_tab === coll_tabs.LIKED_NFTS
     },
-    artsStore() {
-      return artsStore
+    nftsStore() {
+      return nftsStore
     },
   },
 

@@ -6,7 +6,9 @@ export const common = {
 
 export const user_tabs = {
   COLLECTIONS: 0,
-  NFTS: 1
+  NFTS: 1,
+  SALE_NFTS: 2,
+  LIKED_NFTS: 3,
 }
 
 export const admin_tabs = {
@@ -44,5 +46,5 @@ export const contract = {
 export const def_images = {
   artist_avatar: '/assets/artist-default-avatar.svg',
   artist_banner: '/assets/artist-default-banner.svg',
-  artwork: '/assets/artwork-default.svg'
+  nft: '/assets/nft-default.svg'
 }

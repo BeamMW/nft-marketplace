@@ -18,31 +18,31 @@
       <list v-if="show_owned"
             class="list"
             items_name="NFTs"
-            component="artwork"
+            component="nft"
             mode="owner"
             :new_component="is_artist? 'create-nft' : ''"
-            :store="artsStore"
+            :store="nftsStore"
       />
       <list v-if="show_sale"
             class="list"
             items_name="on sale NFTs"
-            component="artwork"
+            component="nft"
             mode="owner:sale"
-            :store="artsStore"
+            :store="nftsStore"
       />
       <list v-if="show_sold"
             class="list"
             items_name="sold NFTs"
-            component="artwork"
+            component="nft"
             mode="artist:sold"
-            :store="artsStore"
+            :store="nftsStore"
       />
       <list v-if="show_liked"
             class="list"
             items_name="liked NFTs"
-            component="artwork"
+            component="nft"
             mode="liker:liked"
-            :store="artsStore"
+            :store="nftsStore"
       />
     </div>
   </div>
@@ -77,7 +77,7 @@ import btnWallet from './btn-wallet'
 import btnEditArtist from './btn-edit-artist'
 import btnKey from './btn-key'
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
 import {my_tabs} from 'utils/consts.js'
 import tabsctrl from './tabs.vue'
@@ -105,8 +105,8 @@ export default {
     collsStore() {
       return collsStore
     },
-    artsStore() {
-      return artsStore
+    nftsStore() {
+      return nftsStore
     },
     is_artist() {
       return artistsStore.is_artist

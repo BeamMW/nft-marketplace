@@ -23,9 +23,9 @@
             component="approve-nft"
             mode="moderator"
             selectable
-            :store="artsStore"
-            :selected="selected_artworks"
-            @selected="onArtworkSelected"
+            :store="nftsStore"
+            :selected="selected_nfts"
+            @selected="onNFTSelected"
       />
       <div class="buttons">
         <btn text="cancel" 
@@ -96,7 +96,7 @@ import btnProfile from './btn-profile'
 import {admin_tabs} from 'utils/consts'
 import list from './items-list.vue'
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import btn from './button.vue'
 
 export default {
@@ -116,7 +116,7 @@ export default {
         {id: admin_tabs.COLLECTIONS, name: 'Collections'},
         {id: admin_tabs.NFTS, name: 'NFTs'}
       ],
-      selected_artworks: [],
+      selected_nfts: [],
       selected_collections: []
     }
   },
@@ -142,17 +142,17 @@ export default {
     collsStore() {
       return collsStore
     },
-    artsStore() {
-      return artsStore
+    nftsStore() {
+      return nftsStore
     },
     active_selected() {
-      return this.show_collections ? this.selected_collections : this.selected_artworks
+      return this.show_collections ? this.selected_collections : this.selected_nfts
     },
     any_selected() {
       return this.active_selected.length > 0
     },
     active_approve() {
-      return this.show_collections ? this.$store.approveCollections : this.$store.approveArtworks
+      return this.show_collections ? this.$store.approveCollections : this.$store.approveNFTs
     }
   },
 
@@ -164,11 +164,11 @@ export default {
         this.selected_collections.push(id)
       }
     },
-    onArtworkSelected(id) {
-      if (this.selected_artworks.includes(id)) {
-        this.selected_artworks = this.selected_artworks.filter(item => item != id)
+    onNFTSelected(id) {
+      if (this.selected_nfts.includes(id)) {
+        this.selected_nfts = this.selected_nfts.filter(item => item != id)
       } else {
-        this.selected_artworks.push(id)
+        this.selected_nfts.push(id)
       }
     },
     onCancel() {

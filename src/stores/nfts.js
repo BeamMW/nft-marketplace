@@ -11,12 +11,12 @@ import {useObservable} from '@vueuse/rxjs'
 
 // TODO: modes a:b:c -> make c rely on loader of a and b
 // TODO: the same in LazyItems
-class ArtworksStore extends LazyItems {
+class NFTSStore extends LazyItems {
   constructor () {
     super({
       objname: 'artwork', 
-      versions: [versions.ARTWORK_VERSION],
-      dbKeys: 'collection, my_impression, [owned+price.amount]'
+      versions: [versions.NFT_VERSION],
+      dbKeys: 'collection, my_impression, [owned+sale], [liked+status], [status+sale]'
     })
     
     this._current_coll_mode = undefined
@@ -154,7 +154,7 @@ class ArtworksStore extends LazyItems {
     data.image = await imagesStore.toContract(data.image)
     return {
       label: formats.toContract(label),
-      data: formats.toContract(versions.ARTWORK_VERSION, data)
+      data: formats.toContract(versions.NFT_VERSION, data)
     }
   }
 
@@ -190,7 +190,7 @@ class ArtworksStore extends LazyItems {
     }
   }
 
-  async buyArtwork (id) {
+  async buyNFT (id) {
     try {
       return await utils.invokeContractAsyncAndMakeTx({
         role: 'user',
@@ -217,7 +217,7 @@ class ArtworksStore extends LazyItems {
     }
   }
 
-  async likeArtwork(id) {
+  async likeNFT(id) {
     try {
       await utils.invokeContractAsyncAndMakeTx({
         role: 'user',
@@ -231,7 +231,7 @@ class ArtworksStore extends LazyItems {
     }
   }
 
-  async unlikeArtwork(id) {
+  async unlikeNFT(id) {
     try {
       await utils.invokeContractAsyncAndMakeTx({
         role: 'user',
@@ -245,7 +245,8 @@ class ArtworksStore extends LazyItems {
     }
   }
 
-  async deleteArtwork (id) {
+  // TODO: change to status:rejected
+  async deleteNFT (id) {
     try {
       await utils.invokeContractAsyncAndMakeTx({
         role: 'manager',
@@ -265,5 +266,5 @@ class ArtworksStore extends LazyItems {
   }
 }
 
-let artworksStore = new ArtworksStore()
-export default artworksStore
+let nftsStore = new NFTSStore()
+export default nftsStore

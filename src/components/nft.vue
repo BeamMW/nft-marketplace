@@ -1,9 +1,9 @@
 <template>
-  <div :class="{'artwork': true, 'error': item.error}">
+  <div :class="{'nft': true, 'error': item.error}">
     <!---- Preview OR Loading ---->
     <preview :image="item.image" 
-             :default="def_artwork"
-             height="200px" 
+             :default="def_nft"
+             height="213px" 
              text_color="dimgray"
              :cover="!(item.image || {}).object"
              @click="onDetails"
@@ -15,7 +15,7 @@
       </div>
     </preview>
     
-    <!---- Delete Artwork Button ---->
+    <!---- Delete NFT Button ---->
     <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
 
     <!---- First info row ---->
@@ -31,13 +31,13 @@
 
     <!---- Third info row, price/buy/sell ----->
     <div class="price-row">
-      <price :artwork="item" mode="compact"/>
+      <price :nft="item" mode="compact"/>
     </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
-  .artwork {
+  .nft {
     display: flex
     flex-direction: column
     width: 213px
@@ -115,9 +115,9 @@
 </style>
 
 <script>
-import price from './artwork-price'
+import price from './nft-price'
 import preview from './image-preview'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import {def_images} from 'utils/consts'
 import moderationStatus from './moderation-status'
 
@@ -137,7 +137,7 @@ export default {
 
   data () {
     return {
-      def_artwork: def_images.artwork,
+      def_nft: def_images.nft,
     }
   },
 
@@ -178,7 +178,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        artsStore.likeArtwork(this.id)
+        nftsStore.likeNFT(this.id)
       }
 
       ev.stopPropagation()
@@ -191,7 +191,7 @@ export default {
       } 
 
       if (this.can_vote) {
-        artsStore.unlikeArtwork(this.id)
+        nftsStore.unlikeNFT(this.id)
       }
 
       ev.stopPropagation()
@@ -199,11 +199,11 @@ export default {
     },
 
     onDelete (id) {
-      this.$store.deleteArtwork(this.id)
+      this.$store.deleteNFT(this.id)
     },
 
     onDetails(ev) {
-      artsStore.toDetails(this.id)
+      nftsStore.toDetails(this.id)
     }
   }
 }

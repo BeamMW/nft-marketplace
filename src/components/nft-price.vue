@@ -1,5 +1,5 @@
 <template>
-  <artworkPriceModal ref="priceModal" @sell-artwork="onSellArtwork"/>
+  <nftPriceModal ref="priceModal" @sell-nft="onSellNFT"/>
   <!--- has price, so display it --->
   <span v-if="price" class="price-container">
     <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
@@ -102,21 +102,21 @@
 <script>
 import btn from './button.vue'
 import popupMenu from './popup-menu.vue'
-import artworkPriceModal from './price-dialog.vue'
+import nftPriceModal from './price-dialog.vue'
 import amount from './amount.vue'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
 
 export default {
   components: {
     btn,
     popupMenu,
-    artworkPriceModal,
+    nftPriceModal,
     amount
   },
 
   props: {
-    artwork: {
+    nft: {
       type: Object,
       required: true,
     },
@@ -132,11 +132,11 @@ export default {
     },
 
     id() {
-      return this.artwork.id
+      return this.nft.id
     },
 
     owned() {
-      return this.artwork.owned
+      return this.nft.owned
     },
 
     author () {
@@ -144,7 +144,7 @@ export default {
     },
 
     price () {
-      return this.artwork.price
+      return this.nft.price
     },
 
     compact() {
@@ -165,17 +165,17 @@ export default {
       this.$refs.priceModal.open()
     },
 
-    onSellArtwork (price) {
-      artsStore.setPrice(this.id, price)
+    onSellNFT (price) {
+      nftsStore.setPrice(this.id, price)
     },
 
     onRemoveFromSale () {
-      artsStore.setPrice(this.id, 0)
+      nftsStore.setPrice(this.id, 0)
     },
 
     onBuy () {
       if (this.is_headless) return this.$store.switchToHeaded()
-      artsStore.buyArtwork(this.id)
+      nftsStore.buyNFT(this.id)
     }
   }
 }

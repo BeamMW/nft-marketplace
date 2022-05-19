@@ -26,11 +26,25 @@ export default class ItemsStore {
       artist_key: undefined
     })
 
-    // TODO: move artwork-specific loaders to artworks. For example all with likes
+    // TODO: move nft-specific loaders to nfts store. For example all with likes
     this._allocMode('user', (store) => {
       console.log(`loader for user:${this._store_name}`)
       return store.where('status')
         .equals('approved')
+    })
+
+    this._allocMode('user:liked', (store) => {
+      console.log(`loader for user:liked:${this._store_name}`)
+      return store
+        .where(['liked', 'status'])
+        .equals([1, 'approved'])
+    })
+
+    this._allocMode('user:sale', (store) => {
+      console.log(`loader for user:liked:${this._store_name}`)
+      return store
+        .where(['status', 'sale'])
+        .equals(['approved', 1])
     })
     
     this._allocMode('moderator', (store) => {
@@ -55,8 +69,8 @@ export default class ItemsStore {
     this._allocMode('owner:sale', (store) => {
       console.log(`loader for owner:sale:${this._store_name}`)
       return store
-        .where(['owned', 'price.amount'])
-        .above([0, 0])
+        .where(['owned', 'sale'])
+        .equals([1, 1])
     })
 
     this._allocMode('artist:sold', (store, mykey) => {
@@ -190,6 +204,7 @@ export default class ItemsStore {
     utils.ensureField(res, 'items', 'array')
    
     let approved = 0
+    let approved_liked = 0
     let pending = 0
     let rejected = 0
     let artist = 0
@@ -197,6 +212,10 @@ export default class ItemsStore {
     let liked = 0
 
     for(let item of res.items) {
+      let original = item
+      original.liked = item.impressions ? 1 : 0
+      original.sale  = (item.price || {}).amount > 0 ? 1 : 0
+
       try {
         [item.label] = formats.fromContract(item.label)
         if (!item.label) {
@@ -227,6 +246,11 @@ export default class ItemsStore {
 
       if (item.status === 'approved') {
         approved++
+
+        if (item.impressions) {
+          approved_liked++
+          
+        }
       }
 
       if (item.status === 'pending') {
@@ -262,6 +286,7 @@ export default class ItemsStore {
     })
 
     this._getMode('user').total = approved
+    this._getMode('user:liked').total = approved_liked
     this._getMode('artist').total = artist
     this._getMode('owner').total = owned
     this._getMode('moderator').total = pending

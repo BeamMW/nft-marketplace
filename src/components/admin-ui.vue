@@ -2,7 +2,7 @@
   <div class="admin-column">
     <div class="admin-row">
       <input type="button" value="Add new artist" @click="onAddArtist"/>
-      <span v-if="!artists_count">Add artists to upload artworks</span>
+      <span v-if="!artists_count">Add artists to upload nfts</span>
       <span v-else>
         <span>Upload for artist:&nbsp;&nbsp;</span>
         <select v-model="$state.selected_artist" class="upload_artist">
@@ -13,7 +13,7 @@
         &nbsp;&nbsp;
         <input type="file" multiple accept="image/*"      
                :disabled="!$state.selected_artist"
-               @change="onUploadArtwork"
+               @change="onUploadNFT"
                @click="value=null"
         />
       </span>
@@ -21,8 +21,8 @@
     <div class="admin-row">
       <span>Rewards left: {{ balance_reward }}</span>&nbsp;&nbsp;&nbsp;
       <input type="button" value="Add Rewards" @click="onAddRewards"/>
-      <input type="button" value="Show Stats" :disabled="pending_artworks != 0" @click="onStats"/>
-      <span v-if="pending_artworks">Artworks to load: {{ pending_artworks }}</span>
+      <input type="button" value="Show Stats" :disabled="pending_nfts != 0" @click="onStats"/>
+      <span v-if="pending_nfts">NFTs to load: {{ pending_nfts }}</span>
     </div>
   </div>
 </template>
@@ -69,8 +69,8 @@ export default {
     balance_reward() {
       return this.$state.balance_reward  / common.GROTHS_IN_BEAM
     },
-    pending_artworks() {
-      return this.$state.pending_artworks
+    pending_nfts() {
+      return this.$state.pending_nfts
     }
   },
 
@@ -105,14 +105,14 @@ export default {
       }
     },
 
-    onUploadArtwork (ev) {
+    onUploadNFT (ev) {
       let files = ev.target.files
       for (let idx = 0; idx < files.length; idx++) {
         let file = files[idx]
         if (!file) { 
           continue
         }
-        this.$store.uploadArtwork(file, this.$state.selected_artist.id, this.$state.selected_artist.label)
+        this.$store.uploadNFT(file, this.$state.selected_artist.id, this.$state.selected_artist.label)
       }
     },
 

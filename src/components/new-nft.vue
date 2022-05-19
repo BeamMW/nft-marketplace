@@ -107,7 +107,7 @@ import priceInput from './price-input.vue'
 import switchInput from './switch-input.vue'
 import formSelect from './form-select.vue'
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 import validators from 'utils/validators'
 import router from 'router'
 import {common} from 'utils/consts'
@@ -202,7 +202,7 @@ export default {
       }
       let collID = this.collections[this.collection].id
       let price  = parseFloat(this.price) * common.GROTHS_IN_BEAM
-      await artsStore.createNFT(collID, this.name, data, price)
+      await nftsStore.createNFT(collID, this.name, data, price)
       router.go(-1)
     }
   }

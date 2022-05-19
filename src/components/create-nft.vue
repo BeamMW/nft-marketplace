@@ -1,5 +1,5 @@
 <template>
-  <div v-if="has_collections" class="new-box" @click="onNewArtwork">
+  <div v-if="has_collections" class="new-box" @click="onNewNFT">
     Create new NFT
   </div>
   <div v-else class="new-box" @click="onNewCollection">
@@ -29,7 +29,7 @@
 
 <script>
 import collsStore from 'stores/collections'
-import artsStore from 'stores/artworks'
+import nftsStore from 'stores/nfts'
 
 export default {
   computed: {
@@ -39,8 +39,8 @@ export default {
   },
 
   methods: {
-    onNewArtwork () {
-      artsStore.toNewItem()
+    onNewNFT () {
+      nftsStore.toNewItem()
     },
     
     onNewCollection() {
