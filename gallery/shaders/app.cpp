@@ -1045,19 +1045,15 @@ ON_METHOD(artist, set_artwork) {
     d.args.label_len = (nLabelSize ? nLabelSize - 1 : 0);
     nArgSize += d.args.label_len;
 
-    auto nDataSize = Env::DocGetBlob("data", nullptr, 0);
+    uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.label_len, Gallery::Artwork::s_DataMaxLen);
+
     if (!nDataSize) {
-        OnError("data not specified");
+        OnError("data must be specified");
         return;
     }
 
-    if (nDataSize > Gallery::Artist::s_DataMaxLen) {
+    if (nDataSize > Gallery::Artist::s_DataMaxLen + 1) {
         OnError("data is too long");
-        return;
-    }
-
-    if (Env::DocGetBlob("data", d.m_szLabelData + d.args.label_len, nDataSize) != nDataSize) {
-        OnError("data can't be parsed");
         return;
     }
 
