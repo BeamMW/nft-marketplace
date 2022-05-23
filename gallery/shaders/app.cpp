@@ -59,10 +59,6 @@
 
 #define Gallery_manager_view_balance(macro)  macro(ContractID, cid)
 
-#define Gallery_manager_add_rewards(macro) \
-    macro(ContractID, cid) \
-    macro(uint32_t, amount)
-
 #define Gallery_manager_get_id(macro)
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
@@ -92,7 +88,6 @@
     macro(manager, view_collections_stats) \
     macro(manager, view_artworks_stats) \
     macro(manager, view_balance) \
-    macro(manager, add_rewards) \
     macro(manager, get_id) \
     macro(manager, explicit_upgrade) \
     macro(manager, set_moderator) \
@@ -158,6 +153,10 @@
     macro(ContractID, cid) \
     macro(Gallery::Nft::Id, id)
 
+#define Gallery_user_add_rewards(macro) \
+    macro(ContractID, cid) \
+    macro(uint32_t, amount)
+
 #define Gallery_user_view_balance(macro) macro(ContractID, cid)
 
 #define Gallery_user_withdraw(macro) \
@@ -176,6 +175,7 @@
     macro(user, view_balance) \
     macro(user, withdraw) \
     macro(user, vote) \
+    macro(user, add_rewards) \
 
 #define GalleryRoles_All(macro) \
     macro(manager) \
@@ -1100,7 +1100,7 @@ ON_METHOD(artist, set_artwork) {
     Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 25000000 + s.fee_base / 10);
 }
 
-ON_METHOD(manager, add_rewards) {
+ON_METHOD(user, add_rewards) {
     StatePlus s;
     if (!s.Init(cid))
         return;
