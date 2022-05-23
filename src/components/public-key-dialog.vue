@@ -91,7 +91,7 @@ export default {
     onCopy() {
       var textArea = document.createElement('textarea')
       textArea.style.position = 'fixed'
-      textArea.value = this.artist_key
+      textArea.value = this.computed_key
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()

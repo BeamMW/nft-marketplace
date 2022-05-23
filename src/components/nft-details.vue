@@ -19,7 +19,7 @@
         </div>
         <div class="info-container">
           <div class="info-box">
-            <div class="title" :class="{'error': error}">{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}{{ title }}</div>
+            <div class="title" :class="{'error': error}">{{ title }}</div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
             <div class="bottom">
               <div class="separator"/>

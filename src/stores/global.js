@@ -18,7 +18,7 @@ function defaultState() {
     is_admin: false,
     is_moderator: false,
     is_artist: false,
-    my_active_tab: 0,
+    my_active_tab: my_tabs.OWNED_NFTS,
     coll_active_tab: 0,
     admin_active_tab: 0,
     user_active_tab: 0,
@@ -230,8 +230,8 @@ const store = {
   async approveNFTs(ids, approve) {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
-      action: 'set_nft',
-      id: ids[0],
+      action: 'set_artwork_status',
+      ids: ids.join(','),
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
@@ -240,8 +240,8 @@ const store = {
   async approveCollections(ids, approve) {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
-      action: 'set_collection',
-      id: ids[0],
+      action: 'set_collection_status',
+      ids: ids.join(','),
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })

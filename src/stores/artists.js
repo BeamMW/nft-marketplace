@@ -192,7 +192,7 @@ class ArtistsStore {
     
     return {
       label: formats.toContract(label),
-      data: formats.toContract(versions.ARTIST_VERSION, data)
+      data: formats.toContract(data, versions.ARTIST_VERSION)
     }
   } 
 
@@ -203,20 +203,15 @@ class ArtistsStore {
       throw new Error('ArtistsStore._fromContract : artist label is empty')
     }
 
-    let [label] = formats.fromContract(artist.label)
-    let [version, data] = formats.fromContract(artist.data)
-
-    if (version != versions.ARTIST_VERSION) {
-      throw new Error('Artist version mismatch: ' + version + ' != ' + versions.ARTIST_VERSION)
-    }
-
-    artist.label = label
-    artist.version = version
-    
-    // TODO: this is bad
-    Object.assign(artist, data)
-    artist.avatar = imagesStore.fromContract(artist.avatar)
-    artist.banner = imagesStore.fromContract(artist.banner)
+    artist.label     = formats.fromContract(artist.label)
+    artist.data      = formats.fromContract(artist.data, versions.ARTIST_VERSION)
+    artist.version   = artist.data.version
+    artist.about     = artist.data.about
+    artist.website   = artist.data.website
+    artist.twitter   = artist.data.twitter
+    artist.instagram = artist.data.instagram
+    artist.avatar    = imagesStore.fromContract(artist.data.avatar)
+    artist.banner    = imagesStore.fromContract(artist.data.banner)
   
     return artist
   }

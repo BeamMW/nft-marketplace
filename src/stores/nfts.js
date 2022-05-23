@@ -154,7 +154,7 @@ class NFTSStore extends LazyItems {
     data.image = await imagesStore.toContract(data.image)
     return {
       label: formats.toContract(label),
-      data: formats.toContract(versions.NFT_VERSION, data)
+      data: formats.toContract(data, versions.NFT_VERSION)
     }
   }
 

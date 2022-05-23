@@ -87,7 +87,7 @@ class CollectionsStore extends LazyItems {
     data.cover = await imagesStore.toContract(data.cover)
     return {
       label: formats.toContract(label),
-      data: formats.toContract(versions.COLLECTION_VERSION, data)
+      data: formats.toContract(data, versions.COLLECTION_VERSION)
     }
   }
 

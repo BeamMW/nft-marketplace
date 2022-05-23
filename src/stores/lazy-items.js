@@ -19,12 +19,10 @@ export default class ItemsStore {
     this._loading = false
   }
 
-  reset (global, db) {
+  reset (global, db, state) {
     this._global = global
     this._db = db
-    this._state = reactive({
-      artist_key: undefined
-    })
+    this._state = reactive(state || {})
 
     // TODO: move nft-specific loaders to nfts store. For example all with likes
     this._allocMode('user', (store) => {
@@ -188,7 +186,7 @@ export default class ItemsStore {
 
   async loadAsync() {
     if(this._loading) {
-      return
+      return false
     }
 
     if (!this._my_key) {
@@ -217,7 +215,7 @@ export default class ItemsStore {
       original.sale  = (item.price || {}).amount > 0 ? 1 : 0
 
       try {
-        [item.label] = formats.fromContract(item.label)
+        item.label = formats.fromContract(item.label)
         if (!item.label) {
           throw new Error('label cannot be empty')
         }
@@ -225,14 +223,9 @@ export default class ItemsStore {
         if (!item.data) {
           throw new Error('empty data on item') 
         }
-
-        [item.version, item.data] = formats.fromContract(item.data)
-        if (!this._versions.includes(item.version)) {
-          throw new Error(`item version mismatch:  ${item.version}`) 
-        }
-
+        
+        item.data = formats.fromContract(item.data, this._versions)
         item = this._fromContract(item)
-        item = Object.assign({}, item)
 
         if (this._global.debug) {
           console.log('item loaded with label', item.label)
@@ -291,6 +284,8 @@ export default class ItemsStore {
     this._getMode('owner').total = owned
     this._getMode('moderator').total = pending
     this._loading = false
+
+    return true
   }
 
   toNewItem() {

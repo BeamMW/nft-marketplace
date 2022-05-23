@@ -278,6 +278,7 @@ export default class Utils {
       }, params)
     }
 
+    console.log('invoke contract', params)
     return Utils.callApi('invoke_contract', params, cback)
   }
 
