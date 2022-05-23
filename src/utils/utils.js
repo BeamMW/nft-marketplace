@@ -856,4 +856,20 @@ export default class Utils {
       }
     }
   }
+
+  static copyText(text) {
+    var textArea = document.createElement('textarea')
+    textArea.style.position = 'fixed'
+    textArea.value = text
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+            
+    try {
+      return document.execCommand('copy')
+    } 
+    finally {
+      document.body.removeChild(textArea)
+    }
+  }
 }

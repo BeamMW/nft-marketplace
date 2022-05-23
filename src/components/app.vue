@@ -1,7 +1,7 @@
 <template>
   <span id="modals"/>
   <error v-if="error && debug" :text="errtext"/>
-  <errorModal v-if="error && !debug" :text="errtext" @copy="onCopy"/>
+  <errorModal v-if="error && !debug" :text="errtext"/>
   <loading v-if="loading" :text="loading"/>
   <div v-else-if="!loading" id="app-container" class="app-container">
     <router-view></router-view>
@@ -24,11 +24,6 @@ import utils from 'utils/utils.js'
 export default {
   components: { 
     loading, error, errorModal
-  },
-  data () {
-    return {
-      allErrorText: null,
-    }
   },
   computed: {
     loading () {
@@ -70,7 +65,9 @@ export default {
       let serr = utils.formatJSON(err)
       return [this.error.context || 'Error occured', serr].join('\n')
     }
-  },
+  }
+  // TODO: non-debug error handling
+  /*
   methods: {
     onCopy () {
       let err = Object.assign({}, this.error.error)
@@ -99,17 +96,7 @@ export default {
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
-            
-      try {
-        return document.execCommand('copy')
-      } 
-      catch (ex) {
-        return false
-      } 
-      finally {
-        document.body.removeChild(textArea)
-      }
     }
-  }
+  }*/
 }
 </script>

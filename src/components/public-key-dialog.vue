@@ -56,8 +56,9 @@
 </style>
 
 <script>
-import modal from './modal.vue'
-import btn from './button.vue'
+import modal from './modal'
+import btn from './button'
+import utils from 'utils/utils'
 import artistsStore from 'stores/artists'
 
 export default {
@@ -89,22 +90,7 @@ export default {
     },
   
     onCopy() {
-      var textArea = document.createElement('textarea')
-      textArea.style.position = 'fixed'
-      textArea.value = this.computed_key
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-            
-      try {
-        return document.execCommand('copy')
-      } 
-      catch (ex) {
-        return false
-      } 
-      finally {
-        document.body.removeChild(textArea)
-      }
+      utils.copyText(this.computed_key)
     },
 
     open () {
