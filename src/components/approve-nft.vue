@@ -17,7 +17,6 @@
                     height="200px"
                     cover
       >
-        <moderationStatus :item="item" short/>
       </imagePreivew>
     </template>
   </div>
@@ -61,12 +60,10 @@
 <script>
 import imagePreivew from './image-preview.vue'
 import {def_images} from 'utils/consts'
-import moderationStatus from './moderation-status.vue'
 
 export default {
   components: {
     imagePreivew,
-    moderationStatus
   },
 
   props: {

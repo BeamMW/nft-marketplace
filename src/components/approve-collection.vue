@@ -20,7 +20,6 @@
                       cover
                       style="float: right; margin-left: 15px; margin-bottom: 10px;"
         >
-          <moderationStatus :item="item" short/>
         </imagePreivew>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
@@ -97,13 +96,11 @@
 
 <script>
 import imagePreivew from './image-preview.vue'
-import moderationStatus from './moderation-status.vue'
 import {def_images} from 'utils/consts'
 
 export default {
   components: {
     imagePreivew,
-    moderationStatus
   },
 
   props: {
