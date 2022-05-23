@@ -128,7 +128,7 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
     Height cur_height = Env::get_Height();
 
     struct ArtistPlus : public Gallery::Artist {
-        char m_szLabelData[s_TotalMaxLen];
+        char data[s_DataMaxLen];
     } a;
 
     if (!a.Load(r.m_pkArtist, sizeof(a))) {
@@ -141,9 +141,15 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
         a.artworks_num = 0;
         s.total_artists++;
         s.Save();
+
+        Gallery::Events::AddArtistLabel::Key alk;
+        alk.id = r.m_pkArtist;
+        auto label_ptr = reinterpret_cast<const uint8_t*>(&r + 1);
+        Env::EmitLog(&alk, sizeof(alk), label_ptr, r.m_LabelLen, KeyTag::Internal);
     }
 
-    Env::Memcpy(a.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
+    auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen;
+    Env::Memcpy(a.data, data_ptr, r.m_DataLen);
     a.label_len = r.m_LabelLen;
     a.data_len = r.m_DataLen;
     a.status = Gallery::Status::kPending;
@@ -152,7 +158,7 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
         ::Update(a.updated, cur_height, r.m_pkArtist);
 
     a.updated = cur_height;
-    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
     Env::AddSig(r.m_pkArtist);
 }
 
