@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0xe3,0x96,0x0e,0x99,0xb5,0x51,0xb3,0x86,0xc5,0xe3,0x98,0x43,0x02,0x2d,0xe8,0x32,0xe0,0xfe,0x2f,0x56,0xa0,0xab,0x85,0x9d,0x4f,0x89,0xcc,0xe0,0xf0,0x5f,0xf8,0x6f};
+    static const ShaderID s_SID_0 = {0x57,0x38,0x20,0x47,0x22,0xf8,0x34,0x3f,0x61,0x7a,0x69,0x63,0x02,0xda,0x7c,0x4a,0x68,0x88,0x8d,0x3e,0x00,0x81,0x14,0x9f,0xd8,0x5b,0xd8,0xf7,0xbe,0xf6,0xb9,0xbd};
 #pragma pack (push, 1)
 
     enum class Tag : uint8_t {
@@ -108,7 +108,7 @@ namespace Gallery {
         uint32_t data_len;
         uint32_t label_len;
         uint32_t collections_num;
-        uint32_t artworks_num;
+        uint32_t nfts_num;
 
         // followed by label and data without delimiter
         static const uint32_t s_LabelMaxLen = 200;
@@ -124,7 +124,7 @@ namespace Gallery {
 
         Status status;
         Height updated;
-        uint32_t artworks_num;
+        uint32_t nfts_num;
         uint32_t data_len;
         uint32_t label_len;
         PubKey m_pkAuthor;
@@ -132,12 +132,12 @@ namespace Gallery {
         Amount total_sold_price;
         struct {
             AmountWithAsset price;
-            uint32_t artwork_id;
+            uint32_t nft_id;
         } max_sold;
 
         struct {
             AmountWithAsset price;
-            uint32_t artwork_id;
+            uint32_t nft_id;
         } min_sold;
         
         // followed by label and data without delimiter
@@ -197,7 +197,7 @@ namespace Gallery {
     struct State {
         static const uint8_t s_Key = 0;
         Config m_Config;
-        uint32_t total_artworks;
+        uint32_t total_nfts;
         uint32_t total_collections;
         uint32_t total_artists;
         uint32_t total_moderators;

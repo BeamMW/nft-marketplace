@@ -25,7 +25,7 @@ struct MyState : public Gallery::State {
 BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
     if (Env::get_CallDepth() > 1) {
         MyState s(false);
-        s.total_artworks = 0;
+        s.total_nfts = 0;
         s.total_artists = 0;
         s.total_collections = 0;
         s.total_moderators = 0;
@@ -120,7 +120,7 @@ BEAM_EXPORT void Method_6(const Gallery::Method::SetArtistStatus& r) {
             ::Update(a.updated, cur_height, r.ids[i]);
 
         a.updated = cur_height;
-        a.Save(r.ids[i], sizeof(Gallery::Artist) + a.label_len + a.data_len);
+        a.Save(r.ids[i], sizeof(Gallery::Artist) + a.data_len);
     }
 }
 
@@ -138,7 +138,8 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
         a.m_hRegistered = cur_height;
         a.updated = cur_height;
         a.collections_num = 0;
-        a.artworks_num = 0;
+        a.nfts_num = 0;
+        a.label_len = r.m_LabelLen;
         s.total_artists++;
         s.Save();
 
@@ -150,7 +151,6 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
 
     auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen;
     Env::Memcpy(a.data, data_ptr, r.m_DataLen);
-    a.label_len = r.m_LabelLen;
     a.data_len = r.m_DataLen;
     a.status = Gallery::Status::kPending;
 
@@ -208,10 +208,10 @@ BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
         c.updated = cur_height;
         c.total_sold = 0;
         c.total_sold_price = 0;
-        c.max_sold.artwork_id = 0;
+        c.max_sold.nft_id = 0;
         c.max_sold.price.m_Amount = 0;
         c.max_sold.price.m_Aid = 0;
-        c.min_sold.artwork_id = 0;
+        c.min_sold.nft_id = 0;
         c.min_sold.price.m_Amount = 0;
         c.min_sold.price.m_Aid = 0;
 
@@ -230,7 +230,7 @@ BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
             ::Update(a.updated, cur_height, r.m_pkArtist);
 
         a.updated = cur_height;
-        a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+        a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
         s.Save();
     }
 
@@ -253,7 +253,7 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
     Gallery::Nft m;
 
     MyState s;
-    m.id = ++s.total_artworks;
+    m.id = ++s.total_nfts;
     m.m_pkOwner = r.m_pkArtist;
     m.m_pkAuthor = r.m_pkArtist;
     m.collection_id = r.collection_id;
@@ -275,8 +275,8 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
 
     // assert: collection exists
     Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
-    c.artworks_num++;
-    Env::Halt_if(c.artworks_num > c.s_MaxNfts);
+    c.nfts_num++;
+    Env::Halt_if(c.nfts_num > c.s_MaxNfts);
 
     Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
         ::Update(c.updated, cur_height, r.collection_id);
@@ -290,13 +290,13 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
 
     // assert: artist exists
     Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
-    ++a.artworks_num;
+    ++a.nfts_num;
 
     Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
         ::Update(a.updated, cur_height, r.m_pkArtist);
 
     a.updated = cur_height;
-    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.label_len + a.data_len);
+    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
     uint32_t nData = r.data_len;
@@ -416,11 +416,11 @@ BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
     c.total_sold_price += m.m_Price.m_Amount;
     if (m.m_Price.m_Amount > c.max_sold.price.m_Amount) {
         c.max_sold.price = m.m_Price;
-        c.max_sold.artwork_id = r.m_ID;
+        c.max_sold.nft_id = r.m_ID;
     }
-    if (!c.min_sold.artwork_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
+    if (!c.min_sold.nft_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
         c.min_sold.price = m.m_Price;
-        c.min_sold.artwork_id = r.m_ID;
+        c.min_sold.nft_id = r.m_ID;
     }
     Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
         ::Update(c.updated, cur_height, m.collection_id);

@@ -32,15 +32,15 @@
 #define Gallery_manager_view_collections_stats(macro) \
     macro(ContractID, cid) \
 
-#define Gallery_manager_view_artworks_stats(macro) \
+#define Gallery_manager_view_nfts_stats(macro) \
     macro(ContractID, cid) \
 
-#define Gallery_manager_view_artworks(macro) \
+#define Gallery_manager_view_nfts(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(Amount, count) \
 
-#define Gallery_manager_view_artwork_sales(macro) \
+#define Gallery_manager_view_nft_sales(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Nft::Id, id) \
 
@@ -48,13 +48,13 @@
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(uint32_t, count) \
-    macro(uint32_t, artworks) \
+    macro(uint32_t, nfts) \
 
 #define Gallery_manager_view_artists(macro) \
     macro(ContractID, cid) \
     macro(Height, h0) \
     macro(uint32_t, count) \
-    macro(uint32_t, artworks) \
+    macro(uint32_t, nfts) \
     macro(uint32_t, collections) \
 
 #define Gallery_manager_view_balance(macro)  macro(ContractID, cid)
@@ -63,7 +63,7 @@
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
 
-#define Gallery_manager_set_artwork_status(macro) \
+#define Gallery_manager_set_nft_status(macro) \
     macro(ContractID, cid) \
 
 #define Gallery_manager_set_collection_status(macro) \
@@ -83,23 +83,23 @@
     macro(manager, view_moderators_stats) \
     macro(manager, view_artists) \
     macro(manager, view_collections) \
-    macro(manager, view_artworks) \
-    macro(manager, view_artwork_sales) \
+    macro(manager, view_nfts) \
+    macro(manager, view_nft_sales) \
     macro(manager, view_collections_stats) \
-    macro(manager, view_artworks_stats) \
+    macro(manager, view_nfts_stats) \
     macro(manager, view_balance) \
     macro(manager, get_id) \
     macro(manager, explicit_upgrade) \
     macro(manager, set_moderator) \
     macro(manager, view_moderators) \
-    macro(manager, set_artwork_status) \
+    macro(manager, set_nft_status) \
     macro(manager, set_artist_status) \
     macro(manager, set_collection_status) \
     macro(manager, set_fee_base) \
 
 // MODERATOR
 
-#define Gallery_moderator_set_artwork_status(macro) \
+#define Gallery_moderator_set_nft_status(macro) \
     macro(ContractID, cid) \
 
 #define Gallery_moderator_set_collection_status(macro) \
@@ -109,7 +109,7 @@
     macro(ContractID, cid) \
 
 #define GalleryRole_moderator(macro) \
-    macro(moderator, set_artwork_status) \
+    macro(moderator, set_nft_status) \
     macro(moderator, set_artist_status) \
     macro(moderator, set_collection_status) \
 
@@ -124,7 +124,7 @@
     macro(ContractID, cid) \
     macro(Gallery::Collection::Id, id) \
 
-#define Gallery_artist_set_artwork(macro) \
+#define Gallery_artist_set_nft(macro) \
     macro(ContractID, cid) \
     macro(Gallery::Collection::Id, collection_id) \
     macro(Amount, amount) \
@@ -132,7 +132,7 @@
 
 #define GalleryRole_artist(macro) \
     macro(artist, get_id) \
-    macro(artist, set_artwork) \
+    macro(artist, set_nft) \
     macro(artist, set_artist) \
     macro(artist, set_collection) \
 
@@ -443,14 +443,11 @@ public:
 #pragma pack (push, 0)
 struct MyArtist : public Gallery::Artist {
 public:
-    char m_szLabelData[s_TotalMaxLen];
-
-    std::string_view GetData() const {
-        return std::string_view(m_szLabelData + label_len, data_len);
-    }
+    char data[s_DataMaxLen];
+    Utils::Vector<char> label;
 
     std::string_view GetLabel() const {
-        return std::string_view(m_szLabelData, label_len);
+        return std::string_view(label.m_p, label_len);
     }
 
     static PubKey id(const ContractID& cid) {
@@ -464,30 +461,21 @@ public:
     // TODO: label_exists
 
     void Print(const ContractID& cid, const Id& id) {
-        // DocAddText prints char[] until it meets \0 symbol, but
-        // m_szLabelData contains label + data without \0 symbol between them
-        char label[label_len + 1];
-        char data[data_len + 1];
-        label[label_len] = 0;
-        data[data_len] = 0;
-        Env::Memcpy(label, m_szLabelData, label_len);
-        Env::Memcpy(data, m_szLabelData + label_len, data_len);
-
         Env::DocGroup gr1("");
         Env::DocAddBlob_T("id", id);
         Env::DocAddNum32("updated", updated);
-        Env::DocAddText("label", label);
+        Env::DocAddText("label", label.m_p);
         Env::DocAddText("data", data);
         Env::DocAddNum("hReg", m_hRegistered);
         Env::DocAddText("status", Gallery::status_to_string(status).data());
 
-        uint32_t print_artworks{};
-        Env::DocGetNum32("artworks", &print_artworks);
+        uint32_t print_nfts{};
+        Env::DocGetNum32("nfts", &print_nfts);
 
         uint32_t print_collections{};
         Env::DocGetNum32("collections", &print_collections);
 
-        if (!print_artworks && !print_collections)
+        if (!print_nfts && !print_collections)
             return;
 
         using ACKey = Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
@@ -513,13 +501,13 @@ public:
             }
         }
 
-        if (print_artworks) {
+        if (print_nfts) {
             ack0.m_KeyInContract.id = id;
             ack0.m_KeyInContract.t_id = 0;
             Env::VarReader rac(ack0, ack1);
 
             bool exists;
-            Env::DocArray gr2("artworks");
+            Env::DocArray gr2("nfts");
             while (rac.MoveNext_T(ack0, exists)) {
                 Env::Key_T<CAKey> cak0, cak1;
                 _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -538,8 +526,11 @@ public:
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Key>& key) {
+        label.m_Count = 0;
+
+
         while (true) {
-            uint32_t nKey = sizeof(key), nVal = sizeof(Artist) + sizeof(m_szLabelData);
+            uint32_t nKey = sizeof(key), nVal = sizeof(Artist) + sizeof(data);
             if (!r.MoveNext(&key, nKey, this, nVal, 0))
                 return false;
 
@@ -547,9 +538,32 @@ public:
                 continue;
 
             nVal -= sizeof(Gallery::Artist);
-            m_szLabelData[std::min(nVal, s_TotalMaxLen)] = 0;
+            data[std::min(nVal, s_DataMaxLen)] = 0;
             break;
         }
+
+        auto cid = key.m_Prefix.m_Cid;
+        Env::Key_T<Gallery::Events::AddArtistLabel::Key> alk0, alk1;
+        _POD_(alk0.m_Prefix.m_Cid) = cid;
+        _POD_(alk1.m_Prefix.m_Cid) = cid;
+        alk0.m_KeyInContract.id = key.m_KeyInContract.id;
+        alk1.m_KeyInContract.id = key.m_KeyInContract.id;
+
+        uint32_t label_count = 0;
+        Env::LogReader alr(alk0, alk1);
+        for ( ; ; label_count++) {
+            uint32_t nData = 0, nKey = sizeof(alk0);
+            if (!alr.MoveNext(&alk0, nKey, nullptr, nData, 0))
+                break;
+
+            label.Prepare(label.m_Count + nData);
+            alr.MoveNext(&alk0, nKey, label.m_p + label.m_Count, nData, 1);
+            label.m_Count += nData;
+        }
+        label.m_p[label.m_Count] = '\0';
+
+        if (!label_count)
+            return false;
         return true;
     }
 };
@@ -558,14 +572,6 @@ public:
 #pragma pack (push, 0)
 struct MyCollection : public Gallery::Collection {
     char m_szLabelData[s_TotalMaxLen + 2];
-
-    std::string_view GetData() const {
-        return std::string_view(m_szLabelData + label_len, data_len);
-    }
-
-    std::string_view GetLabel() const {
-        return std::string_view(m_szLabelData, label_len);
-    }
 
     void Print(const ContractID& cid, const Id& id) {
         // DocAddText prints char[] until it meets \0 symbol, but
@@ -584,7 +590,7 @@ struct MyCollection : public Gallery::Collection {
         Env::DocAddText("label", label);
         Env::DocAddText("data", data);
         Env::DocAddBlob_T("author", m_pkAuthor);
-        Env::DocAddNum32("artworks_count", artworks_num);
+        Env::DocAddNum32("nfts_count", nfts_num);
         Env::DocAddText("status", Gallery::status_to_string(status).data());
         {
             Env::DocGroup gr_sold("total_sold");
@@ -596,19 +602,19 @@ struct MyCollection : public Gallery::Collection {
             Env::DocGroup gr_price("max_price");
             Env::DocAddNum("value", max_sold.price.m_Amount);
             Env::DocAddNum("aid", max_sold.price.m_Aid);
-            Env::DocAddNum32("artwork_id", max_sold.artwork_id);
+            Env::DocAddNum32("nft_id", max_sold.nft_id);
         }
         {
             Env::DocGroup gr_price("min_price");
             Env::DocAddNum("value", min_sold.price.m_Amount);
             Env::DocAddNum("aid", min_sold.price.m_Aid);
-            Env::DocAddNum32("artwork_id", min_sold.artwork_id);
+            Env::DocAddNum32("nft_id", min_sold.nft_id);
         }
 
-        uint32_t print_artworks{};
-        Env::DocGetNum32("artworks", &print_artworks);
+        uint32_t print_nfts{};
+        Env::DocGetNum32("nfts", &print_nfts);
 
-        if (!print_artworks) return;
+        if (!print_nfts) return;
 
         using CAKey = Gallery::Index<Gallery::Tag::kCollectionNftIdx,
             Gallery::Collection::Id, Gallery::Nft>::Key;
@@ -622,7 +628,7 @@ struct MyCollection : public Gallery::Collection {
         cak1.m_KeyInContract.t_id = static_cast<Gallery::Nft::Id>(-1);
         Env::VarReader rca(cak0, cak1);
 
-        Env::DocArray gr2("artworks");
+        Env::DocArray gr2("nfts");
         bool exists;
         while (rca.MoveNext_T(cak0, exists)) {
             Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.t_id));
@@ -950,10 +956,10 @@ ON_METHOD(manager, view_collections_stats) {
     Env::DocAddNum32("total", s.total_collections);
 }
 
-ON_METHOD(manager, view_artworks_stats) {
+ON_METHOD(manager, view_nfts_stats) {
     StatePlus s;
     s.Init(cid);
-    Env::DocAddNum32("total", s.total_artworks);
+    Env::DocAddNum32("total", s.total_nfts);
 }
 
 ON_METHOD(manager, view_artists) {
@@ -1004,7 +1010,7 @@ ON_METHOD(manager, view_collections) {
         c.Print();
 }
 
-ON_METHOD(artist, set_artwork) {
+ON_METHOD(artist, set_nft) {
     struct {
         Gallery::Method::SetNft args;
         char m_szLabelData[Gallery::Nft::s_TotalMaxLen];
@@ -1086,7 +1092,7 @@ ON_METHOD(artist, set_artwork) {
     StatePlus s;
     s.Init(cid);
 
-    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload artwork", nCharge + 25000000 + s.fee_base / 10);
+    Env::GenerateKernel(&cid, d.args.s_iMethod, &d, nArgSize, nullptr, 0, &sig, 1, "Upload nft", nCharge + 25000000 + s.fee_base / 10);
 }
 
 ON_METHOD(user, add_rewards) {
@@ -1193,7 +1199,7 @@ ON_METHOD(manager, view_balance) {
     wlk.PrintTotals();
 }
 
-ON_METHOD(manager, set_artwork_status) {
+ON_METHOD(manager, set_nft_status) {
     char buf[256];
     Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
@@ -1212,10 +1218,10 @@ ON_METHOD(manager, set_artwork_status) {
     args->ids_num = ids_vec.size();
     Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Nft::Id) * ids_vec.size());
 
-    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update nft's status", 2500000);
 }
 
-ON_METHOD(moderator, set_artwork_status) {
+ON_METHOD(moderator, set_nft_status) {
     char buf[256];
     Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
@@ -1239,7 +1245,7 @@ ON_METHOD(moderator, set_artwork_status) {
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     
-    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update artwork's status", 2500000);
+    Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &sig, 1, "Update nft's status", 2500000);
 }
 
 ON_METHOD(moderator, set_artist_status) {
@@ -1455,7 +1461,7 @@ ON_METHOD(artist, get_id) {
     Env::DocAddBlob_T("id", MyArtist::id(cid));
 }
 
-ON_METHOD(manager, view_artwork_sales) {
+ON_METHOD(manager, view_nft_sales) {
     Env::Key_T<Gallery::Events::Sell::Key> key;
     _POD_(key.m_Prefix.m_Cid) = cid;
     key.m_KeyInContract.m_ID = id;
@@ -1474,7 +1480,7 @@ ON_METHOD(manager, view_artwork_sales) {
     }
 }
 
-ON_METHOD(manager, view_artworks) {
+ON_METHOD(manager, view_nfts) {
     char buf[256];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
 
