@@ -295,13 +295,8 @@ const store = {
   },
 
   async switchToHeaded () {
-    try {
-      if (await utils.switchToWebAPI()) {
-        await this.start()
-      }
-    }
-    catch(err) {
-      this.setError(err)
+    if (await utils.switchToWebAPI()) {
+      await this.start()
     }
   },
 
@@ -321,10 +316,6 @@ const store = {
     this.state.admin_active_tab = id
   },
 
-  toBack () {
-    router.go(-1)
-  },
-
   openUrl(url) {
     window.open(url, '_blank')
   },
@@ -337,6 +328,10 @@ const store = {
   openInstagram(nick) {
     let link = `https://www.instagram.com/@${nick}`
     window.open(link, '_blank')
+  },
+
+  toBack () {
+    router.go(-1)
   },
 
   toMyPage() {

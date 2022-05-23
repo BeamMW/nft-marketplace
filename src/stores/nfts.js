@@ -177,86 +177,47 @@ class NFTSStore extends LazyItems {
   }
 
   async setPrice (id, amount) {
-    try {
-      return await utils.invokeContractAsyncAndMakeTx({
-        role: 'user',
-        action: 'set_price',
-        aid: 0,
-        amount, id, cid
-      })
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'set_price',
+      aid: 0,
+      amount, id, cid
+    })
   }
 
   async buyNFT (id) {
-    try {
-      return await utils.invokeContractAsyncAndMakeTx({
-        role: 'user',
-        action: 'buy',
-        id, cid
-      })
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'buy',
+      id, cid
+    })
   }
 
   async getSales(id) {
-    try {
-      let {res} = await utils.invokeContractAsync({
-        role: 'manager',
-        action: 'view_artwork_sales',
-        id, cid
-      })
-      return res.sales
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
+    let {res} = await utils.invokeContractAsync({
+      role: 'manager',
+      action: 'view_artwork_sales',
+      id, cid
+    })
+    return res.sales
   }
 
   async likeNFT(id) {
-    try {
-      await utils.invokeContractAsyncAndMakeTx({
-        role: 'user',
-        action: 'vote',
-        val: 1,
-        id, cid, 
-      })
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'vote',
+      val: 1,
+      id, cid, 
+    })
   }
 
   async unlikeNFT(id) {
-    try {
-      await utils.invokeContractAsyncAndMakeTx({
-        role: 'user',
-        action: 'vote',
-        val: 0,
-        id, cid, 
-      })
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
-  }
-
-  // TODO: change to status:rejected
-  async deleteNFT (id) {
-    try {
-      await utils.invokeContractAsyncAndMakeTx({
-        role: 'manager',
-        action: 'admin_delete',
-        id, cid, 
-      })
-    }
-    catch(err) {
-      this._global.setError(err)
-    }
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'vote',
+      val: 0,
+      id, cid, 
+    })
   }
 
   toNewItem() {
