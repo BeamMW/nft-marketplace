@@ -651,7 +651,7 @@ struct MyCollection : public Gallery::Collection {
 
 #pragma pack (push, 0)
 struct MyArtwork : public Gallery::Artwork {
-    Utils::Vector<uint8_t> vData;
+    Utils::Vector<char> vData;
     Utils::Vector<char> vLabel;
 
     void Print(const ContractID& cid, const Id& id) {
@@ -663,7 +663,7 @@ struct MyArtwork : public Gallery::Artwork {
         Env::DocAddNum32("updated", updated);
         Env::DocAddText("status", Gallery::status_to_string(status).data());
         Env::DocAddText("label", vLabel.m_p);
-        Env::DocAddBlob("data", vData.m_p, vData.m_Count);
+        Env::DocAddText("data", vData.m_p);
         Env::DocAddBlob_T("author", m_pkAuthor);
         Env::DocAddNum32("collection", collection_id);
         if (m_Aid)
@@ -777,6 +777,7 @@ struct MyArtwork : public Gallery::Artwork {
             adr.MoveNext(&adk0, nKey, vData.m_p + vData.m_Count, nData, 1);
             vData.m_Count += nData;
         }
+        vData.m_p[vData.m_Count] = '\0';
 
         Env::LogReader alr(alk0, alk1);
         for ( ; ; nLabelCount++) {
