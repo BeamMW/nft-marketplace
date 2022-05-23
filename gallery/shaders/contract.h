@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0x80,0xce,0xfc,0xe7,0x0b,0x00,0xbe,0xda,0xdb,0xfa,0x58,0xa5,0x94,0x64,0x12,0xc1,0xcc,0xf2,0x82,0xbd,0xf2,0xeb,0x8d,0xa4,0x93,0xf3,0x94,0xda,0x56,0x7b,0x82,0xcf};
+    static const ShaderID s_SID_0 = {0xb3,0x17,0x28,0xa3,0xa9,0xed,0xc9,0xb5,0x23,0xc1,0x2a,0x25,0x07,0x41,0xa8,0xcd,0xc0,0xe2,0x56,0x37,0x68,0x00,0x2d,0xfc,0x95,0xd6,0x1d,0x9d,0xa4,0x9a,0x03,0xe8};
 #pragma pack (push, 1)
 
     enum class Tag : uint8_t {
@@ -111,7 +111,7 @@ namespace Gallery {
         uint32_t artworks_num;
 
         // followed by label and data without delimiter
-        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_LabelMaxLen = 200;
         static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
@@ -141,7 +141,7 @@ namespace Gallery {
         } min_sold;
         
         // followed by label and data without delimiter
-        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_LabelMaxLen = 200;
         static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
         static const uint32_t s_MaxNfts = 500;
@@ -162,7 +162,7 @@ namespace Gallery {
         Status status;
         AmountWithAsset m_Price;
 
-        static const uint32_t s_LabelMaxLen = 10 * 1024;
+        static const uint32_t s_LabelMaxLen = 200;
         static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
     };
