@@ -17,7 +17,7 @@ export default class ArtistsCommon {
     return artist
   }
 
-  static async _toContract (label, data) {
+  static async toContract (label, data) {
     data.avatar = await imagesStore.toContract(data.avatar)
     data.banner = await imagesStore.toContract(data.banner)
     

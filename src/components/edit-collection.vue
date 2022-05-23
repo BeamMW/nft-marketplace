@@ -33,19 +33,21 @@
         />
         <inputField v-model="twitter"
                     label="Twitter"
-                    placeholder="@twitter"
+                    placeholder="twitter"
                     img="twitter"
-                    :max_length="16"
+                    :max_length="15"
                     :valid="twitter_valid"
                     :counter="false"
+                    letters_only
         />
         <inputField v-model="instagram"
                     label="Instagram"
-                    placeholder="@instagram"
+                    placeholder="instagram"
                     img="instagram"
-                    :max_length="31"
+                    :max_length="30"
                     :valid="instagram_valid"
                     :counter="false"
+                    letters_only
         />
       </div>
       <div class="col-second">

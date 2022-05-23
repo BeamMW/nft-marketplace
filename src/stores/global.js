@@ -330,12 +330,12 @@ const store = {
   },
 
   openTwitter(nick) {
-    let link = `https://www.twitter.com/${nick.substring(1)}`
+    let link = `https://www.twitter.com/@${nick}`
     window.open(link, '_blank')
   },
 
   openInstagram(nick) {
-    let link = `https://www.instagram.com/${nick.substring(1)}`
+    let link = `https://www.instagram.com/@${nick}`
     window.open(link, '_blank')
   },
 

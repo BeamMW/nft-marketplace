@@ -205,7 +205,7 @@ class ArtistsStore {
   }
 
   async _toContract (label, data) {
-    return ArtistsCommon.toContract(label, data)
+    return await ArtistsCommon.toContract(label, data)
   } 
 
   _fromContract (cartist) {

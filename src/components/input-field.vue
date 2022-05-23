@@ -12,6 +12,7 @@
              :class="{'err': !valid}"
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
+             @keydown="onKeyDown"
       />
       <slot></slot>
     </div>
@@ -153,7 +154,12 @@ export default {
       type: Boolean,
       default: true,
       required: false
-    }
+    },
+    letters_only: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
   },
 
   emits: [
@@ -167,5 +173,15 @@ export default {
       }
     }
   },
+
+  methods: {
+    onKeyDown(ev) {
+      if (this.letters_only) {
+        if(!/[a-z]/i.test(ev.key)) { 
+          ev.preventDefault()
+        }
+      }
+    }
+  }
 }
 </script>

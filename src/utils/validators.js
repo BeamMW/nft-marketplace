@@ -2,11 +2,11 @@ import {common} from './consts'
 
 export default class Validators {
   static twitter(value) {
-    return /^[@][a-zA-Z0-9_]{1,15}$/.test(value)
+    return /^[a-zA-Z0-9_]{1,15}$/.test(value)
   }
 
   static instagram(value) {
-    return (/^(?!.*[..]{2})[@][a-zA-Z0-9_.]{1,30}$/.test(value))
+    return (/^[a-zA-Z0-9_.]{1,30}$/.test(value))
   }
 
   static url(value) {

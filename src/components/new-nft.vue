@@ -153,9 +153,6 @@ export default {
   data () {
     return {
       name: '',
-      website: '',
-      twitter: '',
-      instagram: '',
       description: '',
       image: undefined,
       price: '',

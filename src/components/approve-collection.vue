@@ -23,8 +23,8 @@
         </imagePreivew>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
-        <div v-if="item.twitter"><span class="link" @click="onTwitter">{{ item.twitter }}</span></div>
-        <div v-if="item.instagram"><span class="link" @click="onInstagram">{{ item.instagram }}</span></div>
+        <div v-if="item.twitter"><span class="link" @click="onTwitter">@{{ item.twitter }}</span></div>
+        <div v-if="item.instagram"><span class="link" @click="onInstagram">@{{ item.instagram }}</span></div>
         <div v-if="item.description">{{ item.description }}</div>
       </div>
     </div>
