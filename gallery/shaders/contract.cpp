@@ -241,10 +241,10 @@ BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
     Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
+BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
     Height cur_height = Env::get_Height();
 
-    Gallery::Artwork m;
+    Gallery::Nft m;
 
     MyState s;
     m.id = ++s.total_artworks;
@@ -259,8 +259,8 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
         Gallery::Artist::Id, Gallery::Collection>
             ::Load(r.m_pkArtist, r.collection_id));
 
-    Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
-        Gallery::Collection::Id, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kCollectionNftIdx,
+        Gallery::Collection::Id, Gallery::Nft>
             ::Save(r.collection_id, m.id);
         
     struct CollectionPlus : public Gallery::Collection {
@@ -270,7 +270,7 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
     // assert: collection exists
     Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
     c.artworks_num++;
-    Env::Halt_if(c.artworks_num > c.s_MaxArtworks);
+    Env::Halt_if(c.artworks_num > c.s_MaxNfts);
 
     Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
         ::Update(c.updated, cur_height, r.collection_id);
@@ -298,7 +298,7 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
     auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1);
     uint32_t nLabel = r.label_len;
 
-    Gallery::Events::AddArtworkData::Key adk;
+    Gallery::Events::AddNftData::Key adk;
     adk.m_ID = m.id;
     adk.m_pkArtist = m.m_pkOwner;
 
@@ -313,12 +313,12 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
         pData += nMaxEventSize;
     }
 
-    Gallery::Events::AddArtworkLabel::Key alk;
+    Gallery::Events::AddNftLabel::Key alk;
     alk.m_ID = m.id;
     alk.m_pkArtist = m.m_pkOwner;
     Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, m.id);
     m.updated = cur_height;
     m.Save(m.id);
@@ -326,7 +326,7 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetArtwork& r) {
     Env::AddSig(r.m_pkArtist);
 }
 
-BEAM_EXPORT void Method_10(const Gallery::Method::SetArtworkStatus& r) {
+BEAM_EXPORT void Method_10(const Gallery::Method::SetNftStatus& r) {
     Height cur_height = Env::get_Height();
 
     Gallery::Moderator m;
@@ -336,11 +336,11 @@ BEAM_EXPORT void Method_10(const Gallery::Method::SetArtworkStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    Gallery::Artwork a;
+    Gallery::Nft a;
     for (int i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!a.Load(r.ids[i]));
         a.status = r.status;
-        Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+        Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
             ::Update(a.updated, cur_height, a.id);
         a.updated = cur_height;
         a.Save(a.id);
@@ -348,13 +348,13 @@ BEAM_EXPORT void Method_10(const Gallery::Method::SetArtworkStatus& r) {
 }
 
 BEAM_EXPORT void Method_11(const Gallery::Method::SetPrice& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     _POD_(m.m_Price) = r.m_Price;
 
     Height cur_height = Env::get_Height();
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
     m.updated = cur_height;
     m.Save(r.m_ID);
@@ -365,7 +365,7 @@ BEAM_EXPORT void Method_11(const Gallery::Method::SetPrice& r) {
 BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
     Height cur_height = Env::get_Height();
 
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     Env::Halt_if(
@@ -396,7 +396,7 @@ BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
     _POD_(m.m_pkOwner) = r.m_pkUser;
     _POD_(m.m_Price).SetZero(); // not for sale until new owner sets the price
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
     m.updated = cur_height;
     m.Save(r.m_ID);
@@ -430,7 +430,7 @@ BEAM_EXPORT void Method_13(const Gallery::Method::Withdraw& r) {
 }
 
 BEAM_EXPORT void Method_14(const Gallery::Method::CheckPrepare& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID));
     Env::AddSig(m.m_pkOwner);
 
@@ -440,13 +440,13 @@ BEAM_EXPORT void Method_14(const Gallery::Method::CheckPrepare& r) {
         m.m_Aid = 0;
     } else {
         // 1st call. Don't checkout, only prepare
-        static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Artwork;SN=Gall;UN=GALL;NTHUN=unique";
+        static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Nft;SN=Gall;UN=GALL;NTHUN=unique";
         m.m_Aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
     }
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
 
     m.updated = cur_height;
@@ -454,7 +454,7 @@ BEAM_EXPORT void Method_14(const Gallery::Method::CheckPrepare& r) {
 }
 
 BEAM_EXPORT void Method_15(const Gallery::Method::CheckOut& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID) || !m.m_Aid);
     Env::AddSig(m.m_pkOwner);
 
@@ -466,7 +466,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::CheckOut& r) {
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
 
     m.updated = cur_height;
@@ -474,7 +474,7 @@ BEAM_EXPORT void Method_15(const Gallery::Method::CheckOut& r) {
 }
 
 BEAM_EXPORT void Method_16(const Gallery::Method::CheckIn& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
 
     Env::FundsLock(m.m_Aid, 1);
@@ -484,7 +484,7 @@ BEAM_EXPORT void Method_16(const Gallery::Method::CheckIn& r) {
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
 
     m.updated = cur_height;
@@ -494,9 +494,9 @@ BEAM_EXPORT void Method_16(const Gallery::Method::CheckIn& r) {
 }
 
 BEAM_EXPORT void Method_17(const Gallery::Method::Vote& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
 
-    Env::Halt_if(!m.Load(r.m_ID.m_ArtworkID));
+    Env::Halt_if(!m.Load(r.m_ID.nft_id));
     //Env::Halt_if(m.status != Gallery::Status::kApproved);
     
     Gallery::Impression::Key impk;
@@ -530,7 +530,7 @@ BEAM_EXPORT void Method_18(const Gallery::Method::AddVoteRewards& r) {
 }
 
 BEAM_EXPORT void Method_19(const Gallery::Method::Transfer& r) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     Env::Halt_if(!m.Load(r.m_ID));
 
     Env::AddSig(m.m_pkOwner);
@@ -538,7 +538,7 @@ BEAM_EXPORT void Method_19(const Gallery::Method::Transfer& r) {
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>
+    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
         ::Update(m.updated, cur_height, r.m_ID);
 
     m.updated = cur_height;

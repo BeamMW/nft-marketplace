@@ -72,7 +72,7 @@ namespace KeyMaterial
     struct Owner
     {
         ContractID m_Cid;
-        Gallery::Artwork::Id m_ID;
+        Gallery::Nft::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
         void Set(const ContractID& cid)
@@ -88,7 +88,7 @@ namespace KeyMaterial
     };
 #pragma pack (pop)
 
-    const Gallery::Artwork::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Artwork::Id>(-1) >> 1) + 1); // hi bit
+    const Gallery::Nft::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Nft::Id>(-1) >> 1) + 1); // hi bit
 }
 
 ON_METHOD(manager, view)

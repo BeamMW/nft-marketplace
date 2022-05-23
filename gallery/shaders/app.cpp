@@ -42,7 +42,7 @@
 
 #define Gallery_manager_view_artwork_sales(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
+    macro(Gallery::Nft::Id, id) \
 
 #define Gallery_manager_view_collections(macro) \
     macro(ContractID, cid) \
@@ -145,18 +145,18 @@
 
 #define Gallery_user_set_price(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
+    macro(Gallery::Nft::Id, id) \
     macro(Amount, amount) \
     macro(AssetID, aid)
 
 #define Gallery_user_transfer(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
+    macro(Gallery::Nft::Id, id) \
     macro(Gallery::Artist::Id, pkNewOwner)
 
 #define Gallery_user_buy(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id)
+    macro(Gallery::Nft::Id, id)
 
 #define Gallery_user_view_balance(macro) macro(ContractID, cid)
 
@@ -166,7 +166,7 @@
 
 #define Gallery_user_vote(macro) \
     macro(ContractID, cid) \
-    macro(Gallery::Artwork::Id, id) \
+    macro(Gallery::Nft::Id, id) \
     macro(uint32_t, val) \
 
 #define GalleryRole_user(macro) \
@@ -267,7 +267,7 @@ namespace KeyMaterial {
 
     struct Owner {
         ContractID m_Cid;
-        Gallery::Artwork::Id m_ID;
+        Gallery::Nft::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
         Owner() {
@@ -285,7 +285,7 @@ namespace KeyMaterial {
     };
 #pragma pack (pop)
 
-    const Gallery::Artwork::Id g_MskImpression = (static_cast<Gallery::Artwork::Id>(-1) >> 1) + 1; // hi bit
+    const Gallery::Nft::Id g_MskImpression = (static_cast<Gallery::Nft::Id>(-1) >> 1) + 1; // hi bit
 }
 
 ON_METHOD(manager, view) {
@@ -306,8 +306,8 @@ ON_METHOD(manager, view) {
     wlk.ViewAll(&kid);
 }
 
-bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m) {
-    Env::Key_T<Gallery::Artwork::Key> k;
+bool ReadItem(const ContractID& cid, Gallery::Nft::Id id, Gallery::Nft& m) {
+    Env::Key_T<Gallery::Nft::Key> k;
     k.m_Prefix.m_Cid = cid;
     k.m_KeyInContract.id = Utils::FromBE(id);
 
@@ -322,24 +322,24 @@ bool ReadItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& 
 struct OwnerInfo {
     KeyMaterial::Owner m_km;
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const Gallery::Artwork& m) {
+    bool DeduceOwner(const ContractID& cid, Gallery::Nft::Id id, const Gallery::Nft& m) {
         return DeduceOwner(cid, id, m.m_pkOwner);
     }
 
-    bool DeduceOwnerRaw(Gallery::Artwork::Id id, const PubKey& pkOwner) {
+    bool DeduceOwnerRaw(Gallery::Nft::Id id, const PubKey& pkOwner) {
         PubKey pk;
         m_km.m_ID = id;
         m_km.Get(pk);
         return (_POD_(pk) == pkOwner);
     }
 
-    bool DeduceOwner(const ContractID& cid, Gallery::Artwork::Id id, const PubKey& pkOwner) {
+    bool DeduceOwner(const ContractID& cid, Gallery::Nft::Id id, const PubKey& pkOwner) {
         m_km.SetCid(cid);
         return DeduceOwnerRaw(id, pkOwner) || // owner
             DeduceOwnerRaw(0, pkOwner); // artist
     }
 
-    bool ReadOwnedItem(const ContractID& cid, Gallery::Artwork::Id id, Gallery::Artwork& m) {
+    bool ReadOwnedItem(const ContractID& cid, Gallery::Nft::Id id, Gallery::Nft& m) {
         if (!ReadItem(cid, id, m))
             return false;
 
@@ -379,18 +379,18 @@ struct ImpressionWalker {
     Gallery::Impression m_Value;
     bool m_Valid = false;
 
-    void Enum(const ContractID& cid, Gallery::Artwork::Id id) {
+    void Enum(const ContractID& cid, Gallery::Nft::Id id) {
         Enum(cid, id, id);
     }
 
-    void Enum(const ContractID& cid, Gallery::Artwork::Id id0, Gallery::Artwork::Id id1) {
+    void Enum(const ContractID& cid, Gallery::Nft::Id id0, Gallery::Nft::Id id1) {
         _POD_(m_Key.m_Prefix.m_Cid) = cid;
-        m_Key.m_KeyInContract.m_ID.m_ArtworkID = id0;
+        m_Key.m_KeyInContract.m_ID.nft_id = id0;
         _POD_(m_Key.m_KeyInContract.m_ID.m_pkUser).SetZero();
 
         Env::Key_T<Gallery::Impression::Key> k1;
         _POD_(k1.m_Prefix.m_Cid) = cid;
-        k1.m_KeyInContract.m_ID.m_ArtworkID = id1;
+        k1.m_KeyInContract.m_ID.nft_id = id1;
         _POD_(k1.m_KeyInContract.m_ID.m_pkUser).SetObject(0xff);
 
         m_Reader.Enum_T(m_Key, k1);
@@ -495,8 +495,8 @@ public:
         using ACKey = Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
             Gallery::Artist::Id, Gallery::Collection>::Key;
 
-        using CAKey = Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
-            Gallery::Collection::Id, Gallery::Artwork>::Key;
+        using CAKey = Gallery::Index<Gallery::Tag::kCollectionNftIdx,
+            Gallery::Collection::Id, Gallery::Nft>::Key;
 
         Env::Key_T<ACKey> ack0, ack1;
         _POD_(ack0.m_Prefix.m_Cid) = cid;
@@ -529,7 +529,7 @@ public:
                 cak0.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
                 cak1.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
                 cak0.m_KeyInContract.t_id = 0;
-                cak1.m_KeyInContract.t_id = static_cast<Gallery::Artwork::Id>(-1);
+                cak1.m_KeyInContract.t_id = static_cast<Gallery::Nft::Id>(-1);
                 Env::VarReader rca(cak0, cak1);
 
                 while (rca.MoveNext_T(cak0, exists)) {
@@ -612,8 +612,8 @@ struct MyCollection : public Gallery::Collection {
 
         if (!print_artworks) return;
 
-        using CAKey = Gallery::Index<Gallery::Tag::kCollectionArtworkIdx,
-            Gallery::Collection::Id, Gallery::Artwork>::Key;
+        using CAKey = Gallery::Index<Gallery::Tag::kCollectionNftIdx,
+            Gallery::Collection::Id, Gallery::Nft>::Key;
 
         Env::Key_T<CAKey> cak0, cak1;
         _POD_(cak0.m_Prefix.m_Cid) = cid;
@@ -621,7 +621,7 @@ struct MyCollection : public Gallery::Collection {
         cak0.m_KeyInContract.id = Utils::FromBE(id);
         cak1.m_KeyInContract.id = Utils::FromBE(id);
         cak0.m_KeyInContract.t_id = 0;
-        cak1.m_KeyInContract.t_id = static_cast<Gallery::Artwork::Id>(-1);
+        cak1.m_KeyInContract.t_id = static_cast<Gallery::Nft::Id>(-1);
         Env::VarReader rca(cak0, cak1);
 
         Env::DocArray gr2("artworks");
@@ -650,7 +650,7 @@ struct MyCollection : public Gallery::Collection {
 #pragma pack (pop)
 
 #pragma pack (push, 0)
-struct MyArtwork : public Gallery::Artwork {
+struct MyNft : public Gallery::Nft {
     Utils::Vector<char> vData;
     Utils::Vector<char> vLabel;
 
@@ -672,7 +672,7 @@ struct MyArtwork : public Gallery::Artwork {
         OwnerInfo oi;
 
         if (!_POD_(m_pkOwner).IsZero()) {
-            uint32_t owned = !!oi.DeduceOwner(cid, iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID, m_pkOwner);
+            uint32_t owned = !!oi.DeduceOwner(cid, iwlk.m_Key.m_KeyInContract.m_ID.nft_id, m_pkOwner);
             Env::DocAddBlob_T("owner", m_pkOwner);
             Env::DocAddNum("owned", owned);
 
@@ -704,10 +704,10 @@ struct MyArtwork : public Gallery::Artwork {
         bool bMyImpressionKey = false;
         PubKey pkMyImpression;
 
-        auto idNorm = iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID;
+        auto idNorm = iwlk.m_Key.m_KeyInContract.m_ID.nft_id;
 
         for ( ; iwlk.m_Valid; iwlk.Move()) {
-            auto idWlk = iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID;
+            auto idWlk = iwlk.m_Key.m_KeyInContract.m_ID.nft_id;
             if (idWlk > idNorm)
                 continue;
             if (idWlk < idNorm)
@@ -717,7 +717,7 @@ struct MyArtwork : public Gallery::Artwork {
                 if (!bMyImpressionKey) {
                     bMyImpressionKey = true;
                     oi.m_km.SetCid(cid);
-                    oi.m_km.m_ID = iwlk.m_Key.m_KeyInContract.m_ID.m_ArtworkID | KeyMaterial::g_MskImpression;
+                    oi.m_km.m_ID = iwlk.m_Key.m_KeyInContract.m_ID.nft_id | KeyMaterial::g_MskImpression;
                     oi.m_km.Get(pkMyImpression);
                 }
 
@@ -738,8 +738,8 @@ struct MyArtwork : public Gallery::Artwork {
 
     // TODO: ReadItem
 
-    bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Artwork::Key>& key) {
-        uint32_t nKey = sizeof(key), nVal = sizeof(Gallery::Artwork);
+    bool ReadNext(Env::VarReader& r, Env::Key_T<Gallery::Nft::Key>& key) {
+        uint32_t nKey = sizeof(key), nVal = sizeof(Gallery::Nft);
         if (!r.MoveNext(&key, nKey, this, nVal, 0))
             return false;
 
@@ -748,7 +748,7 @@ struct MyArtwork : public Gallery::Artwork {
         auto id = Utils::FromBE(key.m_KeyInContract.id);
         auto cid = key.m_Prefix.m_Cid;
 
-        Env::Key_T<Gallery::Events::AddArtworkData::Key> adk0, adk1;
+        Env::Key_T<Gallery::Events::AddNftData::Key> adk0, adk1;
         _POD_(adk0.m_Prefix.m_Cid) = cid;
         _POD_(adk1.m_Prefix.m_Cid) = cid;
         adk0.m_KeyInContract.m_ID = id;
@@ -756,7 +756,7 @@ struct MyArtwork : public Gallery::Artwork {
         _POD_(adk0.m_KeyInContract.m_pkArtist).SetZero();
         _POD_(adk1.m_KeyInContract.m_pkArtist).SetObject(0xff);
 
-        Env::Key_T<Gallery::Events::AddArtworkLabel::Key> alk0, alk1;
+        Env::Key_T<Gallery::Events::AddNftLabel::Key> alk0, alk1;
         _POD_(alk0.m_Prefix.m_Cid) = cid;
         _POD_(alk1.m_Prefix.m_Cid) = cid;
         alk0.m_KeyInContract.m_ID = id;
@@ -1017,8 +1017,8 @@ ON_METHOD(manager, view_collections) {
 
 ON_METHOD(artist, set_artwork) {
     struct {
-        Gallery::Method::SetArtwork args;
-        char m_szLabelData[Gallery::Artwork::s_TotalMaxLen];
+        Gallery::Method::SetNft args;
+        char m_szLabelData[Gallery::Nft::s_TotalMaxLen];
     } d;
 
     KeyMaterial::Owner km;
@@ -1036,9 +1036,9 @@ ON_METHOD(artist, set_artwork) {
     }
 
     uint32_t nArgSize = sizeof(d.args);
-    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Artwork::s_LabelMaxLen + 1); // including 0-term
+    uint32_t nLabelSize = Env::DocGetText("label", d.m_szLabelData, Gallery::Nft::s_LabelMaxLen + 1); // including 0-term
 
-    if (nLabelSize > Gallery::Artwork::s_LabelMaxLen + 1) {
+    if (nLabelSize > Gallery::Nft::s_LabelMaxLen + 1) {
         OnError("label is too long");
         return;
     }
@@ -1046,7 +1046,7 @@ ON_METHOD(artist, set_artwork) {
     d.args.label_len = (nLabelSize ? nLabelSize - 1 : 0);
     nArgSize += d.args.label_len;
 
-    uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.label_len, Gallery::Artwork::s_DataMaxLen);
+    uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.label_len, Gallery::Nft::s_DataMaxLen);
 
     if (!nDataSize) {
         OnError("data must be specified");
@@ -1069,7 +1069,7 @@ ON_METHOD(artist, set_artwork) {
     // - Patent verification: LoadVar + SaveVar, 25K units
     // - Artist verification: LoadVar, 5K units
     // - Global state: LoadVar + SaveVar, 25K units
-    // - Artwork creation: SaveVar, 20K units
+    // - Nft creation: SaveVar, 20K units
     // - AddSig by admin, 10K units
     // - event for the data. This is 100 units per byte, plus 5K units per call, which is repeated for each 8K of data
     // - add some extra for other stuff
@@ -1080,7 +1080,7 @@ ON_METHOD(artist, set_artwork) {
         Env::Cost::SaveVar_For(sizeof(Gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(Gallery::Artist)) +
         Env::Cost::LoadVar_For(sizeof(Gallery::Artist::Key)) +
-        Env::Cost::SaveVar_For(sizeof(Gallery::Artwork)) +
+        Env::Cost::SaveVar_For(sizeof(Gallery::Nft)) +
         Env::Cost::SaveVar_For(sizeof(Height)) +
         Env::Cost::AddSig +
         Env::Cost::Cycle * 200;
@@ -1209,11 +1209,11 @@ ON_METHOD(manager, set_artwork_status) {
     size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
     if (buf_len)
         buf[buf_len - 1] = ';';
-    std::vector<Gallery::Artwork::Id> ids_vec(ParseIds<Gallery::Artwork::Id>(buf));
+    std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
 
-    size_t args_size = sizeof(Gallery::Method::SetArtworkStatus) + sizeof(Gallery::Artwork::Id) * ids_vec.size();
-    std::unique_ptr<Gallery::Method::SetArtworkStatus> args(
-            static_cast<Gallery::Method::SetArtworkStatus*>(::operator new(args_size)));
+    size_t args_size = sizeof(Gallery::Method::SetNftStatus) + sizeof(Gallery::Nft::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetNftStatus> args(
+            static_cast<Gallery::Method::SetNftStatus*>(::operator new(args_size)));
 
     buf_len = Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
@@ -1223,7 +1223,7 @@ ON_METHOD(manager, set_artwork_status) {
     kid.get_Pk(args->signer);
 
     args->ids_num = ids_vec.size();
-    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artwork::Id) * ids_vec.size());
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Nft::Id) * ids_vec.size());
 
     Env::GenerateKernel(&cid, args->s_iMethod, args.get(), args_size, nullptr, 0, &kid, 1, "Update artwork's status", 2500000);
 }
@@ -1233,11 +1233,11 @@ ON_METHOD(moderator, set_artwork_status) {
     size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
     if (buf_len)
         buf[buf_len - 1] = ';';
-    std::vector<Gallery::Artwork::Id> ids_vec(ParseIds<Gallery::Artwork::Id>(buf));
+    std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
 
-    size_t args_size = sizeof(Gallery::Method::SetArtworkStatus) + sizeof(Gallery::Artwork::Id) * ids_vec.size();
-    std::unique_ptr<Gallery::Method::SetArtworkStatus> args(
-            static_cast<Gallery::Method::SetArtworkStatus*>(::operator new(args_size)));
+    size_t args_size = sizeof(Gallery::Method::SetNftStatus) + sizeof(Gallery::Nft::Id) * ids_vec.size();
+    std::unique_ptr<Gallery::Method::SetNftStatus> args(
+            static_cast<Gallery::Method::SetNftStatus*>(::operator new(args_size)));
 
     buf_len = Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
@@ -1248,7 +1248,7 @@ ON_METHOD(moderator, set_artwork_status) {
     km.Get(args->signer);
 
     args->ids_num = ids_vec.size();
-    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Artwork::Id) * ids_vec.size());
+    Env::Memcpy(args->ids, ids_vec.data(), sizeof(Gallery::Nft::Id) * ids_vec.size());
 
     SigRequest sig;
     sig.m_pID = &km;
@@ -1499,15 +1499,15 @@ ON_METHOD(manager, view_artwork_sales) {
 
 ON_METHOD(manager, view_artworks) {
     const size_t MAX_IDS = 128;
-    char buf[MAX_IDS * sizeof(Gallery::Artwork::Id)];
+    char buf[MAX_IDS * sizeof(Gallery::Nft::Id)];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
     if (buf_len)
         buf[buf_len - 1] = ';';
 
-    using HeightArtworkIdx = 
-        Gallery::Index<Gallery::Tag::kHeightArtworkIdx, Height, Gallery::Artwork>;
+    using HeightNftIdx = 
+        Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>;
 
-    GalleryObjectPrinter<MyArtwork, HeightArtworkIdx> a{cid};
+    GalleryObjectPrinter<MyNft, HeightNftIdx> a{cid};
     if (count && h0)
         a.Print(h0, count);
     else if (buf_len)
@@ -1517,7 +1517,7 @@ ON_METHOD(manager, view_artworks) {
 }
 
 ON_METHOD(user, set_price) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id, m))
         return;
@@ -1537,7 +1537,7 @@ ON_METHOD(user, set_price) {
 }
 
 ON_METHOD(user, transfer) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     OwnerInfo oi;
     if (!oi.ReadOwnedItem(cid, id, m))
         return;
@@ -1554,7 +1554,7 @@ ON_METHOD(user, transfer) {
 }
 
 ON_METHOD(user, buy) {
-    Gallery::Artwork m;
+    Gallery::Nft m;
     if (!ReadItem(cid, id, m))
         return;
 
@@ -1646,7 +1646,7 @@ ON_METHOD(user, vote) {
 
     Gallery::Method::Vote args;
     args.m_Impression.m_Value = val;
-    args.m_ID.m_ArtworkID = id;
+    args.m_ID.nft_id = id;
 
     KeyMaterial::Owner km;
     km.SetCid(cid);

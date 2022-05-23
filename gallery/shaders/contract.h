@@ -3,21 +3,21 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0xec,0x76,0xdd,0x50,0x8b,0xd0,0x55,0x15,0x79,0xd2,0x9f,0xbf,0xc3,0x15,0x63,0xe8,0xf3,0xb5,0x02,0x49,0xa1,0x5f,0x6d,0x82,0x6a,0x93,0x6a,0x92,0xf3,0xe1,0xfe,0xab};
+    static const ShaderID s_SID_0 = {0x80,0xce,0xfc,0xe7,0x0b,0x00,0xbe,0xda,0xdb,0xfa,0x58,0xa5,0x94,0x64,0x12,0xc1,0xcc,0xf2,0x82,0xbd,0xf2,0xeb,0x8d,0xa4,0x93,0xf3,0x94,0xda,0x56,0x7b,0x82,0xcf};
 #pragma pack (push, 1)
 
     enum class Tag : uint8_t {
         kArtist = 1,
         kPayout = 2,
-        kArtwork = 3,
+        kNft = 3,
         kModerator = 4,
         kImpression = 5,
         kCollection = 6,
         kArtistCollectionIdx = 7,
-        kCollectionArtworkIdx = 8,
+        kCollectionNftIdx = 8,
         kHeightArtistIdx = 9,
         kHeightModeratorIdx = 10,
-        kHeightArtworkIdx = 11,
+        kHeightNftIdx = 11,
         kHeightCollectionIdx = 12,
     };
 
@@ -144,12 +144,12 @@ namespace Gallery {
         static const uint32_t s_LabelMaxLen = 10 * 1024;
         static const uint32_t s_DataMaxLen = 10 * 1024;
         static const uint32_t s_TotalMaxLen = s_LabelMaxLen + s_DataMaxLen;
-        static const uint32_t s_MaxArtworks = 500;
+        static const uint32_t s_MaxNfts = 500;
     };
 
-    struct Artwork : public GalleryObject<Artwork, uint32_t> {
+    struct Nft : public GalleryObject<Nft, uint32_t> {
         struct Key {
-            Tag tag = Tag::kArtwork;
+            Tag tag = Tag::kNft;
             Id id;
         };
 
@@ -169,7 +169,7 @@ namespace Gallery {
 
     struct Impression {
         struct Id {
-            Artwork::Id m_ArtworkID;
+            Nft::Id nft_id;
             PubKey m_pkUser;
         };
         struct Key {
@@ -184,7 +184,7 @@ namespace Gallery {
             Tag tag = Tag::kPayout;
             PubKey m_pkUser;
             AssetID m_Aid;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
         };
         Amount m_Amount;
     };
@@ -206,19 +206,19 @@ namespace Gallery {
     };
 
     struct Events {
-        struct AddArtworkData {
+        struct AddNftData {
             struct Key {
                 uint8_t m_Prefix = 0;
-                Artwork::Id m_ID;
+                Nft::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
         };
 
-        struct AddArtworkLabel {
+        struct AddNftLabel {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Artwork::Id m_ID;
+                Nft::Id m_ID;
                 PubKey m_pkArtist;
             };
             // data is the exhibit itself
@@ -227,7 +227,7 @@ namespace Gallery {
         struct Sell {
             struct Key {
                 uint8_t m_Prefix = 1;
-                Artwork::Id m_ID;
+                Nft::Id m_ID;
             };
             AmountWithAsset m_Price;
             uint8_t m_HasAid;
@@ -329,7 +329,7 @@ namespace Gallery {
             // followed by label and data without delimiter
         };
 
-        struct SetArtwork {
+        struct SetNft {
             static const uint32_t s_iMethod = 9;
             PubKey m_pkArtist;
             uint32_t data_len;
@@ -339,24 +339,24 @@ namespace Gallery {
             // followed by the data and label
         };
 
-        struct SetArtworkStatus {
+        struct SetNftStatus {
             static const uint32_t s_iMethod = 10;
             PubKey signer;
             Status status;
             uint32_t ids_num;
-            Artwork::Id ids[];
+            Nft::Id ids[];
             static const uint32_t kMaxIds = 128;
         };
 
         struct SetPrice {
             static const uint32_t s_iMethod = 11;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
             AmountWithAsset m_Price;
         };
 
         struct Buy {
             static const uint32_t s_iMethod = 12;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
             PubKey m_pkUser;
             uint8_t m_HasAid;
             Amount m_PayMax;
@@ -370,17 +370,17 @@ namespace Gallery {
 
         struct CheckPrepare {
             static const uint32_t s_iMethod = 14;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
         };
 
         struct CheckOut {
             static const uint32_t s_iMethod = 15;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
         };
 
         struct CheckIn {
             static const uint32_t s_iMethod = 16;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
             PubKey m_pkUser;
         };
 
@@ -397,7 +397,7 @@ namespace Gallery {
 
         struct Transfer {
             static const uint32_t s_iMethod = 19;
-            Artwork::Id m_ID;
+            Nft::Id m_ID;
             PubKey m_pkNewOwner;
         };
     } // namespace Method
