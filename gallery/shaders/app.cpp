@@ -210,32 +210,30 @@ void OnError(const char* sz) {
 
 template <class Id>
 std::vector<Id> ParseIds(const std::string_view& ids) {
-    int cur_pos = 0;
-    int next_pos;
-
     union {
         Id id;
         uint8_t a[sizeof(Id)];
     } blob;
 
     std::vector<Id> res;
-    while ((next_pos = ids.find(';', cur_pos)) != ids.npos) {
-        _POD_(blob.id).SetZero();
-        if constexpr(std::is_same_v<Id, PubKey>) {
-            for (int i = cur_pos; i < next_pos; ++i) {
-                if (isdigit(ids[i])) {
-                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - '0') << (4 * !((i - cur_pos) & 1)));
-                } else {
-                    blob.a[(i - cur_pos) / 2] |= ((ids[i] - 'a' + 10) << (4 * !((i - cur_pos) & 1)));
-                }
-            }
+    int pos = 0;
+    for (auto c : ids) {
+        if (c == ';') {
+            res.push_back(blob.id);
+            _POD_(blob.id).SetZero();
+            pos = 0;
         } else {
-            for (int i = cur_pos; i < next_pos; ++i)
-                blob.id = blob.id * 10 + ids[i] - '0';
+            if constexpr(std::is_same_v<Id, PubKey>) {
+                uint8_t val = isdigit(c) ? (c - '0') : (c - 'a' + 10);
+                blob.a[pos / 2] |= (val << (4 * !(pos & 1)));
+                ++pos;
+            } else {
+                blob.id = blob.id * 10 + c - '0';
+            }
         }
-        cur_pos = next_pos + 1;
-        res.push_back(blob.id);
     }
+    if (!_POD_(blob.id).IsZero())
+        res.push_back(blob.id);
     return res;
 }
 
@@ -959,11 +957,8 @@ ON_METHOD(manager, view_artworks_stats) {
 }
 
 ON_METHOD(manager, view_artists) {
-    const size_t MAX_IDS = 128;
-    char buf[MAX_IDS * sizeof(Gallery::Artist::Id)];
+    char buf[256];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
 
     using HeightArtistIdx = 
         Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>;
@@ -978,11 +973,8 @@ ON_METHOD(manager, view_artists) {
 }
 
 ON_METHOD(manager, view_moderators) {
-    const size_t MAX_IDS = 128;
-    char buf[MAX_IDS * sizeof(Gallery::Moderator::Id)];
+    char buf[256];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
 
     using HeightModeratorIdx = 
         Gallery::Index<Gallery::Tag::kHeightModeratorIdx, Height, Gallery::Moderator>;
@@ -997,11 +989,8 @@ ON_METHOD(manager, view_moderators) {
 }
 
 ON_METHOD(manager, view_collections) {
-    const size_t MAX_IDS = 128;
-    char buf[MAX_IDS * sizeof(Gallery::Collection::Id)];
+    char buf[256];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
 
     using HeightCollectionIdx = 
         Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>;
@@ -1206,16 +1195,14 @@ ON_METHOD(manager, view_balance) {
 
 ON_METHOD(manager, set_artwork_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetNftStatus) + sizeof(Gallery::Nft::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetNftStatus> args(
             static_cast<Gallery::Method::SetNftStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1230,16 +1217,14 @@ ON_METHOD(manager, set_artwork_status) {
 
 ON_METHOD(moderator, set_artwork_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Nft::Id> ids_vec(ParseIds<Gallery::Nft::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetNftStatus) + sizeof(Gallery::Nft::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetNftStatus> args(
             static_cast<Gallery::Method::SetNftStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1259,16 +1244,14 @@ ON_METHOD(moderator, set_artwork_status) {
 
 ON_METHOD(moderator, set_artist_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Artist::Id> ids_vec(ParseIds<Gallery::Artist::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetArtistStatus) + sizeof(Gallery::Artist::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetArtistStatus> args(
             static_cast<Gallery::Method::SetArtistStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1288,16 +1271,14 @@ ON_METHOD(moderator, set_artist_status) {
 
 ON_METHOD(manager, set_artist_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Artist::Id> ids_vec(ParseIds<Gallery::Artist::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetArtistStatus) + sizeof(Gallery::Artist::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetArtistStatus> args(
             static_cast<Gallery::Method::SetArtistStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1312,16 +1293,14 @@ ON_METHOD(manager, set_artist_status) {
 
 ON_METHOD(manager, set_collection_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Collection::Id> ids_vec(ParseIds<Gallery::Collection::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetCollectionStatus) + sizeof(Gallery::Collection::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetCollectionStatus> args(
             static_cast<Gallery::Method::SetCollectionStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1336,16 +1315,14 @@ ON_METHOD(manager, set_collection_status) {
 
 ON_METHOD(moderator, set_collection_status) {
     char buf[256];
-    size_t buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
+    Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<Gallery::Collection::Id> ids_vec(ParseIds<Gallery::Collection::Id>(buf));
 
     size_t args_size = sizeof(Gallery::Method::SetCollectionStatus) + sizeof(Gallery::Collection::Id) * ids_vec.size();
     std::unique_ptr<Gallery::Method::SetCollectionStatus> args(
             static_cast<Gallery::Method::SetCollectionStatus*>(::operator new(args_size)));
 
-    buf_len = Env::DocGetText("status", buf, sizeof(buf));
+    Env::DocGetText("status", buf, sizeof(buf));
     args->status = StringToStatus(buf);
     if (args->status == Gallery::Status::kNone) return;
 
@@ -1498,11 +1475,8 @@ ON_METHOD(manager, view_artwork_sales) {
 }
 
 ON_METHOD(manager, view_artworks) {
-    const size_t MAX_IDS = 128;
-    char buf[MAX_IDS * sizeof(Gallery::Nft::Id)];
+    char buf[256];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
-    if (buf_len)
-        buf[buf_len - 1] = ';';
 
     using HeightNftIdx = 
         Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>;

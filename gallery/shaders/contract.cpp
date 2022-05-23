@@ -497,7 +497,6 @@ BEAM_EXPORT void Method_17(const Gallery::Method::Vote& r) {
     Gallery::Nft m;
 
     Env::Halt_if(!m.Load(r.m_ID.nft_id));
-    //Env::Halt_if(m.status != Gallery::Status::kApproved);
     
     Gallery::Impression::Key impk;
     _POD_(impk.m_ID) = r.m_ID;
