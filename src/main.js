@@ -11,6 +11,7 @@ import nft from './components/nft'
 import collection from './components/collection.vue'
 import createCollection from './components/create-collection'
 import approveCollection from './components/approve-collection'
+import approveArtist from './components/approve-artist'
 import createNFT from './components/create-nft'
 import approveNFT from './components/approve-nft'
 
@@ -33,6 +34,7 @@ utils.initialize(
     vueApp.component('collection', collection)
     vueApp.component('create-collection', createCollection)
     vueApp.component('approve-collection', approveCollection)
+    vueApp.component('approve-artist', approveArtist)
     vueApp.component('create-nft', createNFT)
     vueApp.component('approve-nft', approveNFT)
     vueApp.use(router)

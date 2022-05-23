@@ -4,6 +4,7 @@ import {reactive, nextTick, computed} from 'vue'
 
 import router from 'router'
 import imagesStore from 'stores/images'
+import lazyArtistsStore from 'stores/artists-lazy'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
@@ -87,7 +88,8 @@ const store = {
     this._database = new Database()
     await this._database.initAsync({
       ...collsStore.getDBStores(),
-      ...nftsStore.getDBStores()
+      ...nftsStore.getDBStores(),
+      ...lazyArtistsStore.getDBStores()
     })
 
     //
@@ -96,6 +98,7 @@ const store = {
     nftsStore.reset(this, this._database)
     collsStore.reset(this, this._database)
     artistsStore.reset(this, this._database)
+    lazyArtistsStore.reset(this, this._database)
     imagesStore.reset(this, this._database)
 
     //
@@ -194,7 +197,9 @@ const store = {
     if (this.state.loading) {
       this.state.loading = 'Loading Artists'
     }
+
     await artistsStore.loadAsync()
+    await lazyArtistsStore.loadAsync()
     
     if (this.state.loading) {
       this.state.loading = 'Loading Collections'

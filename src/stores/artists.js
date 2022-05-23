@@ -1,9 +1,10 @@
-import formats from 'stores/formats'
+
 import utils from 'utils/utils'
-import imagesStore from 'stores/images'
-import {versions, cid} from 'stores/consts'
+import {cid, versions} from 'stores/consts'
 import router from 'router'
 import {reactive} from 'vue'
+import ArtistsCommon from './artists-common'
+import formats from 'stores/formats'
 
 class ArtistsStore {
   constructor () {
@@ -104,6 +105,7 @@ class ArtistsStore {
     this._state.total = res.total
   }
 
+  // TODO: check if we need fail flag
   async _loadArtistAsync (id, fail) {
     try {
       let {res} = await utils.invokeContractAsync({
@@ -125,8 +127,24 @@ class ArtistsStore {
         return null
       }
 
-      let artist = this._fromContract(res.items[0])
-      this._setArtist(id, artist)
+      let item = res.items[0]
+      
+      if (!item.label) {
+        throw new Error('label cannot be empty')
+      }
+      
+      if (!item.data) {
+        throw new Error('empty data on item') 
+      }
+
+      item.label = formats.fromContract(item.label)
+      item.data = formats.fromContract(item.data, versions.ARTIST_VERSION)
+      item = this._fromContract(item)
+      this._setArtist(id, item)
+
+      if (this._global.debug) {
+        console.log('item loaded with label', item.label)
+      }
     } 
     catch (err) {
       console.log(`_loadArtistAsync for id ${id}:`, err)
@@ -187,33 +205,11 @@ class ArtistsStore {
   }
 
   async _toContract (label, data) {
-    data.avatar = await imagesStore.toContract(data.avatar)
-    data.banner = await imagesStore.toContract(data.banner)
-    
-    return {
-      label: formats.toContract(label),
-      data: formats.toContract(data, versions.ARTIST_VERSION)
-    }
+    return ArtistsCommon.toContract(label, data)
   } 
 
   _fromContract (cartist) {
-    let artist = Object.assign({}, cartist)
-
-    if (!artist.label) {
-      throw new Error('ArtistsStore._fromContract : artist label is empty')
-    }
-
-    artist.label     = formats.fromContract(artist.label)
-    artist.data      = formats.fromContract(artist.data, versions.ARTIST_VERSION)
-    artist.version   = artist.data.version
-    artist.about     = artist.data.about
-    artist.website   = artist.data.website
-    artist.twitter   = artist.data.twitter
-    artist.instagram = artist.data.instagram
-    artist.avatar    = imagesStore.fromContract(artist.data.avatar)
-    artist.banner    = imagesStore.fromContract(artist.data.banner)
-  
-    return artist
+    return ArtistsCommon.fromContract(cartist)
   }
 
   toBecomeArtist() {

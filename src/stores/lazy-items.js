@@ -46,7 +46,7 @@ export default class ItemsStore {
     })
     
     this._allocMode('moderator', (store) => {
-      // TODO: sort by height in reverse order
+      // TODO: sort by height in reverse order ?
       console.log(`loader for moderator:${this._store_name}`)
       return store.where('status')
         .equals('pending')
@@ -215,7 +215,6 @@ export default class ItemsStore {
       original.sale  = (item.price || {}).amount > 0 ? 1 : 0
 
       try {
-        item.label = formats.fromContract(item.label)
         if (!item.label) {
           throw new Error('label cannot be empty')
         }
@@ -224,6 +223,7 @@ export default class ItemsStore {
           throw new Error('empty data on item') 
         }
         
+        item.label = formats.fromContract(item.label)
         item.data = formats.fromContract(item.data, this._versions)
         item = this._fromContract(item)
 

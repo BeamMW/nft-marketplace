@@ -7,6 +7,16 @@
     </pageTitle>
     <div class="gallery-container">
       <tabsctrl v-model="active_tab" class="tabs" :tabs="tabs"/>
+      <list v-if="show_artists"
+            class="list"
+            items_name="artists to be reviewed"
+            component="approve-artist"
+            mode="moderator"
+            selectable
+            :store="artistsStore"
+            :selected="selected_artists"
+            @selected="onArtistSelected"
+      />
       <list v-if="show_collections"
             class="list"
             items_name="collections to be reviewed"
@@ -97,6 +107,7 @@ import {admin_tabs} from 'utils/consts'
 import list from './items-list.vue'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
+import artistsStore from 'stores/artists-lazy'
 import btn from './button.vue'
 
 export default {
@@ -113,11 +124,13 @@ export default {
   data() {
     return {
       tabs: [
+        {id: admin_tabs.ARTISTS, name: 'Artists'},
         {id: admin_tabs.COLLECTIONS, name: 'Collections'},
         {id: admin_tabs.NFTS, name: 'NFTs'}
       ],
       selected_nfts: [],
-      selected_collections: []
+      selected_collections: [],
+      selected_artists: []
     }
   },
 
@@ -133,6 +146,9 @@ export default {
         this.$store.setAdminTab(value)
       }
     },
+    show_artists() {
+      return this.active_tab === admin_tabs.ARTISTS
+    },
     show_collections() {
       return this.active_tab == admin_tabs.COLLECTIONS
     },
@@ -145,14 +161,21 @@ export default {
     nftsStore() {
       return nftsStore
     },
+    artistsStore() {
+      return artistsStore
+    },
     active_selected() {
-      return this.show_collections ? this.selected_collections : this.selected_nfts
+      if (this.show_artists) return this.selected_artists
+      if (this.show_collections) return this.selected_collections
+      return this.selected_nfts
     },
     any_selected() {
       return this.active_selected.length > 0
     },
     active_approve() {
-      return this.show_collections ? this.$store.approveCollections : this.$store.approveNFTs
+      if (this.show_artists) return this.approveArtists
+      if (this.show_collections) return this.approveCollections
+      return this.$store.approveNFTs
     }
   },
 
@@ -169,6 +192,13 @@ export default {
         this.selected_nfts = this.selected_nfts.filter(item => item != id)
       } else {
         this.selected_nfts.push(id)
+      }
+    },
+    onArtistSelected(id) {
+      if (this.selected_artists.includes(id)) {
+        this.selected_artists = this.selected_artists.filter(item => item != id)
+      } else {
+        this.selected_artists.push(id)
       }
     },
     onCancel() {

@@ -1,7 +1,7 @@
 <template>
-  <div class="approve-collection" :class="{'error': item.error}">
+  <div class="approve-artist" :class="{'error': item.error}">
     <div v-if="item.error" class="info-error">
-      Failed to load Collection<br>Collection ID: {{ item.id }}<br>{{ item.error }}
+      Failed to load Artist<br>Artist ID: {{ item.id }}<br>{{ item.error }}
     </div>
     <div v-else class="row">
       <div class="type">
@@ -9,31 +9,38 @@
         <div v-if="item.website">Website</div>
         <div v-if="item.twitter">Twitter</div>
         <div v-if="item.instagram">Instagram</div>
-        <div v-if="item.description">Description</div>
+        <div v-if="item.about">About</div>
       </div>
       <div class="info">
-        <imagePreivew :image="item.cover" 
-                      :default="def_cover"
-                      radius="10px"
-                      width="348px"
-                      height="108px"
-                      cover
-                      style="float: right; margin-left: 15px; margin-bottom: 10px;"
-        >
-          <moderationStatus :item="item" short/>
-        </imagePreivew>
+        <div class="images">
+          <imagePreview class="banner"
+                        :image="item.banner" 
+                        :default="def_banner"
+                        radius="10px"
+                        width="432px"
+                        height="135px"
+                        cover
+          />
+          <imagePreview class="avatar"
+                        :image="item.avatar" 
+                        :default="def_avatar"
+                        width="120px"
+                        height="120px"
+                        radius="120px"
+          />
+        </div>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
         <div v-if="item.twitter"><span class="link" @click="onTwitter">{{ item.twitter }}</span></div>
         <div v-if="item.instagram"><span class="link" @click="onInstagram">{{ item.instagram }}</span></div>
-        <div v-if="item.description">{{ item.description }}</div>
+        <div v-if="item.about">{{ item.about }}</div>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="stylus" scoped>
-.approve-collection {
+<style scoped lang="stylus">
+.approve-artist {
   background-color: rgba(255, 255, 255, 0.05)
   border-radius: 10px
   box-sizing: border-box
@@ -64,6 +71,20 @@
     & > .info {
       display: block
       width: 100%
+      
+      & > .images {
+        float: right
+        margin-left: 15px 
+        height: 204px
+        position: relative
+        box-sizing: border-box
+
+        .avatar {
+          position: absolute
+          left: 164px
+          top: 81px
+        }
+      }
 
       & > div {
         &:not(:last-child) {
@@ -96,14 +117,12 @@
 </style>
 
 <script>
-import imagePreivew from './image-preview.vue'
-import moderationStatus from './moderation-status.vue'
+import imagePreview from './image-preview.vue'
 import {def_images} from 'utils/consts'
 
 export default {
   components: {
-    imagePreivew,
-    moderationStatus
+    imagePreview
   },
 
   props: {
@@ -113,13 +132,10 @@ export default {
     }
   },
 
-  emits: [
-    'selected'
-  ],
-
   data () {
     return {
-      def_cover: def_images.artist_banner
+      def_banner: def_images.artist_banner,
+      def_avatar: def_images.artist_avatar
     }
   },
 
