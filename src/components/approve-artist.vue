@@ -44,7 +44,7 @@
   background-color: rgba(255, 255, 255, 0.05)
   border-radius: 10px
   box-sizing: border-box
-  padding: 20px 20px 20px 70px
+  padding: 20px 20px 15px 70px
   display:flex
   flex-direction: column
   font-size: 14px
@@ -71,20 +71,6 @@
     & > .info {
       display: block
       width: 100%
-      
-      & > .images {
-        float: right
-        margin-left: 15px 
-        height: 204px
-        position: relative
-        box-sizing: border-box
-
-        .avatar {
-          position: absolute
-          left: 164px
-          top: 81px
-        }
-      }
 
       & > div {
         &:not(:last-child) {
@@ -105,6 +91,20 @@
           &:hover {
             text-decoration: underline
           }
+        }
+      }
+
+      & > .images {
+        float: right
+        margin: 0px 0px 0px 15px !important
+        height: 204px
+        position: relative
+        box-sizing: border-box
+
+        .avatar {
+          position: absolute
+          left: 164px
+          top: 81px
         }
       }
     }
