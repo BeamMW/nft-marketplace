@@ -12,7 +12,7 @@
 <style lang="stylus" scoped>
 .new-box {
   width: 213px
-  height: 294px
+  height: 309px
   border-radius: 10px
   border: 1px dashed rgba(26, 246, 214, 0.5)
   background-color: rgba(26, 246, 214, 0.1)
