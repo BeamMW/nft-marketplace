@@ -139,7 +139,6 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
         a.updated = cur_height;
         a.collections_num = 0;
         a.nfts_num = 0;
-        a.label_len = r.m_LabelLen;
         s.total_artists++;
         s.Save();
 
@@ -148,9 +147,8 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
         auto label_ptr = reinterpret_cast<const char*>(&r + 1);
         Env::EmitLog(&alk, sizeof(alk), label_ptr, r.m_LabelLen, KeyTag::Internal);
         Gallery::Artist::LabelKey lk;
-        lk.id = r.m_pkArtist;
         lk.label_hash = Gallery::GetLabelHash(std::string_view(label_ptr, r.m_LabelLen));
-        Env::SaveVar_T(lk, true);
+        Env::SaveVar_T(lk, r.m_pkArtist);
     }
 
     auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen;
@@ -237,6 +235,15 @@ BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
         a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
         s.Save();
     }
+
+    Gallery::Collection::LabelKey lk;
+    lk.artist_id = r.m_pkArtist;
+    lk.label_hash = Gallery::GetLabelHash(std::string_view(c.m_szLabelData, c.label_len));
+    Env::DelVar_T(lk);
+
+    auto label_ptr = reinterpret_cast<const char*>(&r + 1);
+    lk.label_hash = Gallery::GetLabelHash(std::string_view(label_ptr, r.m_LabelLen));
+    Env::SaveVar_T(lk, c_id);
 
     Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
     c.label_len = r.m_LabelLen;

@@ -446,10 +446,6 @@ public:
     char data[s_DataMaxLen];
     Utils::Vector<char> label;
 
-    std::string_view GetLabel() const {
-        return std::string_view(label.m_p, label_len);
-    }
-
     static PubKey id(const ContractID& cid) {
         KeyMaterial::Owner km;
         km.SetCid(cid);
@@ -527,7 +523,6 @@ public:
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Key>& key) {
         label.m_Count = 0;
-
 
         while (true) {
             uint32_t nKey = sizeof(key), nVal = sizeof(Artist) + sizeof(data);
@@ -911,29 +906,33 @@ ON_METHOD(manager, view_params) {
 }
 
 bool my_artist_exists(const ContractID& cid, const std::string_view& label) {
-    // FIXME
-    bool artist_exists = false;
-    Env::Key_T<Gallery::Artist::LabelKey> lk;
-    lk.m_Prefix.m_Cid = cid;
-    lk.m_KeyInContract.id = MyArtist::id(cid);
-    lk.m_KeyInContract.label_hash = Gallery::GetLabelHash(label);
-    Env::VarReader::Read_T(lk, artist_exists);
-    return artist_exists;
+    Env::Key_T<Gallery::Artist::Key> k;
+    k.m_Prefix.m_Cid = cid;
+    k.m_KeyInContract.id = MyArtist::id(cid);
+    MyArtist a;
+    Env::VarReaderEx<false> r(k, k);
+    uint32_t nKey = 0;
+    uint32_t nVal = 0;
+    return r.MoveNext(nullptr, nKey, nullptr, nVal, 0);
 }
 
-bool artist_label_exists(const ContractID& cid, const std::string_view& label) {
-    Env::Key_T<Gallery::Artist::LabelKey> lk0, lk1;
-    lk1.m_Prefix.m_Cid = cid;
-    lk0.m_Prefix.m_Cid = cid;
-    Gallery::Hash256 label_hash = Gallery::GetLabelHash(label);
-    lk0.m_KeyInContract.label_hash = label_hash;
-    _POD_(lk1.m_KeyInContract.label_hash).SetObject(0xff);
-    _POD_(lk0.m_KeyInContract.id).SetZero();
-    _POD_(lk1.m_KeyInContract.id).SetObject(0xff);
+Gallery::Collection::Id collection_id_by_label(const ContractID& cid, const std::string_view& label) {
+    Env::Key_T<Gallery::Collection::LabelKey> lk;
+    lk.m_Prefix.m_Cid = cid;
+    lk.m_KeyInContract.label_hash = Gallery::GetLabelHash(label);
+    lk.m_KeyInContract.artist_id = MyArtist::id(cid);
+    Gallery::Collection::Id collection_id;
+    Env::VarReader::Read_T(lk, collection_id);
+    return collection_id;
+}
 
-    Env::VarReader r(lk0, lk1);
-    bool artist_label_exists = false;
-    return r.MoveNext_T(lk0, artist_label_exists) && _POD_(lk0.m_KeyInContract.label_hash) == label_hash;
+Gallery::Artist::Id artist_id_by_label(const ContractID& cid, const std::string_view& label) {
+    Env::Key_T<Gallery::Artist::LabelKey> lk;
+    lk.m_Prefix.m_Cid = cid;
+    lk.m_KeyInContract.label_hash = Gallery::GetLabelHash(label);
+    Gallery::Artist::Id artist_id;
+    Env::VarReader::Read_T(lk, artist_id);
+    return artist_id;
 }
 
 ON_METHOD(manager, view_artists_stats) {
@@ -1378,16 +1377,16 @@ ON_METHOD(artist, set_artist) {
     nArgSize += d.args.m_LabelLen;
 
     std::string_view label(d.m_szLabelData, d.args.m_LabelLen);
-    bool label_exists = artist_label_exists(cid, label);
+    Gallery::Artist::Id artist_id = artist_id_by_label(cid, label);
     bool artist_exists = my_artist_exists(cid, label);
 
-    if (!artist_exists && label_exists) {
-        OnError("label already exists");
+    if (artist_exists && (_POD_(artist_id).IsZero() || _POD_(artist_id) != MyArtist::id(cid))) {
+        OnError("label is immutable");
         return;
     }
 
-    if (artist_exists && !label_exists) {
-        OnError("label is immutable");
+    if (!artist_exists && !_POD_(artist_id).IsZero()) {
+        OnError("label already exists");
         return;
     }
 
@@ -1440,8 +1439,16 @@ ON_METHOD(artist, set_collection) {
     }
 
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
-
     nArgSize += d.args.m_LabelLen;
+
+    std::string_view label(d.m_szLabelData, d.args.m_LabelLen);
+    Gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
+    
+    if (d.args.collection_id && collection_id && collection_id != d.args.collection_id ||
+            !d.args.collection_id && collection_id) {
+        OnError("label already exists");
+        return;
+    }
 
     uint32_t nDataSize = Env::DocGetText("data", d.m_szLabelData + d.args.m_LabelLen, Gallery::Collection::s_DataMaxLen + 1); // including 0-term
 

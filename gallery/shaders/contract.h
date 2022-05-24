@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0xcf,0x3b,0xce,0x94,0xda,0x25,0xcf,0xac,0x46,0xee,0x0e,0xbb,0xe6,0x25,0x83,0xe3,0x5e,0x6a,0xf6,0xe6,0xfb,0xd0,0x71,0x1f,0x37,0x1a,0x6c,0x02,0xfa,0x3e,0xce,0xe7};
+    static const ShaderID s_SID_0 = {0x1a,0xb4,0x10,0xb3,0xd8,0xa9,0xa0,0xa2,0x38,0x61,0x64,0x5f,0xc5,0x70,0x21,0x71,0x16,0xeb,0xde,0xbf,0xb0,0x5a,0xe3,0xe0,0x0b,0x4f,0x47,0x26,0x8a,0x3c,0x64,0x96};
 #pragma pack (push, 1)
 
     using Hash256 = Opaque<32>;
@@ -30,13 +30,7 @@ namespace Gallery {
         kHeightNftIdx = 11,
         kHeightCollectionIdx = 12,
         kArtistLabelHash = 13,
-    };
-
-    enum class Role : uint8_t {
-        kManager,
-        kModerator,
-        kArtist,
-        kUser,
+        kCollectionLabelHash = 14,
     };
 
     enum class Status : uint8_t {
@@ -116,14 +110,12 @@ namespace Gallery {
         struct LabelKey {
             Tag tag = Tag::kArtistLabelHash;
             Hash256 label_hash;
-            Id id;
         };
 
         Height m_hRegistered;
         Height updated;
         Status status;
         uint32_t data_len;
-        uint32_t label_len;
         uint32_t collections_num;
         uint32_t nfts_num;
 
@@ -137,6 +129,12 @@ namespace Gallery {
         struct Key {
             Tag tag = Tag::kCollection;
             Id id;
+        };
+
+        struct LabelKey {
+            Tag tag = Tag::kCollectionLabelHash;
+            Artist::Id artist_id;
+            Hash256 label_hash;
         };
 
         Status status;
