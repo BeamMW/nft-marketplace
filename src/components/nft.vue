@@ -115,11 +115,11 @@
 </style>
 
 <script>
-import price from './nft-price'
-import preview from './image-preview'
+import price from 'controls/price'
+import preview from 'controls/preview'
+import moderationStatus from 'controls/moderation-status'
 import nftsStore from 'stores/nfts'
 import {def_images} from 'utils/consts'
-import moderationStatus from './moderation-status'
 
 export default {
   components: {

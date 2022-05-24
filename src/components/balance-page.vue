@@ -1,5 +1,5 @@
 <template>
-  <publicKeyModal ref="keyModal"/>
+  <keyModal ref="keyModal"/>
   <pageTitle title="balance">
     <btnEditArtist/>
     <btnKey/>
@@ -70,17 +70,17 @@
 </style>
 
 <script>
-import publicKeyModal from './public-key-dialog.vue'
-import btn from './button.vue'
-import pageTitle from './page-title.vue'
-import amount from './amount.vue'
-import artistsStore from 'stores/artists.js'
-import btnEditArtist from './btn-edit-artist'
-import btnKey from './btn-key'
+import keyModal from 'components/key-modal'
+import btn from 'controls/button'
+import btnKey from 'controls/btn-key'
+import btnEditArtist from 'controls/btn-edit-artist'
+import pageTitle from 'controls/page-title'
+import amount from 'controls/amount'
+import artistsStore from 'stores/artists'
 
 export default {
   components: {
-    publicKeyModal,
+    keyModal,
     btn,
     pageTitle,
     amount,

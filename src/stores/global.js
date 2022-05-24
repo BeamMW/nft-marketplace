@@ -1,7 +1,3 @@
-import {common, contract, my_tabs} from 'utils/consts.js'
-import utils from 'utils/utils.js'
-import {reactive, nextTick, computed} from 'vue'
-
 import router from 'router'
 import imagesStore from 'stores/images'
 import lazyArtistsStore from 'stores/artists-lazy'
@@ -9,6 +5,9 @@ import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import Database from 'stores/database'
+import utils from 'utils/utils'
+import {reactive, nextTick, computed} from 'vue'
+import {common, contract, my_tabs} from 'utils/consts'
 
 function defaultState() {
   let state = {  
@@ -142,7 +141,7 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils.downloadAsync('./galleryManager.wasm')
+    this.state.shader = await utils.downloadAsync('/galleryManager.wasm')
     
     // utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
     await utils.callApiAsync('ev_subunsub', {ev_system_state: true})

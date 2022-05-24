@@ -16,10 +16,10 @@
 </style>
 
 <script>
-import loading from './loading.vue'
-import error from './error.vue'
-import errorModal from './error-modal.vue'
-import utils from 'utils/utils.js'
+import error from 'components/error'
+import errorModal from 'components/error-modal'
+import loading from 'controls/loading'
+import utils from 'utils/utils'
 
 export default {
   components: { 

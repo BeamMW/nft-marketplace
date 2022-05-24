@@ -1,5 +1,5 @@
 <template>
-  <nftPriceModal ref="priceModal" @sell-nft="onSellNFT"/>
+  <priceModal ref="priceModal" @sell-nft="onSellNFT"/>
   <!--- has price, so display it --->
   <span v-if="price" class="price-container">
     <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
@@ -100,10 +100,10 @@
 </style>
 
 <script>
-import btn from './button.vue'
-import popupMenu from './popup-menu.vue'
-import nftPriceModal from './price-dialog.vue'
-import amount from './amount.vue'
+import priceModal from 'components/price-modal'
+import btn from 'controls/button'
+import popupMenu from 'controls/popup-menu'
+import amount from 'controls/amount'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
 
@@ -111,7 +111,7 @@ export default {
   components: {
     btn,
     popupMenu,
-    nftPriceModal,
+    priceModal,
     amount
   },
 

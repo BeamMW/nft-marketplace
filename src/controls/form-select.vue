@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="form-container">
-      <label class="label">
-        Collection
-      </label>
+      <label class="label">{{ title }}</label>
     </div>
     <div class="custom-select" :class="{'readonly': readonly}" @blur="show = false">
       <div class="selected" :class="{'open focus': show}" @click="open">
@@ -116,6 +114,11 @@ import {nextTick} from 'vue'
  
 export default {
   props: {
+    title: {
+      type: String,
+      default: '',
+      requred: true
+    },
     options: {
       type: Array,
       required: true,

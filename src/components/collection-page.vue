@@ -4,11 +4,11 @@
   <loading v-if="collection === undefined" text="Loading Collection"/>
   <notFound v-else-if="collection === null" text="Collection Not Found"/>
   <div v-else class="collection-container">
-    <publicKeyModal ref="keyModal" :name="author_name" :artist_key="author_key"/>
-    <imagePreview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
+    <keyModal ref="keyModal" :name="author_name" :artist_key="author_key"/>
+    <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
       <div class="info-container">
         <div class="left">
-          <imagePreview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
+          <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
             <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
@@ -53,7 +53,7 @@
           </div>
         </div>
       </div>
-    </imagePreview>  
+    </preview>  
 
     <!-- TODO: same layout as in approve containers -->
     <div :class="{'block': true, 'block-long': long_text}">
@@ -266,18 +266,18 @@
 </style>
 
 <script>
-import pageTitle from './page-title'
-import btn from './button'
-import tabsctrl from './tabs'
-import imagePreview from './image-preview.vue'
+import keyModal from 'components/key-modal'
+import pageTitle from 'controls/page-title'
+import btn from 'controls/button'
+import tabsctrl from 'controls/tabs'
+import preview from 'controls/preview'
+import loading from 'controls/loading'
+import notFound from 'controls/not-found'
+import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
-import loading from './loading'
-import notFound from './not-found'
-import list from './items-list'
 import utils from 'utils/utils'
 import {useObservable} from '@vueuse/rxjs'
-import publicKeyModal from './public-key-dialog'
 import {coll_tabs, def_images} from 'utils/consts'
 import {computed} from 'vue'
 
@@ -285,10 +285,10 @@ export default {
   components: {
     pageTitle,
     btn,
-    imagePreview,
+    preview,
     loading,
     notFound,
-    publicKeyModal,
+    keyModal,
     tabsctrl,
     list
   },

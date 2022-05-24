@@ -1,13 +1,13 @@
 <template>
   <div :style="ctrlStyle">
-    <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (image || {}).error}">
-      <div v-if="image && !readonly" class="remove">
+    <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (modelValue || {}).error}">
+      <div v-if="modelValue && !readonly" class="remove">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
-      <img v-if="image && image.object" :src="image.object" alt="avatar" class="image"/>
-      <div v-if="image && image.loading" class="text" :readonly="readonly">Loading...</div>
-      <div v-if="image && image.error" class="text" :readonly="readonly">Failed to load image</div>
-      <label v-if="!image" class="text" for="image" :readonly="readonly" v-html="title"/>
+      <img v-if="modelValue && modelValue.object" :src="modelValue.object" alt="avatar" class="image"/>
+      <div v-if="modelValue && modelValue.loading" class="text" :readonly="readonly">Loading...</div>
+      <div v-if="modelValue && modelValue.error" class="text" :readonly="readonly">Failed to load image</div>
+      <label v-if="!modelValue" class="text" for="image" :readonly="readonly" v-html="title"/>
       <input v-if="!readonly"
              id="image"
              ref="image"
@@ -93,9 +93,10 @@
 <script>
 export default {
   props: {
-    image: {
+    // eslint-disable-next-line vue/prop-name-casing
+    modelValue: {
       type: Object,
-      required: false,
+      required: true,
       default: undefined
     },
     height: {
@@ -126,7 +127,7 @@ export default {
   },
 
   emits: [
-    'update:image'
+    'update:modelValue'
   ],
 
   computed: {
@@ -137,21 +138,21 @@ export default {
     },
     borderStyle() {
       return {
-        'border': this.image ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'border': this.modelValue ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
   },
   methods: {
     onRemove () {
       this.$refs.image.value = ''
-      this.$emit('update:image', null)
+      this.$emit('update:modelValue', null)
     },
     onUpload (e) {
       let file = e.target.files[0]
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
-        this.$emit('update:image', {
+        this.$emit('update:modelValue', {
           object: e.target.result,
           file
         })

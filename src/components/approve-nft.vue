@@ -10,14 +10,13 @@
         <div v-if="item.description" class="type">Description</div>
         <div v-if="item.description" class="value">{{ item.description }}</div>
       </div>
-      <imagePreivew :image="item.image" 
-                    :default="def_nft"
-                    radius="10px"
-                    width="200px"
-                    height="200px"
-                    cover
-      >
-      </imagePreivew>
+      <preview :image="item.image" 
+               :default="def_nft"
+               radius="10px"
+               width="200px"
+               height="200px"
+               cover
+      />
     </template>
   </div>
 </template>
@@ -57,12 +56,12 @@
 </style>
 
 <script>
-import imagePreivew from './image-preview.vue'
+import preview from 'controls/preview'
 import {def_images} from 'utils/consts'
 
 export default {
   components: {
-    imagePreivew,
+    preview,
   },
 
   props: {

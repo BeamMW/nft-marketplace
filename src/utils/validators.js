@@ -1,4 +1,4 @@
-import {common} from './consts'
+import {common} from 'utils/consts'
 
 export default class Validators {
   static twitter(value) {

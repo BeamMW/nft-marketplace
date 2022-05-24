@@ -1,10 +1,10 @@
 
-import utils from 'utils/utils'
-import {cid, versions} from 'stores/consts'
-import router from 'router'
-import {reactive} from 'vue'
-import ArtistsCommon from './artists-common'
+import ArtistsCommon from 'stores/artists-common'
 import formats from 'stores/formats'
+import utils from 'utils/utils'
+import router from 'router'
+import {cid, versions} from 'stores/consts'
+import {reactive} from 'vue'
 
 class ArtistsStore {
   constructor () {

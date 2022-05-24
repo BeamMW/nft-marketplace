@@ -72,16 +72,16 @@
 </style>
 
 <script>
-import pageTitle from './page-title.vue'
-import btnWallet from './btn-wallet'
-import btnEditArtist from './btn-edit-artist'
-import btnKey from './btn-key'
+import pageTitle from 'controls/page-title'
+import btnWallet from 'controls/btn-wallet'
+import btnEditArtist from 'controls/btn-edit-artist'
+import btnKey from 'controls/btn-key'
+import tabsctrl from 'controls/tabs'
+import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
-import {my_tabs} from 'utils/consts.js'
-import tabsctrl from './tabs.vue'
-import list from './items-list.vue'
+import {my_tabs} from 'utils/consts'
 
 export default {
   components: {

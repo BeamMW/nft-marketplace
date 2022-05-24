@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import btn from './button'
+import btn from 'controls/button'
 import artistsStore from 'stores/artists'
 
 export default {

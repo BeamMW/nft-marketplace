@@ -27,7 +27,7 @@
               <!-- TODO: make collection clickable and navigate to it on click -->
               <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }}</span></div>
               <div class="separator"/>
-              <artPrice :nft="nft"/>
+              <price :nft="nft"/>
             </div>
           </div>
         </div>
@@ -290,20 +290,20 @@
 </style>
 
 <script>
-import artPrice from './nft-price'
-import preview from './image-preview'
-import loading from './loading'
-import notFound from './not-found'
+import price from 'controls/price'
+import preview from 'controls/preview'
+import loading from 'controls/loading'
+import pageTitle from 'controls/page-title'
+import moderationStatus from 'controls/moderation-status'
+import notFound from 'controls/not-found'
 import artistsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
-import pageTitle from './page-title'
 import {useObservable} from '@vueuse/rxjs'
 import {Observable} from 'rxjs'
 import {computed} from 'vue'
-import moderationStatus from './moderation-status'
 
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
@@ -313,7 +313,7 @@ import { AgGridVue } from "ag-grid-vue3"
 
 export default {
   components: {
-    artPrice,
+    price,
     preview,
     pageTitle,
     loading,

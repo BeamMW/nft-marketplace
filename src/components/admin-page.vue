@@ -55,8 +55,8 @@
 </style>
 
 <script>
-import {common} from 'utils/consts.js'
-import {artistsStore} from 'stores/artists.js'
+import {common} from 'utils/consts'
+import {artistsStore} from 'stores/artists'
 
 export default {
   computed: {

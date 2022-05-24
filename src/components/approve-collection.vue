@@ -12,15 +12,15 @@
         <div v-if="item.description">Description</div>
       </div>
       <div class="info">
-        <imagePreivew :image="item.cover" 
-                      :default="def_cover"
-                      radius="10px"
-                      width="348px"
-                      height="108px"
-                      cover
-                      style="float: right; margin-left: 15px; margin-bottom: 10px;"
+        <preview :image="item.cover" 
+                 :default="def_cover"
+                 radius="10px"
+                 width="348px"
+                 height="108px"
+                 cover
+                 style="float: right; margin-left: 15px; margin-bottom: 10px;"
         >
-        </imagePreivew>
+        </preview>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
         <div v-if="item.twitter"><span class="link" @click="onTwitter">@{{ item.twitter }}</span></div>
@@ -95,12 +95,12 @@
 </style>
 
 <script>
-import imagePreivew from './image-preview.vue'
+import preview from 'controls/preview'
 import {def_images} from 'utils/consts'
 
 export default {
   components: {
-    imagePreivew,
+    preview,
   },
 
   props: {

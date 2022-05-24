@@ -4,7 +4,7 @@
       {{ label }}
     </label>
     <div class="input" :class="{'err': !valid, 'readonly': readonly}">
-      <img v-if="img" :src="`../assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
+      <img v-if="img" :src="`/assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
       <input :value="modelValue"
              :placeholder="placeholder"
              :style="style"
@@ -16,12 +16,12 @@
       />
       <slot></slot>
     </div>
-    <charactersLengthInfo v-if="max_length && counter" 
-                          :readonly="readonly" 
-                          :max_length="max_length" 
-                          :value="modelValue.length"
-                          :class="{'chars-err': !valid}"
-                          style="margin-top:3px;"
+    <charslen v-if="max_length && counter" 
+              :readonly="readonly" 
+              :max_length="max_length" 
+              :value="modelValue.length"
+              :class="{'chars-err': !valid}"
+              style="margin-top:3px;"
     />
   </div>
 </template>
@@ -107,12 +107,13 @@
 </style>
 
 <script>
-import charactersLengthInfo from './characters-length-info.vue'
+import charslen from 'controls/charslen'
 
 export default {
   components: {
-    charactersLengthInfo
+    charslen
   },
+
   props: {
     label: {
       type: String,

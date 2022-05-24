@@ -1,6 +1,6 @@
 <template>
   <div class="select-container" :style="style">
-    <img :src="`../assets/${icon}.svg`" alt="icon" :style="icon_style">
+    <img :src="`/assets/${icon}.svg`" alt="icon" :style="icon_style">
     <slot></slot>
   </div>
 </template>

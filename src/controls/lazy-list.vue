@@ -83,8 +83,8 @@
 </style>
 
 <script>
-import paginator from './paginator'
-import selectItem from './select-item'
+import paginator from 'controls/paginator'
+import selectItem from 'controls/select-item'
 import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
 

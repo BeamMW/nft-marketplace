@@ -1,9 +1,9 @@
-import {computed, reactive} from 'vue'
-import utils from 'utils/utils.js'
-import {cid} from 'stores/consts'
-import {common} from 'utils/consts'
+import utils from 'utils/utils'
 import formats from 'stores/formats'
 import router from 'router'
+import {cid} from 'stores/consts'
+import {common} from 'utils/consts'
+import {computed, reactive} from 'vue'
 import {liveQuery} from 'dexie'
 import {Observable} from 'rxjs'
 

@@ -113,12 +113,12 @@
 </style>
 
 <script>
-import preview from './image-preview'
-import amount from './amount'
+import preview from 'controls/preview'
+import amount from 'controls/amount'
+import moderationStatus from 'controls/moderation-status'
+import btnEdit from 'controls/btn-edit'
 import collsStore from 'stores/collections'
 import {def_images} from 'utils/consts'
-import moderationStatus from './moderation-status'
-import btnEdit from './btn-edit'
 
 export default {
   components: {

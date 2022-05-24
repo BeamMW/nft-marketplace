@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import btn from './button.vue'
+import btn from 'controls/button'
 
 export default {
   components: {

@@ -88,11 +88,11 @@
 </style>
 
 <script>
-import modal from './modal.vue'
-import btn from './button.vue'
-import priceInput from './price-input.vue'
-import utils from 'utils/utils.js'
-import {common} from 'utils/consts.js'
+import modal from 'controls/modal'
+import btn from 'controls/button'
+import priceInput from 'controls/price-input'
+import utils from 'utils/utils'
+import {common} from 'utils/consts'
 
 export default {
   components: { 

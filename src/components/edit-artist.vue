@@ -18,51 +18,51 @@
     </template>
     <div class="fields">
       <div class="col-first">
-        <inputField v-model="label"
-                    label="Artist Name*"
-                    :valid="label_valid"
-                    :max_length="25"
-                    :readonly="edit_self || in_set_artist"
-                    style="margin-bottom:58px;margin-top:0"
+        <formInput v-model="label"
+                   label="Artist Name*"
+                   :valid="label_valid"
+                   :max_length="25"
+                   :readonly="edit_self || in_set_artist"
+                   style="margin-bottom:58px;margin-top:0"
         />
-        <inputField v-model="website"
-                    label="Website"
-                    placeholder="https://website.name/"
-                    img="glob"
-                    :max_length="40"
-                    :valid="website_valid"
-                    :readonly="in_set_artist"
+        <formInput v-model="website"
+                   label="Website"
+                   placeholder="https://website.name/"
+                   img="glob"
+                   :max_length="40"
+                   :valid="website_valid"
+                   :readonly="in_set_artist"
         />
-        <inputField v-model="twitter"
-                    label="Twitter"
-                    placeholder="twitter"
-                    img="twitter"
-                    :max_length="15"
-                    :valid="twitter_valid"
-                    :readonly="in_set_artist"
-                    :counter="false"
-                    letters_only
+        <formInput v-model="twitter"
+                   label="Twitter"
+                   placeholder="twitter"
+                   img="twitter"
+                   :max_length="15"
+                   :valid="twitter_valid"
+                   :readonly="in_set_artist"
+                   :counter="false"
+                   letters_only
         />
-        <inputField v-model="instagram"
-                    label="Instagram"
-                    placeholder="instagram"
-                    img="instagram"
-                    :max_length="30"
-                    :valid="instagram_valid"
-                    :readonly="in_set_artist"
-                    :counter="false"
-                    letters_only
+        <formInput v-model="instagram"
+                   label="Instagram"
+                   placeholder="instagram"
+                   img="instagram"
+                   :max_length="30"
+                   :valid="instagram_valid"
+                   :readonly="in_set_artist"
+                   :counter="false"
+                   letters_only
         />
       </div>
       <div class="col-second">
-        <textAreaField v-model="about"
-                       label="About me"
-                       :valid="about_valid"
-                       :max_length="75"
-                       :readonly="in_set_artist"
+        <textArea v-model="about"
+                  label="About me"
+                  :valid="about_valid"
+                  :max_length="75"
+                  :readonly="in_set_artist"
         />
         <div class="uploads-container" style="margin-top:45px;">
-          <addImage v-model:image="banner"
+          <addImage v-model="banner"
                     accept="image/jpeg;image/png;image/svg+xml"
                     title="Add an artist banner<br>(*.jpg, *.png, *.svg)"  
                     :readonly="in_set_artist" 
@@ -247,19 +247,19 @@
 </style>
 
 <script>
-import inputField from './input-field.vue'
-import textAreaField from './textarea-field.vue'
-import pageTitle from './page-title.vue'
-import btn from './button.vue'
-import addImage from './add-image.vue'
+import formInput from 'controls/form-input'
+import textArea from 'controls/textarea'
+import pageTitle from 'controls/page-title'
+import btn from 'controls/button'
+import addImage from 'controls/add-image'
 import artistsStore from 'stores/artists'
 import validators from 'utils/validators'
 import router from 'router'
 
 export default {
   components: {
-    inputField, 
-    textAreaField, 
+    formInput, 
+    textArea, 
     pageTitle,
     addImage,
     btn

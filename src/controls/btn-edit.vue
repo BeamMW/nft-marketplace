@@ -22,7 +22,7 @@
 </style>
 
 <script>
-import btn from './button'
+import btn from 'controls/button'
 
 export default {
   components: {

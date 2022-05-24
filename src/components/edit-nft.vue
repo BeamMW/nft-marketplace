@@ -10,17 +10,18 @@
       </p>
       <div class="fields">
         <div class="col-first">
-          <inputField v-model="name"
-                      label="NFT Name*"
-                      :valid="name_valid"
-                      :max_length="35"
+          <formInput v-model="name"
+                     label="NFT Name*"
+                     :valid="name_valid"
+                     :max_length="35"
           />
-          <textAreaField v-model="description"
-                         label="Description"
-                         :valid="description_valid"
-                         :max_length="300"
+          <textArea v-model="description"
+                    label="Description"
+                    :valid="description_valid"
+                    :max_length="300"
           />
           <formSelect v-model="collection"
+                      title="Collection"
                       :options="collections"
           />
           <priceInput v-model="price"
@@ -29,7 +30,7 @@
           <switchInput v-model="dontsell" label="Not for sale"/>
         </div>
         <div class="col-second">
-          <addImage v-model:image="image"
+          <addImage v-model="image"
                     :error="image_valid ? '' : 'image cannot be larger than 250kb'"
                     accept="image/*"
                     title="Add NFT here<br>(any image, including animated)"
@@ -97,28 +98,28 @@
 </style>
 
 <script>
-import inputField from './input-field.vue'
-import textAreaField from './textarea-field.vue'
-import pageTitle from './page-title.vue'
-import notFound from './not-found.vue'
-import btn from './button.vue'
-import addImage from './add-image.vue'
-import priceInput from './price-input.vue'
-import switchInput from './switch-input.vue'
-import formSelect from './form-select.vue'
+import formInput from 'controls/form-input'
+import textArea from 'controls/textarea'
+import pageTitle from 'controls/page-title'
+import notFound from 'controls/not-found'
+import btn from 'controls/button'
+import addImage from 'controls/add-image'
+import priceInput from 'controls/price-input'
+import switchInput from 'controls/switch-input'
+import formSelect from 'controls/form-select'
+import loading from 'controls/loading'
+import validators from 'utils/validators'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
-import validators from 'utils/validators'
 import router from 'router'
 import {common} from 'utils/consts'
 import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
-import loading from './loading.vue'
 
 export default {
   components: {
-    inputField, 
-    textAreaField, 
+    formInput, 
+    textArea, 
     pageTitle,
     btn,
     addImage,

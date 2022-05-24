@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="input-container">
-      <img src="../assets/icon-search.svg" alt="icon" @click="onShowInput"/>
+      <img src="/assets/icon-search.svg" alt="icon" @click="onShowInput"/>
       <input v-show="show"
              :value="modelValue"
              :maxlength="max_length"

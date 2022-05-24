@@ -9,7 +9,7 @@
 
 <script>
 import artistsStore from 'stores/artists'
-import btn from './button'
+import btn from 'controls/button'
 
 export default {
   components: {

@@ -98,17 +98,17 @@
 </style>
 
 <script>
-import tabsctrl from './tabs'
-import pageTitle from './page-title'
-import btnKey from './btn-key'
-import btnWallet from './btn-wallet'
-import btnProfile from './btn-profile'
-import {admin_tabs} from 'utils/consts'
-import list from './items-list.vue'
+import tabsctrl from 'controls/tabs'
+import pageTitle from 'controls/page-title'
+import btn from 'controls/button'
+import btnKey from 'controls/btn-key'
+import btnWallet from 'controls/btn-wallet'
+import btnProfile from 'controls/btn-profile'
+import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists-lazy'
-import btn from './button.vue'
+import {admin_tabs} from 'utils/consts'
 
 export default {
   components: {

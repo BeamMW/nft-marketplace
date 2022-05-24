@@ -222,7 +222,7 @@ class NFTSStore extends LazyItems {
 
   toNewItem() {
     router.push({
-      name: 'new-nft'
+      name: 'edit-nft'
     })
   }
 }

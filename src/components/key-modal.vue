@@ -56,8 +56,8 @@
 </style>
 
 <script>
-import modal from './modal'
-import btn from './button'
+import modal from 'controls/modal'
+import btn from 'controls/button'
 import utils from 'utils/utils'
 import artistsStore from 'stores/artists'
 

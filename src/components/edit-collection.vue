@@ -18,46 +18,46 @@
     <notFound v-else-if="edit_mode && collection == null" text="Collection Not Found" error/>
     <div v-else class="fields">
       <div class="col-first">
-        <inputField v-model="label"
-                    label="Collection Name*"
-                    :valid="label_valid"
-                    :max_length="40"
-                    style="margin-bottom:55px;margin-top:0"
+        <formInput v-model="label"
+                   label="Collection Name*"
+                   :valid="label_valid"
+                   :max_length="40"
+                   style="margin-bottom:55px;margin-top:0"
         />
-        <inputField v-model="website"
-                    label="Website"
-                    placeholder="https://website.name/"
-                    img="glob"
-                    :max_length="40"
-                    :valid="website_valid"
+        <formInput v-model="website"
+                   label="Website"
+                   placeholder="https://website.name/"
+                   img="glob"
+                   :max_length="40"
+                   :valid="website_valid"
         />
-        <inputField v-model="twitter"
-                    label="Twitter"
-                    placeholder="twitter"
-                    img="twitter"
-                    :max_length="15"
-                    :valid="twitter_valid"
-                    :counter="false"
-                    letters_only
+        <formInput v-model="twitter"
+                   label="Twitter"
+                   placeholder="twitter"
+                   img="twitter"
+                   :max_length="15"
+                   :valid="twitter_valid"
+                   :counter="false"
+                   letters_only
         />
-        <inputField v-model="instagram"
-                    label="Instagram"
-                    placeholder="instagram"
-                    img="instagram"
-                    :max_length="30"
-                    :valid="instagram_valid"
-                    :counter="false"
-                    letters_only
+        <formInput v-model="instagram"
+                   label="Instagram"
+                   placeholder="instagram"
+                   img="instagram"
+                   :max_length="30"
+                   :valid="instagram_valid"
+                   :counter="false"
+                   letters_only
         />
       </div>
       <div class="col-second">
-        <textAreaField v-model="description"
-                       label="Description"
-                       height="198px"
-                       :valid="description_valid"
-                       :max_length="1000"
+        <textArea v-model="description"
+                  label="Description"
+                  height="198px"
+                  :valid="description_valid"
+                  :max_length="1000"
         />
-        <addImage v-model:image="cover"
+        <addImage v-model="cover"
                   title="Add collection image<br>(*.jpg, *.png, *.svg)"
                   accept="image/jpeg;image/png;image/svg+xml"
                   :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
@@ -140,23 +140,23 @@
 </style>
 
 <script>
-import inputField from './input-field.vue'
-import textAreaField from './textarea-field.vue'
-import pageTitle from './page-title.vue'
-import btn from './button.vue'
-import addImage from './add-image.vue'
+import formInput from 'controls/form-input'
+import textArea from 'controls/textarea'
+import pageTitle from 'controls/page-title'
+import btn from 'controls/button'
+import addImage from 'controls/add-image'
+import loading from 'controls/loading'
+import notFound from 'controls/not-found'
 import collsStore from 'stores/collections'
 import router from 'router'
 import validators from 'utils/validators'
-import loading from './loading.vue'
-import notFound from './not-found.vue'
 import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
 
 export default {
   components: {
-    inputField, 
-    textAreaField, 
+    formInput, 
+    textArea, 
     pageTitle,
     btn,
     addImage,

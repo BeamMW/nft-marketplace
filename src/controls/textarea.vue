@@ -10,7 +10,7 @@
               @input="$emit('update:modelValue', $event.target.value)"
     >
     </textarea>
-    <charactersLengthInfo v-if="max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
+    <charslen v-if="max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
   </div>
 </template>
 
@@ -74,12 +74,13 @@
 </style>
 
 <script>
-import charactersLengthInfo from './characters-length-info.vue'
+import charslen from 'controls/charslen'
 
 export default {
   components: {
-    charactersLengthInfo
+    charslen
   },
+
   props: {
     label: {
       type: String,

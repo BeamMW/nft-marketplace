@@ -1,19 +1,18 @@
 import './styles/fonts.css'
 import './styles/global.css'
 
-import App from './components/app.vue'
+import App from 'components/app'
 import router from 'router'
-import utils from './utils/utils.js'
+import utils from 'utils/utils'
 import {createApp} from 'vue/dist/vue.esm-bundler.js'
-
-import store from './stores/global.js'
-import nft from './components/nft'
-import collection from './components/collection.vue'
-import createCollection from './components/create-collection'
-import approveCollection from './components/approve-collection'
-import approveArtist from './components/approve-artist'
-import createNFT from './components/create-nft'
-import approveNFT from './components/approve-nft'
+import store from 'stores/global'
+import nft from 'components/nft'
+import collection from 'components/collection'
+import createCollection from 'components/create-collection'
+import approveCollection from 'components/approve-collection'
+import approveArtist from 'components/approve-artist'
+import createNFT from 'components/create-nft'
+import approveNFT from 'components/approve-nft'
 
 utils.initialize(
   {

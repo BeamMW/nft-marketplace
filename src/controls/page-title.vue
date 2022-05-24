@@ -53,7 +53,7 @@
 </style>
 
 <script>
-import backBtn from './btn-back.vue'
+import backBtn from 'controls/btn-back'
 
 export default {
   components: {

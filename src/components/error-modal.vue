@@ -94,8 +94,8 @@
 </style>
 
 <script>
-import modal from './modal.vue'
-import btn from './button.vue'
+import modal from 'controls/modal'
+import btn from 'controls/button'
 
 export default {
   components: {

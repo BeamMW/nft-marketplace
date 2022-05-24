@@ -1,6 +1,6 @@
 <template>
   <div>
-    <publicKeyModal ref="keyModal"/>
+    <keyModal ref="keyModal"/>
     <btn height="36px" 
          width="36px" 
          padding="0px" 
@@ -13,13 +13,13 @@
 </template>
 
 <script>
-import btn from './button'
-import publicKeyModal from './public-key-dialog'
+import keyModal from 'components/key-modal'
+import btn from 'controls/button'
 
 export default {
   components: {
     btn,
-    publicKeyModal
+    keyModal
   },
 
   methods: {

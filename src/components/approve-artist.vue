@@ -13,20 +13,20 @@
       </div>
       <div class="info">
         <div class="images">
-          <imagePreview class="banner"
-                        :image="item.banner" 
-                        :default="def_banner"
-                        radius="10px"
-                        width="432px"
-                        height="135px"
-                        cover
+          <preview class="banner"
+                   :image="item.banner" 
+                   :default="def_banner"
+                   radius="10px"
+                   width="432px"
+                   height="135px"
+                   cover
           />
-          <imagePreview class="avatar"
-                        :image="item.avatar" 
-                        :default="def_avatar"
-                        width="120px"
-                        height="120px"
-                        radius="120px"
+          <preview class="avatar"
+                   :image="item.avatar" 
+                   :default="def_avatar"
+                   width="120px"
+                   height="120px"
+                   radius="120px"
           />
         </div>
         <div>{{ item.label }}</div>
@@ -117,12 +117,12 @@
 </style>
 
 <script>
-import imagePreview from './image-preview.vue'
+import preview from 'controls/preview'
 import {def_images} from 'utils/consts'
 
 export default {
   components: {
-    imagePreview
+    preview
   },
 
   props: {

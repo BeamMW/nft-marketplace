@@ -1,13 +1,13 @@
 <template>
   <div class="price-input">
-    <inputField v-model="computedValue"
-                :label="label"
-                :readonly="readonly"
-                @keydown="onKey"
-                @paste="onPaste"
+    <formInput v-model="computedValue"
+               :label="label"
+               :readonly="readonly"
+               @keydown="onKey"
+               @paste="onPaste"
     >
       <span class="beam" :class="{'readonly': readonly}">BEAM</span>
-    </inputField>
+    </formInput>
   </div>
 </template>
 
@@ -31,12 +31,12 @@
 </style>
 
 <script>
+import formInput from 'controls/form-input'
 import utils from 'utils/utils'
-import inputField from './input-field'
 
 export default {
   components: {
-    inputField
+    formInput
   },
   props: {
     label: {

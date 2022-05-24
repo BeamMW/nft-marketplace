@@ -21,7 +21,7 @@
 </style>
 
 <script>
-import utils from 'utils/utils.js'
+import utils from 'utils/utils'
 
 export default {
   props: {
