@@ -90,13 +90,13 @@ export default class Utils {
     client.startWallet()
 
     client.subscribe((response) => {
-      let err = 'Unexpected wasm wallet client response call: ' + response
+      let err = new Error('Unexpected wasm wallet client response call: ' + response)
       console.log(err)
       throw err
     })
 
     client.setApproveContractInfoHandler((info) => {
-      let err = 'Unexpected wasm wallet client transaction in headless wallet: ' + info
+      let err = new Error('Unexpected wasm wallet client transaction in headless wallet: ' + info)
       console.log(err)
       throw err
     })
@@ -139,7 +139,7 @@ export default class Utils {
 
   static async switchToWebAPI () {
     if (!Utils.isHeadless()) {
-      throw 'Wallet must be opened in a headless mode'
+      throw new Error('Wallet must be opened in a headless mode')
     }
 
     let apiver    = InitParams['api_version'] || 'current'

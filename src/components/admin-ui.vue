@@ -96,7 +96,7 @@ export default {
         let data = prompt('Enter: artistid,name')
         if (data != null) {
           let parsed = data.split(',')
-          if (parsed.length != 2) throw 'No comma found'
+          if (parsed.length != 2) throw new Error('No comma found')
           this.$store.addArtist(parsed[0],parsed[1])
         }
       }
