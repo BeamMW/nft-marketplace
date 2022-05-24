@@ -18,7 +18,7 @@
           <div class="social">
             <div>
               <btn v-if="website" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onWebsite">
-                <img src="~assets/globe.svg">
+                <img src="~assets/globe-green.svg">
               </btn>
               <btn v-if="twitter" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onTwitter">
                 <img src="~assets/twitter-green.svg">

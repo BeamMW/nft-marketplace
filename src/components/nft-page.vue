@@ -1,5 +1,6 @@
 <template>
-  <div id="container" class="nft-details-container">
+  <messageModal ref="messageModal"/>
+  <div id="container" class="nft-page-container">
     <pageTitle/>
     <loading v-if="nft === undefined" text="Loading NFT"/>
     <notFound v-else-if="nft == null" text="NFT Not Found"/>
@@ -19,7 +20,12 @@
         </div>
         <div class="info-container">
           <div class="info-box">
-            <div class="title" :class="{'error': error}">{{ title }}</div>
+            <div class="title" :class="{'error': error}">
+              {{ title }}
+              <btn color="transparent" height="24px" padding="0px" @click="onShare">
+                <img src="~assets/share.svg" width="24">
+              </btn>
+            </div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
             <div class="bottom">
               <div class="separator"/>
@@ -66,7 +72,7 @@
 </template>
 
 <style scoped lang="stylus">
-  .nft-details-container {
+  .nft-page-container {
     display: flex
     flex-direction: column
     box-sizing: border-box
@@ -240,6 +246,15 @@
               white-space: nowrap
               text-overflow: ellipsis
               overflow: hidden
+              display: flex
+
+              & > button {
+                margin-left: auto
+
+                &:not(:last-child) {
+                  margin-right: 5px
+                }
+              }
             }
 
             & > .description {
@@ -290,6 +305,8 @@
 </style>
 
 <script>
+import messageModal from 'components/message-modal'
+import btn from 'controls/button.vue'
 import price from 'controls/price'
 import preview from 'controls/preview'
 import loading from 'controls/loading'
@@ -313,12 +330,14 @@ import { AgGridVue } from "ag-grid-vue3"
 
 export default {
   components: {
+    btn,
     price,
     preview,
     pageTitle,
     loading,
     notFound,
-    moderationStatus
+    moderationStatus,
+    messageModal
   },
 
   props: {
@@ -413,6 +432,10 @@ export default {
     },
     formatHeight(height) {
       return utils.formatHeight(height)
+    },
+    onShare() {
+      utils.copyText(window.location.href)
+      this.$refs.messageModal.open('NFT Share', `Link to the NFT '${this.title}' has been copied to clipboard.`)
     },
     onAuthor () {
       // FUTURE

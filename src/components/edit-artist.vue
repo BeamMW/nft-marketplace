@@ -28,7 +28,7 @@
         <formInput v-model="website"
                    label="Website"
                    placeholder="https://website.name/"
-                   img="glob"
+                   img="globe"
                    :max_length="40"
                    :valid="website_valid"
                    :readonly="in_set_artist"
