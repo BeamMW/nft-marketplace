@@ -7,8 +7,10 @@ class ImagesStore {
   }
 
   reset () {
+    this._cache_size = 100
     this._state = reactive({
-      images: {}
+      images: {},
+      track: []
     })
   }
 
@@ -50,11 +52,19 @@ class ImagesStore {
     let old = this._state.images[image.ipfs_hash]
     
     if (old) {
+      if (old.object) URL.revokeObjectURL(old.object)
       utils.clearAssign(this._state.images[image.ipfs_hash], image)
     }
 
     if (!old) {
       this._state.images[image.ipfs_hash] = image
+      this._state.track.push(image.ipfs_hash)
+      while(this._state.track.length > this._cache_size) {
+        let hash = this._state.track.shift()
+        let clear = this._state.images[hash]
+        if (clear.object) URL.revokeObjectURL(image.object)
+        delete this._state.images[hash]
+      }
     }
 
     return this._state.images[image.ipfs_hash]
@@ -87,11 +97,8 @@ class ImagesStore {
       // TODO: can skip u8arr here?
       let u8arr = new Uint8Array(res.data)
       let blob = new Blob([u8arr], {type: what.mime_type})
-      // TODO: revoke object
-      // TODO: keep only N images & delete and release old ones
       let object = URL.createObjectURL(blob, {oneTimeOnly: false})
 
-      //this._clearLR(image)
       return this._setImage({
         ipfs_hash: what.ipfs_hash, 
         mime_type: what.mime_type,
@@ -99,7 +106,7 @@ class ImagesStore {
       })
     }
     catch(err) {
-      console.log(`ImagesStore._ipfsLoad for hash ${what.ipfs_hash}`, err)
+      console.log(`ImagesStore._ipfsLoad failed for hash ${what.ipfs_hash}`, err)
       return this._setError(what, err)
     }
   }
