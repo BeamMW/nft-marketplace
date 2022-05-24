@@ -220,9 +220,12 @@ class NFTSStore extends LazyItems {
     })
   }
 
-  toNewItem() {
+  toNewItem(collid) {
     router.push({
-      name: 'edit-nft'
+      name: 'new-nft',
+      params: {
+        collid
+      }
     })
   }
 }

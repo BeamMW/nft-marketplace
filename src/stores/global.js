@@ -335,7 +335,7 @@ const store = {
 
   toMyPage() {
     router.push({
-      name: 'my-page'
+      name: 'my'
     })
   },
 

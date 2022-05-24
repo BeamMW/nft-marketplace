@@ -39,6 +39,7 @@
             <div>
               <div>
                 <img src="~assets/icon-beam.svg">
+                <!-- TODO: real minprice -->
                 <span class="value">{{ min_price }}</span>
               </div>
               <span>min price</span>
@@ -86,6 +87,7 @@
           items_name="NFTs"
           component="nft"
           :new_component="owned ? 'create-nft' : ''"
+          :new_component_props="{'selected_collection': id}"
           :mode="`artist:collection:${id}`"
           :store="nftsStore"
     />

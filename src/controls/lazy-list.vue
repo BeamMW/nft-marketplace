@@ -27,7 +27,7 @@
                        :item="item"
             />
           </template>
-          <component :is="new_component" v-if="show_new"/>
+          <component :is="new_component" v-if="show_new" v-bind="new_component_props"/>
         </div>
       </div>
       <paginator :current="page"
@@ -120,6 +120,10 @@ export default {
       type: String,
       default: ''
     },
+    new_component_props: {
+      type: Object,
+      default: undefined
+    },
     selected: {
       type: Array,
       default: undefined
@@ -166,7 +170,6 @@ export default {
       let pos = ev.target.scrollTop
       this.$router.replace({name: this.$route.name, hash: `#${pos}`})
     },
-
     onPage(page) {
       this.$refs.itemslist.scrollTop = 0
       this.store.setPage(this.mode, page)

@@ -130,7 +130,15 @@ export default {
     notFound
   },
 
-  setup () {
+  props: {
+    collid: {
+      type: Number,
+      default: undefined,
+      required: false
+    }
+  },
+
+  setup (props) {
     const collsObservable = computed(() => useObservable(collsStore.getLazyAllItems('artist')))
     const collections = computed(() => {
       let colls = collsObservable.value.value
@@ -158,7 +166,7 @@ export default {
       image: undefined,
       price: '',
       dontsell: true,
-      collection: 0,
+      collection: 0
     }
   },
 
@@ -190,6 +198,20 @@ export default {
     price(newval) {
       this.dontsell = !newval || parseFloat(newval) === 0.0
     }
+  },
+
+  created() {
+    let unwatch = this.$watch('collections', (newval) => {
+      if (this.collid !== undefined && newval.length) {
+        for(let idx = 0; idx < newval.length; idx++) {
+          if(newval[idx].id === this.collid) {
+            this.collection = idx
+            break
+          }
+        }
+        unwatch()
+      }
+    })
   },
 
   methods: {    

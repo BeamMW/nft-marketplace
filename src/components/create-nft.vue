@@ -32,6 +32,13 @@ import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 
 export default {
+  props: {
+    selected_collection: {
+      type: Number,
+      default: undefined,
+      required: false
+    } 
+  },
   computed: {
     has_collections() {
       return collsStore.getAllItemsCount('artist') > 0
@@ -40,7 +47,7 @@ export default {
 
   methods: {
     onNewNFT () {
-      nftsStore.toNewItem()
+      nftsStore.toNewItem(this.selected_collection)
     },
     
     onNewCollection() {
