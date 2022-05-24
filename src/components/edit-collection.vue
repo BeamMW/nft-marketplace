@@ -67,14 +67,14 @@
   </div>
   <div class="actions">
     <btn text="cancel" @click="$router.go(-1)">
-      <img src="~assets/icon-cancel.svg"/>
+      <img src="~assets/cancel.svg"/>
     </btn>
     <btn :text="edit_mode ? 'update collection' : 'create collection'" 
          color="green" 
          :disabled="!can_submit" 
          @click="onSetCollection"
     >
-      <img src="~assets/icon-create.svg"/>
+      <img src="~assets/create.svg"/>
     </btn>
   </div>
 </template>

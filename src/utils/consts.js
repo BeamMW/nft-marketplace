@@ -12,9 +12,9 @@ export const user_tabs = {
 }
 
 export const admin_tabs = {
-  ARTISTS: 0,
+  NFTS: 0,
   COLLECTIONS: 1,
-  NFTS: 2
+  ARTISTS: 2
 }
 
 export const my_tabs = {

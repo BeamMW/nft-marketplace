@@ -11,12 +11,12 @@
       <moderationStatus :item="item"/>
       <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
-        <img :src="'/assets/icon-heart' + (liked ? '-red' : '') + '.svg'"/>
+        <img :src="'/assets/heart' + (liked ? '-red' : '') + '.svg'"/>
       </div>
     </preview>
     
     <!---- Delete NFT Button ---->
-    <img v-if="is_admin" class="delete" src="~assets/icon-delete.svg" @click="onDelete"/>
+    <img v-if="is_admin" class="delete" src="~assets/delete.svg" @click="onDelete"/>
 
     <!---- First info row ---->
     <div class="info-row">

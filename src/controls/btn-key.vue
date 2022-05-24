@@ -7,7 +7,7 @@
          radius="10px"
          @click="onClick"
     >
-      <img src="~assets/icon-key.svg">
+      <img src="~assets/key.svg">
     </btn>
   </div>
 </template>

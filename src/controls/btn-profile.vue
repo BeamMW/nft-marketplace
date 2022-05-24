@@ -3,7 +3,7 @@
        :text="my_name"
        @click="$store.toMyPage"
   >
-    <img src="~assets/icon-user.svg">
+    <img src="~assets/user.svg">
   </btn>
 </template>
 

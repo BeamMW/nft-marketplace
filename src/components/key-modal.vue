@@ -5,15 +5,15 @@
       <div class="data">
         <span>{{ computed_key }}</span>
         <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
-          <img src="~assets/icon-copy.svg"/>
+          <img src="~assets/copy.svg"/>
         </btn>
       </div>
       <div class="controls">
         <btn text="close" @click="close">
-          <img src="~assets/icon-cancel.svg"/>
+          <img src="~assets/cancel.svg"/>
         </btn>
         <btn text="copy and close" color="green" @click="onCopyAndClose">
-          <img src="~assets/icon-copy-blue.svg"/>
+          <img src="~assets/copy-blue.svg"/>
         </btn>
       </div>
     </div>

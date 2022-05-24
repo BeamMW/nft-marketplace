@@ -1,6 +1,6 @@
 <template>
   <div class="back-btn" @click="$router.go(-1)">
-    <img src="~assets/icon-back.svg"/>
+    <img src="~assets/back.svg"/>
     {{ text }}
   </div>
 </template>

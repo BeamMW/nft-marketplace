@@ -1,6 +1,6 @@
 <template>
   <div class="amount-container" :style="text_style">
-    <img src="~assets/icon-beam.svg" :style="icon_style"/>
+    <img src="~assets/beam.svg" :style="icon_style"/>
     <div>
       <div>{{ value }} BEAM</div>
       <div v-if="info">{{ info }}</div>

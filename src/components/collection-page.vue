@@ -4,7 +4,7 @@
   <loading v-if="collection === undefined" text="Loading Collection"/>
   <notFound v-else-if="collection === null" text="Collection Not Found"/>
   <div v-else class="collection-container">
-    <keyModal ref="keyModal" :name="author_name" :artist_key="author_key"/>
+    <keyModal ref="keyModal" :name="author_error ? '' : author_name" :artist_key="author_key"/>
     <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
       <div class="info-container">
         <div class="left">
@@ -18,7 +18,7 @@
           <div class="social">
             <div>
               <btn v-if="website" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onWebsite">
-                <img src="~assets/glob-green.svg">
+                <img src="~assets/globe.svg">
               </btn>
               <btn v-if="twitter" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onTwitter">
                 <img src="~assets/twitter-green.svg">
@@ -27,7 +27,7 @@
                 <img src="~assets/instagram-green.svg">
               </btn>
               <btn color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onKey">
-                <img src="~assets/icon-key-small.svg">
+                <img src="~assets/key-small.svg">
               </btn>
             </div>  
           </div>
@@ -38,15 +38,14 @@
             </div>
             <div>
               <div>
-                <img src="~assets/icon-beam.svg">
-                <!-- TODO: real minprice -->
+                <img src="~assets/beam.svg">
                 <span class="value">{{ min_price }}</span>
               </div>
               <span>min price</span>
             </div>
             <div>
               <div>
-                <img src="~assets/icon-beam.svg">
+                <img src="~assets/beam.svg">
                 <span class="value">{{ trade_volume }}</span>
               </div>
               <span>trade volume</span>
@@ -357,6 +356,9 @@ export default {
     author_key() {
       return this.collection.author
     },
+    author_error() {
+      return this.collection.author_error
+    },
     instagram() {
       return this.collection.instagram || this.collection.author_instagram
     },
@@ -373,11 +375,11 @@ export default {
       return this.collection.artworks_count
     },
     min_price() {
-      let value = this.collection.min_price ? this.collection.min_price.value : 0
+      let value = this.collection.min_price.value 
       return utils.formatAmount3(value)
     },
     trade_volume() {
-      let value = this.collection.total_sold ? this.collection.total_sold.volume : 0
+      let value = this.collection.total_sold.volume
       return utils.formatAmount3(value)
     },
     active_tab: {

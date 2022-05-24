@@ -60,7 +60,7 @@ export default {
     },
 
     icon() {
-      return this.selected ? 'icon-selected' : 'icon-unselected'
+      return this.selected ? 'item-selected' : 'item-unselected'
     }
   }
 }

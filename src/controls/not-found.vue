@@ -1,6 +1,6 @@
 <template>
   <div :class="{'not-found': true, 'error': error}">
-    <img src="~assets/icon-wallet-empty.svg"/>
+    <img src="~assets/empty-wallet.svg"/>
     <div class="text">{{ text }}</div>
   </div>
 </template>

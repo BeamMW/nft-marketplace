@@ -94,14 +94,14 @@
     </p>
     <div class="actions">
       <btn text="cancel" @click="$router.go(-1)">
-        <img src="~assets/icon-cancel.svg"/>
+        <img src="~assets/cancel.svg"/>
       </btn>
       <btn :text="edit_self ? 'update artist' : 'create account'" 
            color="green" 
            :disabled="!can_submit || in_set_artist" 
            @click="onSetArtist"
       >
-        <img src="~assets/icon-create.svg"/>
+        <img src="~assets/create.svg"/>
       </btn>
     </div>
   </div>

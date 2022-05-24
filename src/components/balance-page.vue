@@ -19,7 +19,7 @@
              padding="0px"
              @click="onWithdrawClick"
         >
-          <img src="~assets/icon-receive.svg">
+          <img src="~assets/receive.svg">
         </btn>
       </div>
     </div>

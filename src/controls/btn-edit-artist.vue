@@ -7,7 +7,7 @@
        radius="10px" 
        @click="onEditArtist"
   >
-    <img src="~assets/icon-pencil.svg">
+    <img src="~assets/pencil.svg">
   </btn>
   <btn v-else
        height="36px" 

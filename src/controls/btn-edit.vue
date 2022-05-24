@@ -9,7 +9,7 @@
        :hover="false"
        @click="onEdit"
   >
-    <img width="18" src="~assets/icon-pencil.svg">
+    <img width="18" src="~assets/pencil.svg">
   </btn>
 </template>
 

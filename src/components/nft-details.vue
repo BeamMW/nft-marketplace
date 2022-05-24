@@ -38,7 +38,7 @@
         <div width="200px">Amount</div>
         <div v-if="sales && sales.length" class="sorted">
           Height
-          <img src="~assets/icon-down.svg" class="arrow"/>
+          <img src="~assets/arrow-down.svg" class="arrow"/>
         </div>
         <div v-else>
           Height
@@ -47,7 +47,7 @@
       <div v-if="sales != undefined && sales.length" class="table-body">
         <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${sales.length - index}`" class="row">
           <div>
-            <img src="~assets/icon-beam.svg"/>
+            <img src="~assets/beam.svg"/>
             <span class="curr">BEAM</span>
           </div>
           <div class="text">{{ formatAmount8(sale.amount) }}</div>
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div v-else-if="sales !== undefined && !sales.length" class="table-body-empty">
-        <img src="~assets/icon-wallet-empty.svg"/>
+        <img src="~assets/empty-wallet.svg"/>
         <div>Trading history is empty</div>
       </div>  
       <div v-else class="table-body-loading">

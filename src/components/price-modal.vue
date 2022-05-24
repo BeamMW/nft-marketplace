@@ -14,7 +14,7 @@
       </div>
       <div class="controls">
         <btn text="cancel" @click="close">
-          <img src="~assets/icon-cancel.svg"/>
+          <img src="~assets/cancel.svg"/>
         </btn>
         <btn id="proceed"
              text="proceed"
@@ -22,7 +22,7 @@
              :disabled="!price_valid" 
              @click="onProceed"
         >
-          <img src="~assets/icon-receive-proceed.svg"/>
+          <img src="~assets/proceed.svg"/>
         </btn>
       </div>
     </div>

@@ -6,14 +6,14 @@
     
     <!--- has price and owned, display change price / remove from sale options --->
     <template v-if="owned">
-      <img class="dots" src="~assets/icon-actions.svg" @click="onSaleMenu"/>
+      <img class="dots" src="~assets/actions.svg" @click="onSaleMenu"/>
       <popupMenu ref="saleMenu">
         <div class="item" @click="onChangePrice">
-          <img src="~assets/icon-change.svg"/>
+          <img src="~assets/change.svg"/>
           update the price
         </div>
         <div class="item" @click="onRemoveFromSale">
-          <img src="~assets/icon-eye-crossed.svg"/>
+          <img src="~assets/eye-crossed.svg"/>
           remove from sale
         </div>
       </popupMenu>
@@ -34,7 +34,7 @@
            height="33px" 
            @click="onBuy"
       >
-        <img src="~assets/icon-button.svg">
+        <img src="~assets/buy-sell.svg">
       </btn>
     </template>  
   </span>
@@ -56,7 +56,7 @@
            height="33px"
            @click="onSell"
       >
-        <img src="~assets/icon-button.svg">
+        <img src="~assets/buy-sell.svg">
       </btn>
     </template>
 

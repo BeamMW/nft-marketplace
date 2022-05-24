@@ -7,15 +7,15 @@
     </pageTitle>
     <div class="gallery-container">
       <tabsctrl v-model="active_tab" class="tabs" :tabs="tabs"/>
-      <list v-if="show_artists"
+      <list v-if="show_nfts"
             class="list"
-            items_name="artists to be reviewed"
-            component="approve-artist"
+            items_name="NFTs to be reviewed"
+            component="approve-nft"
             mode="moderator"
             selectable
-            :store="artistsStore"
-            :selected="selected_artists"
-            @selected="onArtistSelected"
+            :store="nftsStore"
+            :selected="selected_nfts"
+            @selected="onNFTSelected"
       />
       <list v-if="show_collections"
             class="list"
@@ -27,36 +27,36 @@
             :selected="selected_collections"
             @selected="onCollectionSelected"
       />
-      <list v-if="show_nfts"
+      <list v-if="show_artists"
             class="list"
-            items_name="NFTs to be reviewed"
-            component="approve-nft"
+            items_name="artists to be reviewed"
+            component="approve-artist"
             mode="moderator"
             selectable
-            :store="nftsStore"
-            :selected="selected_nfts"
-            @selected="onNFTSelected"
+            :store="artistsStore"
+            :selected="selected_artists"
+            @selected="onArtistSelected"
       />
       <div class="buttons">
         <btn text="cancel" 
              :disabled="!any_selected"
              @click="onCancel"
         >
-          <img src="~assets/icon-cancel.svg"/>
+          <img src="~assets/cancel.svg"/>
         </btn>
         <btn text="reject"
              color="red"
              :disabled="!any_selected"
              @click="onReject"
         >
-          <img src="~assets/icon-reject.svg"/>
+          <img src="~assets/reject.svg"/>
         </btn>
         <btn text="approve"
              color="green"
              :disabled="!any_selected"
              @click="onApprove"
         >
-          <img src="~assets/icon-ok.svg"/>
+          <img src="~assets/ok.svg"/>
         </btn>
       </div>
     </div>
@@ -124,9 +124,9 @@ export default {
   data() {
     return {
       tabs: [
-        {id: admin_tabs.ARTISTS, name: 'Artists'},
+        {id: admin_tabs.NFTS, name: 'NFTs'},
         {id: admin_tabs.COLLECTIONS, name: 'Collections'},
-        {id: admin_tabs.NFTS, name: 'NFTs'}
+        {id: admin_tabs.ARTISTS, name: 'Artists'}
       ],
       selected_nfts: [],
       selected_collections: [],

@@ -1,7 +1,7 @@
 <template>
   <div class="list-container">
     <div v-if="items === undefined" class="empty">
-      <img src="~assets/icon-empty-gallery.svg"/>
+      <img src="~assets/empty-gallery.svg"/>
       <!-- TODO: delay showing text a bit, otherwise it blinks on every page switch -->
       <div class="text">Loading {{ items_name }}...</div>
     </div>
@@ -36,7 +36,7 @@
       />
     </template>
     <div v-else class="empty"> 
-      <img src="~assets/icon-empty-gallery.svg"/>
+      <img src="~assets/empty-gallery.svg"/>
       <div class="text">There are no {{ items_name }} at the moment</div>
     </div>
   </div>

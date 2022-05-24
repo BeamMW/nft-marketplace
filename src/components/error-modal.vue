@@ -13,13 +13,13 @@
           <div class="error_data">
             <span>{{ text }}</span>
             <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
-              <img src="~assets/icon-copy.svg"/>
+              <img src="~assets/copy.svg"/>
             </btn>
           </div>
           <div class="restart">Restarting in {{ errleft }}</div>
         </div>
         <btn color="carnation" padding="10px 30px 10px 30px" text="ok" @click="close">
-          <img src="~assets/icon-ok.svg"/> 
+          <img src="~assets/ok.svg"/> 
         </btn>
       </div>
     </div>

@@ -6,7 +6,7 @@
     <div class="custom-select" :class="{'readonly': readonly}" @blur="show = false">
       <div class="selected" :class="{'open focus': show}" @click="open">
         {{ options[modelValue].name }}
-        <img src="~assets/icon-down.svg" class="arrow"/>
+        <img src="~assets/arrow-down.svg" class="arrow"/>
       </div>
       <div v-show="show" class="items">
         <div v-for="(option, idx) in (options || [])" :key="option.id" @click="onSelected($event, idx)">

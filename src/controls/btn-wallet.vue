@@ -5,7 +5,7 @@
        radius="10px"
        @click="onClick"
   >
-    <img src="~assets/icon-wallet.svg">
+    <img src="~assets/wallet.svg">
   </btn>
 </template>
 
