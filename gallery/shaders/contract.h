@@ -3,8 +3,18 @@
 #include <string_view>
 
 namespace Gallery {
-    static const ShaderID s_SID_0 = {0x57,0x38,0x20,0x47,0x22,0xf8,0x34,0x3f,0x61,0x7a,0x69,0x63,0x02,0xda,0x7c,0x4a,0x68,0x88,0x8d,0x3e,0x00,0x81,0x14,0x9f,0xd8,0x5b,0xd8,0xf7,0xbe,0xf6,0xb9,0xbd};
+    static const ShaderID s_SID_0 = {0xcf,0x3b,0xce,0x94,0xda,0x25,0xcf,0xac,0x46,0xee,0x0e,0xbb,0xe6,0x25,0x83,0xe3,0x5e,0x6a,0xf6,0xe6,0xfb,0xd0,0x71,0x1f,0x37,0x1a,0x6c,0x02,0xfa,0x3e,0xce,0xe7};
 #pragma pack (push, 1)
+
+    using Hash256 = Opaque<32>;
+
+    inline Hash256 GetLabelHash(const std::string_view& label) {
+        Hash256 res;
+        HashProcessor::Sha256 hp;
+        hp.Write(label.begin(), label.size());
+        hp >> res;
+        return res;
+    }
 
     enum class Tag : uint8_t {
         kArtist = 1,
@@ -19,6 +29,7 @@ namespace Gallery {
         kHeightModeratorIdx = 10,
         kHeightNftIdx = 11,
         kHeightCollectionIdx = 12,
+        kArtistLabelHash = 13,
     };
 
     enum class Role : uint8_t {
@@ -99,6 +110,12 @@ namespace Gallery {
     struct Artist : public GalleryObject<Artist, PubKey> {
         struct Key {
             Tag tag = Tag::kArtist;
+            Id id;
+        };
+
+        struct LabelKey {
+            Tag tag = Tag::kArtistLabelHash;
+            Hash256 label_hash;
             Id id;
         };
 

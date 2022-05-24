@@ -145,8 +145,12 @@ BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
 
         Gallery::Events::AddArtistLabel::Key alk;
         alk.id = r.m_pkArtist;
-        auto label_ptr = reinterpret_cast<const uint8_t*>(&r + 1);
+        auto label_ptr = reinterpret_cast<const char*>(&r + 1);
         Env::EmitLog(&alk, sizeof(alk), label_ptr, r.m_LabelLen, KeyTag::Internal);
+        Gallery::Artist::LabelKey lk;
+        lk.id = r.m_pkArtist;
+        lk.label_hash = Gallery::GetLabelHash(std::string_view(label_ptr, r.m_LabelLen));
+        Env::SaveVar_T(lk, true);
     }
 
     auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen;

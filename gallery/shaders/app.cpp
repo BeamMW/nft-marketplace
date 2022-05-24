@@ -910,32 +910,30 @@ ON_METHOD(manager, view_params) {
     }
 }
 
-bool artist_label_exists(const ContractID& cid, const std::string_view& label, bool& artist_exists) {
-    artist_exists = false;
+bool my_artist_exists(const ContractID& cid, const std::string_view& label) {
+    // FIXME
+    bool artist_exists = false;
+    Env::Key_T<Gallery::Artist::LabelKey> lk;
+    lk.m_Prefix.m_Cid = cid;
+    lk.m_KeyInContract.id = MyArtist::id(cid);
+    lk.m_KeyInContract.label_hash = Gallery::GetLabelHash(label);
+    Env::VarReader::Read_T(lk, artist_exists);
+    return artist_exists;
+}
 
-    Env::Key_T<Gallery::Artist::Key> k0, k1;
-    k0.m_Prefix.m_Cid = cid;
-    k1.m_Prefix.m_Cid = cid;
-    _POD_(k0.m_KeyInContract.id).SetZero();
-    _POD_(k1.m_KeyInContract.id).SetObject(0xff);
+bool artist_label_exists(const ContractID& cid, const std::string_view& label) {
+    Env::Key_T<Gallery::Artist::LabelKey> lk0, lk1;
+    lk1.m_Prefix.m_Cid = cid;
+    lk0.m_Prefix.m_Cid = cid;
+    Gallery::Hash256 label_hash = Gallery::GetLabelHash(label);
+    lk0.m_KeyInContract.label_hash = label_hash;
+    _POD_(lk1.m_KeyInContract.label_hash).SetObject(0xff);
+    _POD_(lk0.m_KeyInContract.id).SetZero();
+    _POD_(lk1.m_KeyInContract.id).SetObject(0xff);
 
-    Env::VarReader r(k0, k1);
-    MyArtist a;
-    PubKey my_key = a.id(cid);
-
-    while (true) {
-        if (!a.ReadNext(r, k0))
-            break;
-
-        if (!Env::Memcmp(&k0.m_KeyInContract.id, &my_key, sizeof(PubKey))) {
-            artist_exists = true;
-            continue;
-        }
-
-        if (a.GetLabel() == label)
-            return true;
-    }
-    return false;
+    Env::VarReader r(lk0, lk1);
+    bool artist_label_exists = false;
+    return r.MoveNext_T(lk0, artist_label_exists) && _POD_(lk0.m_KeyInContract.label_hash) == label_hash;
 }
 
 ON_METHOD(manager, view_artists_stats) {
@@ -1379,9 +1377,17 @@ ON_METHOD(artist, set_artist) {
     d.args.m_LabelLen = (nLabelSize ? nLabelSize - 1 : 0);
     nArgSize += d.args.m_LabelLen;
 
-    bool artist_exists = false;
-    if (artist_label_exists(cid, d.m_szLabelData, artist_exists)) {
+    std::string_view label(d.m_szLabelData, d.args.m_LabelLen);
+    bool label_exists = artist_label_exists(cid, label);
+    bool artist_exists = my_artist_exists(cid, label);
+
+    if (!artist_exists && label_exists) {
         OnError("label already exists");
+        return;
+    }
+
+    if (artist_exists && !label_exists) {
+        OnError("label is immutable");
         return;
     }
 
