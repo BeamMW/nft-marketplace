@@ -391,6 +391,26 @@ BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
         (r.m_HasAid != (!!m.m_Aid))
     );
 
+    struct CollectionPlus : public Gallery::Collection {
+        char m_szLabelData[s_TotalMaxLen];
+    } c;
+
+    c.Load(m.collection_id, sizeof(c));
+    ++c.total_sold;
+    c.total_sold_price += m.m_Price.m_Amount;
+    if (m.m_Price.m_Amount > c.max_sold.price.m_Amount) {
+        c.max_sold.price = m.m_Price;
+        c.max_sold.nft_id = r.m_ID;
+    }
+    if (!c.min_sold.nft_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
+        c.min_sold.price = m.m_Price;
+        c.min_sold.nft_id = r.m_ID;
+    }
+    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+        ::Update(c.updated, cur_height, m.collection_id);
+    c.updated = cur_height;
+    c.Save(m.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+
     Env::FundsLock(m.m_Price.m_Aid, r.m_PayMax);
 
     Gallery::Events::Sell::Key esk;
@@ -418,25 +438,6 @@ BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
     m.updated = cur_height;
     m.Save(r.m_ID);
 
-    struct CollectionPlus : public Gallery::Collection {
-        char m_szLabelData[s_TotalMaxLen];
-    } c;
-
-    c.Load(m.collection_id, sizeof(c));
-    ++c.total_sold;
-    c.total_sold_price += m.m_Price.m_Amount;
-    if (m.m_Price.m_Amount > c.max_sold.price.m_Amount) {
-        c.max_sold.price = m.m_Price;
-        c.max_sold.nft_id = r.m_ID;
-    }
-    if (!c.min_sold.nft_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
-        c.min_sold.price = m.m_Price;
-        c.min_sold.nft_id = r.m_ID;
-    }
-    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
-        ::Update(c.updated, cur_height, m.collection_id);
-    c.updated = cur_height;
-    c.Save(m.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
     //Env::AddSig(r.m_pkUser);
 }
 
