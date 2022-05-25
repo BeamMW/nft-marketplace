@@ -1,12 +1,20 @@
 import {common} from 'utils/consts'
 
 export default class Validators {
+  static twitter_allowed () {
+    return /^[a-zA-Z0-9_]{1,15}$/
+  }
+
+  static instagram_allowed () {
+    return /^[a-zA-Z0-9_.]{1,30}$/
+  }
+
   static twitter(value) {
-    return /^[a-zA-Z0-9_]{1,15}$/.test(value)
+    return Validators.twitter_allowed().test(value)
   }
 
   static instagram(value) {
-    return (/^[a-zA-Z0-9_.]{1,30}$/.test(value))
+    return Validators.instagram_allowed().test(value)
   }
 
   static url(value) {

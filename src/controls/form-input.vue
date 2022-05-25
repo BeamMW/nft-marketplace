@@ -21,6 +21,7 @@
               :max_length="max_length" 
               :value="modelValue.length"
               :class="{'chars-err': !valid}"
+              :tip="tip"
               style="margin-top:3px;"
     />
   </div>
@@ -156,11 +157,16 @@ export default {
       default: true,
       required: false
     },
-    letters_only: {
-      type: Boolean,
-      default: false,
+    tip: {
+      type: String,
+      default: undefined,
       required: false
     },
+    allowed: {
+      type: Object,
+      default: undefined,
+      required: false
+    }
   },
 
   emits: [
@@ -177,10 +183,9 @@ export default {
 
   methods: {
     onKeyDown(ev) {
-      if (this.letters_only) {
-        if(!/[a-z]/i.test(ev.key)) { 
-          ev.preventDefault()
-        }
+      // TODO: merge 'allowed', 'valid' & 'max_chars' to one regex
+      if (this.allowed && !this.allowed.test(ev.key)) {
+        ev.preventDefault()
       }
     }
   }

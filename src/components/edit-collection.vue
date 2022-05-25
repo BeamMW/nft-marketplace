@@ -38,7 +38,7 @@
                    :max_length="15"
                    :valid="twitter_valid"
                    :counter="false"
-                   letters_only
+                   :allowed="twitter_allowed"
         />
         <formInput v-model="instagram"
                    label="Instagram"
@@ -47,7 +47,7 @@
                    :max_length="30"
                    :valid="instagram_valid"
                    :counter="false"
-                   letters_only
+                   :allowed="instagram_allowed"
         />
       </div>
       <div class="col-second">
@@ -243,6 +243,9 @@ export default {
       let value = this.twitter
       return !value || validators.twitter(value)
     },
+    twitter_allowed() {
+      return validators.twitter_allowed()
+    },
     instagram: {
       get () {
         return this.instagram_ != undefined ? this.instagram_ : (this.collection || {}).instagram
@@ -254,6 +257,9 @@ export default {
     instagram_valid() {
       let value = this.instagram
       return !value || validators.instagram(value)
+    },
+    instagram_allowed() {
+      return validators.instagram_allowed()
     },
     description: {
       get () {

@@ -43,8 +43,6 @@
 <script>
 import modal from 'controls/modal'
 import btn from 'controls/button'
-import utils from 'utils/utils'
-import artistsStore from 'stores/artists'
 
 export default {
   components: { 
@@ -58,28 +56,12 @@ export default {
     }
   },
 
-  computed: {
-    computed_key () {
-      return this.artist_key || artistsStore.my_id
-    },
-  },
-
   methods: {
-    onCopyAndClose() {
-      this.onCopy()
-      this.close()
-    },
-  
-    onCopy() {
-      utils.copyText(this.computed_key)
-    },
-
     open (title, message) {
       this.title = title
       this.message = message
       this.$refs.modal.open()
     },
-
     close () {
       this.$refs.modal.close()
     }

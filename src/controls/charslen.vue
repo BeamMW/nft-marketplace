@@ -1,6 +1,6 @@
 <template>
   <div class="info">
-    <span>{{ max_length }} characters max</span> 
+    <span>{{ tip_computed }}</span> 
     <span>{{ value }} / {{ max_length }} </span>
   </div>
 </template>
@@ -32,6 +32,20 @@ export default {
       type: Number,
       default: 0,
       required: false
+    },
+    tip: {
+      type: String,
+      default: undefined,
+      required: false
+    },
+  },
+
+  computed: {
+    tip_computed () {
+      if (this.tip === undefined) {
+        return `${this.max_length} characters max`
+      }
+      return this.tip
     }
   }
 }

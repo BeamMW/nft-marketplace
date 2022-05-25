@@ -1,5 +1,6 @@
 <template>
   <messageModal ref="messageModal"/>
+  <transferModal :id="id" ref="transferModal"/>
   <div id="container" class="nft-page-container">
     <pageTitle/>
     <loading v-if="nft === undefined" text="Loading NFT"/>
@@ -20,10 +21,15 @@
         </div>
         <div class="info-container">
           <div class="info-box">
-            <div class="title" :class="{'error': error}">
-              {{ title }}
+            <div class="title-row" :class="{'error': error}">
+              <div class="title">
+                {{ title }}
+              </div>
               <btn color="transparent" height="24px" padding="0px" @click="onShare">
                 <img src="~assets/share.svg" width="24">
+              </btn>
+              <btn v-if="owned" color="transparent" height="20px" padding="0px 0px 2px 0px" @click="onTransfer">
+                <img src="~assets/transfer.svg" width="20">
               </btn>
             </div>
             <div class="description" :class="{'error': error}">{{ description }}</div>
@@ -239,20 +245,25 @@
             display: flex
             flex-direction: column
 
-            & > .title {
-              font-size: 20px
-              font-weight: bold
-              color: #fff
-              white-space: nowrap
-              text-overflow: ellipsis
-              overflow: hidden
+            & > .title-row {
               display: flex
+              flex-direction: row
+              align-items: center
+
+              & > .title {
+                font-size: 20px
+                font-weight: bold
+                color: #fff
+                white-space: nowrap
+                text-overflow: ellipsis
+                overflow: hidden
+                flex: 1
+                padding-right: 15px
+              }
 
               & > button {
-                margin-left: auto
-
                 &:not(:last-child) {
-                  margin-right: 5px
+                  margin-right: 15px
                 }
               }
             }
@@ -306,6 +317,7 @@
 
 <script>
 import messageModal from 'components/message-modal'
+import transferModal from 'components/transfer-modal'
 import btn from 'controls/button.vue'
 import price from 'controls/price'
 import preview from 'controls/preview'
@@ -337,7 +349,8 @@ export default {
     loading,
     notFound,
     moderationStatus,
-    messageModal
+    messageModal,
+    transferModal
   },
 
   props: {
@@ -388,6 +401,10 @@ export default {
     error () {
       return !!this.nft.error
     },
+
+    owned() {
+      return !!this.nft.owned
+    },
     
     title () {
       return this.nft.label
@@ -435,7 +452,11 @@ export default {
     },
     onShare() {
       utils.copyText(window.location.href)
-      this.$refs.messageModal.open('NFT Share', `Link to the NFT '${this.title}' has been copied to clipboard.`)
+      let title = this.error ? '' : ` '${this.title}' `
+      this.$refs.messageModal.open('Share NFT', `Link to the NFT ${title} has been copied to clipboard.`)
+    },
+    onTransfer() {
+      this.$refs.transferModal.open()
     },
     onAuthor () {
       // FUTURE

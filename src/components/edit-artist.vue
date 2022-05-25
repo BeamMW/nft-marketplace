@@ -41,7 +41,7 @@
                    :valid="twitter_valid"
                    :readonly="in_set_artist"
                    :counter="false"
-                   letters_only
+                   :allowed="twitter_allowed"
         />
         <formInput v-model="instagram"
                    label="Instagram"
@@ -51,7 +51,7 @@
                    :valid="instagram_valid"
                    :readonly="in_set_artist"
                    :counter="false"
-                   letters_only
+                   :allowed="instagram_allowed"
         />
       </div>
       <div class="col-second">
@@ -305,9 +305,15 @@ export default {
       let value = this.website
       return !value || validators.url(value)
     },
+    twitter_allowed() {
+      return validators.twitter_allowed()
+    },
     twitter_valid() {
       let value = this.twitter
       return !value || validators.twitter(value)
+    },
+    instagram_allowed() {
+      return validators.instagram_allowed()
     },
     instagram_valid() {
       let value = this.instagram

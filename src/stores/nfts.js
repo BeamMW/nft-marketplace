@@ -220,6 +220,15 @@ class NFTSStore extends LazyItems {
     })
   }
 
+  async transferNFT(id, to) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'transfer',
+      pkNewOwner: to,
+      id, cid
+    })
+  }
+
   toNewItem(collid) {
     router.push({
       name: 'new-nft',
