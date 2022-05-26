@@ -65,6 +65,7 @@
           <addImage v-model="banner"
                     accept="image/jpeg;image/png;image/svg+xml"
                     title="Add an artist banner<br>(*.jpg, *.png, *.svg)"  
+                    height="135px"
                     :readonly="in_set_artist" 
                     :error="banner_valid ? '' : ' '"
           />

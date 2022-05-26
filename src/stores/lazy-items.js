@@ -199,8 +199,11 @@ export default class ItemsStore {
       cid
     })
 
+    if (this._global.state.debug) {
+      console.log(`view_${this._objname}s result`, res)
+    }
+
     utils.ensureField(res, 'items', 'array')
-   
     let approved = 0
     let approved_liked = 0
     let pending = 0

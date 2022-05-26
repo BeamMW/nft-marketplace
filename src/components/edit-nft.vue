@@ -32,9 +32,11 @@
         <div class="col-second">
           <addImage v-model="image"
                     :error="image_valid ? '' : 'image cannot be larger than 250kb'"
+                    class="add-image"
                     accept="image/*"
                     title="Add NFT here<br>(any image, including animated)"
-                    height="374px"
+                    height="390px"
+                    width="390px"
           />
         </div>
       </div>
@@ -71,7 +73,7 @@
       display: flex
       
       .col-first {
-        flex-basis: 50%
+        flex: 1
 
         & > *:not(:last-child) {
           margin-bottom: 20px
@@ -79,7 +81,6 @@
       }
 
       .col-second {
-        flex-basis: 50%
         margin-left: 30px
         margin-top: 30px
       }

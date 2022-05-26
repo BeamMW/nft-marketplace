@@ -102,7 +102,12 @@ export default {
     height: {
       type: String,
       required: false,
-      default: '135px'
+      default: ''
+    },
+    width: {
+      type: String,
+      required: false,
+      default: ''
     },
     title: {
       type: String,
@@ -132,9 +137,17 @@ export default {
 
   computed: {
     ctrlStyle() {
-      return {
-        'height': this.height
+      let res = {}
+
+      if (this.height) {
+        res.height = this.height
       }
+
+      if (this.width) {
+        res.width = this.width
+      }
+
+      return res
     },
     borderStyle() {
       return {

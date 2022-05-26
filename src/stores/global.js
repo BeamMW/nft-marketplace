@@ -160,6 +160,10 @@ const store = {
       action: 'view_params', 
       'cid': this.state.cid}
     )
+
+    if (this.state.debug) {
+      console.log('view_params result:', res)
+    }
     
     utils.ensureField(res, 'is_admin', 'number')
     utils.ensureField(res, 'is_moderator', 'number')  
