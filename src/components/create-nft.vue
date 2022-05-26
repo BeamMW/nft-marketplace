@@ -19,6 +19,7 @@
   cursor: pointer
   color: rgba(26, 246, 214, 0.7)
   font-size: 14px
+  box-sizing: border-box
 
   display: flex
   align-items: center
