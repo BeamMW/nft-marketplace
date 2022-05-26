@@ -72,7 +72,7 @@ namespace KeyMaterial
     struct Owner
     {
         ContractID m_Cid;
-        Gallery::Nft::Id m_ID;
+        gallery::Nft::Id m_ID;
         uint8_t m_pSeed[sizeof(g_szOwner) - sizeof(char)];
 
         void Set(const ContractID& cid)
@@ -88,13 +88,13 @@ namespace KeyMaterial
     };
 #pragma pack (pop)
 
-    const Gallery::Nft::Id g_MskImpression = Utils::FromBE((static_cast<Gallery::Nft::Id>(-1) >> 1) + 1); // hi bit
+    const gallery::Nft::Id g_MskImpression = Utils::FromBE((static_cast<gallery::Nft::Id>(-1) >> 1) + 1); // hi bit
 }
 
 ON_METHOD(manager, view)
 {
     static const ShaderID s_pSid[] = {
-        Gallery::s_SID_0,
+        gallery::s_SID_0,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
@@ -115,13 +115,12 @@ ON_METHOD(manager, deploy_version)
     Env::GenerateKernel(nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, "Deploy Gallery bytecode", 0);
 }
 
-
 ON_METHOD(manager, deploy_contract)
 {
 #pragma pack (push, 1)
     struct Args
         :public Upgradable2::Create
-        ,public Gallery::Method::Init
+        ,public gallery::method::Init
     {
     };
 #pragma pack (pop)
@@ -129,11 +128,11 @@ ON_METHOD(manager, deploy_contract)
     Args args;
     _POD_(args).SetZero();
 
-    args.m_Config.m_VoteReward.m_Amount = voteRewardAmount;
-    args.m_Config.m_VoteReward.m_Aid = voteRewardAid;
-    KeyMaterial::MyAdminKey().get_Pk(args.m_Config.m_pkAdmin);
+    args.config.vote_reward.amount = voteRewardAmount;
+    args.config.vote_reward.aid = voteRewardAid;
+    KeyMaterial::MyAdminKey().get_Pk(args.config.admin_id);
 
-    if (!ManagerUpgadable2::FillDeployArgs(args, &args.m_Config.m_pkAdmin))
+    if (!ManagerUpgadable2::FillDeployArgs(args, &args.config.admin_id))
         return;
 
     Env::GenerateKernel(nullptr, 0, &args, sizeof(args), nullptr, 0, nullptr, 0, "Deploy Gallery contract", 3000000);

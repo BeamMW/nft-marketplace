@@ -4,9 +4,9 @@
 
 #include <algorithm>
 
-struct MyState : public Gallery::State {
+struct MyState : public gallery::State {
     MyState() {
-        Env::LoadVar_T((uint8_t) s_Key, *this);
+        Env::LoadVar_T((uint8_t) kKey, *this);
     }
 
     MyState(bool) {
@@ -14,15 +14,15 @@ struct MyState : public Gallery::State {
     }
 
     void Save() {
-        Env::SaveVar_T((uint8_t) s_Key, *this);
+        Env::SaveVar_T((uint8_t) kKey, *this);
     }
 
     void AddSigAdmin() {
-        Env::AddSig(m_Config.m_pkAdmin);
+        Env::AddSig(config.admin_id);
     }
 };
 
-BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
+BEAM_EXPORT void Ctor(const gallery::method::Init& r) {
     if (Env::get_CallDepth() > 1) {
         MyState s(false);
         s.total_nfts = 0;
@@ -31,8 +31,8 @@ BEAM_EXPORT void Ctor(const Gallery::Method::Init& r) {
         s.total_moderators = 0;
         s.fee_base = 0;
 
-        s.m_VoteBalance = 0;
-        _POD_(s.m_Config) = r.m_Config;
+        s.vote_balance = 0;
+        _POD_(s.config) = r.config;
 
         s.Save();
     }
@@ -42,24 +42,24 @@ BEAM_EXPORT void Dtor(void*) {
     // ignore
 }
 
-void PayoutMove(const Gallery::Payout::Key& key, Amount val, bool bAdd) {
+void PayoutMove(const gallery::Payout::Key& key, Amount val, bool bAdd) {
     if (!val) return;
 
-    Gallery::Payout po;
+    gallery::Payout po;
     if (Env::LoadVar_T(key, po)) {
         if (bAdd) {
-            Strict::Add(po.m_Amount, val);
+            Strict::Add(po.amount, val);
         } else {
-            Strict::Sub(po.m_Amount, val);
+            Strict::Sub(po.amount, val);
 
-            if (!po.m_Amount) {
+            if (!po.amount) {
                 Env::DelVar_T(key);
                 return;
             }
         }
     } else {
         Env::Halt_if(!bAdd);
-        po.m_Amount = val;
+        po.amount = val;
     }
 
     Env::SaveVar_T(key, po);
@@ -69,43 +69,42 @@ BEAM_EXPORT void Method_2(void*) {
     // called on upgrade
 }
 
-BEAM_EXPORT void Method_3(const Gallery::Method::SetFeeBase& r) {
+BEAM_EXPORT void Method_3(const gallery::method::SetFeeBase& r) {
     MyState s;
     s.fee_base = r.amount;
     s.Save();
     s.AddSigAdmin();
 }
 
-BEAM_EXPORT void Method_4(const Gallery::Method::SetModerator& r) {
-    Gallery::Moderator m;
-    MyState s;
+BEAM_EXPORT void Method_4(const gallery::method::SetModerator& r) {
     Height cur_height = Env::get_Height();
 
+    MyState s;
+    gallery::Moderator m;
     if (!m.Load(r.id)) {
         m.registered = cur_height;
         m.updated = cur_height;
         s.total_moderators++;
     }
 
-    m.approved = r.approved;
-
-    Gallery::Index<Gallery::Tag::kHeightModeratorIdx, Height, Gallery::Moderator>
+    gallery::Index<gallery::Tag::kHeightModeratorIdx, Height, gallery::Moderator>
         ::Update(m.updated, cur_height, r.id);
 
+    m.approved = r.approved;
     m.updated = cur_height;
     m.Save(r.id);
     s.Save();
     s.AddSigAdmin();
 }
 
-BEAM_EXPORT void Method_6(const Gallery::Method::SetArtistStatus& r) {
+BEAM_EXPORT void Method_6(const gallery::method::SetArtistStatus& r) {
     Height cur_height = Env::get_Height();
 
-    struct ArtistPlus : public Gallery::Artist {
-        char m_szLabelData[s_TotalMaxLen];
+    struct ArtistPlus : public gallery::Artist {
+        char m_szLabelData[kTotalMaxLen];
     } a;
 
-    Gallery::Moderator m;
+    gallery::Moderator m;
     MyState s;
     if (!m.Load(r.signer) || !m.approved)
         s.AddSigAdmin();
@@ -116,62 +115,62 @@ BEAM_EXPORT void Method_6(const Gallery::Method::SetArtistStatus& r) {
         Env::Halt_if(!a.Load(r.ids[i], sizeof(a)));
         a.status = r.status;
 
-        Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
+        gallery::Index<gallery::Tag::kHeightArtistIdx, Height, gallery::Artist>
             ::Update(a.updated, cur_height, r.ids[i]);
 
         a.updated = cur_height;
-        a.Save(r.ids[i], sizeof(Gallery::Artist) + a.data_len);
+        a.Save(r.ids[i], sizeof(gallery::Artist) + a.data_len);
     }
 }
 
-BEAM_EXPORT void Method_5(const Gallery::Method::SetArtist& r) {
+BEAM_EXPORT void Method_5(const gallery::method::SetArtist& r) {
     Height cur_height = Env::get_Height();
 
-    struct ArtistPlus : public Gallery::Artist {
-        char data[s_DataMaxLen];
+    struct ArtistPlus : public gallery::Artist {
+        char data[kDataMaxLen];
     } a;
 
-    if (!a.Load(r.m_pkArtist, sizeof(a))) {
+    if (!a.Load(r.aritst_id, sizeof(a))) {
         MyState s;
         // if artist doesn't exist, then label is required
-        Env::Halt_if(!r.m_LabelLen); 
-        a.m_hRegistered = cur_height;
+        Env::Halt_if(!r.label_len); 
+        a.registered = cur_height;
         a.updated = cur_height;
         a.collections_num = 0;
         a.nfts_num = 0;
         s.total_artists++;
         s.Save();
 
-        Gallery::Events::AddArtistLabel::Key alk;
-        alk.id = r.m_pkArtist;
+        gallery::Events::AddArtistLabel::Key alk;
+        alk.id = r.aritst_id;
         auto label_ptr = reinterpret_cast<const char*>(&r + 1);
-        Env::EmitLog(&alk, sizeof(alk), label_ptr, r.m_LabelLen, KeyTag::Internal);
-        Gallery::Artist::LabelKey lk;
-        lk.label_hash = Gallery::GetLabelHash(std::string_view(label_ptr, r.m_LabelLen));
-        Env::SaveVar_T(lk, r.m_pkArtist);
+        Env::EmitLog(&alk, sizeof(alk), label_ptr, r.label_len, KeyTag::Internal);
+        gallery::Artist::LabelKey lk;
+        lk.label_hash = gallery::GetLabelHash(std::string_view(label_ptr, r.label_len));
+        Env::SaveVar_T(lk, r.aritst_id);
     }
 
-    auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.m_LabelLen;
-    Env::Memcpy(a.data, data_ptr, r.m_DataLen);
-    a.data_len = r.m_DataLen;
-    a.status = Gallery::Status::kPending;
+    auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
+    Env::Memcpy(a.data, data_ptr, r.data_len);
+    a.data_len = r.data_len;
+    a.status = gallery::Status::kPending;
 
-    Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
-        ::Update(a.updated, cur_height, r.m_pkArtist);
+    gallery::Index<gallery::Tag::kHeightArtistIdx, Height, gallery::Artist>
+        ::Update(a.updated, cur_height, r.aritst_id);
 
     a.updated = cur_height;
-    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
-    Env::AddSig(r.m_pkArtist);
+    a.Save(r.aritst_id, sizeof(gallery::Artist) + a.data_len);
+    Env::AddSig(r.aritst_id);
 }
 
-BEAM_EXPORT void Method_7(const Gallery::Method::SetCollectionStatus& r) {
+BEAM_EXPORT void Method_7(const gallery::method::SetCollectionStatus& r) {
     Height cur_height = Env::get_Height();
 
-    struct CollectionPlus : public Gallery::Collection {
-        char m_szLabelData[s_TotalMaxLen];
+    struct CollectionPlus : public gallery::Collection {
+        char m_szLabelData[kTotalMaxLen];
     } c;
 
-    Gallery::Moderator m;
+    gallery::Moderator m;
     MyState s;
     if (!m.Load(r.signer) || !m.approved)
         s.AddSigAdmin();
@@ -183,131 +182,131 @@ BEAM_EXPORT void Method_7(const Gallery::Method::SetCollectionStatus& r) {
 
         c.status = r.status;
 
-        Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+        gallery::Index<gallery::Tag::kHeightCollectionIdx, Height, gallery::Collection>
             ::Update(c.updated, cur_height, r.ids[i]);
 
         c.updated = cur_height;
-        c.Save(r.ids[i], sizeof(Gallery::Collection) + c.label_len + c.data_len);
+        c.Save(r.ids[i], sizeof(gallery::Collection) + c.label_len + c.data_len);
     }
 }
 
-BEAM_EXPORT void Method_8(const Gallery::Method::SetCollection& r) {
+BEAM_EXPORT void Method_8(const gallery::method::SetCollection& r) {
     Height cur_height = Env::get_Height();
 
-    struct CollectionPlus : public Gallery::Collection {
-        char m_szLabelData[s_TotalMaxLen];
+    struct CollectionPlus : public gallery::Collection {
+        char m_szLabelData[kTotalMaxLen];
     } c;
 
-    Gallery::Collection::Id c_id = r.collection_id;
+    gallery::Collection::Id c_id = r.collection_id;
 
     if (!c.Load(c_id, sizeof(c))) {
         // if collection doesn't exist, then label is required
-        Env::Halt_if(!r.m_LabelLen); 
+        Env::Halt_if(!r.label_len); 
 
         MyState s;
         c_id = ++s.total_collections;
-        c.m_pkAuthor = r.m_pkArtist;
+        c.author = r.aritst_id;
         c.updated = cur_height;
         c.total_sold = 0;
         c.total_sold_price = 0;
         c.max_sold.nft_id = 0;
-        c.max_sold.price.m_Amount = 0;
-        c.max_sold.price.m_Aid = 0;
+        c.max_sold.price.amount = 0;
+        c.max_sold.price.aid = 0;
         c.min_sold.nft_id = 0;
-        c.min_sold.price.m_Amount = 0;
-        c.min_sold.price.m_Aid = 0;
+        c.min_sold.price.amount = 0;
+        c.min_sold.price.aid = 0;
 
-        Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
-            Gallery::Artist::Id, Gallery::Collection>
-                ::Save(c.m_pkAuthor, c_id);
+        gallery::Index<gallery::Tag::kArtistCollectionIdx,
+            gallery::Artist::Id, gallery::Collection>
+                ::Save(c.author, c_id);
 
-        struct ArtistPlus : public Gallery::Artist {
-            char m_szLabelData[s_TotalMaxLen];
+        struct ArtistPlus : public gallery::Artist {
+            char m_szLabelData[kTotalMaxLen];
         } a;
 
-        a.Load(r.m_pkArtist, sizeof(a));
+        a.Load(r.aritst_id, sizeof(a));
         ++a.collections_num;
 
-        Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
-            ::Update(a.updated, cur_height, r.m_pkArtist);
+        gallery::Index<gallery::Tag::kHeightArtistIdx, Height, gallery::Artist>
+            ::Update(a.updated, cur_height, r.aritst_id);
 
         a.updated = cur_height;
-        a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
+        a.Save(r.aritst_id, sizeof(gallery::Artist) + a.data_len);
         s.Save();
     }
 
-    Gallery::Collection::LabelKey lk;
-    lk.artist_id = r.m_pkArtist;
-    lk.label_hash = Gallery::GetLabelHash(std::string_view(c.m_szLabelData, c.label_len));
+    gallery::Collection::LabelKey lk;
+    lk.artist_id = r.aritst_id;
+    lk.label_hash = gallery::GetLabelHash(std::string_view(c.m_szLabelData, c.label_len));
     Env::DelVar_T(lk);
 
     auto label_ptr = reinterpret_cast<const char*>(&r + 1);
-    lk.label_hash = Gallery::GetLabelHash(std::string_view(label_ptr, r.m_LabelLen));
+    lk.label_hash = gallery::GetLabelHash(std::string_view(label_ptr, r.label_len));
     Env::SaveVar_T(lk, c_id);
 
-    Env::Memcpy(c.m_szLabelData, &r + 1, r.m_LabelLen + r.m_DataLen);
-    c.label_len = r.m_LabelLen;
-    c.data_len = r.m_DataLen;
-    c.status = Gallery::Status::kPending;
+    Env::Memcpy(c.m_szLabelData, &r + 1, r.label_len + r.data_len);
+    c.label_len = r.label_len;
+    c.data_len = r.data_len;
+    c.status = gallery::Status::kPending;
 
-    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+    gallery::Index<gallery::Tag::kHeightCollectionIdx, Height, gallery::Collection>
         ::Update(c.updated, cur_height, c_id);
 
     c.updated = cur_height;
-    c.Save(c_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
-    Env::AddSig(r.m_pkArtist);
+    c.Save(c_id, sizeof(gallery::Collection) + c.label_len + c.data_len);
+    Env::AddSig(r.aritst_id);
 }
 
-BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
+BEAM_EXPORT void Method_9(const gallery::method::SetNft& r) {
     Height cur_height = Env::get_Height();
 
-    Gallery::Nft m;
+    gallery::Nft m;
 
     MyState s;
     m.id = ++s.total_nfts;
-    m.m_pkOwner = r.m_pkArtist;
-    m.m_pkAuthor = r.m_pkArtist;
+    m.owner = r.aritst_id;
+    m.author = r.aritst_id;
     m.collection_id = r.collection_id;
-    m.status = Gallery::Status::kPending;
-    _POD_(m.m_Price) = r.m_Price;
+    m.status = gallery::Status::kPending;
+    _POD_(m.price) = r.price;
 
     // assert: artist owns collection
-    Env::Halt_if(!Gallery::Index<Gallery::Tag::kArtistCollectionIdx,
-        Gallery::Artist::Id, Gallery::Collection>
-            ::Load(r.m_pkArtist, r.collection_id));
+    Env::Halt_if(!gallery::Index<gallery::Tag::kArtistCollectionIdx,
+        gallery::Artist::Id, gallery::Collection>
+            ::Load(r.aritst_id, r.collection_id));
 
-    Gallery::Index<Gallery::Tag::kCollectionNftIdx,
-        Gallery::Collection::Id, Gallery::Nft>
+    gallery::Index<gallery::Tag::kCollectionNftIdx,
+        gallery::Collection::Id, gallery::Nft>
             ::Save(r.collection_id, m.id);
         
-    struct CollectionPlus : public Gallery::Collection {
-        char m_szLabelData[s_TotalMaxLen];
+    struct CollectionPlus : public gallery::Collection {
+        char m_szLabelData[kTotalMaxLen];
     } c;
 
     // assert: collection exists
     Env::Halt_if(!c.Load(r.collection_id, sizeof(c)));
     c.nfts_num++;
-    Env::Halt_if(c.nfts_num > c.s_MaxNfts);
+    Env::Halt_if(c.nfts_num > c.kMaxNfts);
 
-    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+    gallery::Index<gallery::Tag::kHeightCollectionIdx, Height, gallery::Collection>
         ::Update(c.updated, cur_height, r.collection_id);
     c.updated = cur_height;
-    c.Save(r.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    c.Save(r.collection_id, sizeof(gallery::Collection) + c.label_len + c.data_len);
 
     // verify artist
-    struct ArtistPlus : public Gallery::Artist {
-        char m_szLabelData[s_TotalMaxLen];
+    struct ArtistPlus : public gallery::Artist {
+        char m_szLabelData[kTotalMaxLen];
     } a;
 
     // assert: artist exists
-    Env::Halt_if(!a.Load(r.m_pkArtist, sizeof(a)));
+    Env::Halt_if(!a.Load(r.aritst_id, sizeof(a)));
     ++a.nfts_num;
 
-    Gallery::Index<Gallery::Tag::kHeightArtistIdx, Height, Gallery::Artist>
-        ::Update(a.updated, cur_height, r.m_pkArtist);
+    gallery::Index<gallery::Tag::kHeightArtistIdx, Height, gallery::Artist>
+        ::Update(a.updated, cur_height, r.aritst_id);
 
     a.updated = cur_height;
-    a.Save(r.m_pkArtist, sizeof(Gallery::Artist) + a.data_len);
+    a.Save(r.aritst_id, sizeof(gallery::Artist) + a.data_len);
 
     auto pData = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
     uint32_t nData = r.data_len;
@@ -315,9 +314,9 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
     auto pLabel = reinterpret_cast<const uint8_t*>(&r + 1);
     uint32_t nLabel = r.label_len;
 
-    Gallery::Events::AddNftData::Key adk;
-    adk.m_ID = m.id;
-    adk.m_pkArtist = m.m_pkOwner;
+    gallery::Events::AddNftData::Key adk;
+    adk.nft_id = m.id;
+    adk.aritst_id = m.owner;
 
     uint32_t nMaxEventSize = 0x100000;
 
@@ -330,234 +329,235 @@ BEAM_EXPORT void Method_9(const Gallery::Method::SetNft& r) {
         pData += nMaxEventSize;
     }
 
-    Gallery::Events::AddNftLabel::Key alk;
-    alk.m_ID = m.id;
-    alk.m_pkArtist = m.m_pkOwner;
+    gallery::Events::AddNftLabel::Key alk;
+    alk.nft_id = m.id;
+    alk.aritst_id = m.owner;
     Env::EmitLog(&alk, sizeof(alk), pLabel, nLabel, KeyTag::Internal);
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
         ::Update(m.updated, cur_height, m.id);
     m.updated = cur_height;
     m.Save(m.id);
     s.Save();
-    Env::AddSig(r.m_pkArtist);
+    Env::AddSig(r.aritst_id);
 }
 
-BEAM_EXPORT void Method_10(const Gallery::Method::SetNftStatus& r) {
+BEAM_EXPORT void Method_10(const gallery::method::SetNftStatus& r) {
     Height cur_height = Env::get_Height();
 
-    Gallery::Moderator m;
+    gallery::Moderator m;
     MyState s;
     if (!m.Load(r.signer) || !m.approved)
         s.AddSigAdmin();
     else
         Env::AddSig(r.signer);
 
-    Gallery::Nft a;
+    gallery::Nft a;
     for (int i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!a.Load(r.ids[i]));
         a.status = r.status;
-        Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
+        gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
             ::Update(a.updated, cur_height, a.id);
         a.updated = cur_height;
         a.Save(a.id);
     }
 }
 
-BEAM_EXPORT void Method_11(const Gallery::Method::SetPrice& r) {
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID));
+BEAM_EXPORT void Method_11(const gallery::method::SetPrice& r) {
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id));
 
-    _POD_(m.m_Price) = r.m_Price;
+    _POD_(m.price) = r.price;
 
     Height cur_height = Env::get_Height();
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 
-    Env::AddSig(m.m_pkOwner); // would fail if no current owner (i.e. checked out)
+    Env::AddSig(m.owner); // would fail if no current owner (i.e. checked out)
 }
 
-BEAM_EXPORT void Method_12(const Gallery::Method::Buy& r) {
+BEAM_EXPORT void Method_12(const gallery::method::Buy& r) {
     Height cur_height = Env::get_Height();
 
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID));
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id));
 
     Env::Halt_if(
-        !m.m_Price.m_Amount || // not for sale!
-        (r.m_PayMax < m.m_Price.m_Amount) || // too expensive
-        (r.m_HasAid != (!!m.m_Aid))
+        !m.price.amount || // not for sale!
+        (r.pay_max < m.price.amount) || // too expensive
+        (r.has_aid != (!!m.aid))
     );
 
-    struct CollectionPlus : public Gallery::Collection {
-        char m_szLabelData[s_TotalMaxLen];
+    struct CollectionPlus : public gallery::Collection {
+        char m_szLabelData[kTotalMaxLen];
     } c;
 
     c.Load(m.collection_id, sizeof(c));
     ++c.total_sold;
-    c.total_sold_price += m.m_Price.m_Amount;
-    if (m.m_Price.m_Amount > c.max_sold.price.m_Amount) {
-        c.max_sold.price = m.m_Price;
-        c.max_sold.nft_id = r.m_ID;
+    c.total_sold_price += m.price.amount;
+    if (m.price.amount > c.max_sold.price.amount) {
+        c.max_sold.price = m.price;
+        c.max_sold.nft_id = r.nft_id;
     }
-    if (!c.min_sold.nft_id || m.m_Price.m_Amount < c.min_sold.price.m_Amount) {
-        c.min_sold.price = m.m_Price;
-        c.min_sold.nft_id = r.m_ID;
+    if (!c.min_sold.nft_id || m.price.amount < c.min_sold.price.amount) {
+        c.min_sold.price = m.price;
+        c.min_sold.nft_id = r.nft_id;
     }
-    Gallery::Index<Gallery::Tag::kHeightCollectionIdx, Height, Gallery::Collection>
+    gallery::Index<gallery::Tag::kHeightCollectionIdx, Height, gallery::Collection>
         ::Update(c.updated, cur_height, m.collection_id);
     c.updated = cur_height;
-    c.Save(m.collection_id, sizeof(Gallery::Collection) + c.label_len + c.data_len);
+    c.Save(m.collection_id, sizeof(gallery::Collection) + c.label_len + c.data_len);
 
-    Env::FundsLock(m.m_Price.m_Aid, r.m_PayMax);
+    Env::FundsLock(m.price.aid, r.pay_max);
 
-    Gallery::Events::Sell::Key esk;
-    esk.m_ID = r.m_ID;
-    Gallery::Events::Sell es;
-    _POD_(es.m_Price) = m.m_Price;
-    es.m_HasAid = r.m_HasAid;
+    gallery::Events::Sell::Key esk;
+    esk.nft_id = r.nft_id;
+    gallery::Events::Sell es;
+    _POD_(es.price) = m.price;
+    es.has_aid = r.has_aid;
     Env::EmitLog_T(esk, es);
 
-    Gallery::Payout::Key pok;
-    pok.m_ID = r.m_ID;
-    pok.m_Aid = m.m_Price.m_Aid;
+    gallery::Payout::Key pok;
+    pok.nft_id = r.nft_id;
+    pok.aid = m.price.aid;
 
-    _POD_(pok.m_pkUser) = m.m_pkOwner;
-    PayoutMove(pok, m.m_Price.m_Amount, true);
+    _POD_(pok.user) = m.owner;
+    PayoutMove(pok, m.price.amount, true);
 
-    _POD_(pok.m_pkUser) = r.m_pkUser;
-    PayoutMove(pok, r.m_PayMax - m.m_Price.m_Amount, true);
+    _POD_(pok.user) = r.user;
+    PayoutMove(pok, r.pay_max - m.price.amount, true);
 
-    _POD_(m.m_pkOwner) = r.m_pkUser;
-    _POD_(m.m_Price).SetZero(); // not for sale until new owner sets the price
+    _POD_(m.owner) = r.user;
+    _POD_(m.price).SetZero(); // not for sale until new owner sets the price
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 
-    //Env::AddSig(r.m_pkUser);
+    //Env::AddSig(r.user);
 }
 
-BEAM_EXPORT void Method_13(const Gallery::Method::Withdraw& r) {
-    PayoutMove(r.m_Key, r.m_Value, false);
-    Env::FundsUnlock(r.m_Key.m_Aid, r.m_Value);
-    Env::AddSig(r.m_Key.m_pkUser);
+BEAM_EXPORT void Method_13(const gallery::method::Withdraw& r) {
+    PayoutMove(r.key, r.value, false);
+    Env::FundsUnlock(r.key.aid, r.value);
+    Env::AddSig(r.key.user);
 }
 
-BEAM_EXPORT void Method_14(const Gallery::Method::CheckPrepare& r) {
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID));
-    Env::AddSig(m.m_pkOwner);
+BEAM_EXPORT void Method_14(const gallery::method::CheckPrepare& r) {
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id));
+    Env::AddSig(m.owner);
 
-    if (m.m_Aid) {
+    if (m.aid) {
         // destroy it
-        Env::Halt_if(!Env::AssetDestroy(m.m_Aid));
-        m.m_Aid = 0;
+        Env::Halt_if(!Env::AssetDestroy(m.aid));
+        m.aid = 0;
     } else {
         // 1st call. Don't checkout, only prepare
         static const char szMeta[] = "STD:SCH_VER=1;N=Gallery Nft;SN=Gall;UN=GALL;NTHUN=unique";
-        m.m_Aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
+        m.aid = Env::AssetCreate(szMeta, sizeof(szMeta) - 1);
     }
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
 
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 }
 
-BEAM_EXPORT void Method_15(const Gallery::Method::CheckOut& r) {
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID) || !m.m_Aid);
-    Env::AddSig(m.m_pkOwner);
+BEAM_EXPORT void Method_15(const gallery::method::CheckOut& r) {
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id) || !m.aid);
+    Env::AddSig(m.owner);
 
-    Env::Halt_if(!Env::AssetEmit(m.m_Aid, 1, 1));
-    Env::FundsUnlock(m.m_Aid, 1);
+    Env::Halt_if(!Env::AssetEmit(m.aid, 1, 1));
+    Env::FundsUnlock(m.aid, 1);
 
-    _POD_(m.m_pkOwner).SetZero();
-    _POD_(m.m_Price).SetZero();
+    _POD_(m.owner).SetZero();
+    _POD_(m.price).SetZero();
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
 
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 }
 
-BEAM_EXPORT void Method_16(const Gallery::Method::CheckIn& r) {
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID) || !_POD_(m.m_pkOwner).IsZero());
+BEAM_EXPORT void Method_16(const gallery::method::CheckIn& r) {
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id) || !_POD_(m.owner).IsZero());
 
-    Env::FundsLock(m.m_Aid, 1);
-    Env::Halt_if(!Env::AssetEmit(m.m_Aid, 1, 0));
+    Env::FundsLock(m.aid, 1);
+    Env::Halt_if(!Env::AssetEmit(m.aid, 1, 0));
 
-    _POD_(m.m_pkOwner) = r.m_pkUser;
+    _POD_(m.owner) = r.user;
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
 
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 
-    //Env::AddSig(r.m_pkUser);
+    //Env::AddSig(r.user);
 }
 
-BEAM_EXPORT void Method_17(const Gallery::Method::Vote& r) {
-    Gallery::Nft m;
+BEAM_EXPORT void Method_17(const gallery::method::Vote& r) {
+    gallery::Nft m;
 
-    Env::Halt_if(!m.Load(r.m_ID.nft_id));
+    Env::Halt_if(!m.Load(r.nft_id));
     
-    Gallery::Impression::Key impk;
-    _POD_(impk.m_ID) = r.m_ID;
+    gallery::Like::Key like_key;
+    like_key.nft_id = r.nft_id;
+    like_key.artist_id = r.artist_id;
 
-    Gallery::Impression imp;
-    if (!Env::LoadVar_T(impk, imp)) {
-        imp.m_Value = 0;
+    gallery::Like like;
+    if (!Env::LoadVar_T(like_key, like)) {
+        like.value = 0;
 
         MyState s;
-        Strict::Sub(s.m_VoteBalance, s.m_Config.m_VoteReward.m_Amount);
+        Strict::Sub(s.vote_balance, s.config.vote_reward.amount);
         s.Save();
 
-        Env::FundsUnlock(s.m_Config.m_VoteReward.m_Aid, s.m_Config.m_VoteReward.m_Amount);
+        Env::FundsUnlock(s.config.vote_reward.aid, s.config.vote_reward.amount);
     }
 
-    Env::Halt_if(imp.m_Value == r.m_Impression.m_Value); // not changed
+    Env::Halt_if(like.value == r.value); // not changed
 
-    imp.m_Value = r.m_Impression.m_Value;
-    Env::SaveVar_T(impk, imp);
+    like.value = r.value;
+    Env::SaveVar_T(like_key, like);
 
-    Env::AddSig(impk.m_ID.m_pkUser);
+    Env::AddSig(r.artist_id);
 }
 
-BEAM_EXPORT void Method_18(const Gallery::Method::AddVoteRewards& r) {
+BEAM_EXPORT void Method_18(const gallery::method::AddVoteRewards& r) {
     MyState s;
-    Strict::Add(s.m_VoteBalance, r.m_Amount);
+    Strict::Add(s.vote_balance, r.amount);
     s.Save();
 
-    Env::FundsLock(s.m_Config.m_VoteReward.m_Aid, r.m_Amount);
+    Env::FundsLock(s.config.vote_reward.aid, r.amount);
 }
 
-BEAM_EXPORT void Method_19(const Gallery::Method::Transfer& r) {
-    Gallery::Nft m;
-    Env::Halt_if(!m.Load(r.m_ID));
+BEAM_EXPORT void Method_19(const gallery::method::Transfer& r) {
+    gallery::Nft m;
+    Env::Halt_if(!m.Load(r.nft_id));
 
-    Env::AddSig(m.m_pkOwner);
-    _POD_(m.m_pkOwner) = r.m_pkNewOwner;
+    Env::AddSig(m.owner);
+    _POD_(m.owner) = r.new_owner;
 
     Height cur_height = Env::get_Height();
 
-    Gallery::Index<Gallery::Tag::kHeightNftIdx, Height, Gallery::Nft>
-        ::Update(m.updated, cur_height, r.m_ID);
+    gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>
+        ::Update(m.updated, cur_height, r.nft_id);
 
     m.updated = cur_height;
-    m.Save(r.m_ID);
+    m.Save(r.nft_id);
 }
