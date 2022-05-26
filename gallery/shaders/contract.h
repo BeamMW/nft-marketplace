@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace gallery {
-    static const ShaderID s_SID_0 = {0x72,0x6b,0x5b,0xce,0x64,0x8b,0xd4,0x26,0xb3,0x41,0x49,0xb3,0xbd,0x92,0x40,0x97,0xbd,0xe4,0x9c,0x00,0x21,0x52,0x3b,0x68,0x2a,0x0b,0xdd,0x53,0x6a,0x19,0x06,0xc9};
+    static const ShaderID s_SID_0 = {0x24,0xc7,0xd4,0x93,0x80,0xf1,0x28,0x88,0xb6,0x17,0xc9,0x6a,0x54,0xd9,0x60,0x97,0x08,0x72,0x88,0x99,0x26,0x7f,0x8e,0x34,0xe0,0xad,0x8b,0xee,0x18,0xcb,0x2c,0xc2};
 #pragma pack (push, 1)
 
     using Hash256 = Opaque<32>;
@@ -92,6 +92,7 @@ namespace gallery {
 
     struct Artist : public GalleryObject<Artist, PubKey> {
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kArtist;
             Id id;
             explicit Key(const Id& id) : id{id} {}
@@ -99,8 +100,11 @@ namespace gallery {
         };
 
         struct LabelKey {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kArtistLabelHash;
             Hash256 label_hash;
+            explicit LabelKey(const Hash256& hash) : label_hash{hash} {}
+            LabelKey() : label_hash{} {}
         };
 
         Height registered;
@@ -128,6 +132,8 @@ namespace gallery {
             Tag tag = Tag::kCollectionLabelHash;
             Artist::Id artist_id;
             Hash256 label_hash;
+            explicit LabelKey(const Artist::Id& artist_id, const Hash256& hash) : artist_id{artist_id}, label_hash{hash} {}
+            LabelKey() : label_hash{} {}
         };
 
         Status status;
@@ -218,7 +224,7 @@ namespace gallery {
             struct Key {
                 uint8_t kPrefix = 0;
                 Nft::Id nft_id;
-                Artist::Id aritst_id;
+                Artist::Id artist_id;
             };
             // data is the exhibit itself
         };
@@ -227,7 +233,7 @@ namespace gallery {
             struct Key {
                 uint8_t kPrefix = 1;
                 Nft::Id nft_id;
-                Artist::Id aritst_id;
+                Artist::Id artist_id;
             };
             // data is the exhibit itself
         };
@@ -236,6 +242,8 @@ namespace gallery {
             struct Key {
                 uint8_t kPrefix = 2;
                 Artist::Id id;
+                explicit Key(const Artist::Id& id) : id{id} {}
+                Key() : id{} {}
             };
         };
 
@@ -311,10 +319,10 @@ namespace gallery {
 
         struct SetArtist {
             static const uint32_t kMethod = 5;
-            Artist::Id aritst_id;
+            Artist::Id artist_id;
             uint32_t label_len;
             uint32_t data_len;
-            // followed by label and data without delimiter
+            // followed by label and data
         };
 
         struct SetArtistStatus {
@@ -323,7 +331,6 @@ namespace gallery {
             PubKey signer;
             uint32_t ids_num;
             Artist::Id ids[];
-            static const uint32_t kMaxIds = 128;
         };
 
         struct SetCollectionStatus {
@@ -332,12 +339,11 @@ namespace gallery {
             PubKey signer;
             uint32_t ids_num;
             Collection::Id ids[];
-            static const uint32_t kMaxIds = 128;
         };
 
         struct SetCollection {
             static const uint32_t kMethod = 8;
-            Artist::Id aritst_id;
+            Artist::Id artist_id;
             Collection::Id collection_id;
             uint32_t label_len;
             uint32_t data_len;
@@ -346,7 +352,7 @@ namespace gallery {
 
         struct SetNft {
             static const uint32_t kMethod = 9;
-            Artist::Id aritst_id;
+            Artist::Id artist_id;
             uint32_t data_len;
             uint32_t label_len;
             Collection::Id collection_id;
@@ -360,7 +366,6 @@ namespace gallery {
             Status status;
             uint32_t ids_num;
             Nft::Id ids[];
-            static const uint32_t kMaxIds = 128;
         };
 
         struct SetPrice {
