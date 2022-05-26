@@ -124,7 +124,6 @@ const store = {
     if (err) {
       // TODO: wrap in new Error
       // eslint-disable-next-line no-debugger
-      debugger
       return this.setError(err,  'API handling error')
     }
 

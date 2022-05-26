@@ -173,8 +173,8 @@ export default {
       return this.active_selected.length > 0
     },
     active_approve() {
-      if (this.show_artists) return this.approveArtists
-      if (this.show_collections) return this.approveCollections
+      if (this.show_artists) return this.$store.approveArtists
+      if (this.show_collections) return this.$store.approveCollections
       return this.$store.approveNFTs
     }
   },
