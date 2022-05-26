@@ -10,7 +10,7 @@ import moderatorPage from 'components/moderator-page'
 import {createRouter, createWebHistory} from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(window.location.pathname),
   routes: [
     {path: '/', component: userPage, name: 'gallery'},
     {path: '/my', component: myPage, name: 'my'},

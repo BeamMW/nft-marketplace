@@ -443,6 +443,13 @@ export default {
     })()
   },
 
+  mounted() {
+    //alert(document.baseURI)
+    //let router = this.$router
+    //let curr = router.currentRoute
+    //alert('location: ' + window.location.href + '\nbaseURI: ' + document.baseURI + '\nroute: ' + curr.value.fullPath)
+  },
+
   methods: {  
     formatAmount8(amount) {
       return utils.formatAmount8(amount)

@@ -68,10 +68,10 @@
                     :readonly="in_set_artist" 
                     :error="banner_valid ? '' : ' '"
           />
-          <img src="~/assets/elipse.svg" alt="avatar" class="elipse"/>
+          <img src="~assets/elipse.svg" alt="avatar" class="elipse"/>
           <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
             <div v-if="avatar && !in_set_artist" class="remove">
-              <img src="~/assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
+              <img src="~assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
             </div>
             <img v-if="avatar && avatar.object" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
             <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
@@ -93,7 +93,7 @@
       Artist info cannot be changed while artist transaction is in progress
     </p>
     <div class="actions">
-      <btn text="cancel" @click="$router.go(-1)">
+      <btn text="cancel" @click="router.go(-1)">
         <img src="~assets/cancel.svg"/>
       </btn>
       <btn :text="edit_self ? 'update artist' : 'create account'" 

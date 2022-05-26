@@ -4,7 +4,7 @@
       {{ label }}
     </label>
     <div class="input" :class="{'err': !valid, 'readonly': readonly}">
-      <img v-if="img" :src="`/assets/${img}.svg`" :class="{'error': !valid}" alt="icon"/>
+      <img v-if="img" :src="icon_src" :class="{'error': !valid}" alt="icon"/>
       <input :value="modelValue"
              :placeholder="placeholder"
              :style="style"
@@ -178,6 +178,9 @@ export default {
       return {
         'padding-left': this.img.length ? '38px' : '15px'
       }
+    },
+    icon_src() {
+      return require('assets/' + this.img + '.svg')
     }
   },
 

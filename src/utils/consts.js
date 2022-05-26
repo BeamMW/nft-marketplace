@@ -45,7 +45,7 @@ export const contract = {
 }
 
 export const def_images = {
-  artist_avatar: '/assets/artist-default-avatar.svg',
-  artist_banner: '/assets/artist-default-banner.svg',
-  nft: '/assets/nft-default.svg'
+  artist_avatar: require('assets/artist-default-avatar.svg'),
+  artist_banner: require('assets/artist-default-banner.svg'),
+  nft: require('assets/nft-default.svg')
 }

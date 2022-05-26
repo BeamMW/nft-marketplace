@@ -11,7 +11,7 @@
       <moderationStatus :item="item"/>
       <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes_cnt }}</div>
-        <img :src="'/assets/heart' + (liked ? '-red' : '') + '.svg'"/>
+        <img :src="like_icon"/>
       </div>
     </preview>
     
@@ -136,8 +136,10 @@ export default {
   },
 
   data () {
+    //alert('require: ' + require(def_images.nft))
     return {
-      def_nft: def_images.nft,
+      // eslint-disable-next-line no-undef
+      def_nft: def_images.nft
     }
   },
 
@@ -169,6 +171,12 @@ export default {
     likes_cnt () {
       return this.item.impressions
     },
+
+    like_icon() {
+      let liked = require('assets/heart-red.svg')
+      let unliked = require('assets/heart.svg')
+      return this.liked ? liked : unliked
+    }
   },
 
   methods: {

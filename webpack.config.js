@@ -75,7 +75,8 @@ const config = (DEV_MODE) => {return {
           {
             loader: 'file-loader',
             options: {
-              name: 'assets/[name].[ext]'
+              name: 'assets/[name].[ext]',
+              esModule: false
             }
           }
         ]

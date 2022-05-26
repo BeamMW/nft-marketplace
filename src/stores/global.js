@@ -141,7 +141,7 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils.downloadAsync('/galleryManager.wasm')
+    this.state.shader = await utils.downloadAsync('galleryManager.wasm')
     
     //utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
     await utils.callApiAsync('ev_subunsub', {ev_system_state: true})

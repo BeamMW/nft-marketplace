@@ -73,7 +73,7 @@ export default {
 
   data () {
     return {
-      def_nft: def_images.nft,
+      def_nft: def_images.nft
     }
   },
 }
