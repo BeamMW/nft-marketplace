@@ -93,7 +93,7 @@
       Artist info cannot be changed while artist transaction is in progress
     </p>
     <div class="actions">
-      <btn text="cancel" @click="router.go(-1)">
+      <btn text="cancel" @click="$router.go(-1)">
         <img src="~assets/cancel.svg"/>
       </btn>
       <btn :text="edit_self ? 'update artist' : 'create account'" 
