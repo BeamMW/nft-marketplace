@@ -15,7 +15,6 @@
                      :cover="!(image || {}).object"
                      height="360px" 
                      radius="0"
-                     cover
             >
               <moderationStatus :item="nft"/>
             </preview>

@@ -36,34 +36,30 @@ export default {
       return this.$state.debug
     },
     errtext () {
-      const maxLen = 50
-
-      if (typeof this.error.error === 'string') {
-        return [this.error.context || 'Error occured', this.error.error].join('/n')
-      }
-
-      if (this.error.error instanceof Error) {
-        if (this.debug) {
-          return this.error.error.stack
-        } else {
-          return this.error.error.stack.substring(0, maxLen) + ' --excluded--'
+      let formatError = (error) =>  {
+        if (typeof error === 'string') {
+          return error
         }
-      }
-      
-      let err = Object.assign({}, this.error.error)
-      // strip off some long unncessary binary stuff that might occur here
-      if (err.answer && err.answer.result) {
-        if(err.answer.result.raw_data) {
-          err.answer.result.raw_data = '--excluded--'
+        
+        if (error instanceof Error) {
+          return error.cause ? [error.stack, formatError(error.cause)].join('\n') : error.stack
         }
 
-        if (err.answer.result.output && err.answer.result.output.length > maxLen) {
-          err.answer.result.output = err.answer.result.output.substring(0, maxLen) + ' --excluded--'
+        error = Object.assign({}, error)
+        const maxLen = 50
+
+        if (error.answer && error.answer.result) {
+          if(error.answer.result.raw_data) {
+            error.answer.result.raw_data = '--excluded--'
+          }
+
+          if (error.answer.result.output && error.answer.result.output.length > maxLen) {
+            error.answer.result.output = error.answer.result.output.substring(0, maxLen) + ' --excluded--'
+          }
         }
+        return utils.formatJSON(error)
       }
-            
-      let serr = utils.formatJSON(err)
-      return [this.error.context || 'Error occured', serr].join('\n')
+      return formatError(this.error.error)
     }
   }
   // TODO: non-debug error handling

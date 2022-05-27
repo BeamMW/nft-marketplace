@@ -151,9 +151,7 @@ export default class ItemsStore {
         .offset((page -1) * this._per_page)
         .limit(this._per_page)
         .toArray(items => items.map(item => this._fromContract(item)))
-
-      // TODO: check what happens if there is an error in loader, ensure that it caught & handled at the top level
-      // TODO: handle all throws/errors that possible at the top level / remove all setError calls
+        
       return liveQuery(qloader)
     }
 

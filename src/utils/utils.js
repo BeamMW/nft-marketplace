@@ -90,15 +90,11 @@ export default class Utils {
     client.startWallet()
 
     client.subscribe((response) => {
-      let err = new Error('Unexpected wasm wallet client response call: ' + response)
-      console.log(err)
-      throw err
+      throw new Error(`Unexpected wasm wallet client response call: ${response}`)
     })
 
     client.setApproveContractInfoHandler((info) => {
-      let err = new Error('Unexpected wasm wallet client transaction in headless wallet: ' + info)
-      console.log(err)
-      throw err
+      throw new Error(`Unexpected wasm wallet client transaction in headless wallet ${info}`)
     })
         
     return new Promise((resolve, reject) => {

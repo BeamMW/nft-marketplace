@@ -13,6 +13,7 @@ import approveCollection from 'components/approve-collection'
 import approveArtist from 'components/approve-artist'
 import createNFT from 'components/create-nft'
 import approveNFT from 'components/approve-nft'
+import ErrorEx from 'utils/errorex'
 
 utils.initialize(
   {
@@ -23,12 +24,15 @@ utils.initialize(
   },
   (err) => {
     const vueApp = createApp(App)
+
+    //
+    // Handle uncaught vue errors & promise/async rejections
+    //
+    vueApp.config.errorHandler = (err, instance, info) => {store.setError(err)}
+    window.addEventListener('unhandledrejection', ev => store.setError(ev.reason))
+
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
-    vueApp.config.errorHandler = (err, instance, info) => {
-      // TODO error context
-      store.setError(err)
-    }
     vueApp.component('nft', nft)
     vueApp.component('collection', collection)
     vueApp.component('create-collection', createCollection)
@@ -38,13 +42,6 @@ utils.initialize(
     vueApp.component('approve-nft', approveNFT)
     vueApp.use(router)
     vueApp.mount('body')
-
-    //
-    // Catch all unhandled errors in promises/async functions
-    //
-    window.addEventListener('unhandledrejection', ev => { 
-      store.setError(ev.reason)
-    })
 
     const {validator_error,
       content_main,
@@ -75,16 +72,9 @@ utils.initialize(
     }
 
     if (err) {
-      return store.setError(err, 'Failed to initialize application', true)
+      return store.setError(new ErrorEx('Failed to initialize application', err), true)
     }
 
-    try {
-      // TODO handle async error
-      store.start()
-    }
-    catch(err) {
-      alert(err)
-      return store.setError(err, 'Failed to initialize store', true)
-    }
+    store.start()
   }
 )

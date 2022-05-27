@@ -6,6 +6,7 @@ import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import Database from 'stores/database'
 import utils from 'utils/utils'
+import ErrorEx from 'utils/errorex'
 import {reactive, nextTick, computed} from 'vue'
 import {common, contract, my_tabs} from 'utils/consts'
 
@@ -48,26 +49,21 @@ const store = {
   //
   // Errors
   //
-  setError(error, context, reload) {
-    this.state.error = {error, context, reload}
+  setError(error, reload) {
+    this.state.error = {error, reload}
     router.push({name: 'gallery'})
-  },
-
-  checkError (err) {
-    if (err) this.setError(err)
   },
 
   clearError() {
     if (this.state.error) {
       let reload = this.state.error.reload
       this.state.error = undefined
-      /// TODO: start is async, handle error
       reload ? utils.reload() : this.start()
     }
   },
 
   //
-  // Shader, CID, debug helpers
+  // App entry point
   //
   async start () {
     //
@@ -115,16 +111,9 @@ const store = {
     })
   },
 
-  onShowMethods (err, res) {
-    if (err) return this.setError(err)
-    alert(utils.formatJSON(res))
-  },
-
   onApiResult(err, res, full) {
     if (err) {
-      // TODO: wrap in new Error
-      // eslint-disable-next-line no-debugger
-      return this.setError(err,  'API handling error')
+      return this.setError(new ErrorEx('API handling error', err))
     }
 
     if (full.id == 'ev_system_state') {
@@ -136,13 +125,21 @@ const store = {
       return
     }
 
-    this.setError(full, 'Unexpected API result')
+    this.setError(new ErrorEx('Unexpected API result', full))
   },
 
   async checkCID () {
     this.state.shader = await utils.downloadAsync('galleryManager.wasm')
     
-    //utils.invokeContract('', (...args) => this.onShowMethods(...args), this.state.shader)
+    /*
+    utils.invokeContract('', 
+      (err, res) => {
+        if (err) return this.setError(new ErrorEx('Failed to list methids', err))
+        alert(utils.formatJSON(res))
+      },
+      this.state.shader
+    )*/
+
     await utils.callApiAsync('ev_subunsub', {ev_system_state: true})
     let {res} = await utils.invokeContractAsync(
       {role: 'manager', action: 'view'}, 
@@ -224,16 +221,18 @@ const store = {
     }
   },
 
-  withdrawBEAM () {
+  async withdrawBEAM () {
     // TODO: this will not happen in demo but all the amounts might not fit into one block
     //       need to set nMaxCount to 100 max and reflet that in UI
     //       AND
     //       withdrawal in bulk negates privacy. Need to ask user what to do - in bulk
     //       or for each piece separately
-    utils.invokeContract(
-      `role=user,action=withdraw,nMaxCount=10,cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'user',
+      action: 'withdraw',
+      nMaxCount: 10,
+      cid: this.state.cid
+    })
   },
 
   async approveNFTs(ids, approve) {
@@ -257,43 +256,26 @@ const store = {
   },
 
   //
-  // NFT actions, Buy, Sell, Like &c.
-  //
-  onMakeTx (err, sres, full) {
-    if (err) {
-      return this.setError(err, 'Failed to generate transaction request')
-    }
-
-    utils.ensureField(full.result, 'raw_data', 'array')
-    utils.callApi(
-      'process_invoke_data', {data: full.result.raw_data}, 
-      (...args) => this.onSendToChain(...args)
-    )
-  },
-
-  onSendToChain(err, res) {
-    if (err) {
-      if (utils.isUserCancelled(err)) return
-      return this.setError(err, 'Failed to create transaction')
-    }
-    utils.ensureField(res, 'txid', 'string')
-  },
-
-  //
   // Admin stuff
   //
-  addRewards (amount) {
-    utils.invokeContract(
-      `role=manager,action=add_rewards,num=${amount},cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
+  async addRewards (amount) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'manager',
+      action: 'add_rewards',
+      num: amount,
+      cid: this.state.cid
+    })
   },
 
-  addArtist (key, name) {
-    utils.invokeContract(
-      `role=manager,action=set_artist,pkArtist=${key},label=${name},bEnable=1,cid=${this.state.cid}`, 
-      (...args) => this.onMakeTx(...args)
-    )
+  async addArtist (key, name) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'manager',
+      action: 'set_artist',
+      pkArtist: key,
+      label: name,
+      bEnable: 1,
+      cid: this.state.cid
+    })
   },
 
   async switchToHeaded () {

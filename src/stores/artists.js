@@ -3,6 +3,7 @@ import ArtistsCommon from 'stores/artists-common'
 import formats from 'stores/formats'
 import utils from 'utils/utils'
 import router from 'router'
+import ErrorEx from 'utils/errorex'
 import {cid, versions} from 'stores/consts'
 import {reactive} from 'vue'
 
@@ -88,7 +89,7 @@ class ArtistsStore {
     
     // We always fail if unable to load self
     if (self.error) {
-      throw self.error
+      throw new ErrorEx('Failed to load self', self.error)
     }
 
     this._state.is_artist = true
@@ -190,16 +191,10 @@ class ArtistsStore {
 
     this._state.artist_tx = txid
     let interval = setInterval(async () => {
-      try {
-        let {res} = await utils.callApiAsync('tx_status', {txId: this.artist_tx})
-        if ([0, 1, 5].indexOf(res.status) == -1) {
-          clearInterval(interval)
-          this._state.artist_tx = ''
-        }
-      }
-      catch(err) {
+      let {res} = await utils.callApiAsync('tx_status', {txId: this.artist_tx})
+      if ([0, 1, 5].indexOf(res.status) == -1) {
+        clearInterval(interval)
         this._state.artist_tx = ''
-        this.global.setError(err)
       }
     }, 1000)
   }
