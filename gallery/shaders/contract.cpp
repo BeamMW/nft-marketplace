@@ -4,12 +4,12 @@
 
 #include <algorithm>
 
-struct MyState : public gallery::State {
-    MyState() {
+struct ContractState : public gallery::State {
+    ContractState() {
         Env::LoadVar_T(kKey, *this);
     }
 
-    MyState(bool) {
+    ContractState(bool) {
         // no auto-load
     }
 
@@ -47,7 +47,7 @@ void PayoutMove(const gallery::Payout::Key& key, Amount val, bool bAdd) {
 
 BEAM_EXPORT void Ctor(const gallery::method::Init& r) {
     if (Env::get_CallDepth() > 1) {
-        MyState s(false);
+        ContractState s(false);
         _POD_(s).SetZero();
         _POD_(s.config) = r.config;
         s.Save();
@@ -63,7 +63,7 @@ BEAM_EXPORT void Method_2(void*) {
 }
 
 BEAM_EXPORT void Method_3(const gallery::method::SetFeeBase& r) {
-    MyState s;
+    ContractState s;
     s.fee_base = r.amount;
     s.Save();
     s.AddSigAdmin();
@@ -71,7 +71,7 @@ BEAM_EXPORT void Method_3(const gallery::method::SetFeeBase& r) {
 
 BEAM_EXPORT void Method_4(const gallery::method::SetModerator& r) {
     Height cur_height = Env::get_Height();
-    MyState s;
+    ContractState s;
     gallery::Moderator m;
     if (!m.Load(r.id)) {
         m.registered = cur_height;
@@ -98,7 +98,7 @@ BEAM_EXPORT void Method_5(const gallery::method::SetArtist& r) {
     } a;
 
     if (!a.Load(r.artist_id, sizeof(a))) {
-        MyState s;
+        ContractState s;
         a.registered = cur_height;
         a.updated = cur_height;
         a.collections_num = 0;
@@ -135,7 +135,7 @@ BEAM_EXPORT void Method_6(const gallery::method::SetArtistStatus& r) {
     } a;
 
     gallery::Moderator m;
-    MyState s;
+    ContractState s;
     if (!m.Load(r.signer) || !m.approved) s.AddSigAdmin();
     else Env::AddSig(r.signer);
 
@@ -159,7 +159,7 @@ BEAM_EXPORT void Method_7(const gallery::method::SetCollectionStatus& r) {
     } c;
 
     gallery::Moderator m;
-    MyState s;
+    ContractState s;
     if (!m.Load(r.signer) || !m.approved) s.AddSigAdmin();
     else Env::AddSig(r.signer);
 
@@ -186,7 +186,7 @@ BEAM_EXPORT void Method_8(const gallery::method::SetCollection& r) {
     gallery::Collection::Id c_id = r.collection_id;
 
     if (!c.Load(c_id, sizeof(c))) {
-        MyState s;
+        ContractState s;
         c_id = ++s.total_collections;
         _POD_(c).SetZero();
         c.author = r.artist_id;
@@ -238,7 +238,7 @@ BEAM_EXPORT void Method_9(const gallery::method::SetNft& r) {
 
     Height cur_height = Env::get_Height();
     gallery::Nft m;
-    MyState s;
+    ContractState s;
 
     m.id = ++s.total_nfts;
     m.owner = r.artist_id;
@@ -310,7 +310,7 @@ BEAM_EXPORT void Method_10(const gallery::method::SetNftStatus& r) {
     Height cur_height = Env::get_Height();
     gallery::Nft n;
     gallery::Moderator m;
-    MyState s;
+    ContractState s;
     if (!m.Load(r.signer) || !m.approved) s.AddSigAdmin();
     else Env::AddSig(r.signer);
 
@@ -484,7 +484,7 @@ BEAM_EXPORT void Method_17(const gallery::method::Vote& r) {
     if (!Env::LoadVar_T(like_key, like)) {
         like.value = 0;
 
-        MyState s;
+        ContractState s;
         Strict::Sub(s.vote_balance, s.config.vote_reward.amount);
         s.Save();
 
@@ -500,7 +500,7 @@ BEAM_EXPORT void Method_17(const gallery::method::Vote& r) {
 }
 
 BEAM_EXPORT void Method_18(const gallery::method::AddVoteRewards& r) {
-    MyState s;
+    ContractState s;
     Strict::Add(s.vote_balance, r.amount);
     s.Save();
 
