@@ -9,11 +9,13 @@
       <div class="details-row"> 
         <div class="nft-container">
           <div>
+            <!-- TODO: scale image to fit container as in old gallery-->
             <preview :image="image" 
                      :default="def_nft" 
                      :cover="!(image || {}).object"
                      height="360px" 
                      radius="0"
+                     cover
             >
               <moderationStatus :item="nft"/>
             </preview>
