@@ -120,6 +120,7 @@ class NFTSStore extends LazyItems {
 
   _fromContract(awork) {
     awork = Object.assign({}, awork)
+    awork.store = this
     awork.description = awork.data.description
 
     let author = artistsStore.loadArtist(awork.author)

@@ -5,6 +5,7 @@
     </div>
     <div v-else class="row">
       <div class="type">
+        <div>Artist</div>
         <div>Name</div>
         <div v-if="item.website">Website</div>
         <div v-if="item.twitter">Twitter</div>
@@ -21,6 +22,7 @@
                  style="float: right; margin-left: 15px; margin-bottom: 10px;"
         >
         </preview>
+        <div>{{ item.author_name }}</div>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
         <div v-if="item.twitter"><span class="link" @click="onTwitter">@{{ item.twitter }}</span></div>

@@ -5,7 +5,7 @@
              :default="def_nft"
              height="213px" 
              text_color="dimgray"
-             :cover="!(item.image || {}).object"
+             contain
              @click="onDetails"
     >
       <moderationStatus :item="item"/>

@@ -4,7 +4,7 @@
       <div v-if="modelValue && !readonly" class="remove">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
-      <img v-if="modelValue && modelValue.object" :src="modelValue.object" alt="avatar" class="image"/>
+      <img v-if="modelValue && modelValue.object" :src="modelValue.object" alt="avatar" class="image" :style="image_style"/>
       <div v-if="modelValue && modelValue.loading" class="text" :readonly="readonly">Loading...</div>
       <div v-if="modelValue && modelValue.error" class="text" :readonly="readonly">Failed to load image</div>
       <label v-if="!modelValue" class="text" for="image" :readonly="readonly" v-html="title"/>
@@ -51,7 +51,6 @@
     .image {
       width: 100%
       height: 100%
-      object-fit: cover
       border-radius: 10px
       border: 1px dashed transparent
     }
@@ -128,6 +127,14 @@ export default {
       type: String,
       default: 'image/*',
       required: false
+    },
+    contain: {
+      type: Boolean,
+      default: false
+    },
+    cover: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -154,6 +161,19 @@ export default {
         'border': this.modelValue ? '1px dashed transparent' : '1px dashed #1AF6D6',
       }
     },
+    image_style() {
+      let res = {}
+      
+      if (this.cover) {
+        res['object-fit'] = 'cover'
+      }
+
+      if (this.contain) {
+        res['object-fit'] = 'contain'
+      }
+
+      return res
+    }
   },
   methods: {
     onRemove () {

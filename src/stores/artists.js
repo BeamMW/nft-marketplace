@@ -204,7 +204,9 @@ class ArtistsStore {
   } 
 
   _fromContract (cartist) {
-    return ArtistsCommon.fromContract(cartist)
+    let result = ArtistsCommon.fromContract(cartist)
+    result.store = this
+    return result
   }
 
   toBecomeArtist() {

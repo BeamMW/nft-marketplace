@@ -225,7 +225,7 @@ export default class ItemsStore {
         }
         
         item.label = formats.fromContract(item.label)
-        item.data = formats.fromContract(item.data, this._versions)
+        item.data  = formats.fromContract(item.data, this._versions) 
         item = this._fromContract(item)
 
         if (this._global.debug) {

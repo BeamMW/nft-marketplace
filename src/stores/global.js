@@ -222,11 +222,11 @@ const store = {
   },
 
   async withdrawBEAM () {
-    // TODO: this will not happen in demo but all the amounts might not fit into one block
-    //       need to set nMaxCount to 100 max and reflet that in UI
-    //       AND
-    //       withdrawal in bulk negates privacy. Need to ask user what to do - in bulk
-    //       or for each piece separately
+    // FUTURE: this will not happen in demo but all the amounts might not fit into one block
+    //         need to set nMaxCount to 100 max and reflet that in UI
+    //         AND
+    //         withdrawal in bulk negates privacy. Need to ask user what to do - in bulk
+    //         or for each piece separately
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'user',
       action: 'withdraw',

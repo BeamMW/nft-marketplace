@@ -1,8 +1,6 @@
 <template>
   <div class="preview-container" :style="style">
-    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
     <div v-if="loading && show_text" class="loading">Loading...</div>
-    <!--div v-if="error && show_text" class="error">Failed to load image</div-->
     <img v-if="src" class="preview" :src="src" :style="image_style"/>
     <slot></slot>
   </div>  
@@ -60,6 +58,10 @@ export default {
       default: '10px 10px 0 0'
     },
     cover: {
+      type: Boolean,
+      default: false
+    },
+    contain: {
       type: Boolean,
       default: false
     },
@@ -123,6 +125,10 @@ export default {
 
       if (this.cover) {
         res['object-fit'] = 'cover'
+      }
+
+      if (this.contain) {
+        res['object-fit'] = 'contain'
       }
 
       return res

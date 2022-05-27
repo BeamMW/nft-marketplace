@@ -4,7 +4,7 @@
   <errorModal v-if="error && !debug" :text="errtext"/>
   <loading v-if="loading" :text="loading"/>
   <div v-else-if="!loading" id="app-container" class="app-container">
-    <router-view></router-view>
+    <router-view/>
   </div>
 </template>
 

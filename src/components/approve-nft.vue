@@ -5,6 +5,8 @@
     </div>
     <template v-else>
       <div class="info">
+        <div class="type">Artist</div>
+        <div class="value">{{ item.author_name }}</div>
         <div class="type">Name</div>
         <div class="value">{{ item.label }}</div>
         <div v-if="item.description" class="type">Description</div>
@@ -15,7 +17,7 @@
                radius="10px"
                width="200px"
                height="200px"
-               cover
+               contain
       />
     </template>
   </div>

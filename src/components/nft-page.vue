@@ -12,7 +12,7 @@
             <!-- TODO: scale image to fit container as in old gallery-->
             <preview :image="image" 
                      :default="def_nft" 
-                     :cover="!(image || {}).object"
+                     contain
                      height="360px" 
                      radius="0"
             >

@@ -61,6 +61,7 @@
                   title="Add collection image<br>(*.jpg, *.png, *.svg)"
                   accept="image/jpeg;image/png;image/svg+xml"
                   height="135px"
+                  cover
                   :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
         />
       </div>

@@ -17,8 +17,8 @@ class CollectionsStore extends LazyItems {
 
   _fromContract (coll) {
     coll = Object.assign({}, coll)
-    coll.store = this // TODO: move to base
-
+    
+    coll.store = this
     coll.description = coll.data.description
     coll.instagram = coll.data.instagram
     coll.twitter = coll.data.twitter

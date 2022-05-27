@@ -38,6 +38,7 @@
                     title="Add NFT here<br>(any image, including animated)"
                     height="390px"
                     width="390px"
+                    contain
           />
         </div>
       </div>
