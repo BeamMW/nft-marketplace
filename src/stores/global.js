@@ -255,6 +255,16 @@ const store = {
     })
   },
 
+  async approveArtists(ids, approve) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'moderator',
+      action: 'set_artist_status',
+      ids: ids.join(','),
+      status: approve ? 'approved' : 'rejected',
+      cid: this.state.cid
+    })
+  },
+
   //
   // Admin stuff
   //
