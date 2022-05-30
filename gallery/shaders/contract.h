@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace gallery {
-    static const ShaderID s_SID_0 = {0x24,0xc7,0xd4,0x93,0x80,0xf1,0x28,0x88,0xb6,0x17,0xc9,0x6a,0x54,0xd9,0x60,0x97,0x08,0x72,0x88,0x99,0x26,0x7f,0x8e,0x34,0xe0,0xad,0x8b,0xee,0x18,0xcb,0x2c,0xc2};
+    static const ShaderID s_SID_0 = {0x1a,0xed,0x20,0x83,0xd5,0x7f,0x93,0xad,0xb9,0xd2,0x6b,0xbc,0x1b,0x52,0xa7,0xc7,0x14,0x43,0xcb,0x13,0xf7,0x0a,0x6e,0xc2,0x41,0xed,0xe7,0x55,0x05,0xce,0x3a,0x9c};
 #pragma pack (push, 1)
 
     using Hash256 = Opaque<32>;
@@ -45,40 +45,37 @@ namespace gallery {
         AssetID aid;
     };
 
-    template <class T, class ID>
     struct GalleryObject {
-        using Id = ID;
-
-        bool Load(const Id& id, size_t object_size = sizeof(T)) {
-            typename T::Key k;
-            if constexpr(std::is_same_v<Id, PubKey>)
-                k.id = id;
-            else
-                k.id = Utils::FromBE(id); 
-            return Env::LoadVar(&k, sizeof(k), this, object_size, KeyTag::Internal);
+        template <class T>
+        static bool Load(T& object, const typename T::Id& id, size_t object_size = sizeof(T)) {
+            typename T::Key k{InitKey_<T>(id)};
+            return Env::LoadVar(&k, sizeof(k), &object, object_size, KeyTag::Internal);
         }
 
-        bool Save(const Id& id, size_t object_size = sizeof(T)) {
-            typename T::Key k;
-            if constexpr(std::is_same_v<Id, PubKey>)
-                k.id = id;
-            else
-                k.id = Utils::FromBE(id); 
-            return Env::SaveVar(&k, sizeof(k), this, object_size, KeyTag::Internal);
+        template <class T>
+        static bool Save(T& object, const typename T::Id& id, size_t object_size = sizeof(T)) {
+            typename T::Key k{InitKey_<T>(id)};
+            return Env::SaveVar(&k, sizeof(k), &object, object_size, KeyTag::Internal);
         }
 
-        void Delete(const Id& id) {
-            typename T::Key k;
-            if constexpr(std::is_same_v<Id, PubKey>)
-                k.id = id; 
+        template <class T>
+        static void Delete(const typename T::Id& id) {
+            Env::DelVar_T(InitKey_<T>(id));
+        }
+    private:
+        template <class T>
+        static typename T::Key InitKey_(const typename T::Id& id) {
+            if constexpr(std::is_same_v<typename T::Id, PubKey>)
+                return typename T::Key{id};
             else
-                k.id = Utils::FromBE(id); 
-            Env::DelVar_T(k);
+                return typename T::Key{Utils::FromBE(id)};
         }
     };
-
-    struct Moderator : public GalleryObject<Moderator, PubKey> {
+    
+    struct Moderator {
+        using Id = PubKey;
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kModerator;
             Id id;
             explicit Key(const Id& id) : id{id} {}
@@ -90,7 +87,8 @@ namespace gallery {
         bool approved;
     };
 
-    struct Artist : public GalleryObject<Artist, PubKey> {
+    struct Artist {
+        using Id = PubKey;
         struct Key {
             // The order is crucial: tag must be the first
             Tag tag = Tag::kArtist;
@@ -120,8 +118,10 @@ namespace gallery {
         static const uint32_t kTotalMaxLen = kLabelMaxLen + kDataMaxLen;
     };
 
-    struct Collection : public GalleryObject<Collection, uint32_t> {
+    struct Collection {
+        using Id = uint32_t;
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kCollection;
             Id id;
             explicit Key(const Id& id) : id{id} {}
@@ -129,6 +129,7 @@ namespace gallery {
         };
 
         struct LabelKey {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kCollectionLabelHash;
             Artist::Id artist_id;
             Hash256 label_hash;
@@ -161,8 +162,10 @@ namespace gallery {
         static const uint32_t kMaxNfts = 500;
     };
 
-    struct Nft : public GalleryObject<Nft, uint32_t> {
+    struct Nft {
+        using Id = uint32_t;
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kNft;
             Id id;
             explicit Key(const Id& id) : id{id} {}
@@ -186,6 +189,7 @@ namespace gallery {
 
     struct Like {
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kLike;
             Nft::Id nft_id;
             Artist::Id artist_id;
@@ -195,6 +199,7 @@ namespace gallery {
 
     struct Payout {
         struct Key {
+            // The order is crucial: tag must be the first
             Tag tag = Tag::kPayout;
             Artist::Id user;
             AssetID aid;
@@ -222,7 +227,8 @@ namespace gallery {
     struct Events {
         struct AddNftData {
             struct Key {
-                uint8_t kPrefix = 0;
+                // The order is crucial: prefix must be the first
+                const uint8_t kPrefix = 0;
                 Nft::Id nft_id;
                 Artist::Id artist_id;
             };
@@ -231,7 +237,8 @@ namespace gallery {
 
         struct AddNftLabel {
             struct Key {
-                uint8_t kPrefix = 1;
+                // The order is crucial: prefix must be the first
+                const uint8_t prefix = 1;
                 Nft::Id nft_id;
                 Artist::Id artist_id;
             };
@@ -240,7 +247,8 @@ namespace gallery {
 
         struct AddArtistLabel {
             struct Key {
-                uint8_t kPrefix = 2;
+                // The order is crucial: prefix must be the first
+                uint8_t prefix = 2;
                 Artist::Id id;
                 explicit Key(const Artist::Id& id) : id{id} {}
                 Key() : id{} {}
@@ -249,7 +257,8 @@ namespace gallery {
 
         struct Sell {
             struct Key {
-                uint8_t kPrefix = 3;
+                // The order is crucial: prefix must be the first
+                uint8_t prefix = 3;
                 Nft::Id nft_id;
             };
             AmountWithAsset price;
@@ -260,6 +269,7 @@ namespace gallery {
     template <Tag tg, class Idx, class T>
     struct Index {
         struct Key {
+            // The order is crucial
             Tag tag = tg;
             Idx id;
             typename T::Id t_id;
@@ -282,8 +292,6 @@ namespace gallery {
             Delete(old_id, t_id);
             return Save(new_id, t_id);
         }
-
-        bool placeholder;
     private:
         static Key InitKey_(const Idx& id, const typename T::Id& t_id) {
             Key k;
@@ -379,7 +387,6 @@ namespace gallery {
             Nft::Id nft_id;
             Artist::Id user;
             uint8_t has_aid;
-            Amount pay_max;
         };
 
         struct Withdraw {
