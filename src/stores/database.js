@@ -3,7 +3,7 @@ import {Dexie} from 'dexie'
 
 export default class Database extends Dexie {
   constructor() {
-    super('gallery')
+    super(['gallery', versions.DATABASE_VERSION].join('-'))
   }
 
   async initAsync (stores) {     

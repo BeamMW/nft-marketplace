@@ -89,6 +89,10 @@ class NFTSStore extends LazyItems {
     let result = super._getMode(mode) 
 
     if (!result) {
+      if (this._current_coll_mode === mode) {
+        return this._state[this._current_coll_mode]
+      }
+
       if (this._current_coll_mode) {
         delete this._state[this._current_coll_mode]
         console.log('delete ' + this._current_coll_mode)
@@ -106,10 +110,7 @@ class NFTSStore extends LazyItems {
 
       if (cmode && collid != -1) {
         let loader = cmode.make_loader(collid)
-        result = this._allocMode(mode, loader)
-        // MAYBE: this is ineffective though OK since collections do not have a lot of items
-        let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
-        result.total = computed(() => observable.value)
+        result = this._allocMode({mode, loader, computed_total: true})
       }  
 
       this._current_coll_mode = mode

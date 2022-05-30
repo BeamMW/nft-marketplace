@@ -30,16 +30,16 @@ export default class Formats {
       let parsed = JSON.parse(data)
 
       if (typeof parsed !== 'object') { 
-        throw new Error('Formats.fromContract invalid parsed data type: ' + typeof parsed)
+        throw new Error(`Formats.fromContract invalid parsed data type: ${typeof parsed}`)
       }
 
       if (typeof versions === 'number') {
         if (versions !== parsed.version) {
-          throw new Error('Version mismatch in Formats.fromContract for: ' + data) 
+          throw new Error(`Version mismatch in Formats.fromContract for: ${data}`) 
         }
       }
       else if (!versions.includes(parsed.version)) {
-        throw new Error('Version mismatch in Formats.fromContract for: ' + data) 
+        throw new Error(`Version mismatch in Formats.fromContract for: ${data}`) 
       }
 
       return parsed
