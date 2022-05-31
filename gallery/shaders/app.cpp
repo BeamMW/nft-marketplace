@@ -452,8 +452,8 @@ private:
 
 #pragma pack(push, 0)
 struct AppNft : public gallery::Nft {
-    std::array<char, kLabelMaxLen> label;
-    std::array<char, kDataMaxLen> data;
+    std::array<char, kLabelMaxLen + 1> label;
+    std::array<char, kDataMaxLen + 1> data;
 
     void Print(const ContractID& cid, const Id& id) {
         Env::DocGroup gr1("");
@@ -948,7 +948,7 @@ ON_METHOD(artist, set_nft) {
     d.args.label_len = label_size - 1;
 
     uint32_t data_size = Env::DocGetText(
-        "data", d.label_and_data + d.args.label_len, gallery::Nft::kDataMaxLen);
+        "data", d.label_and_data + d.args.label_len, gallery::Nft::kDataMaxLen + 1);
 
     if (data_size < 2) {
         OnError("data must be specified");
@@ -1360,11 +1360,11 @@ ON_METHOD(artist, set_artist) {
         (!artist_exists ? Env::Cost::Log_For(label_size) : 0) +
         (!artist_exists ? Env::Cost::SaveVar_For(sizeof(gallery::Artist::Id))
                         : 0) +
+        Env::Cost::MemOpPerByte * (sizeof(gallery::Artist) + data_size) +
         Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
                                gallery::Artist::kDataMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Artist) + data_size) +
-        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
-        Env::Cost::Cycle * 300;
+        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig;
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d, args_size, nullptr, 0, &sig,
                         1, comment.data(),
@@ -1444,7 +1444,7 @@ ON_METHOD(artist, set_collection) {
                         : 0) +
         2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
-        Env::Cost::Cycle * 300;
+        Env::Cost::MemOpPerByte * (sizeof(gallery::Collection) + label_size + data_size);
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
                         &sig, 1, "Set collection",
