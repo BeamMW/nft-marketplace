@@ -11,7 +11,7 @@ class CollectionsStore extends LazyItems {
     super({
       objname: 'collection', 
       versions: [versions.COLLECTION_VERSION],
-      dbKeys: 'collection'
+      modes: ['moderator', 'user', 'artist']
     })
   }
 

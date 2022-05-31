@@ -45,6 +45,7 @@
     border-radius: 10px
     position:relative
     overflow: hidden
+    cursor: pointer
 
     & > .delete {
       position: absolute

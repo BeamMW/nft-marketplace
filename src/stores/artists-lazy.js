@@ -6,7 +6,8 @@ class ArtistsStore extends LazyItems {
   constructor () {
     super({
       objname: 'artist', 
-      versions: [versions.ARTIST_VERSION]
+      versions: [versions.ARTIST_VERSION],
+      modes: ['moderator']
     })
   }
 

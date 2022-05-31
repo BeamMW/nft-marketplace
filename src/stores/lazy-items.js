@@ -9,15 +9,88 @@ import {Observable} from 'rxjs'
 import {useObservable} from '@vueuse/rxjs'
 
 export default class ItemsStore {
-  constructor({objname, versions, perPage, dbKeys}) {
-    this._objname = objname
-    this._extra_dbkeys = dbKeys
-    this._store_name = `${objname}s`
-    this._metastore_name = `${objname}s_meta`
-    this._versions = versions
-    this._per_page = perPage || common.ITEMS_PER_PAGE
+  // Keys 
+  //  for all items: id
+  //
+  // Artists modes: 
+  //  moderator -> keys: status
+  //
+  // Collections modes:
+  //  moderator -> keys: status
+  //  user      -> keys: status
+  //  artist    -> keys: author
+  //
+  // NFTS modes:
+  //  moderator   -> keys: status
+  //  user        -> keys: status
+  //  user:sale   -> keys: [status+sale]
+  //  user:liked  -> keys: [status+liked]
+  //  owned       -> keys: owned
+  //  owned:sale  -> keys: [owned+sale]
+  //  artist:sold -> keys: [author+owned]
+  //  liker:liked -> keys: [satus+my_impression]
+  //
+  constructor({objname, versions, perPage, extraDBKeys, modes}) {
     this._my_key = ''
     this._loading = false
+    this._objname = objname
+    this._per_page = perPage || common.ITEMS_PER_PAGE
+    this._versions = versions
+    this._store_name = `${objname}s`
+    this._metastore_name = `${objname}s_meta`
+    this._modes = [...modes]
+    
+    //
+    // Generate keys list based on extra keys and modes
+    //
+    let keyset = new Set()
+    keyset.add('id')
+
+    if (extraDBKeys) {
+      for (let key of extraDBKeys) {
+        keyset.add(key)
+      }
+    }
+
+    for (let mode of modes) {
+      if (mode === 'moderator') {
+        keyset.add('status')
+      }
+
+      if (mode === 'user') {
+        keyset.add('status')
+      }
+
+      if (mode === 'artist') {
+        keyset.add('author')
+      }
+      
+      if (mode == 'user:sale') {
+        keyset.add('[status+sale]')
+      }
+
+      if (mode == 'user:liked') {
+        keyset.add('[status+liked]')
+      }
+
+      if (mode == 'owned') {
+        keyset.add('owned')
+      }
+
+      if (mode == 'owned:sale') {
+        keyset.add('[owned+sale]')
+      }
+
+      if (mode == 'artist:sold') {
+        keyset.add('[author+owned]')
+      }
+
+      if (mode == 'liker:liked') {
+        keyset.add('[status+my_impression]')
+      }
+    }
+
+    this._db_keys = Array.from(keyset)
   }
 
   reset (global, db, state) {
@@ -25,7 +98,6 @@ export default class ItemsStore {
     this._db = db
     this._state = reactive(state || {})
 
-    // TODO: move nft-specific loaders to nfts store. For example all with likes
     this._allocMode({
       mode: 'user', 
       loader: (store) => {
@@ -41,8 +113,8 @@ export default class ItemsStore {
       loader: (store) => {
         console.log(`loader for user:liked:${this._store_name}`)
         return store
-          .where(['liked', 'status'])
-          .equals([1, 'approved'])
+          .where(['status', 'liked'])
+          .equals(['approved', 1])
       }
     })
 
@@ -59,9 +131,9 @@ export default class ItemsStore {
     this._allocMode({
       mode: 'moderator', 
       loader: (store) => {
-        // TODO: sort by height in reverse order ?
         console.log(`loader for moderator:${this._store_name}`)
-        return store.where('status')
+        return store
+          .where('status')
           .equals('pending')
       }
     })
@@ -71,24 +143,25 @@ export default class ItemsStore {
       loader: (store, mykey) => {
         console.log(`loader for artist:${this._store_name}`)
         return store
-          .where({'author': mykey})
+          .where('author')
+          .equals(mykey)
       }
     })
 
     this._allocMode({
-      mode: 'owner', 
+      mode: 'owned', 
       loader: (store) => {
-        console.log(`loader for owner:${this._store_name}`)
+        console.log(`loader for owned:${this._store_name}`)
         return store
-          .where({'owned': 1})
+          .where('owned')
+          .equals(1)
       }
     })
 
     this._allocMode({
-      mode: 'owner:sale', 
-      computed_total: true,
+      mode: 'owned:sale', 
       loader: (store) => {
-        console.log(`loader for owner:sale:${this._store_name}`)
+        console.log(`loader for owned:sale:${this._store_name}`)
         return store
           .where(['owned', 'sale'])
           .equals([1, 1])
@@ -97,7 +170,6 @@ export default class ItemsStore {
 
     this._allocMode({
       mode: 'artist:sold', 
-      computed_total: true,
       loader: (store, mykey) => {
         console.log(`loader for artist:sold:${this._store_name}`)
         return store
@@ -111,8 +183,8 @@ export default class ItemsStore {
       loader: (store) => {
         console.log(`loader for liker:liked:${this._store_name}`)
         return store
-          .where(['my_impression', 'status'])
-          .equals([1, 'approved'])
+          .where(['status', 'my_impression'])
+          .equals(['approved', 1])
       }
     })
   }
@@ -146,12 +218,7 @@ export default class ItemsStore {
 
   getDBStores() {
     let res = {} 
-    // TODO: check keys
-    let keys = 'id, status, author, owned, [author+owned], [my_impression+status]'
-    if (this._extra_dbkeys) {
-      keys = [keys, this._extra_dbkeys].join(', ')
-    }
-    res[this._store_name] = keys
+    res[this._store_name] = this._db_keys.join(',')
     res[this._metastore_name] = 'name'
     return res
   }
@@ -227,7 +294,19 @@ export default class ItemsStore {
 
   async _loadStatus() {
     let db = this._db 
-    let names = ['hprocessed', 'approved', 'pending', 'rejected', 'author', 'owned', 'approved_liked', 'approved_i_liked', 'approved_sale']
+    let names = [
+      'hprocessed', 
+      'approved', 
+      'pending', 
+      'rejected', 
+      'artist', 
+      'artist_sold', 
+      'owned', 
+      'owned_sale', 
+      'approved_liked', 
+      'approved_i_liked', 
+      'approved_sale'
+    ]
     let values = await db[this._metastore_name].bulkGet(names)
 
     let loadValue = (item, defval) => {
@@ -340,22 +419,41 @@ export default class ItemsStore {
       // Author can't be changed, so we check it only if old object doesn't exist
       //
       if (old === undefined && item.author === this._my_key) {
-        status.author++
+        status.artist++
       }
 
       //
       // Owned status
       //
-      if (old != undefined && old.owned  !== item.owned) {
-        if (old.owned) {
-          status.owned--
-        }
+      if (old != undefined && old.owned) {
+        status.owned--
       }
 
-      if (old === undefined || old.owned !== item.owned) {
-        if (item.owned) {
-          status.owned++
-        }
+      if (item.owned) {
+        status.owned++
+      }
+
+      //
+      // Owned & sale
+      //
+      if (old != undefined && old.owned && old.sale) {
+        status.owned_sale--
+      }
+
+      if (item.owned && item.sale) {
+        status.owned_sale++
+      }
+
+      //
+      // Artist & sold
+      //
+      // TODO!!!: check how first sale works
+      if (old != undefined && old.author == this._my_key && !!old.first_sale) {
+        status.artist_sold--
+      }
+
+      if (item.author == this._my_key && !!item.first_sale) {
+        status.artist_sold++
       }
 
       //
@@ -407,13 +505,6 @@ export default class ItemsStore {
         }
       }
 
-      //
-      // Approved & on sale
-      //
-
-      //
-      // Approved like
-      //
       status.hprocessed = Math.max(status.hprocessed, item.updated)
     }
 
@@ -422,12 +513,14 @@ export default class ItemsStore {
       await this._saveStatus(status)
     })
 
+    this._getMode('moderator').total    = status.pending
     this._getMode('user').total         = status.approved
     this._getMode('user:sale').total    = status.approved_sale
     this._getMode('user:liked').total   = status.approved_liked
-    this._getMode('artist').total       = status.author
-    this._getMode('owner').total        = status.owned
-    this._getMode('moderator').total    = status.pending
+    this._getMode('artist').total       = status.artist
+    this._getMode('artist:sold').total  = status.artist_sold
+    this._getMode('owned').total        = status.owned
+    this._getMode('owned:sale').total   = status.owned_sale
     this._getMode('liker:liked').total  = status.approved_i_liked
 
     if (res.items.length > 0) {

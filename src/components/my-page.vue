@@ -9,7 +9,7 @@
       <tabsctrl v-model="active_tab" :tabs="tabs"/>
       <list v-if="show_collections"
             class="list"
-            items_name="collections"
+            items_name="your collections"
             component="collection"
             new_component="create-collection"
             mode="artist"
@@ -17,9 +17,9 @@
       />
       <list v-if="show_owned"
             class="list"
-            items_name="NFTs"
+            items_name="owned NFTs"
             component="nft"
-            mode="owner"
+            mode="owned"
             :new_component="is_artist? 'create-nft' : ''"
             :store="nftsStore"
       />
@@ -27,7 +27,7 @@
             class="list"
             items_name="on sale NFTs"
             component="nft"
-            mode="owner:sale"
+            mode="owned:sale"
             :store="nftsStore"
       />
       <list v-if="show_sold"
@@ -136,14 +136,14 @@ export default {
         res.push({id: my_tabs.COLLECTIONS, name: 'Collections'})
       }
 
-      res.push({id: my_tabs.OWNED_NFTS, name: 'NFTs'})
+      res.push({id: my_tabs.OWNED_NFTS, name: 'Owned NFTs'})
       res.push({id: my_tabs.SALE_NFTS,  name: 'On Sale'})
 
       if (this.is_artist) {
         res.push({id: my_tabs.SOLD_NFTS,  name: 'Sold'})
       }
 
-      res.push({id: my_tabs.LIKED_NFTS, name: 'Liked'})
+      res.push({id: my_tabs.LIKED_NFTS, name: 'You Liked'})
       return res
     }
   }

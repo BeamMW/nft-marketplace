@@ -7,14 +7,27 @@ import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
 
-// TODO: modes a:b:c -> make c rely on loader of a and b
-// TODO: the same in LazyItems
+//
+// Custom modes
+//   user:collection     -> keys: collection, status
+//   artist:collection   -> keys: collection
+//
 class NFTSStore extends LazyItems {
   constructor () {
     super({
       objname: 'artwork', 
       versions: [versions.NFT_VERSION],
-      dbKeys: 'collection, my_impression, [owned+sale], [liked+status], [status+sale]'
+      modes: [
+        'moderator', 
+        'user', 
+        'user:sale', 
+        'user:liked', 
+        'owned', 
+        'owned:sale', 
+        'artist:sold', 
+        'liker:liked'
+      ],
+      extraDBKeys: ['collection']
     })
     
     this._current_coll_mode = undefined
@@ -24,9 +37,7 @@ class NFTSStore extends LazyItems {
           return (store) => {
             console.log(`loader for artist:collection:liked:${collid}`)
             return store
-              .where({
-                'collection': collid
-              })
+              .where({'collection': collid})
               .and(item => item.impressions > 0)
           }
         }
@@ -36,11 +47,7 @@ class NFTSStore extends LazyItems {
           return (store) => {
             console.log(`loader for artist:collection:sale:${collid}`)
             return store
-              .where({
-                'collection': collid,
-                'owned': 1
-              })
-              .and(item => item.price && item.price.amount > 0)
+              .where({'collection': collid, 'owned': 1, 'sale': 1})
           }
         }
       },
@@ -48,10 +55,7 @@ class NFTSStore extends LazyItems {
         make_loader(collid) {
           return (store) => {
             console.log(`loader for artist:collection:${collid}`)
-            return store
-              .where({
-                'collection': collid
-              })
+            return store.where({'collection': collid})
           }
         }
       }, 
