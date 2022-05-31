@@ -8,6 +8,7 @@
 #include <string_view>
 #include <type_traits>
 #include <vector>
+#include <map>
 
 // MANAGER
 
@@ -632,69 +633,46 @@ private:
     ContractID cid_;
 };
 
-// TODO
 struct BalanceWalker {
-    Env::VarReaderEx<true> m_Reader;
-    Env::Key_T<gallery::Payout::Key> m_Key;
-    gallery::Payout m_Data;
-
-    // TODO: add tree (map) class
-    Utils::Vector<gallery::AmountWithAsset> m_Totals;
+    Env::VarReaderEx<true> reader;
+    Env::Key_T<gallery::Payout::Key> key;
+    gallery::Payout payout;
+    std::map<AssetID, Amount> totals;
 
     void Enum(const ContractID& cid) {
-        _POD_(m_Key.m_Prefix.m_Cid) = cid;
-        _POD_(m_Key.m_KeyInContract).SetZero();
+        key.m_Prefix.m_Cid = cid;
+        _POD_(key.m_KeyInContract).SetZero();
 
         Env::Key_T<gallery::Payout::Key> k1;
-        _POD_(k1.m_Prefix.m_Cid) = cid;
+        k1.m_Prefix.m_Cid = cid;
         _POD_(k1.m_KeyInContract).SetObject(0xff);
 
-        m_Reader.Enum_T(m_Key, k1);
+        reader.Enum_T(key, k1);
     }
 
     bool MoveNext() {
-        return m_Reader.MoveNext_T(m_Key, m_Data);
+        return reader.MoveNext_T(key, payout);
     }
 
     void Print() const {
-        Env::DocAddNum("aid", m_Key.m_KeyInContract.aid);
-        Env::DocAddNum("amount", m_Data.amount);
+        Env::DocAddNum("aid", key.m_KeyInContract.aid);
+        Env::DocAddNum("amount", payout.amount);
     }
 
     void AddToTotals() {
-        auto aid = m_Key.m_KeyInContract.aid;
-
-        uint32_t iIdx = 0;
-        for (;; iIdx++) {
-            if (iIdx == m_Totals.m_Count) {
-                auto& x = m_Totals.emplace_back();
-                x.aid = aid;
-                x.amount = m_Data.amount;
-                break;
-            }
-
-            if (m_Totals.m_p[iIdx].aid == aid) {
-                m_Totals.m_p[iIdx].amount +=
-                    m_Data.amount;  // don't care if overflows
-                break;
-            }
-        }
+        totals[key.m_KeyInContract.aid] += payout.amount;
     }
 
     void PrintTotals() {
         Env::DocArray gr0("totals");
-
-        for (uint32_t i = 0; i < m_Totals.m_Count; i++) {
+        for (auto it : totals) {
             Env::DocGroup gr1("");
-
-            auto& x = m_Totals.m_p[i];
-            Env::DocAddNum("aid", x.aid);
-            Env::DocAddNum("amount", x.amount);
+            Env::DocAddNum("aid", it.first);
+            Env::DocAddNum("amount", it.second);
         }
     }
 };
 
-// TODO
 struct BalanceWalkerOwner : public BalanceWalker {
     ContractID cid;
 
@@ -710,11 +688,10 @@ struct BalanceWalkerOwner : public BalanceWalker {
             if (!BalanceWalker::MoveNext())
                 return false;
 
-            if (IsOwner(cid, m_Key.m_KeyInContract.user,
-                        m_Key.m_KeyInContract.nft_id))
+            if (IsOwner(cid, key.m_KeyInContract.user,
+                        key.m_KeyInContract.nft_id))
                 break;
         }
-
         return true;
     }
 };
@@ -1599,7 +1576,6 @@ ON_METHOD(user, buy) {
 
 ON_METHOD(user, view_balance) {
     BalanceWalkerOwner wlk{cid};
-
     {
         Env::DocArray gr0("items");
         for (wlk.Enum(cid); wlk.MoveNext();) {
@@ -1616,15 +1592,15 @@ ON_METHOD(user, withdraw) {
     uint32_t count = 0;
     for (wlk.Enum(cid); wlk.MoveNext();) {
         gallery::method::Withdraw args;
-        _POD_(args.key) = wlk.m_Key.m_KeyInContract;
-        args.value = wlk.m_Data.amount;  // everything
+        _POD_(args.key) = wlk.key.m_KeyInContract;
+        args.value = wlk.payout.amount;  // everything
 
         FundsChange fc;
         fc.m_Consume = 0;
-        fc.m_Aid = wlk.m_Key.m_KeyInContract.aid;
-        fc.m_Amount = wlk.m_Data.amount;
+        fc.m_Aid = wlk.key.m_KeyInContract.aid;
+        fc.m_Amount = wlk.payout.amount;
 
-        key_material::Owner km{cid, wlk.m_Key.m_KeyInContract.nft_id};
+        key_material::Owner km{cid, wlk.key.m_KeyInContract.nft_id};
 
         SigRequest sig;
         sig.m_pID = &km;
