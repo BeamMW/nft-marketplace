@@ -128,11 +128,13 @@ export default class ItemsStore {
       })
     }
 
-    //if (computed_total) {
-    //  console.log('computed total for' + mode)
-    //  let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
-    //  result.total = computed(() => observable.value)
-    //}
+    if (computed_total) {
+      console.log('computed total for ' + mode)
+      result.total = computed(() => {
+        let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
+        return observable.value
+      })
+    }
 
     this._state[mode] = result
     return result
@@ -181,21 +183,20 @@ export default class ItemsStore {
     return new Observable(subscriber => subscriber.next(null))
   }
   
-  getLazyPageItems(mode) {
+  getLazyPageItems(modename) {
     // TODO: convert to computed with error + loading flags
-    let loader = this._getMode(mode).loader
-
-    if (loader) {
-      let page = this.getPage(mode)
-      let qloader = () => loader(this._db[this._store_name], this._my_key)
-        .offset((page -1) * this._per_page)
-        .limit(this._per_page)
-        .toArray(items => items.map(item => this._fromContract(item)))
-        
-      return liveQuery(qloader)
+    let mode = this._getMode(modename)
+    if (!mode.loader) {
+      throw new Error(`No loader for mode ${modename}`)
     }
 
-    return new Observable(subscriber => subscriber.next(null))
+    let page = this.getPage(modename)
+    let qloader = () => mode.loader(this._db[this._store_name], this._my_key)
+      .offset((page -1) * this._per_page)
+      .limit(this._per_page)
+      .toArray(items => items.map(item => this._fromContract(item)))
+        
+    return liveQuery(qloader)
   }
 
   getLazyItem(mode, id) {

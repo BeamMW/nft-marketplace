@@ -41,7 +41,7 @@
                 <img src="~assets/beam.svg">
                 <span class="value">{{ min_price }}</span>
               </div>
-              <span>min price</span>
+              <span>floor price</span>
             </div>
             <div>
               <div>

@@ -1,6 +1,7 @@
 <template>
   <btn height="34px"
        :text="my_name"
+       tooltip="show profile"
        @click="$store.toMyPage"
   >
     <img src="~assets/user.svg">

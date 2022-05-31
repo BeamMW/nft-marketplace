@@ -5,6 +5,7 @@
        :disabled="in_set_artist"
        padding="0px" 
        radius="10px" 
+       tooltip="edit artist info"
        @click="onEditArtist"
   >
     <img src="~assets/pencil.svg">

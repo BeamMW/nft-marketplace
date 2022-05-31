@@ -12,6 +12,7 @@
     "build": "webpack --mode=production"
   },
   "devDependencies": {
+    "@popperjs/core": "^2.11.5",
     "@vueuse/rxjs": "^8.4.2",
     "beam-wasm-client-masternet": "^7.0.12638",
     "copy-webpack-plugin": "^9.0.1",

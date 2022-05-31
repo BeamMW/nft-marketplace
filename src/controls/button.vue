@@ -1,17 +1,19 @@
 <template>
-  <button :class="{
+  <button ref="button"         
+          :class="{
             'button': true,
             'reverse': reverse,
             'transparent': color == 'transparent',
             'disabled': disabled,
             'no-hover': !hover
-          }"         
+          }"
           :disabled="disabled"
           :style="button_style"
+          @mouseover="onMouseOver"
   >
     <slot></slot>
     <span class="text" :style="text_style">{{ text }}</span>
-    <span v-if="tooltip" class="tooltip">{{ tooltip }}</span>
+    <span v-if="tooltip" ref="tooltip" class="tooltip" :style="tip_style">{{ tooltip }}</span>
   </button>
 </template>
 
@@ -70,31 +72,15 @@
   & > .tooltip {
     box-sizing: border-box
     visibility: hidden
-    width: 120px
-    background: rgba(255, 255, 255, 0.15)
-    backdrop-filter: blur(30px)
+    backdrop-filter: blur(10px)
     color: #fff
-    text-align: center
     border-radius: 6px
-    padding: 11px 0px
-    position: absolute
+    padding: 11px 11px
+    position: fixed
     z-index: 1
-    top: 150%
-    left: -54%
-    margin-left: -60px
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
-
-    &::after {
-      content: ""
-      position: absolute
-      bottom: 100%
-      left: 83%
-      margin-left: -5px
-      border-width: 5px
-      border-style: solid
-      border-color: transparent transparent rgba(255, 255, 255, 0.15) transparent
-    }
+    opacity: 0.85
   }
 
   &:hover .tooltip {
@@ -104,6 +90,8 @@
 </style>
 
 <script>
+import utils from 'utils/utils'
+
 export default {
   props: {
     color: {  // magenta, blue, green, transparent, dark-blue
@@ -180,7 +168,9 @@ export default {
         transparent: 'transparent',
         carnation:'#f9605b',
         red: '#ff746b',
-      }
+      },
+      tip_left: -1,
+      tip_top: -1
     }
   },
 
@@ -228,7 +218,46 @@ export default {
         'width': this.width,
         'border-radius': this.radius
       }
+    },
+
+    tip_style() {
+      let res = {
+        background: utils.getStyles().background_popup
+      }
+
+      if (this.tip_left != -1) {
+        res['left'] = [this.tip_left, 'px'].join('')
+      }
+
+      if (this.tip_top != -1) {
+        res['top'] = [this.tip_top, 'px'].join('')
+      }
+
+      return res
     }
   },
+
+  methods: {
+    onMouseOver() {
+      let tooltip = this.$refs.tooltip
+      
+      if (!tooltip) {
+        return
+      }
+
+      let tipRect  = tooltip.getBoundingClientRect()
+      let tipRight = tipRect.right
+      let windowWidth  = window.innerWidth
+      
+      if (tipRight > windowWidth) {
+        this.tip_left = windowWidth - tipRect.width
+      }
+
+      let button = this.$refs.button
+      let btnRect = button.getBoundingClientRect()
+      let btnBottom = btnRect.bottom
+      this.tip_top  = btnBottom + 12
+    }
+  }
 }
 </script>

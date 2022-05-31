@@ -1,12 +1,11 @@
 <template>
-  <div :class="{'nft': true, 'error': item.error}">
+  <div :class="{'nft': true, 'error': item.error}" @click="onDetails">
     <!---- Preview OR Loading ---->
     <preview :image="item.image" 
              :default="def_nft"
              height="213px" 
              text_color="dimgray"
              contain
-             @click="onDetails"
     >
       <moderationStatus :item="item"/>
       <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">

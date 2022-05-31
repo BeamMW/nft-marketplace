@@ -154,6 +154,7 @@ export default {
 
   methods: {
     onSaleMenu(ev) {
+      ev.stopPropagation()
       this.$refs.saleMenu.open(ev)
     },
 

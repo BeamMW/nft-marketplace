@@ -1,11 +1,10 @@
 <template>
   <!--selectItem-->
-  <div :class="{'collection': true, 'error': item.error}">
+  <div :class="{'collection': true, 'error': item.error}" @click="onDetails">
     <preview :image="item.cover"
              :default="def_cover"
              height="140px" 
              cover
-             @click="onDetails"
     >
       <btnEdit :item="item"/> 
       <moderationStatus :item="item"/>
@@ -46,6 +45,7 @@
     border-radius: 10px
     position: relative
     overflow: hidden
+    cursor: pointer
 
     & > .info-row {
       display: flex

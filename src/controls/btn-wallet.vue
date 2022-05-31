@@ -3,6 +3,7 @@
        width="36px" 
        padding="0px" 
        radius="10px"
+       tooltip="show balance"
        @click="onClick"
   >
     <img src="~assets/wallet.svg">

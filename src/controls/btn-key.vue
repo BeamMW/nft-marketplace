@@ -5,6 +5,7 @@
          width="36px" 
          padding="0px" 
          radius="10px"
+         tooltip="show artist key"
          @click="onClick"
     >
       <img src="~assets/key.svg">

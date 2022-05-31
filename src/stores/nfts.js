@@ -6,8 +6,6 @@ import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
-import {liveQuery} from 'dexie'
-import {useObservable} from '@vueuse/rxjs'
 
 // TODO: modes a:b:c -> make c rely on loader of a and b
 // TODO: the same in LazyItems
