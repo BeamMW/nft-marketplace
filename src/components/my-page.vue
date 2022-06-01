@@ -143,7 +143,7 @@ export default {
         res.push({id: my_tabs.SOLD_NFTS,  name: 'Sold'})
       }
 
-      res.push({id: my_tabs.LIKED_NFTS, name: 'You Liked'})
+      res.push({id: my_tabs.LIKED_NFTS, name: 'Liked by Me'})
       return res
     }
   }
