@@ -158,7 +158,8 @@ export default {
       this.$refs.saleMenu.open(ev)
     },
 
-    onChangePrice() {
+    onChangePrice(ev) {
+      ev.stopPropagation()
       this.$refs.priceModal.open()
     },
 
@@ -177,7 +178,8 @@ export default {
       nftsStore.setPrice(this.id, price)
     },
 
-    onRemoveFromSale () {
+    onRemoveFromSale (ev) {
+      ev.stopPropagation()
       nftsStore.setPrice(this.id, 0)
     },
   }

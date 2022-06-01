@@ -9,7 +9,6 @@
       <div class="details-row"> 
         <div class="nft-container">
           <div>
-            <!-- TODO: scale image to fit container as in old gallery-->
             <preview :image="image" 
                      :default="def_nft" 
                      contain
@@ -331,9 +330,6 @@ import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
-import {useObservable} from '@vueuse/rxjs'
-import {Observable} from 'rxjs'
-import {computed} from 'vue'
 
 /*
 import "ag-grid-community/dist/styles/ag-grid.css"
@@ -362,39 +358,17 @@ export default {
   },
 
   setup(props) {
-    let nftObservable = computed(() => useObservable(nftsStore.getLazyItem('manager', props.id)))
-    let nft = computed(() => {
-      let result = nftObservable.value.value
-      if (!result) {
-        return result
-      }
-      return result.length == 0 ? null : result[0]
-    })
-
-    let collObservable = computed(() => {
-      if (!nft.value) return new Observable(subscriber => subscriber.next(nft.value))
-      if (!nft.value.collection) return new Observable(subscriber => subscriber(null))
-      return useObservable(collsStore.getLazyItem('manager', nft.value.collection))
-    })  
-     
-    let collection = computed(() => {
-      let result = collObservable.value.value
-      if (!result) {
-        return result
-      }
-      return result.length == 0 ? null : result[0]
-    })
-    
+    let nft = nftsStore.getLazyItem(props.id)    
     return {
-      nft,
-      collection
+      nft
     }
   },
 
   data () {
     return {
       sales: undefined,
-      def_nft: def_images.nft
+      def_nft: def_images.nft,
+      collection: undefined
     }
   },
 
@@ -437,18 +411,17 @@ export default {
       return artistsStore.artists
     }
   },
-  
+
+  watch: {
+    'nft': function (val) {
+      this.collection = collsStore.getLazyItem(val.collection)
+    }
+  },
+
   created() {
     (async () => {
       this.sales = await nftsStore.getSales(this.id)
     })()
-  },
-
-  mounted() {
-    //alert(document.baseURI)
-    //let router = this.$router
-    //let curr = router.currentRoute
-    //alert('location: ' + window.location.href + '\nbaseURI: ' + document.baseURI + '\nroute: ' + curr.value.fullPath)
   },
 
   methods: {  

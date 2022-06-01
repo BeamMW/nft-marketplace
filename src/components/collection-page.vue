@@ -278,9 +278,7 @@ import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import utils from 'utils/utils'
-import {useObservable} from '@vueuse/rxjs'
 import {coll_tabs, def_images} from 'utils/consts'
-import {computed} from 'vue'
 
 export default {
   components: {
@@ -302,18 +300,7 @@ export default {
   },
 
   setup (props) {
-    let collObservable = computed(() => {
-      return useObservable(collsStore.getLazyItem('manager', props.id))
-    })
-
-    let collection = computed(() => {
-      let result = collObservable.value.value
-      if (!result) {
-        return result
-      }
-      return result.length == 0 ? null : result[0]
-    })  
-
+    let collection = collsStore.getLazyItem(props.id)
     return {
       collection
     }

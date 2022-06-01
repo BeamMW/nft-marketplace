@@ -265,13 +265,23 @@ export default class ItemsStore {
     return liveQuery(qloader)
   }
 
-  getLazyItem(mode, id) {
-    // TODO: convert to computed with error + loading flags
-    let loader = () => this._db[this._store_name]
-      .where('id')
-      .equals(id)
-      .toArray(items => items.map(item => this._fromContract(item)))
-    return liveQuery(loader)
+  //
+  // Do not call getLazyItem from inside a computed() because of useObservable
+  //
+  getLazyItem(id) {
+    let loader = () => {
+      console.log(`lazy loader for ${this._objname}:${id}`)
+      return this._db[this._store_name]
+        .where('id')
+        .equals(id)
+        .toArray(items => items.map(item => this._fromContract(item)))
+    }
+    let observable = useObservable(liveQuery(loader))
+    return computed(() => {
+      let result = observable.value
+      if (!result) return undefined
+      return result.length == 0 ? null : result[0]
+    })
   }
 
   async _loadKeyAsync() {

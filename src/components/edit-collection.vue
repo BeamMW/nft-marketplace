@@ -152,8 +152,6 @@ import notFound from 'controls/not-found'
 import collsStore from 'stores/collections'
 import router from 'router'
 import validators from 'utils/validators'
-import {useObservable} from '@vueuse/rxjs'
-import {computed} from 'vue'
 
 export default {
   components: {
@@ -175,19 +173,7 @@ export default {
   },
 
   setup(props) {
-    let collection = undefined
-
-    if (props.id !== undefined) {
-      const collsObservable = computed(() => useObservable(collsStore.getLazyItem('artist', props.id)))
-      collection = computed(() => {
-        let result = collsObservable.value.value
-        if (!result) {
-          return result
-        }
-        return result.length == 0 ? null : result[0]
-      })
-    }
-
+    let collection = props.id ? collsStore.getLazyItem(props.id) : undefined
     return {
       collection
     }
