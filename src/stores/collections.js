@@ -25,6 +25,7 @@ class CollectionsStore extends LazyItems {
     coll.website = coll.data.website
 
     let author = artistsStore.loadArtist(coll.author)
+    // do we need this?? may be comes from contract
     coll.owned = computed(() => artistsStore.my_id == coll.author)
 
     coll.author_error = computed(() => {

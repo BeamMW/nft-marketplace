@@ -370,7 +370,17 @@ export default class ItemsStore {
     let db = this._db
 
     for(let item of res.items) {
+      //
+      // original would be written to database
+      // we add some calculated props for convenience
+      //
       let original = item
+
+      // convert owned to bool. Not all objects have it
+      if (Object.prototype.hasOwnProperty.call(item, 'owned')) {
+        original.owned = !!item.owned 
+      }
+      
       original.liked = item.impressions ? 1 : 0
       original.sale  = (item.price || {}).amount > 0 ? 1 : 0
       original.approved = (item.status === 'approved') 

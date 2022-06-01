@@ -25,10 +25,10 @@
               <div class="title">
                 {{ title }}
               </div>
-              <btn color="transparent" height="24px" padding="0px" @click="onShare">
+              <btn v-if="approved" color="transparent" height="24px" padding="0px" @click="onShare">
                 <img src="~assets/share.svg" width="24">
               </btn>
-              <btn v-if="owned" color="transparent" height="20px" padding="0px 0px 2px 0px" @click="onTransfer">
+              <btn v-if="approved & owned" color="transparent" height="20px" padding="0px 0px 2px 0px" @click="onTransfer">
                 <img src="~assets/transfer.svg" width="20">
               </btn>
             </div>
@@ -377,8 +377,12 @@ export default {
       return !!this.nft.error
     },
 
+    approved() {
+      return this.nft.approved
+    },
+
     owned() {
-      return !!this.nft.owned
+      return this.nft.owned
     },
     
     title () {

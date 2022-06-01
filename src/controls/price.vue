@@ -1,74 +1,84 @@
 <template>
   <priceModal ref="priceModal" @sell-nft="onSellNFT"/>
-  <!--- has price, so display it --->
-  <span v-if="price" class="price-container">
-    <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
+  <span class="price-container">
     
-    <!--- has price and owned, display change price / remove from sale options --->
-    <template v-if="owned">
-      <img class="dots" src="~assets/actions.svg" @click="onSaleMenu"/>
-      <popupMenu ref="saleMenu">
-        <div class="item" @click="onChangePrice">
-          <img src="~assets/change.svg"/>
-          update the price
-        </div>
-        <div class="item" @click="onRemoveFromSale">
-          <img src="~assets/eye-crossed.svg"/>
-          remove from sale
-        </div>
-      </popupMenu>
+    <!--- cannot do any actions while not approved -->
+    <span v-if="!approved" class="not-for-sale">
+      <!--- TODO: add tooltip about not approved -->
+      Not for sale
+    </span>
+
+    <template v-if="approved">
+      <!--- has price, so display it --->
+      <template v-if="price">
+        <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
+        
+        <!--- has price and owned, display change price / remove from sale options --->
+        <template v-if="owned">
+          <img class="dots" src="~assets/actions.svg" @click="onSaleMenu"/>
+          <popupMenu ref="saleMenu">
+            <div class="item" @click="onChangePrice">
+              <img src="~assets/change.svg"/>
+              update the price
+            </div>
+            <div class="item" @click="onRemoveFromSale">
+              <img src="~assets/eye-crossed.svg"/>
+              remove from sale
+            </div>
+          </popupMenu>
+        </template>
+
+        <!---- has price but not owned, can buy ---->
+        <template v-if="!owned">
+          <btn v-if="compact" 
+               text="buy" 
+               color="transparent" 
+               padding="2px 7px 5px 7px"
+               text_color="magenta"
+               @click="onBuy"
+          />
+          <btn v-else 
+               text="buy" 
+               color="magenta"
+               height="33px" 
+               @click="onBuy"
+          >
+            <img src="~assets/buy-sell.svg">
+          </btn>
+        </template>  
+      </template>
+
+      <span v-if="!price" class="price-container">
+        <!---- doesn't have price & owned, can sell ---->
+        <template v-if="owned">
+          <btn v-if="compact" 
+               text="sell" 
+               color="transparent" 
+               padding="0px 7px 0px 7px"
+               height="31px"
+               text_color="blue"
+               @click="onSell"
+          />
+          <btn v-else 
+               text="sell" 
+               color="blue" 
+               height="33px"
+               @click="onSell"
+          >
+            <img src="~assets/buy-sell.svg">
+          </btn>
+        </template>
+
+        <!---- doesn't have price & not owned & author, means sold ----> 
+        <span v-if="!owned && author" class="not-for-sale">Sold</span>
+
+        <!---- doesn't have price & not owned & author,     
+            can be anything - not approved yet, not sold by
+            owner &c. Just dispaly that it is not on sale
+        ---->
+        <span v-if="!owned && !author" class="not-for-sale">Not for sale</span>
+      </span>
     </template>
-
-    <!---- has price but not owned, can buy ---->
-    <template v-if="!owned">
-      <btn v-if="compact" 
-           text="buy" 
-           color="transparent" 
-           padding="2px 7px 5px 7px"
-           text_color="magenta"
-           @click="onBuy"
-      />
-      <btn v-else 
-           text="buy" 
-           color="magenta"
-           height="33px" 
-           @click="onBuy"
-      >
-        <img src="~assets/buy-sell.svg">
-      </btn>
-    </template>  
-  </span>
-
-  <span v-if="!price" class="price-container">
-    <!---- doesn't have price & owned, can sell ---->
-    <template v-if="owned">
-      <btn v-if="compact" 
-           text="sell" 
-           color="transparent" 
-           padding="0px 7px 0px 7px"
-           height="31px"
-           text_color="blue"
-           @click="onSell"
-      />
-      <btn v-else 
-           text="sell" 
-           color="blue" 
-           height="33px"
-           @click="onSell"
-      >
-        <img src="~assets/buy-sell.svg">
-      </btn>
-    </template>
-
-    <!---- doesn't have price & not owned & author, means sold ----> 
-    <!-- TODO: take into account moderation / ban -->
-    <span v-if="!owned && author" class="not-for-sale">Sold</span>
-
-    <!---- doesn't have price & not owned & author,     
-           can be anything - not approved yet, not sold by
-           owner &c. Just dispaly that it is not on sale
-    ---->
-    <span v-if="!owned && !author" class="not-for-sale">Not for sale</span>
   </span>
 </template>
 
@@ -133,6 +143,10 @@ export default {
 
     id() {
       return this.nft.id
+    },
+
+    approved() {
+      return this.nft.approved
     },
 
     owned() {
