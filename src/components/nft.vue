@@ -157,7 +157,7 @@ export default {
     },
 
     is_approved() {
-      return this.item.status === 'approved'
+      return this.item.approved
     },
                 
     can_vote () {

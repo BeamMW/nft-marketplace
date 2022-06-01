@@ -1,5 +1,5 @@
 <template>
-  <div v-if="item.status !== 'approved'"
+  <div v-if="!approved"
        :class="{'top-message': true, 'pending': pending, 'rejected': rejected}" 
        :style="style"
   >
@@ -46,11 +46,14 @@ export default {
   },
 
   computed: {
+    approved() {
+      return this.item.approved
+    },
     pending () {
-      return this.item.status === 'pending'
+      return this.item.pending
     },
     rejected () {
-      return this.item.status === 'rejected'
+      return this.item.rejected
     },
     style() {
       let res = {

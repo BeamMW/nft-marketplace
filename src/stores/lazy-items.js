@@ -5,7 +5,6 @@ import {cid} from 'stores/consts'
 import {common} from 'utils/consts'
 import {computed, nextTick, reactive} from 'vue'
 import {liveQuery} from 'dexie'
-import {Observable} from 'rxjs'
 import {useObservable} from '@vueuse/rxjs'
 
 export default class ItemsStore {
@@ -238,15 +237,17 @@ export default class ItemsStore {
     return this._getMode(mode).total
   }
 
-  getLazyAllItems(mode) {
-    // TODO: convert to computed with error + loading flags
-    let loader = this._getMode(mode).loader
-    if (loader) {
-      let qloader = () => loader(this._db[this._store_name], this._my_key)
-        .toArray(items => items.map(item => this._fromContract(item)))
-      return liveQuery(qloader)
+  //
+  // Do not call getLazyAllItems from inside a computed() because of useObservable
+  //
+  getLazyAllItems(modename) {
+    let mode = this._getMode(modename)
+    if (!mode.loader) {
+      throw new Error(`No loader for mode ${modename}`)
     }
-    return new Observable(subscriber => subscriber.next(null))
+    // TODO: call fromContract only when it comes from contract, store converted in database
+    let loader = () => mode.loader(this._db[this._store_name], this._my_key).toArray(items => items.map(item => this._fromContract(item)))
+    return useObservable(liveQuery(loader)) // TODO: -> null, undefined, value
   }
   
   getLazyPageItems(modename) {
@@ -372,6 +373,9 @@ export default class ItemsStore {
       let original = item
       original.liked = item.impressions ? 1 : 0
       original.sale  = (item.price || {}).amount > 0 ? 1 : 0
+      original.approved = (item.status === 'approved') 
+      original.pending  = (item.status === 'pending')
+      original.rejected = (item.status !== 'approved' && item.status !== 'pending')
 
       try {
         if (!item.label) {
@@ -401,25 +405,25 @@ export default class ItemsStore {
       // Status
       // 
       if (old !== undefined && old.status !== item.status) {
-        if (old.status === 'approved') {
+        if (old.approved) {
           status.approved--
         }
-        if (old.status === 'pending') {
+        if (old.pending) {
           status.pending--
         }
-        if (old.status === 'rejected') {
+        if (old.rejected) {
           status.rejected--
         }
       }
       
       if (old === undefined || old.status !== item.status) {
-        if (item.status === 'approved') {
+        if (item.approved) {
           status.approved++
         }
-        if (item.status === 'pending') {
+        if (item.pending) {
           status.pending++
         }
-        if (item.status === 'rejected') {
+        if (item.rejected) {
           status.rejected++
         }
       }
@@ -468,7 +472,7 @@ export default class ItemsStore {
       //
       // Approved and ...
       //
-      if (old && old.status === 'approved') {
+      if (old && old.approved) {
         //
         // ... and liked by someone
         //
@@ -491,7 +495,7 @@ export default class ItemsStore {
         }
       }
 
-      if (item.status === 'approved') {
+      if (item.approved) {
         //
         // ... and liked by someone
         //

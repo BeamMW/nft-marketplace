@@ -116,7 +116,6 @@ import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import router from 'router'
 import {common} from 'utils/consts'
-import {useObservable} from '@vueuse/rxjs'
 import {computed} from 'vue'
 
 export default {
@@ -142,9 +141,9 @@ export default {
   },
 
   setup (props) {
-    const collsObservable = computed(() => useObservable(collsStore.getLazyAllItems('artist')))
+    const lazyColls = collsStore.getLazyAllItems('artist')
     const collections = computed(() => {
-      let colls = collsObservable.value.value
+      let colls = lazyColls.value
       if (!colls) {
         return undefined
       }
