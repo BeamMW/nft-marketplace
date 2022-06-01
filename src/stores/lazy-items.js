@@ -201,9 +201,8 @@ export default class ItemsStore {
     }
 
     if (computed_total) {
-      console.log('computed total for ' + mode)
+      let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
       result.total = computed(() => {
-        let observable = useObservable(liveQuery(() => loader(this._db[this._store_name]).count()))
         return observable.value
       })
     }
