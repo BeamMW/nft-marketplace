@@ -162,8 +162,15 @@ export default {
       this.$refs.priceModal.open()
     },
 
-    onSell () {
+    onSell (ev) {
+      ev.stopPropagation()
       this.$refs.priceModal.open()
+    },
+
+    onBuy (ev) {
+      ev.stopPropagation()
+      if (this.is_headless) return this.$store.switchToHeaded()
+      nftsStore.buyNFT(this.id)
     },
 
     onSellNFT (price) {
@@ -173,11 +180,6 @@ export default {
     onRemoveFromSale () {
       nftsStore.setPrice(this.id, 0)
     },
-
-    onBuy () {
-      if (this.is_headless) return this.$store.switchToHeaded()
-      nftsStore.buyNFT(this.id)
-    }
   }
 }
 </script>
