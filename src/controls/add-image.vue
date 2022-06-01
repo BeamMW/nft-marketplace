@@ -95,7 +95,7 @@ export default {
     // eslint-disable-next-line vue/prop-name-casing
     modelValue: {
       type: Object,
-      required: true,
+      required: false,
       default: undefined
     },
     height: {
