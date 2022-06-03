@@ -1,94 +1,79 @@
 <template>
-  <modal ref="modal">
-    <div class="content">
-      <div class="error_title">
-        {{ title }}
+  <modal ref="modal" max_width="70%">
+    <div class="error-modal">
+      <div class="title">{{ title }}</div>
+      <div class="description">
+        Something went wrong. Gallery will be automatically reloaded.<br>
+        If you come across this problem again, copy error message using the copy button send it to support.
       </div>
-      <div class="error_description">
-        <p>Something went wrong. The page will be automatically restarted.</p>
-        <p>If you came across this problem again, copy the following text and send it to support, please.</p>
-      </div>
-      <div class="error">
-        <div>
-          <div class="error_data">
-            <span>{{ text }}</span>
-            <btn class="icon-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
-              <img src="~assets/copy.svg"/>
-            </btn>
-          </div>
-          <div class="restart">Restarting in {{ errleft }}</div>
-        </div>
-        <btn color="carnation" padding="10px 30px 10px 30px" text="ok" @click="close">
-          <img src="~assets/ok.svg"/> 
+      <div class="content">
+        <pre class="error-text">
+          {{ errtext }}
+        </pre>
+        <btn class="btn-copy" color="transparent" padding="11px 0 11px 10px" @click="onCopy">
+          <img src="~assets/copy.svg"/>
         </btn>
       </div>
+      <div class="restart">Restarting in {{ errleft }}s</div>
+      <btn color="carnation" padding="10px 30px 10px 30px" text="ok" @click="onOK">
+        <img src="~assets/ok.svg"/> 
+      </btn>
     </div>
   </modal>
 </template>
 
 <style scoped lang="stylus">
-  .content {
+  .error-modal {
     display: flex
     flex-direction: column
     align-items: center
     font-family: 'SFProDisplay', sans-serif
 
-    .error_title {
+    .title {
       font-family: 'SFProDisplay', sans-serif
       font-size: 18px
       font-weight: 700
-      line-height: 21px
+      margin-bottom: 20px
       font-style: normal
       text-align: center
       color: #fff
     }
 
-    .error_description {
+    .description {
       text-align: center
-
-      & > p {
-        font-size: 14px
-        line-height: 17px
-        font-style: normal
-        font-weight: 400
-        margin-bottom: 10px
-      }
+      font-size: 14px
+      line-height: 21px
+      font-style: normal
+      font-weight: 400
+      margin-bottom: 15px
     }
 
-    .error {
-      display:         flex
-      flex-direction:  column
-      align-items:     center
+    .content {
+      display: flex
+      flex-direction: row
+      align-items: center
       justify-content: center
-      height:          100%
-      width:           100%
-      overflow:        hidden    
-      filter:          unset
-      padding-bottom:  10px
+      max-width: 100%
+      overflow: hidden
 
-      & > div {
-        width: 70%
-        
-        & > .error_data {
-          font-family: 'SFProDisplay', sans-serif
-          font-weight: normal
-          white-space: pre-wrap
-          display: flex
-          justify-content: center
-          flex-direction: row
-          align-items: center
-          color: rgba(255, 90, 90, 1)
+      .error-text {
+        font-family: 'SFProDisplay', sans-serif
+        font-weight: normal
+        color: rgba(255, 90, 90, 1)
+        overflow: hidden
+      }
 
-          .icon-copy {
-            cursor: pointer
-          }
-        }
+      .btn-copy {
+        cursor: pointer
+        margin-left: 10px
+        flex: 1
       }
-      .restart {
-        color: rgba(255, 255, 255, 0.7)
-        text-align: center
-        margin: 24px 0px 41px
-      }
+    }
+    
+    .restart {
+      color: rgba(255, 255, 255, 0.7)
+      text-align: center
+      margin: 15px 0px 25px
     }
   }
 </style>
@@ -96,19 +81,20 @@
 <script>
 import modal from 'controls/modal'
 import btn from 'controls/button'
+import utils from 'utils/utils'
 
 export default {
   components: {
     modal, btn
   },
   props: {
-    text: {
+    error: {
       default: undefined,
       type: [String, Object]
     },
     title: {
       type: String,
-      default: 'Error'
+      default: 'Gallery Error'
     },
   },
   emits: ['copy'],
@@ -120,28 +106,76 @@ export default {
     }
   },
 
+  computed: {
+    errtext() {
+      let full = this.errfull
+      if (this.$state.debug) {
+        return full
+      }
+
+      const maxLines = 10
+      let split = full.split('\n')
+      
+      if  (split.length > maxLines) {
+        split = split.slice(0, maxLines)
+        split.push('...')
+      }
+    
+      return split.join('\n')
+    },
+
+    errfull() {
+      let formatError = (error) =>  {
+        if (typeof error === 'string') {
+          return error
+        }
+        
+        if (error instanceof Error) {
+          return error.cause ? [error.stack, formatError(error.cause)].join('\n') : error.stack
+        }
+
+        error = Object.assign({}, error)
+        const maxLen = 50
+
+        if (error.answer && error.answer.result) {
+          if(error.answer.result.raw_data) {
+            error.answer.result.raw_data = '--excluded--'
+          }
+
+          if (error.answer.result.output && error.answer.result.output.length > maxLen) {
+            error.answer.result.output = error.answer.result.output.substring(0, maxLen) + ' --excluded--'
+          }
+        }
+        return utils.formatJSON(error)
+      }
+      return formatError(this.error.error)
+    }
+  },
+
   mounted () {
     this.errleft = 10
+    this.$refs.modal.open()
     this.timeout = setInterval(() => {
       this.errleft -= 1
       if (this.errleft == 0) {
-        clearInterval(this.timeout)
-        this.$store.clearError()
+        this.close()
       }
     }, 1000)
-    this.$refs.modal.open()
-
   },
 
   methods: {
     onCopy() {
-      this.$emit('copy')
+      utils.copyText(this.errfull)
     },
  
-    close() {
+    onOK() {
+      this.close()
+    },
+
+    close () {
       clearInterval(this.timeout)
-      this.$store.clearError()
       this.$refs.modal.close()
+      this.$store.clearError()
     }
   }
 }

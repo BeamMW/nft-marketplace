@@ -1,7 +1,7 @@
 <template>
   <Teleport to="#modals">
     <div v-if="show" class="modal-dialog">
-      <div class="modal-content" :style="style">
+      <div class="modal-content" :style="content_style">
         <slot/>
       </div>
     </div>
@@ -32,6 +32,13 @@
 import utils from 'utils/utils'
 
 export default {
+  props: {
+    max_width: {
+      type: String,
+      default: undefined
+    }
+  },
+
   data () {
     return {
       show: false,
@@ -39,10 +46,14 @@ export default {
   },
 
   computed: {
-    style() {
-      return {
+    content_style() {
+      let style = {
         'background-color': utils.getStyles().background_popup,
       }
+      if (this.max_width) {
+        style['max-width'] = this.max_width
+      }
+      return style
     },
 
     id () {
