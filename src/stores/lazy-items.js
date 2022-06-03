@@ -342,12 +342,18 @@ export default class ItemsStore {
     await db[this._metastore_name].bulkPut(save)
   }
 
-  async loadAsync() {
-    if(this._loading) {
+  async loadAsync () {
+    if (this._loading) {
       return false
     }
 
     this._loading = true
+    await this._loadAsyncInternal(0)
+  }
+
+  async _loadAsyncInternal(depth) {
+    console.log(`_loadAsyncInternal for ${this._objname}s with depth ${depth}`)
+    
     await this._loadKeyAsync()
     let status = await this._loadStatus()
     let hnext = status.hprocessed + 1
@@ -547,7 +553,7 @@ export default class ItemsStore {
     this._getMode('liker:liked').total  = status.approved_i_liked
 
     if (res.items.length > 0) {
-      nextTick(() => this.loadAsync())
+      nextTick(() => this._loadAsyncInternal(++depth))
     }
 
     if (this._global.state.debug) {

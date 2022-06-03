@@ -2,7 +2,7 @@
   <div class="list-container">
     <div v-if="items === undefined" class="empty">
       <!-- If items are loaded from local store it is quite quick,
-           loader appears and then disappears quckly. This looks like blinking.
+           loader appears and then disappears quickly. This looks like blinking.
            So we delay it and display only if items are taking long time to load.
        -->
       <template v-if="delay_passed">
