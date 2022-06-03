@@ -60,6 +60,9 @@
 #define Gallery_manager_set_fee_base(macro) \
     macro(ContractID, cid) macro(Amount, amount)
 
+#define Gallery_manager_set_rate_limit(macro) \
+    macro(ContractID, cid) macro(Amount, amount)
+
 #define GalleryRole_manager(macro)                                            \
     macro(manager, view) macro(manager, view_params) macro(                   \
         manager, view_artists_stats) macro(manager, view_moderators_stats)    \
@@ -73,7 +76,8 @@
                                 macro(manager, set_nft_status)                \
                                     macro(manager, set_artist_status)         \
                                         macro(manager, set_collection_status) \
-                                            macro(manager, set_fee_base)
+                                            macro(manager, set_fee_base)      \
+                                                macro(manager, set_rate_limit)
 
 // MODERATOR
 
@@ -694,7 +698,8 @@ struct BalanceWalkerOwner : public BalanceWalker {
                 return false;
 
             if (IsOwner(cid, key.m_KeyInContract.user,
-                        key.m_KeyInContract.nft_id) || IsOwner(cid, key.m_KeyInContract.user, 0))
+                        key.m_KeyInContract.nft_id) ||
+                IsOwner(cid, key.m_KeyInContract.user, 0))
                 break;
         }
         return true;
@@ -800,7 +805,8 @@ gallery::Artist::Id artist_id_by_label(const ContractID& cid,
     return artist_id;
 }
 
-void SetNftStatusCommon(const ContractID& cid, const PubKey& signer, const SigRequest* sig) {
+void SetNftStatusCommon(const ContractID& cid, const PubKey& signer,
+                        const SigRequest* sig) {
     char buf[256];
     Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<gallery::Nft::Id> ids_vec(ParseIds<gallery::Nft::Id>(buf));
@@ -836,7 +842,8 @@ void SetNftStatusCommon(const ContractID& cid, const PubKey& signer, const SigRe
                         sig, 1, "Update nfts' status", charge);
 }
 
-void SetArtistStatusCommon(const ContractID& cid, const PubKey& signer, const SigRequest* sig) {
+void SetArtistStatusCommon(const ContractID& cid, const PubKey& signer,
+                           const SigRequest* sig) {
     char buf[1024];
     Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<gallery::Artist::Id> ids_vec(
@@ -876,7 +883,8 @@ void SetArtistStatusCommon(const ContractID& cid, const PubKey& signer, const Si
                         sig, 1, "Update artists' status", charge);
 }
 
-void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer, const SigRequest* sig) {
+void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
+                               const SigRequest* sig) {
     char buf[256];
     Env::DocGetText("ids", buf, sizeof(buf));
     std::vector<gallery::Collection::Id> ids_vec(
@@ -1013,9 +1021,12 @@ ON_METHOD(manager, view_artists) {
         gallery::Index<gallery::Tag::kHeightArtistIdx, Height, gallery::Artist>;
 
     GalleryObjectPrinter<AppArtist, HeightArtistIdx> a{cid};
-    if (count && h0) a.Print(h0, count);
-    else if (buf_len) a.Print(buf);
-    else a.Print();
+    if (count && h0)
+        a.Print(h0, count);
+    else if (buf_len)
+        a.Print(buf);
+    else
+        a.Print();
 }
 
 ON_METHOD(manager, view_moderators) {
@@ -1026,9 +1037,12 @@ ON_METHOD(manager, view_moderators) {
                                               Height, gallery::Moderator>;
 
     GalleryObjectPrinter<AppModerator, HeightModeratorIdx> m{cid};
-    if (count && h0) m.Print(h0, count);
-    else if (buf_len) m.Print(buf);
-    else m.Print();
+    if (count && h0)
+        m.Print(h0, count);
+    else if (buf_len)
+        m.Print(buf);
+    else
+        m.Print();
 }
 
 ON_METHOD(manager, view_collections) {
@@ -1040,9 +1054,12 @@ ON_METHOD(manager, view_collections) {
                        gallery::Collection>;
 
     GalleryObjectPrinter<AppCollection, HeightCollectionIdx> c{cid};
-    if (count && h0) c.Print(h0, count);
-    else if (buf_len) c.Print(buf);
-    else c.Print();
+    if (count && h0)
+        c.Print(h0, count);
+    else if (buf_len)
+        c.Print(buf);
+    else
+        c.Print();
 }
 
 ON_METHOD(artist, set_nft) {
@@ -1077,8 +1094,9 @@ ON_METHOD(artist, set_nft) {
 
     d.args.label_len = label_size - 1;
 
-    uint32_t data_size = Env::DocGetText(
-        "data", d.label_and_data + d.args.label_len, gallery::Nft::kDataMaxLen + 1);
+    uint32_t data_size =
+        Env::DocGetText("data", d.label_and_data + d.args.label_len,
+                        gallery::Nft::kDataMaxLen + 1);
 
     if (data_size < 2) {
         OnError("data must be specified");
@@ -1222,6 +1240,14 @@ ON_METHOD(manager, set_fee_base) {
     key_material::Admin kid;
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
                         &kid, 1, "Set fee base", 0);
+}
+
+ON_METHOD(manager, set_rate_limit) {
+    gallery::method::SetRateLimit args;
+    args.amount = amount;
+    key_material::Admin kid;
+    Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
+                        &kid, 1, "Set rate limit", 0);
 }
 
 ON_METHOD(artist, set_artist) {
@@ -1379,7 +1405,8 @@ ON_METHOD(artist, set_collection) {
                         : 0) +
         2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
-        Env::Cost::MemOpPerByte * (sizeof(gallery::Collection) + label_size + data_size);
+        Env::Cost::MemOpPerByte *
+            (sizeof(gallery::Collection) + label_size + data_size);
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
                         &sig, 1, "Set collection",
@@ -1417,9 +1444,12 @@ ON_METHOD(manager, view_nfts) {
         gallery::Index<gallery::Tag::kHeightNftIdx, Height, gallery::Nft>;
 
     GalleryObjectPrinter<AppNft, HeightNftIdx> a{cid};
-    if (count && h0) a.Print(h0, count);
-    else if (buf_len) a.Print(buf);
-    else a.Print();
+    if (count && h0)
+        a.Print(h0, count);
+    else if (buf_len)
+        a.Print(buf);
+    else
+        a.Print();
 }
 
 ON_METHOD(user, set_price) {
@@ -1636,5 +1666,5 @@ BEAM_EXPORT void Method_1() {
 #undef PAR_PASS
 #undef PAR_READ
 
-    OnError("unknown Role");
+        OnError("unknown Role");
 }

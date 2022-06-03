@@ -51,6 +51,7 @@ BEAM_EXPORT void Ctor(const method::Init& r) {
         ContractState s(false);
         _POD_(s).SetZero();
         _POD_(s.config) = r.config;
+        s.rate_limit = static_cast<Height>(-1);
         s.Save();
     }
 }
@@ -104,6 +105,7 @@ BEAM_EXPORT void Method_5(const method::SetArtist& r) {
         a.updated = cur_height;
         a.collections_num = 0;
         a.nfts_num = 0;
+        a.last_created_object = 0;
         s.total_artists++;
         s.Save();
 
@@ -211,6 +213,8 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.artist_id);
         a.updated = cur_height;
+        Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
+        a.last_created_object = cur_height;
         GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
         s.Save();
     }
@@ -285,6 +289,8 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     ++a.nfts_num;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
+    Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
+    a.last_created_object = cur_height;
     a.updated = cur_height;
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
 
