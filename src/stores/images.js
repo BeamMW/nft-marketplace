@@ -14,20 +14,45 @@ class ImagesStore {
     })
   }
 
-  fromContract(image) {
-    if (!image) {
-      return image
-    }
-
+  _ensureFields(image) {
     try {
       utils.ensureField(image, 'ipfs_hash', 'string')
       utils.ensureField(image, 'mime_type', 'string')
     }
     catch(err) {
-      console.log('ImagesStore.from_contract', err)
-      return this._setError(image, err)
+      console.log('ImagesStore._ensureFields', err)
+      return err
+    }
+    return null
+  }
+
+  fromContract(image) {
+    if (!image) {
+      return image
     }
 
+    let err = this._ensureFields(image)
+
+    if (err)
+      alert('image error, id ' + image.id + ', err ' + err)
+      
+    return {
+      ipfs_hash: image.ipfs_hash,
+      mime_type: image.mime_type,
+      error: err
+    }
+  }
+
+  fromDB(image) {
+    if (!image || image.error) {
+      return image
+    }
+
+    let err = this._ensureFields(image)
+    if (err) {
+      return this._setError(image, err)
+    }
+    
     let cached = this._state.images[image.ipfs_hash]
     if (cached) {
       return cached

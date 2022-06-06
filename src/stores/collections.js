@@ -15,19 +15,11 @@ class CollectionsStore extends LazyItems {
     })
   }
 
-  _fromContract (coll) {
+  fromDB(coll) {
     coll = Object.assign({}, coll)
-    
     coll.store = this
-    coll.description = coll.data.description
-    coll.instagram = coll.data.instagram
-    coll.twitter = coll.data.twitter
-    coll.website = coll.data.website
 
     let author = artistsStore.loadArtist(coll.author)
-    // do we need this?? may be comes from contract
-    coll.owned = computed(() => artistsStore.my_id == coll.author)
-
     coll.author_error = computed(() => {
       return author.error
     })
@@ -78,13 +70,22 @@ class CollectionsStore extends LazyItems {
     } 
 
     if (!coll.error) {  
-      coll.cover = imagesStore.fromContract(coll.data.cover)
+      coll.cover = imagesStore.fromDB(coll.cover)
     }
     
     return coll
   }
 
-  async _toContract(label, data) {
+  fromContract (coll) {
+    coll.description = coll.data.description
+    coll.instagram = coll.data.instagram
+    coll.twitter = coll.data.twitter
+    coll.website = coll.data.website
+    coll.cover = coll.data.cover
+    return coll
+  }
+
+  async toContract(label, data) {
     data.cover = await imagesStore.toContract(data.cover)
     return {
       label: formats.toContract(label),

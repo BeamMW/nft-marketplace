@@ -7,6 +7,7 @@ import ErrorEx from 'utils/errorex'
 import {cid, versions} from 'stores/consts'
 import {reactive} from 'vue'
 
+// TODO: use lazy store where possible
 class ArtistsStore {
   constructor () {
     this.reset()
@@ -140,7 +141,8 @@ class ArtistsStore {
 
       item.label = formats.fromContract(item.label)
       item.data = formats.fromContract(item.data, versions.ARTIST_VERSION)
-      item = this._fromContract(item)
+      item = this.fromContract(item)
+      item = this.fromDB(item)
       this._setArtist(id, item)
 
       if (this._global.debug) {
@@ -178,7 +180,7 @@ class ArtistsStore {
   }
 
   async setArtist(label, data) {
-    ({label, data} = await this._toContract(label, data))
+    ({label, data} = await this.toContract(label, data))
     let txid = await utils.invokeContractAsyncAndMakeTx({
       role: 'artist',
       action: 'set_artist',
@@ -199,14 +201,18 @@ class ArtistsStore {
     }, 1000)
   }
 
-  async _toContract (label, data) {
+  async toContract (label, data) {
     return await ArtistsCommon.toContract(label, data)
   } 
 
-  _fromContract (cartist) {
-    let result = ArtistsCommon.fromContract(cartist)
-    result.store = this
-    return result
+  fromContract (artist) {
+    return ArtistsCommon.fromContract(artist)
+  }
+
+  fromDB(artist) {
+    artist = ArtistsCommon.fromDB(artist)
+    artist.store = this
+    return artist
   }
 
   toBecomeArtist() {

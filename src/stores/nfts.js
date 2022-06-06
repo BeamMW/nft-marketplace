@@ -121,10 +121,15 @@ class NFTSStore extends LazyItems {
     return result
   }
 
-  _fromContract(awork) {
+  fromContract(awork) {
+    awork.description = awork.data.description 
+    awork.image = awork.data.image
+    return awork
+  }
+
+  fromDB(awork) {
     awork = Object.assign({}, awork)
     awork.store = this
-    awork.description = awork.data.description
 
     let author = artistsStore.loadArtist(awork.author)
     awork.author_error = computed(() => {
@@ -148,13 +153,13 @@ class NFTSStore extends LazyItems {
     }
 
     if (!awork.error) {
-      awork.image = imagesStore.fromContract(awork.data.image)
+      awork.image = imagesStore.fromDB(awork.image)
     }
     
     return awork
   }
 
-  async _toContract(label, data) {
+  async toContract(label, data) {
     data.image = await imagesStore.toContract(data.image)
     return {
       label: formats.toContract(label),
@@ -163,7 +168,7 @@ class NFTSStore extends LazyItems {
   }
 
   async createNFT(collid, label, data, price) {
-    ({label, data} = await this._toContract(label, data))
+    ({label, data} = await this.toContract(label, data))
     
     let args = {
       role: 'artist',

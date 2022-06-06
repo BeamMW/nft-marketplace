@@ -245,8 +245,7 @@ export default class ItemsStore {
     if (!mode.loader) {
       throw new Error(`No loader for mode ${modename}`)
     }
-    // TODO: call fromContract only when it comes from contract, store converted in database
-    let loader = () => mode.loader(this._db[this._store_name], this._my_key).toArray(items => items.map(item => this._fromContract(item)))
+    let loader = () => mode.loader(this._db[this._store_name], this._my_key).toArray(items => items.map(item => this.fromDB(item)))
     return useObservable(liveQuery(loader)) // TODO: -> null, undefined, value
   }
   
@@ -261,7 +260,7 @@ export default class ItemsStore {
     let qloader = () => mode.loader(this._db[this._store_name], this._my_key)
       .offset((page -1) * this._per_page)
       .limit(this._per_page)
-      .toArray(items => items.map(item => this._fromContract(item)))
+      .toArray(items => items.map(item => this.fromDB(item)))
         
     return liveQuery(qloader)
   }
@@ -275,7 +274,7 @@ export default class ItemsStore {
       return this._db[this._store_name]
         .where('id')
         .equals(id)
-        .toArray(items => items.map(item => this._fromContract(item)))
+        .toArray(items => items.map(item => this.fromDB(item)))
     }
     let observable = useObservable(liveQuery(loader))
     return computed(() => {
@@ -377,21 +376,20 @@ export default class ItemsStore {
 
     for(let item of res.items) {
       //
-      // original would be written to database
+      // item would be written to database
       // we add some calculated props for convenience
       //
-      let original = item
-
+    
       // convert owned to bool. Not all objects have it
       if (Object.prototype.hasOwnProperty.call(item, 'owned')) {
-        original.owned = !!item.owned 
+        item.owned = !!item.owned 
       }
       
-      original.liked = item.impressions ? 1 : 0
-      original.sale  = (item.price || {}).amount > 0 ? 1 : 0
-      original.approved = (item.status === 'approved') 
-      original.pending  = (item.status === 'pending')
-      original.rejected = (item.status !== 'approved' && item.status !== 'pending')
+      item.liked = item.impressions ? 1 : 0
+      item.sale  = (item.price || {}).amount > 0 ? 1 : 0
+      item.approved = (item.status === 'approved') 
+      item.pending  = (item.status === 'pending')
+      item.rejected = (item.status !== 'approved' && item.status !== 'pending')
 
       try {
         if (!item.label) {
@@ -404,7 +402,17 @@ export default class ItemsStore {
         
         item.label = formats.fromContract(item.label)
         item.data  = formats.fromContract(item.data, this._versions) 
-        item = this._fromContract(item)
+
+        // fromContract  
+        // - changes some props in the item
+        // - add props to the item
+        // - all data would be stored in db
+        // - must not create a copy
+        let fcitem = this.fromContract(item)
+
+        if (fcitem !== item) {
+          throw new Error('fromContract copied the item')
+        }
 
         if (this._global.debug) {
           console.log('item loaded with label', item.label)

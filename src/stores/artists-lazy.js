@@ -11,10 +11,14 @@ class ArtistsStore extends LazyItems {
     })
   }
 
-  _fromContract(cartist) {
-    let result = ArtistsCommon.fromContract(cartist)
-    result.store = this
-    return result
+  fromDB(artist) {
+    artist = ArtistsCommon.fromDB(artist)
+    artist.store = this
+    return artist
+  }
+  
+  fromContract(artist) {
+    return ArtistsCommon.fromContract(artist)
   }
 }
 
