@@ -30,7 +30,6 @@ export default class ItemsStore {
   //  liker:liked -> keys: [satus+my_impression]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
-    this._my_key = ''
     this._loading = false
     this._objname = objname
     this._per_page = perPage || common.ITEMS_PER_PAGE
@@ -92,10 +91,22 @@ export default class ItemsStore {
     this._db_keys = Array.from(keyset)
   }
 
-  reset (global, db, state) {
+  defaultState() {
+    return {
+      my_key: ''
+    }
+  }
+
+  get my_key () {
+    return this._state.my_key
+  }
+
+  reset (global, db) {
     this._global = global
     this._db = db
-    this._state = reactive(state || {})
+
+    let clean_state = this.defaultState()
+    this._state = reactive(clean_state)
 
     this._allocMode({
       mode: 'user', 
@@ -245,7 +256,7 @@ export default class ItemsStore {
     if (!mode.loader) {
       throw new Error(`No loader for mode ${modename}`)
     }
-    let loader = () => mode.loader(this._db[this._store_name], this._my_key).toArray(items => items.map(item => this.fromDB(item)))
+    let loader = () => mode.loader(this._db[this._store_name], this.my_key).toArray(items => items.map(item => this.fromDB(item)))
     return useObservable(liveQuery(loader)) // TODO: -> null, undefined, value
   }
   
@@ -257,7 +268,7 @@ export default class ItemsStore {
     }
 
     let page = this.getPage(modename)
-    let qloader = () => mode.loader(this._db[this._store_name], this._my_key)
+    let qloader = () => mode.loader(this._db[this._store_name], this.my_key)
       .offset((page -1) * this._per_page)
       .limit(this._per_page)
       .toArray(items => items.map(item => this.fromDB(item)))
@@ -285,8 +296,8 @@ export default class ItemsStore {
   }
 
   async _loadKeyAsync() {
-    if(this._my_key) {
-      return this._my_key
+    if(this.my_key) {
+      return this.my_key
     }
 
     let {res} = await utils.invokeContractAsync({
@@ -296,9 +307,9 @@ export default class ItemsStore {
     })
 
     utils.ensureField(res, 'id', 'string')
-    this._my_key = res.id
+    this._state.my_key = res.id
     
-    return this._my_key
+    return this._state.my_key
   }
 
   async _loadStatus() {
@@ -455,7 +466,7 @@ export default class ItemsStore {
       //
       // Author can't be changed, so we check it only if old object doesn't exist
       //
-      if (old === undefined && item.author === this._my_key) {
+      if (old === undefined && item.author === this.my_key) {
         status.artist++
       }
 
@@ -485,11 +496,11 @@ export default class ItemsStore {
       // Artist & sold
       //
       // TODO!!!: check how first sale works
-      if (old != undefined && old.author == this._my_key && !!old.first_sale) {
+      if (old != undefined && old.author == this.my_key && !!old.first_sale) {
         status.artist_sold--
       }
 
-      if (item.author == this._my_key && !!item.first_sale) {
+      if (item.author == this.my_key && !!item.first_sale) {
         status.artist_sold++
       }
 
