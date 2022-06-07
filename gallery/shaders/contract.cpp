@@ -51,7 +51,6 @@ BEAM_EXPORT void Ctor(const method::Init& r) {
         ContractState s(false);
         _POD_(s).SetZero();
         _POD_(s.config) = r.config;
-        s.rate_limit = static_cast<Height>(-1);
         s.Save();
     }
 }
