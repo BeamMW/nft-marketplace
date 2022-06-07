@@ -1540,8 +1540,38 @@ ON_METHOD(user, buy) {
     fc.m_Amount = nft.price.amount;
     fc.m_Aid = nft.price.aid;
 
-    Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
-                        1, "Buy item", 1795645);
+    Height cur_height = Env::get_Height();
+
+    const uint32_t kSlotNonceKey = 0;
+    const uint32_t kSlotKrnNonce = 1;
+    const uint32_t kSlotKrnBlind = 2;
+
+    PubKey krn_blind;
+    PubKey full_nonce;
+    Secp::Point p0, p1;
+    p0.FromSlot(kSlotKrnBlind);
+    p0.Export(krn_blind);
+
+    p0.FromSlot(kSlotKrnNonce);
+    p1.FromSlot(kSlotNonceKey);
+    p0 += p1;
+    p0.Export(full_nonce);
+
+    Secp_scalar_data e;
+    Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
+                                &args.user, 1, "Buy item", 1795645, cur_height,
+                                cur_height + 5, krn_blind, full_nonce, e,
+                                kSlotKrnBlind, kSlotKrnNonce, &e);
+    Secp::Scalar s;
+    s.Import(e);
+    Env::KeyID kid(&km, sizeof(km));
+    kid.get_Blind(s, s, kSlotNonceKey);
+    s.Export(e);
+
+    Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
+                                &args.user, 1, "Buy item", 1795645, cur_height,
+                                cur_height + 5, krn_blind, full_nonce, e,
+                                kSlotKrnBlind, kSlotKrnNonce, nullptr);
 }
 
 ON_METHOD(user, view_balance) {
