@@ -166,17 +166,14 @@
             left: 50%
             transform: translate(-50%, -30%)
             display: flex
-            align-items: center
             justify-content: center
+            align-items: center
 
             .avatar {
               height: 136px
               width: 136px
               background-color: rgba(26, 246, 214, 0.1)
               border-radius: 68px
-              left: 6px
-              top: 5px
-              position: absolute
 
               .text {
                 height: 100%

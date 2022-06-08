@@ -21,13 +21,14 @@
                    height="135px"
                    cover
           />
-          <preview class="avatar"
-                   :image="item.avatar" 
-                   :default="def_avatar"
-                   width="120px"
-                   height="120px"
-                   radius="120px"
-          />
+          <div class="ellipse" :style="ellipse_style">
+            <preview :image="item.avatar" 
+                     :default="def_avatar"
+                     width="120px"
+                     height="120px"
+                     radius="120px"
+            />
+          </div>
         </div>
         <div>{{ item.label }}</div>
         <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
@@ -101,10 +102,17 @@
         position: relative
         box-sizing: border-box
 
-        .avatar {
+        .ellipse {
           position: absolute
           left: 164px
           top: 81px
+          border-radius: 74px
+          width: 132px
+          height: 132px
+          background-color: orange
+          display: flex
+          justify-content: center
+          align-items: center
         }
       }
     }
@@ -136,6 +144,14 @@ export default {
     return {
       def_banner: def_images.artist_banner,
       def_avatar: def_images.artist_avatar
+    }
+  },
+
+  computed: {
+    ellipse_style() {
+      return {
+        'background-color': '#232323'
+      }
     }
   },
 
