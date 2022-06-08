@@ -3,12 +3,13 @@
        height="36px" 
        width="36px" 
        :disabled="in_set_artist"
+       :color="edit_btn_color"
        padding="0px" 
        radius="10px" 
        tooltip="edit artist info"
        @click="onEditArtist"
   >
-    <img src="~assets/pencil.svg">
+    <img :src="edit_btn_icon">
   </btn>
   <btn v-else
        height="36px" 
@@ -38,6 +39,16 @@ export default {
     },
     in_set_artist() {
       return !!artistsStore.artist_tx
+    },
+    edit_btn_color() {
+      if (artistsStore.self.approved) return 'transparent'
+      if (artistsStore.self.pending) return '#ed69ff'
+      return 'red'
+    },
+    edit_btn_icon() {
+      if (artistsStore.self.approved) return require('assets/pencil.svg')
+      if (artistsStore.self.pending) return require('assets/pencil-blue.svg')
+      return require('assets/pencil-blue.svg')
     }
   },
 

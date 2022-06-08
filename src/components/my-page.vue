@@ -5,6 +5,18 @@
       <btnWallet/>
       <btnKey/>
     </pageTitle>
+    <p v-if="self_pending" class="description pending">
+      <i>
+        Your account is pending for approval by moderator.<br>
+        Artist name and pictures would not be shown in gallery. Approved NFTs and Collections would still be shown in gallery.
+      </i>
+    </p>
+    <p v-if="self_rejected" class="description rejected">
+      <i>
+        Your account is rejected by moderator. Edit your profile to resubmit for approval.<br>
+        Artist name and pictures would not be shown in gallery. Approved NFTs and Collections would still be shown in gallery.
+      </i>
+    </p>
     <div class="gallery-container">
       <tabsctrl v-model="active_tab" :tabs="tabs"/>
       <list v-if="show_collections"
@@ -54,6 +66,28 @@
     height: 100%
     display: flex
     flex-direction: column
+
+    .description {
+      font-size: 14px
+      text-align: center
+      margin: 0px 0px 10px 0px
+      font-family: 'SFProDisplay', sans-serif
+
+      &.pending {
+        color: #ed69ff
+        opacity: 0.8
+      }
+
+      &.rejected {
+        color: #ff746b
+        opacity: 0.8
+      }
+
+      & > i {
+        display: block
+        margin-top: 6px
+      }
+    }
 
     & > .gallery-container {
       flex: 1
@@ -145,6 +179,12 @@ export default {
 
       res.push({id: my_tabs.LIKED_NFTS, name: 'Liked by Me'})
       return res
+    },
+    self_pending () {
+      return artistsStore.self.pending
+    },
+    self_rejected () {
+      return artistsStore.self.rejected
     }
   }
 }

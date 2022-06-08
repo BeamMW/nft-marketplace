@@ -143,6 +143,11 @@ class ArtistsStore {
       item.data = formats.fromContract(item.data, versions.ARTIST_VERSION)
       item = this.fromContract(item)
       item = this.fromDB(item)
+
+      item.approved = (item.status === 'approved') ? 1 : 0 
+      item.pending  = (item.status === 'pending') ? 1 : 0
+      item.rejected = (!item.aproved && !item.pending) ? 1 : 0
+      
       this._setArtist(id, item)
 
       if (this._global.debug) {
