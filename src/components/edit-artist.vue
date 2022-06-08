@@ -29,7 +29,7 @@
                    label="Website"
                    placeholder="https://website.name/"
                    img="globe"
-                   :max_length="250"
+                   :max_length="150"
                    :valid="website_valid"
                    :readonly="in_set_artist"
         />
@@ -315,7 +315,7 @@ export default {
     },
     website_valid() {
       let value = this.website
-      return !value || (value.length <= 250 && validators.url(value))
+      return !value || (value.length <= 150 && validators.url(value))
     },
     twitter_allowed() {
       return validators.twitter_allowed()

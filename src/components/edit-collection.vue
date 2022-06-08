@@ -28,7 +28,7 @@
                    label="Website"
                    placeholder="https://website.name/"
                    img="globe"
-                   :max_length="40"
+                   :max_length="150"
                    :valid="website_valid"
         />
         <formInput v-model="twitter"
@@ -217,7 +217,7 @@ export default {
     website_valid() {
       let value = this.website
       if (!value) return true
-      return validators.url(value)
+      return value.length <= 150 && validators.url(value)
     },
     twitter: {
       get () {
