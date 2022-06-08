@@ -390,17 +390,12 @@ export default class ItemsStore {
       // item would be written to database
       // we add some calculated props for convenience
       //
-    
-      // convert owned to bool. Not all objects have it
-      if (Object.prototype.hasOwnProperty.call(item, 'owned')) {
-        item.owned = !!item.owned 
-      }
       
       item.liked = item.impressions ? 1 : 0
       item.sale  = (item.price || {}).amount > 0 ? 1 : 0
-      item.approved = (item.status === 'approved') 
-      item.pending  = (item.status === 'pending')
-      item.rejected = (item.status !== 'approved' && item.status !== 'pending')
+      item.approved = (item.status === 'approved') ? 1 : 0 
+      item.pending  = (item.status === 'pending') ? 1 : 0
+      item.rejected = (item.status !== 'approved' && item.status !== 'pending') ? 1 : 0
 
       try {
         if (!item.label) {
