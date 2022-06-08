@@ -34,8 +34,8 @@
           <addImage v-model="image"
                     :error="image_valid ? '' : 'image cannot be larger than 250kb'"
                     class="add-image"
-                    accept="image/*"
-                    title="Add NFT here<br>(any image, including animated)"
+                    accept="image/apng;image/gif;image/jpeg;image/png;image/svg+xml;image/webp"
+                    title="Add NFT image here<br>(*.apng, *.gif, *.jpeg, *.png, *.svg, *.webp)"
                     height="390px"
                     width="390px"
                     contain

@@ -1,5 +1,4 @@
 <template>
-  <maxsizeModal ref="maxsizeModal"/>
   <div class="container">
     <template v-if="edit_self">
       <pageTitle title="Edit your Artist"/>
@@ -30,7 +29,7 @@
                    label="Website"
                    placeholder="https://website.name/"
                    img="globe"
-                   :max_length="40"
+                   :max_length="250"
                    :valid="website_valid"
                    :readonly="in_set_artist"
         />
@@ -65,29 +64,30 @@
         <div class="uploads-container" style="margin-top:45px;">
           <addImage v-model="banner"
                     accept="image/jpeg;image/png;image/svg+xml"
-                    title="Add an artist banner<br>(*.jpg, *.png, *.svg)"  
+                    title="Add an artist banner<br>(*.jpg, *.png, *.svg)<br>&nbsp;"  
                     height="135px"
                     cover
                     :readonly="in_set_artist" 
                     :error="banner_valid ? '' : ' '"
           />
-          <img src="~assets/elipse.svg" alt="avatar" class="elipse"/>
-          <div class="avatar" :style="avatarStyles" :readonly="in_set_artist">
-            <div v-if="avatar && !in_set_artist" class="remove">
-              <img src="~assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
+          <div class="ellipse" :style="ellipse_style">
+            <div class="avatar" :style="avatar_style" :readonly="in_set_artist">
+              <div v-if="avatar && !in_set_artist" class="remove">
+                <img src="~assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
+              </div>
+              <img v-if="avatar && avatar.object" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
+              <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image<br>(*.jpeg, *.png, *.svg)</label>
+              <input v-if="!in_set_artist" id="avatar"
+                     ref="avatar"
+                     type="file"
+                     accept="image/jpeg;image/png;image/svg+xml"  
+                     class="files"
+                     @change="onUploadAvatar"
+              />
             </div>
-            <img v-if="avatar && avatar.object" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-            <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image</label>
-            <input v-if="!in_set_artist" id="avatar"
-                   ref="avatar"
-                   type="file"
-                   accept="image/jpeg;image/png;image/svg+xml"  
-                   class="files"
-                   @change="onUploadAvatar"
-            />
           </div>
           <div v-if="!avatar_valid || !banner_valid" class="error_msg">
-            <p class="error">image cannot be larger than 250kb</p>
+            <p class="error">image cannot be larger than {{ max_image_size }}</p>
           </div>
         </div>
       </div>
@@ -158,72 +158,75 @@
         .uploads-container {
           position: relative
 
-          .elipse {
-            position: absolute
+          .ellipse {
+            border-radius: 74px
+            width: 150px
+            height: 150px
+            position: relative
             left: 50%
             transform: translate(-50%, -30%)
-            filter: grayscale(100%) brightness(0%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8)
-          }
-
-          .avatar {
             display: flex
             align-items: center
             justify-content: center
-            height: 120px
-            width: 120px
-            background-color: rgba(26, 246, 214, 0.1)
-            border-radius: 9999px
-            position: relative
-            left: 50%
-            transform: translate(-50%, -26%)
 
-            .text {
-              height: 100%
-              display: flex
-              justify-content: center
-              align-items: center
-              font-size: 14px
-              color: #1af6d6
-              cursor: pointer
+            .avatar {
+              height: 136px
+              width: 136px
+              background-color: rgba(26, 246, 214, 0.1)
+              border-radius: 68px
+              left: 6px
+              top: 5px
+              position: absolute
+
+              .text {
+                height: 100%
+                display: flex
+                justify-content: center
+                align-items: center
+                font-size: 14px
+                color: #1af6d6
+                cursor: pointer
+
+                &[readonly] {
+                  opacity: 0.6
+                }
+              }
 
               &[readonly] {
                 opacity: 0.6
               }
-            }
 
-            &[readonly] {
-              opacity: 0.6
-            }
+              .remove {
+                background-color: rgba(0, 0, 0, 0.7)
+                position: absolute
+                left: 50%
+                top: 50%
+                transform: translate(-50%,-50%)
+                z-index: 2
+                border-radius: 9999px
+                padding: 7px 7px 3px 7px
+                cursor: pointer
+              }
 
-            .remove {
-              background-color: rgba(0, 0, 0, 0.7)
-              position: absolute
-              left: 50%
-              top: 50%
-              transform: translate(-50%,-50%)
-              z-index: 2
-              border-radius: 9999px
-              padding: 7px 7px 3px 7px
-              cursor: pointer
-            }
-
-            .files {
-              visibility:hidden
-              width: 0
-            }
-          
-            .image {
-              width: 100%
-              height: 100%
-              object-fit: cover
-              border-radius: 9999px
-              border: 1px dashed transparent
+              .files {
+                visibility:hidden
+                width: 0
+              }
+            
+              .image {
+                width: 100%
+                height: 100%
+                object-fit: cover
+                border-radius: 9999px
+                border: 1px dashed transparent
+              }
             }
           }
         
           .error_msg {
             text-align: center
-            margin-top: -16px
+            margin-top: -42px
+            margin-bottom: 26px
 
             .error {
               font-style: italic
@@ -249,7 +252,6 @@
 </style>
 
 <script>
-import maxsizeModal from 'components/maxsize-modal'
 import formInput from 'controls/form-input'
 import textArea from 'controls/textarea'
 import pageTitle from 'controls/page-title'
@@ -258,11 +260,11 @@ import addImage from 'controls/add-image'
 import artistsStore from 'stores/artists'
 import validators from 'utils/validators'
 import router from 'router'
+import utils from 'utils/utils'
 import {common} from 'utils/consts'
 
 export default {
   components: {
-    maxsizeModal,
     formInput, 
     textArea, 
     pageTitle,
@@ -297,18 +299,23 @@ export default {
     edit_self () {
       return !!(this.id === artistsStore.my_id && artistsStore.is_artist)
     },
-    avatarStyles() {
+    avatar_style() {
       return {
         'border' :  this.avatar ? '1px dashed transparent' : (this.in_set_artist ? '1px dashed rgba(26, 246, 214, 0.7)' : '1px dashed #1AF6D6'),
       }
     },
+    ellipse_style() {
+      return {
+        'background-color': utils.getStyles().background_main
+      }
+    },
     label_valid() {
       let value = this.label
-      return !value || value.length <= 100
+      return !value || value.length <= 25
     },
     website_valid() {
       let value = this.website
-      return !value || validators.url(value)
+      return !value || (value.length <= 250 && validators.url(value))
     },
     twitter_allowed() {
       return validators.twitter_allowed()
@@ -408,7 +415,10 @@ export default {
       set (val) {
         this.avatar_ = val
       }
-    }
+    },
+    max_image_size() {
+      return utils.formatBytes(common.MAX_IMAGE_SIZE)
+    },
   },
 
   methods: {    
@@ -422,12 +432,6 @@ export default {
     },
 
     onUploadAvatar(e) {
-      let file = e.target.files[0]
-      if (file.size > common.MAX_IMAGE_SIZE) {
-        this.$refs.avatar.value = ''
-        this.$refs.maxsizeModal.open()
-        return
-      }
       this.loadImage(e, (object, file) => {
         this.avatar_ = {object, file}
       })

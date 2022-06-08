@@ -1,5 +1,4 @@
 <template>
-  <maxsizeModal ref="maxsizeModal"/>
   <div :style="ctrlStyle">
     <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (modelValue || {}).error}">
       <div v-if="modelValue && !readonly" class="remove">
@@ -91,14 +90,7 @@
 </style>
 
 <script>
-import {common} from 'utils/consts'
-import maxsizeModal from 'components/maxsize-modal'
-
 export default {
-  components: {
-    maxsizeModal
-  },
-
   props: {
     // eslint-disable-next-line vue/prop-name-casing
     modelValue: {
@@ -190,11 +182,6 @@ export default {
     },
     onUpload (e) {
       let file = e.target.files[0]
-      if (file.size > common.MAX_IMAGE_SIZE) {
-        this.$refs.image.value = ''
-        this.$refs.maxsizeModal.open()
-        return
-      }
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
