@@ -210,7 +210,6 @@ const store = {
     if (this.state.loading) {
       this.state.loading = 'Loading NFTs'
     }
-
     await nftsStore.loadAsync()
 
     if (this.state.loading) { 
