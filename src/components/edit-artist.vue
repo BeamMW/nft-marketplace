@@ -1,4 +1,5 @@
 <template>
+  <maxsizeModal ref="maxsizeModal"/>
   <div class="container">
     <template v-if="edit_self">
       <pageTitle title="Edit your Artist"/>
@@ -175,7 +176,6 @@
             position: relative
             left: 50%
             transform: translate(-50%, -26%)
-            cursor:pointer
 
             .text {
               height: 100%
@@ -249,6 +249,7 @@
 </style>
 
 <script>
+import maxsizeModal from 'components/maxsize-modal'
 import formInput from 'controls/form-input'
 import textArea from 'controls/textarea'
 import pageTitle from 'controls/page-title'
@@ -257,9 +258,11 @@ import addImage from 'controls/add-image'
 import artistsStore from 'stores/artists'
 import validators from 'utils/validators'
 import router from 'router'
+import {common} from 'utils/consts'
 
 export default {
   components: {
+    maxsizeModal,
     formInput, 
     textArea, 
     pageTitle,
@@ -419,6 +422,12 @@ export default {
     },
 
     onUploadAvatar(e) {
+      let file = e.target.files[0]
+      if (file.size > common.MAX_IMAGE_SIZE) {
+        this.$refs.avatar.value = ''
+        this.$refs.maxsizeModal.open()
+        return
+      }
       this.loadImage(e, (object, file) => {
         this.avatar_ = {object, file}
       })
