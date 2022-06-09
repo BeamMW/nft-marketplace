@@ -59,11 +59,13 @@
                   :max_length="1000"
         />
         <addImage v-model="cover"
+                  v-model:error="cover_error"
                   title="Add collection image<br>(*.jpg, *.png, *.svg)"
                   accept="image/jpeg;image/png;image/svg+xml"
                   height="135px"
+                  :min_width="914"
+                  :min_height="170"
                   cover
-                  :error="cover_valid ? '' : 'image cannot be larger than 250kb'"
         />
       </div>
     </div>
@@ -189,7 +191,8 @@ export default {
       twitter_: undefined,
       instagram_: undefined,
       description_: undefined,
-      cover_: undefined
+      cover_: undefined,
+      cover_error: undefined,
     }
   },
 
@@ -276,7 +279,7 @@ export default {
       }
     },
     cover_valid() {
-      return !this.cover || validators.image(this.cover)
+      return !this.cover || !this.cover_error
     },
     can_submit () {
       return this.label && this.label_valid &&

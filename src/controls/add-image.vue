@@ -1,23 +1,23 @@
 <template>
   <div :style="ctrlStyle">
     <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (modelValue || {}).error}">
-      <div v-if="modelValue && !readonly" class="remove">
+      <div v-if="modelValue && !readonly" class="remove" :style="remove_style">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
-      <img v-if="modelValue && modelValue.object" :src="modelValue.object" alt="avatar" class="image" :style="image_style"/>
+      <img v-if="modelValue && modelValue.object" ref="image" :src="modelValue.object" class="image" :style="image_style" @load="onLoad"/>
       <div v-if="modelValue && modelValue.loading" class="text" :readonly="readonly">Loading...</div>
       <div v-if="modelValue && modelValue.error" class="text" :readonly="readonly">Failed to load image</div>
-      <label v-if="!modelValue" class="text" for="image" :readonly="readonly" v-html="title"/>
+      <label v-if="!modelValue" class="text" :for="input_id" :readonly="readonly" v-html="title"/>
       <input v-if="!readonly"
-             id="image"
-             ref="image"
+             :id="input_id"
+             ref="input"
              type="file"
              class="files"
              :accept="accept"
              @change="onUpload"
       />
     </div>
-    <div v-if="error" class="error">
+    <div v-if="error && show_error" class="error">
       {{ error }}
     </div>
   </div>
@@ -30,7 +30,6 @@
     justify-content: center
     position:relative
     background-color: rgba(26, 246, 214, 0.1)
-    border-radius: 10px
     height: 100%
 
     &[readonly] {
@@ -41,17 +40,23 @@
       background-color: rgba(0, 0, 0, 0.7)
       position: absolute
       z-index: 2
-      top: 20px
-      right: 20px
       border-radius: 9999px
-      padding: 7px 7px 3px 7px
       cursor: pointer
+      width: 34px
+      height: 34px
+      display: flex
+      align-items: center
+      justify-content: center
+
+      &>img {
+        width: 20px
+        height: 20px
+      }
     }
 
     .image {
       width: 100%
       height: 100%
-      border-radius: 10px
       border: 1px dashed transparent
     }
     
@@ -90,6 +95,9 @@
 </style>
 
 <script>
+import utils from 'utils/utils'
+import {common, genUniqueID} from 'utils/consts'
+
 export default {
   props: {
     // eslint-disable-next-line vue/prop-name-casing
@@ -97,6 +105,11 @@ export default {
       type: Object,
       required: false,
       default: undefined
+    },
+    error: {
+      type: String,
+      required: false,
+      default:undefined
     },
     height: {
       type: String,
@@ -108,15 +121,20 @@ export default {
       required: false,
       default: ''
     },
+    min_height: {
+      type: Number,
+      required: false,
+      default: undefined
+    },
+    min_width: {
+      type: Number,
+      required: false,
+      default: undefined
+    },
     title: {
       type: String,
       default: '',
       required: true
-    },
-    error: {
-      type: String,
-      default: '',
-      required: false
     },
     readonly: {
       type: Boolean,
@@ -135,12 +153,27 @@ export default {
     cover: {
       type: Boolean,
       default: false
-    }
+    },
+    show_error: {
+      type: Boolean,
+      default: true
+    },
+    rounded: {
+      type: Boolean,
+      default: false
+    },
   },
 
   emits: [
-    'update:modelValue'
+    'update:modelValue',
+    'update:error'
   ],
+
+  data() {
+    return {
+      input_id: genUniqueID()
+    }
+  },
 
   computed: {
     ctrlStyle() {
@@ -159,10 +192,13 @@ export default {
     borderStyle() {
       return {
         'border': this.modelValue ? '1px dashed transparent' : '1px dashed #1AF6D6',
+        'border-radius': this.rounded ? `${parseInt(this.height)/2}px` : '10px'
       }
     },
     image_style() {
-      let res = {}
+      let res = {
+        'border-radius': this.rounded ? `${parseInt(this.height)/2}px` : '10px'
+      }
       
       if (this.cover) {
         res['object-fit'] = 'cover'
@@ -173,12 +209,25 @@ export default {
       }
 
       return res
-    }
+    },
+    remove_style() {
+      if (this.rounded) {
+        return {
+          'left': `${parseInt(this.height)/2-17}px`,
+          'top': `${parseInt(this.height)/2-17}px`
+        }
+      }
+      return {
+        'top': '20px',
+        'right': '20px'
+      }
+    },
   },
   methods: {
     onRemove () {
-      this.$refs.image.value = ''
+      this.$refs.input.value = ''
       this.$emit('update:modelValue', null)
+      this.$emit('update:error', null)
     },
     onUpload (e) {
       let file = e.target.files[0]
@@ -190,6 +239,40 @@ export default {
           file
         })
       }
+    },
+    onLoad() {
+      console.log('!!!!Image', this.modelValue)
+      //
+      // Check file size
+      //
+      let file = this.modelValue.file
+      if (file) {
+        if (file.size >= common.MAX_IMAGE_SIZE) {
+          let error = `Image size must be less than ${utils.formatBytes(common.MAX_IMAGE_SIZE)}`
+          this.$emit('update:error', error)
+          return
+        }
+      }
+
+      //
+      // Check image size
+      //
+      if (this.min_width || this.min_height) {
+        let type = file ? file.type : this.modelValue.mime_type
+        if (type !== 'image/svg+xml') {
+          let werr = this.min_width && this.$refs.image.naturalWidth < this.min_width
+          let herr = this.min_height && this.$refs.image.naturalHeight < this.min_height
+          if (werr || herr) {
+            this.$emit('update:error', `Image size must be at least ${this.min_width}x${this.min_height}px`) 
+            return
+          }
+        }
+      }
+
+      //
+      // Everything is OK
+      //
+      this.$emit('update:error', undefined)
     }
   }
 }

@@ -49,3 +49,9 @@ export const def_images = {
   artist_banner: require('assets/artist-default-banner.svg'),
   nft: require('assets/nft-default.svg')
 }
+
+let uniqueID = 0
+export function genUniqueID () {
+  uniqueID++
+  return `id-${uniqueID}`
+}

@@ -64,31 +64,33 @@
         />
         <div class="uploads-container" style="margin-top:45px;">
           <addImage v-model="banner"
+                    v-model:error="banner_error"
                     accept="image/jpeg;image/png;image/svg+xml"
                     title="Add an artist banner<br>(*.jpg, *.png, *.svg)<br>&nbsp;"  
                     height="135px"
                     cover
+                    :show_error="false"
+                    :min_width="914"
+                    :min_height="170"
                     :readonly="in_set_artist" 
-                    :error="banner_valid ? '' : ' '"
           />
           <div class="ellipse" :style="ellipse_style">
-            <div class="avatar" :style="avatar_style" :readonly="in_set_artist">
-              <div v-if="avatar && !in_set_artist" class="remove">
-                <img src="~assets/remove.svg" alt="remove avatar" @click="onRemoveAvatar"/>
-              </div>
-              <img v-if="avatar && avatar.object" :src="avatar.object" alt="avatar" class="image" :class="{'error': !avatar_valid}"/>
-              <label v-if="!avatar" class="text" :readonly="in_set_artist" for="avatar">Add an artist image<br>(*.jpeg, *.png, *.svg)</label>
-              <input v-if="!in_set_artist" id="avatar"
-                     ref="avatar"
-                     type="file"
-                     accept="image/jpeg;image/png;image/svg+xml"  
-                     class="files"
-                     @change="onUploadAvatar"
-              />
-            </div>
+            <addImage v-model="avatar"
+                      v-model:error="avatar_error"
+                      accept="image/jpeg;image/png;image/svg+xml"
+                      title="Add an artist image<br>(*.jpeg, *.png, *.svg)"
+                      height="136px"
+                      width="136px"
+                      cover
+                      rounded
+                      :show_error="false"
+                      :min_width="136"
+                      :min_height="136"
+                      :readonly="in_set_artist" 
+            />  
           </div>
           <div v-if="!avatar_valid || !banner_valid" class="error_msg">
-            <p class="error">image cannot be larger than {{ max_image_size }}</p>
+            <p class="error">{{ banner_error || avatar_error }}</p>
           </div>
         </div>
       </div>
@@ -226,7 +228,7 @@
             margin-top: -42px
             margin-bottom: 26px
 
-            .error {
+            & > p {
               font-style: italic
               font-size: 12px
               font-weight: 400
@@ -288,7 +290,9 @@ export default {
       instagram_: undefined,
       about_: undefined,
       banner_: undefined,
-      avatar_: undefined
+      banner_error: undefined,
+      avatar_: undefined,
+      avatar_error: undefined
     }
   },
 
@@ -336,7 +340,7 @@ export default {
       return !value || value.length <= 75
     },
     banner_valid() {
-      return !this.banner || validators.image(this.banner)
+      return !this.banner || !this.banner_error
     },
     avatar_valid() {
       return !this.avatar || validators.image(this.avatar)
@@ -422,26 +426,6 @@ export default {
   },
 
   methods: {    
-    loadImage(e, cback) {
-      let file = e.target.files[0]
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = (e) => {
-        cback(e.target.result, file)
-      }
-    },
-
-    onUploadAvatar(e) {
-      this.loadImage(e, (object, file) => {
-        this.avatar_ = {object, file}
-      })
-    },
-    
-    onRemoveAvatar() {
-      this.avatar_ = null
-      this.$refs.avatar.value = ''
-    },
-
     async onSetArtist() {
       try {
         let data = {

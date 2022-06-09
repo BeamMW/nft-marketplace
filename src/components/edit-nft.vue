@@ -32,12 +32,14 @@
         </div>
         <div class="col-second">
           <addImage v-model="image"
-                    :error="image_valid ? '' : 'image cannot be larger than 250kb'"
+                    v-model:error="image_error"
                     class="add-image"
                     accept="image/apng;image/gif;image/jpeg;image/png;image/svg+xml;image/webp"
                     title="Add NFT image here<br>(*.apng, *.gif, *.jpeg, *.png, *.svg, *.webp)"
                     height="390px"
                     width="390px"
+                    :min_width="360"
+                    :min_height="360"
                     contain
           />
         </div>
@@ -111,7 +113,6 @@ import priceInput from 'controls/price-input'
 import switchInput from 'controls/switch-input'
 import formSelect from 'controls/form-select'
 import loading from 'controls/loading'
-import validators from 'utils/validators'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import router from 'router'
@@ -166,6 +167,7 @@ export default {
       name: '',
       description: '',
       image: undefined,
+      image_error: undefined,
       price: '',
       dontsell: true,
       collection: 0
@@ -181,13 +183,10 @@ export default {
       let value = this.description
       return !value || value.length <= 300
     },
-    image_valid() {
-      return !this.image || validators.image(this.image)
-    },
     can_submit () {
       return this.name && this.name_valid &&
              this.description_valid &&
-             this.image && this.image_valid
+             this.image && !this.image_error
     }
   },
 

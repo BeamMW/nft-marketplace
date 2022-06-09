@@ -1,3 +1,4 @@
+import utils from 'utils/utils'
 import {common} from 'utils/consts'
 
 export default class Validators {
@@ -31,12 +32,37 @@ export default class Validators {
   }
 
   static image (image) {
-    if (!image) return false
+    return !Validators.image_error(image)
+  }
 
-    if (image.file) {
-      return image.file.size <= common.MAX_IMAGE_SIZE
+  static image_error(image, minw, minh) {
+    if (!image) return 'Image cannot be empty'
+
+    if (image.error) {
+      return image.error.toString()
     }
 
-    return image.ipfs_hash
+    if (image.file) {
+      if(image.file.size >= common.MAX_IMAGE_SIZE) {
+        return `Image size must be less than ${utils.formatBytes(common.MAX_IMAGE_SIZE)}`
+      }
+    }
+
+    if (minw && minh) {
+      if (!image.object) {
+        return 'Image is not loaded'
+      }
+      
+      console.log(minw, minh, image.object)
+      if (image.object.width < minw || image.object.height < minh) {
+        return `Image size must be at least ${minw}x${minh}px`
+      }
+    } 
+
+    if (!image.file && !image.object) {
+      return 'Image doesn\'t contain data'
+    }
+
+    return ''
   }
 }
