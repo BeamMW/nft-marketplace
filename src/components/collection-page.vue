@@ -10,7 +10,7 @@
         <div class="left">
           <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
-            <span class="name">{{ author_name }}</span>
+            <span class="name">{{ author_name }} {{ safe }}</span>
             <span class="about">{{ author_about }}</span>
           </div>
         </div>
@@ -85,25 +85,25 @@
           class="list"
           items_name="NFTs"
           component="nft"
-          :new_component="owned ? 'create-nft' : ''"
+          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
           :new_component_props="{'selected_collection': id}"
-          :mode="`artist:collection:${id}`"
+          :mode="`${safe_mode}:collection:${id}`"
           :store="nftsStore"
     />
     <list v-if="show_sale"
           class="list"
           items_name="NFTs"
           component="nft"
-          :new_component="owned ? 'create-nft' : ''"
-          :mode="`artist:collection:sale:${id}`"
+          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+          :mode="`${safe_mode}:collection:sale:${id}`"
           :store="nftsStore"
     />
     <list v-if="show_liked"
           class="list"
           items_name="NFTs"
           component="nft"
-          :new_component="owned ? 'create-nft' : ''"
-          :mode="`artist:collection:liked:${id}`"
+          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+          :mode="`${safe_mode}:collection:liked:${id}`"
           :store="nftsStore"
     />
   </div>
@@ -276,6 +276,7 @@ import loading from 'controls/loading'
 import notFound from 'controls/not-found'
 import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
+import aritstsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
 import utils from 'utils/utils'
 import {coll_tabs, def_images} from 'utils/consts'
@@ -297,6 +298,10 @@ export default {
       type: Number,
       required: true
     },
+    mode: {
+      type: String,
+      default: 'user'
+    }
   },
 
   setup (props) {
@@ -326,19 +331,31 @@ export default {
       return this.collection.owned
     },
     title () {
-      return this.collection && !this.collection.error ? this.collection.label : ''
-    },
-    cover() {
-      return this.collection.cover
+      if (!this.collection) return 'Loading...'
+      if (this.collection.error) return 'Failed to load collection'
+      return this.show_safe ? this.collection.safe_label : this.collection.label
     },
     avatar() {
-      return this.collection.avatar
+      return this.collection.safe_avatar
+    },
+    show_safe () {
+      if (this.mode === 'artist' && this.collection.author === aritstsStore.my_key) return false
+      return true
+    },
+    safe_mode () {
+      return this.show_safe ? 'user' : this.mode
+    },
+    approved () {
+      return this.collection.approved
+    },
+    cover() {
+      return this.show_safe ? this.collection.safe_cover : this.collection.cover
     },
     author_name() {
-      return this.collection.author_name
+      return this.show_safe ? this.collection.safe_author_name : this.collection.author_name
     },
     author_about() {
-      return this.collection.author_about
+      return this.show_safe && this.approved ? '' : this.collection.author_about
     },
     author_key() {
       return this.collection.author
@@ -347,16 +364,31 @@ export default {
       return this.collection.author_error
     },
     instagram() {
+      if (this.show_safe) {
+        if (this.approved && this.collection.instagram) return this.collection.instagram
+        if (this.collection.author_approved && this.collection.author_instagram) return this.collection.author_instagram
+        return undefined
+      }
       return this.collection.instagram || this.collection.author_instagram
     },
     twitter() {
+      if (this.show_safe) {
+        if (this.approved && this.collection.twitter) return this.collection.twitter
+        if (this.collection.author_approved && this.collection.author_twitter) return this.collection.author_twitter
+        return undefined
+      }
       return this.collection.twitter || this.collection.author_twitter
     },
     website() {
+      if (this.show_safe) {
+        if (this.approved && this.collection.website) return this.collection.website
+        if (this.collection.author_approved && this.collection.author_website) return this.collection.author_website
+        return undefined
+      }
       return this.collection.website || this.collection.author_website
     },
     description() {
-      return this.collection.description
+      return this.show_safe ? this.collection.safe_description : this.collection.description
     },
     nfts_count() {
       return this.collection.artworks_count
@@ -422,7 +454,7 @@ export default {
       this.$store.openInstagram(this.instagram)
     },
     onTwitter() {
-      this.$store.openUrl(this.twitter)
+      this.$store.openTwitter(this.twitter)
     },
     onWebsite() {
       this.$store.openUrl(this.website)

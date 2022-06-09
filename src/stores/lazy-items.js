@@ -592,11 +592,14 @@ export default class ItemsStore {
     })
   }
 
-  toDetails(id) {
+  toDetails(id, mode) {
     router.push({
       name: this._objname,
       params: {
         id
+      },
+      query: {
+        mode
       }
     })
   }

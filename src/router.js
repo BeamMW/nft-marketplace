@@ -25,7 +25,17 @@ const router = createRouter({
         return route.params.collid ? {collid: Number(route.params.collid)} : {}
       }
     },
-    {path: '/collection/:id', component: collectionPage, name: 'collection', props: (route) => {return {id: Number(route.params.id)}}},
+    {
+      path: '/collection/:id', 
+      component: collectionPage, 
+      name: 'collection', 
+      props: (route) => {
+        return {
+          id: Number(route.params.id),
+          mode: route.query.mode
+        }
+      }
+    },
     {path: '/moderator', component: moderatorPage, name: 'moderator'} 
   ]
 })

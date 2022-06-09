@@ -11,7 +11,7 @@
     </preview>
     <div class="info-row">  
       <div class="avatar" :class="{'error': item.author_error}">
-        <preview :image="item.avatar" 
+        <preview :image="avatar" 
                  :show_text="false"
                  :default="def_avatar"
                  width="72px" 
@@ -21,7 +21,7 @@
       </div>
       <div class="text">
         <div class="label" :class="{'error': item.error}">{{ coll_name }}</div>
-        <div class="author" :class="{'error': item.author_error}" v-html="item.by_author"></div>
+        <div class="author" :class="{'error': item.author_error}" v-html="by_author"></div>
         <div class="description">{{ item.description }}</div>
         <hr class="line"/>
         <div class="items-info" :class="{'error': item.error}">
@@ -118,6 +118,7 @@ import amount from 'controls/amount'
 import moderationStatus from 'controls/moderation-status'
 import btnEdit from 'controls/btn-edit'
 import collsStore from 'stores/collections'
+import artistsStore from 'stores/artists'
 import {def_images} from 'utils/consts'
 
 export default {
@@ -132,6 +133,10 @@ export default {
     item: {
       type: Object,
       required: true,
+    },
+    mode: {
+      type: String,
+      default: 'user'
     }
   },
 
@@ -144,13 +149,19 @@ export default {
 
   computed: {
     coll_name () {
-      return [this.$state.debug ? `[${this.item.id}] - ` : '', this.item.label].join('')
+      return this.item.label
     },
+    avatar() {
+      return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.avatar : this.item.safe_avatar
+    },
+    by_author() {
+      return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.by_author : this.item.safe_by_author
+    }
   },
 
   methods: {
     onDetails (ev) {
-      collsStore.toDetails(this.item.id)
+      collsStore.toDetails(this.item.id, this.mode)
     }
   }
 }

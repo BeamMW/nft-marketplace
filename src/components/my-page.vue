@@ -26,6 +26,7 @@
             new_component="create-collection"
             mode="artist"
             :store="collsStore"
+            :component_props="{'mode': 'artist'}"
       />
       <list v-if="show_owned"
             class="list"

@@ -30,10 +30,24 @@ class CollectionsStore extends LazyItems {
       return author.label
     }) 
 
+    coll.safe_author_name = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      if (author.approved) return author.label
+      return '[author is in moderation]' 
+    }) 
+
     coll.by_author = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
       return `by <span style="color:#00f6d2">${author.label}</span>`
+    })
+
+    coll.safe_by_author = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      if (author.approved) return  `by <span style="color:#00f6d2">${author.label}</span>`
+      return '<span style="opacity:0.5">[author is in moderation]</span>'
     })
 
     // TODO: review all author props, may be there is a better way to do this
@@ -63,6 +77,28 @@ class CollectionsStore extends LazyItems {
       if(author.loading) return {loading: true}
       if(author.error) return {error: true}
       return author.avatar
+    })
+
+    coll.safe_avatar = computed(() => {
+      if(author.loading) return {loading: true}
+      if(author.error) return {error: true}
+      if(author.approved) return author.avatar
+      return require('assets/artist-default-avatar.svg')
+    })
+
+    coll.safe_cover = computed(() => {
+      if (coll.approved) return coll.cover
+      return require('assets/artist-default-banner.svg')
+    })
+
+    coll.safe_label = computed(() => {
+      if (coll.status === 'approved') return coll.label
+      return '[collection is in moderation]'
+    })
+
+    coll.safe_description = computed(() => {
+      if (coll.approved) return coll.description
+      return '[collection is in moderation]'
     })
 
     if (coll.error) {

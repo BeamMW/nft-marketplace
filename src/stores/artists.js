@@ -48,6 +48,10 @@ class ArtistsStore {
     return this._state.my_id
   }
 
+  get my_key() {
+    return this._state.my_id
+  }
+
   get self () {
     return this._state.artists[this._state.my_id]
   }

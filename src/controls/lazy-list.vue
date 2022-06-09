@@ -24,6 +24,7 @@
             >
               <component :is="component" 
                          :item="item"
+                         v-bind="component_props"
               />
             </selectitem>
           </template>
@@ -31,6 +32,7 @@
             <component :is="component" v-for="item in items"
                        :key="item.id"
                        :item="item"
+                       v-bind="component_props"
             />
           </template>
           <component :is="new_component" v-if="show_new" v-bind="new_component_props"/>
@@ -112,6 +114,10 @@ export default {
     component: {
       type: String,
       required: true,
+      default: undefined
+    },
+    component_props: {
+      type: Object,
       default: undefined
     },
     items_name: {

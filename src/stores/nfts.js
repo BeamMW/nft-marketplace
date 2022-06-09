@@ -62,16 +62,30 @@ class NFTSStore extends LazyItems {
       {name: 'user:collection:liked:',
         make_loader(collid) {
           return (store) => {
-            console.log(`loader for artist:collection:${collid}`)
+            console.log(`loader for user:collection:${collid}`)
             return store
               .where({
                 'collection': collid,
-                'state': 'approved'
+                'status': 'approved'
               })
               .and(item => item.impressions > 0)
           }
         }
       }, 
+      {name: 'user:collection:sale:', 
+        make_loader(collid) {
+          return (store) => {
+            console.log(`loader for user:collection:sale:${collid}`)
+            return store
+              .where({
+                'collection': collid, 
+                'owned': 1, 
+                'sale': 1,
+                'status': 'approved'
+              })
+          }
+        }
+      },
       {name: 'user:collection:',
         make_loader(collid) {
           return (store) => {
@@ -79,7 +93,7 @@ class NFTSStore extends LazyItems {
             return store
               .where({
                 'collection': collid,
-                'state': 'approved'
+                'status': 'approved'
               })
           }
         }
