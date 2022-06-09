@@ -1,4 +1,5 @@
 <template>
+  <messageModal ref="messageModal"/>
   <div class="container">
     <template v-if="edit_self">
       <pageTitle title="Edit your Artist"/>
@@ -249,6 +250,7 @@
 </style>
 
 <script>
+import messageModal from 'components/message-modal'
 import formInput from 'controls/form-input'
 import textArea from 'controls/textarea'
 import pageTitle from 'controls/page-title'
@@ -262,6 +264,7 @@ import {common} from 'utils/consts'
 
 export default {
   components: {
+    messageModal,
     formInput, 
     textArea, 
     pageTitle,
@@ -440,15 +443,31 @@ export default {
     },
 
     async onSetArtist() {
-      let data = {
-        website:   this.website,
-        twitter:   this.twitter,
-        instagram: this.instagram,
-        about:     this.about,
-        avatar:    this.avatar,
-        banner:    this.banner
+      try {
+        let data = {
+          website:   this.website,
+          twitter:   this.twitter,
+          instagram: this.instagram,
+          about:     this.about,
+          avatar:    this.avatar,
+          banner:    this.banner
+        }        
+        let txid = await artistsStore.setArtist(this.label, data)
+        if (!txid) {
+          // user cancelled
+          return
+        }
       }
-      await artistsStore.setArtist(this.label, data)
+      catch(err) {
+        if (err.error === 'label already exists') {
+          this.$refs.messageModal.open(
+            'Duplicate artist name',
+            'Artist with the same name already exists.<br>Choose another name and retry.',
+            true)
+          return
+        }
+        throw err
+      }
       router.go(-1)
     }
   }

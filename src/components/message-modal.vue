@@ -2,10 +2,11 @@
   <modal ref="modal">
     <div class="content">
       <div class="title">{{ title }}</div>
-      <div class="message">{{ message }}</div>
+      <div class="message" v-html="message"/>
       <div class="controls">
-        <btn text="close" @click="close">
-          <img src="~assets/cancel.svg"/>
+        <btn text="close" :color="error ? 'red' : undefined" @click="close">
+          <img v-if="error" src="~assets/cancel-blue.svg">
+          <img v-else src="~assets/cancel.svg"/>
         </btn>
       </div>
     </div>
@@ -26,6 +27,7 @@
 
     .message {
       margin-top: 30px
+      text-align: center
     }
       
     .controls {
@@ -51,13 +53,15 @@ export default {
 
   data() {
     return {
+      error: false,
       title: '',
       message: ''
     }
   },
 
   methods: {
-    open (title, message) {
+    open (title, message, error) {
+      this.error = error
       this.title = title
       this.message = message
       this.$refs.modal.open()

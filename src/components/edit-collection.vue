@@ -1,4 +1,5 @@
 <template>
+  <messageModal ref="messageModal"/>
   <div class="container">
     <template v-if="edit_mode">
       <pageTitle title="Edit collection"/>
@@ -152,9 +153,11 @@ import notFound from 'controls/not-found'
 import collsStore from 'stores/collections'
 import router from 'router'
 import validators from 'utils/validators'
+import messageModal from 'components/message-modal'
 
 export default {
   components: {
+    messageModal,
     formInput, 
     textArea, 
     pageTitle,
@@ -287,14 +290,31 @@ export default {
 
   methods: {   
     async onSetCollection() {
-      let data = {
-        website:     this.website,
-        twitter:     this.twitter,
-        instagram:   this.instagram,
-        description: this.description,
-        cover:       this.cover
+      try {
+        let data = {
+          website:     this.website,
+          twitter:     this.twitter,
+          instagram:   this.instagram,
+          description: this.description,
+          cover:       this.cover
+        }
+        let txid = await collsStore.setCollection(this.id, this.label, data)
+        if (!txid) {
+          // user cancelled
+          return
+        }
       }
-      await collsStore.setCollection(this.id, this.label, data)
+      catch(err) {
+        if (err.error === 'label already exists') {
+          this.$refs.messageModal.open(
+            'Duplicate collection name', 
+            'You already have a collection with the same name.<br>Please choose another name and retry.',
+            true
+          )
+          return
+        }
+        throw err
+      }
       router.go(-1)
     }
   }
