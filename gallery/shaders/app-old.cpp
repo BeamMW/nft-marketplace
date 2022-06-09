@@ -273,7 +273,6 @@ struct AppArtist : public gallery::Artist {
         Env::DocAddNum("registered", registered);
         Env::DocAddNum("collections_count", collections_num);
         Env::DocAddNum("nfts_count", nfts_num);
-        Env::DocAddNum("approved_cnt", approved_cnt);
         Env::DocAddText("status", StatusToString(status).data());
 
         uint32_t print_nfts{};
@@ -1510,7 +1509,7 @@ ON_METHOD(user, transfer) {
     }
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &sig, 1, "Transfer item", 202135);
+                        &sig, 1, "Transfer item", 113746);
 }
 
 ON_METHOD(user, buy) {
@@ -1547,6 +1546,8 @@ ON_METHOD(user, buy) {
     const uint32_t kSlotKrnNonce = 1;
     const uint32_t kSlotKrnBlind = 2;
 
+    Env::KeyID kid{&km, sizeof(km)};
+
     PubKey krn_blind;
     PubKey full_nonce;
     Secp::Point p0, p1;
@@ -1558,20 +1559,17 @@ ON_METHOD(user, buy) {
     p0 += p1;
     p0.Export(full_nonce);
 
-    Secp_scalar_data e;
-    Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
-                                &args.user, 1, "Buy item", 1795645, cur_height,
-                                cur_height + 5, krn_blind, full_nonce, e,
-                                kSlotKrnBlind, kSlotKrnNonce, &e);
-    Secp::Scalar s;
-    s.Import(e);
-    Env::KeyID kid(&km, sizeof(km));
-    kid.get_Blind(s, s, kSlotNonceKey);
-    s.Export(e);
+    /*
+    Secp_scalar_data e{};
+    Secp::Scalar s1{};
+    s1.Import(e);
+    kid.get_Blind(s1, s1, kSlotNonceKey);
+    s1.Export(e);
+    */
 
     Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
                                 &args.user, 1, "Buy item", 1795645, cur_height,
-                                cur_height + 5, krn_blind, full_nonce, e,
+                                cur_height + 6, krn_blind, full_nonce, {},
                                 kSlotKrnBlind, kSlotKrnNonce, nullptr);
 }
 

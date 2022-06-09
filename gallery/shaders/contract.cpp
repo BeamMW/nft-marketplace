@@ -105,6 +105,7 @@ BEAM_EXPORT void Method_5(const method::SetArtist& r) {
         a.collections_num = 0;
         a.nfts_num = 0;
         a.last_created_object = 0;
+        a.approved_cnt = 0;
         s.total_artists++;
         s.Save();
 
@@ -148,6 +149,7 @@ BEAM_EXPORT void Method_6(const method::SetArtistStatus& r) {
     for (int i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!GalleryObject::Load(a, r.ids[i], sizeof(a)));
         a.status = r.status;
+        a.approved_cnt += (r.status == Status::kApproved);
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.ids[i]);
         a.updated = cur_height;
@@ -508,11 +510,31 @@ BEAM_EXPORT void Method_18(const method::AddVoteRewards& r) {
 }
 
 BEAM_EXPORT void Method_19(const method::Transfer& r) {
+    Height cur_height = Env::get_Height();
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
     Env::AddSig(m.owner);
+
+    Events::Sell::Key esk;
+    esk.nft_id = r.nft_id;
+    Events::Sell es;
+    _POD_(es.price).SetZero();
+    es.has_aid = 0;
+    Env::EmitLog_T(esk, es);
+
+    struct CollectionPlus : public Collection {
+        char m_szLabelData[kTotalMaxLen];
+    } c;
+
+    GalleryObject::Load(c, m.collection_id, sizeof(c));
+    ++c.total_sold;
+    Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
+        c.updated, cur_height, m.collection_id);
+    c.updated = cur_height;
+    GalleryObject::Save(c, m.collection_id,
+                        sizeof(Collection) + c.label_len + c.data_len);
+
     _POD_(m.owner) = r.new_owner;
-    Height cur_height = Env::get_Height();
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                    r.nft_id);
     m.updated = cur_height;
