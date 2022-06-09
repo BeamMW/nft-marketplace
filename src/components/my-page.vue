@@ -35,6 +35,7 @@
             mode="owned"
             :new_component="is_artist? 'create-nft' : ''"
             :store="nftsStore"
+            :component_props="{'mode': 'artist'}"
       />
       <list v-if="show_sale"
             class="list"
@@ -42,6 +43,7 @@
             component="nft"
             mode="owned:sale"
             :store="nftsStore"
+            :component_props="{'mode': 'artist'}"
       />
       <list v-if="show_sold"
             class="list"
@@ -49,6 +51,7 @@
             component="nft"
             mode="artist:sold"
             :store="nftsStore"
+            :component_props="{'mode': 'artist'}"
       />
       <list v-if="show_liked"
             class="list"
@@ -56,6 +59,7 @@
             component="nft"
             mode="liker:liked"
             :store="nftsStore"
+            :component_props="{'mode': 'artist'}"
       />
     </div>
   </div>

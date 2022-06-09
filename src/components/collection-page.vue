@@ -89,6 +89,7 @@
           :new_component_props="{'selected_collection': id}"
           :mode="`${safe_mode}:collection:${id}`"
           :store="nftsStore"
+          :component_props="{'mode': safe_mode}"
     />
     <list v-if="show_sale"
           class="list"
@@ -97,6 +98,7 @@
           :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
           :mode="`${safe_mode}:collection:sale:${id}`"
           :store="nftsStore"
+          :component_props="{'mode': safe_mode}"
     />
     <list v-if="show_liked"
           class="list"
@@ -105,6 +107,7 @@
           :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
           :mode="`${safe_mode}:collection:liked:${id}`"
           :store="nftsStore"
+          :component_props="{'mode': safe_mode}"
     />
   </div>
 </template>
@@ -276,7 +279,7 @@ import loading from 'controls/loading'
 import notFound from 'controls/not-found'
 import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
-import aritstsStore from 'stores/artists'
+import artistsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
 import utils from 'utils/utils'
 import {coll_tabs, def_images} from 'utils/consts'
@@ -339,7 +342,7 @@ export default {
       return this.collection.safe_avatar
     },
     show_safe () {
-      if (this.mode === 'artist' && this.collection.author === aritstsStore.my_key) return false
+      if (this.mode === 'artist' && this.collection.author === artistsStore.my_key) return false
       return true
     },
     safe_mode () {

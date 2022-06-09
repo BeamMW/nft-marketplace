@@ -354,6 +354,10 @@ export default {
     id: {
       type: Number,
       required: true
+    },
+    mode: {
+      type: String,
+      default: 'user'
     }
   },
 
@@ -384,23 +388,28 @@ export default {
     owned() {
       return this.nft.owned
     },
+
+    show_safe () {
+      if (this.mode === 'artist' && this.nft.author === artistsStore.my_key) return false
+      return true
+    },
     
     title () {
-      return this.nft.label
+      return this.show_safe ? this.nft.safe_label : this.nft.label
     },
 
     description () {
-      return this.nft.description
+      return this.show_safe ? this.nft.safe_description : this.nft.description
     },
 
     author_name () {
-      return this.nft.author_name
+      return this.show_safe ? this.nft.safe_author_name : this.nft.author_name
     },
 
     collection_name() {
       if (this.collection === null) return 'Error: not found'
       if (this.collection === undefined) return 'Loading...'
-      return this.collection.label
+      return this.show_safe ? this.collection.safe_label : this.collection.label
     },
 
     collection_error() {
@@ -408,7 +417,7 @@ export default {
     },
 
     image () {
-      return this.nft.image
+      return this.show_safe? this.nft.safe_image : this.nft.image
     },
 
     artists () {

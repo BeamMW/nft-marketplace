@@ -162,6 +162,35 @@ class NFTSStore extends LazyItems {
       return `by <span style="color:#00f6d2">${author.label}</span>`
     })
 
+    awork.safe_by_author = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      if (awork.approved) `by <span style="color:#00f6d2">${author.label}</span>`
+      return '[author is in modeation]'
+    })
+
+    awork.safe_author_name = computed(() => {
+      if (author.loading) return 'Loading...'
+      if (author.error) return 'Failed to load author'
+      if (author.approved) return  author.label
+      return '[author is in moderation]'
+    })
+
+    awork.safe_label = computed(() => {
+      if (awork.approved) return awork.label
+      return '[nft is in moderation]'
+    })
+
+    awork.safe_description = computed(() => {
+      if (awork.approved) return awork.label
+      return '[nft is in moderation]'
+    })
+
+    awork.safe_image = computed(() => {
+      if (awork.approved) return awork.image
+      return require('assets/nft-default.svg')
+    })
+
     if (awork.error) {
       awork.image = {error: true}
     }

@@ -15,7 +15,6 @@ const router = createRouter({
     {path: '/', component: userPage, name: 'gallery'},
     {path: '/my', component: myPage, name: 'my'},
     {path: '/balance', component: balancePage, name: 'balance'},
-    {path: '/nft/:id', component: nftPage, name: 'artwork', props: (route) => {return {id: Number(route.params.id)}}},
     {path: '/edit-artist/:id', component: editArtist, name: 'edit-artist', props: true},
     {path: '/become-artist', component: editArtist, name: 'become-artist'},
     {path: '/edit-collection/:id', component: editCollection, name: 'edit-collection', props: (route) => {return {id: Number(route.params.id)}}},
@@ -35,6 +34,17 @@ const router = createRouter({
           mode: route.query.mode
         }
       }
+    },
+    {
+      path: '/nft/:id', 
+      component: nftPage, 
+      name: 'artwork',
+      props: (route) => {
+        return {
+          id: Number(route.params.id),
+          mode: route.query.mode
+        }
+      },
     },
     {path: '/moderator', component: moderatorPage, name: 'moderator'} 
   ]

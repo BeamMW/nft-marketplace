@@ -25,7 +25,7 @@
 
     <!---- Second info row, author ---->
     <div class="info-row" :class="{'error': item.author_error}">
-      <span class="author" v-html="item.by_author"></span>
+      <span class="author" v-html="by_author"></span>
     </div>
 
     <!---- Third info row, price/buy/sell ----->
@@ -119,6 +119,7 @@ import price from 'controls/price'
 import preview from 'controls/preview'
 import moderationStatus from 'controls/moderation-status'
 import nftsStore from 'stores/nfts'
+import artistsStore from 'stores/artists'
 import {def_images} from 'utils/consts'
 
 export default {
@@ -132,11 +133,14 @@ export default {
     item: {
       type: Object,
       required: true,
-    }
+    },
+    mode: {
+      type: String,
+      default: 'user'
+    },
   },
 
   data () {
-    //alert('require: ' + require(def_images.nft))
     return {
       // eslint-disable-next-line no-undef
       def_nft: def_images.nft
@@ -176,6 +180,10 @@ export default {
       let liked = require('assets/heart-red.svg')
       let unliked = require('assets/heart.svg')
       return this.liked ? liked : unliked
+    },
+
+    by_author() {
+      return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.by_author : this.item.safe_by_author
     }
   },
 
@@ -211,7 +219,7 @@ export default {
     },
 
     onDetails(ev) {
-      nftsStore.toDetails(this.id)
+      nftsStore.toDetails(this.id, this.mode)
     }
   }
 }
