@@ -86,7 +86,7 @@ class ArtistsStore {
       return
     }
 
-    let self = await this._loadArtistAsync(this._state.my_id, false)
+    let self = await this._loadArtistAsync(this._state.my_id)
     if (self === null) {
       this._state.is_artist = false
       return
@@ -112,7 +112,7 @@ class ArtistsStore {
   }
 
   // TODO: check if we need fail flag
-  async _loadArtistAsync (id, fail) {
+  async _loadArtistAsync (id) {
     try {
       let {res} = await utils.invokeContractAsync({
         role: 'manager',
@@ -121,15 +121,16 @@ class ArtistsStore {
         cid
       })
 
+      console.log('_loadArtistAsync', res)
       utils.ensureField(res, 'items', 'array')
+
       if (res.items.length > 1) {
         throw new Error('artists.length > 1')
       }
 
       if (res.items.length == 0) {
-        if (fail) {
-          throw new Error('artist not found')
-        }
+        console.log(`artist ${id} not found`)
+        delete this._state.artists[id]
         return null
       }
 
@@ -150,7 +151,7 @@ class ArtistsStore {
 
       item.approved = (item.status === 'approved') ? 1 : 0 
       item.pending  = (item.status === 'pending') ? 1 : 0
-      item.rejected = (!item.aproved && !item.pending) ? 1 : 0
+      item.rejected = (!item.approved && !item.pending) ? 1 : 0
       
       this._setArtist(id, item)
 

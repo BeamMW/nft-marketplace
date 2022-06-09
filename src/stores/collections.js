@@ -33,7 +33,8 @@ class CollectionsStore extends LazyItems {
     coll.safe_author_name = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
-      if (author.approved) return author.label
+      // Author name cannot be changed, so if already ever approved (approved_cnt > 0) it is safe to display
+      if (author.approved_cnt) return author.label
       return '[author is in moderation]' 
     }) 
 
@@ -46,7 +47,8 @@ class CollectionsStore extends LazyItems {
     coll.safe_by_author = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
-      if (author.approved) return  `by <span style="color:#00f6d2">${author.label}</span>`
+      // Author name cannot be changed, so if already ever approved (approved_cnt > 0) it is safe to display
+      if (author.approved_cnt) return  `by <span style="color:#00f6d2">${author.label}</span>`
       return '<span style="opacity:0.5">[author is in moderation]</span>'
     })
 
@@ -130,7 +132,7 @@ class CollectionsStore extends LazyItems {
   }
 
   async setCollection(id, label, data) {
-    ({label, data} = await this._toContract(label, data))
+    ({label, data} = await this.toContract(label, data))
     
     let args = {
       role: 'artist',

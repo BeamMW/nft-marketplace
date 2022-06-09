@@ -10,7 +10,7 @@
         <div class="left">
           <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
-            <span class="name">{{ author_name }} {{ safe }}</span>
+            <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
           </div>
         </div>
@@ -394,7 +394,7 @@ export default {
       return this.show_safe ? this.collection.safe_description : this.collection.description
     },
     nfts_count() {
-      return this.collection.artworks_count
+      return (this.collection.nfts_count || 0)
     },
     min_price() {
       let value = this.collection.min_price.value 

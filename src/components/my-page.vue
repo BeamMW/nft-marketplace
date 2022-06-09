@@ -186,10 +186,10 @@ export default {
       return res
     },
     self_pending () {
-      return artistsStore.self.pending
+      return (artistsStore.self || {}).pending
     },
     self_rejected () {
-      return artistsStore.self.rejected
+      return (artistsStore.self || {}).rejected
     }
   }
 }

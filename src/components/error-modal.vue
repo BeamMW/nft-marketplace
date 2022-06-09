@@ -139,11 +139,11 @@ export default {
 
         if (error.answer && error.answer.result) {
           if(error.answer.result.raw_data) {
-            error.answer.result.raw_data = '--excluded--'
+            // error.answer.result.raw_data = '--excluded--'
           }
 
           if (error.answer.result.output && error.answer.result.output.length > maxLen) {
-            error.answer.result.output = error.answer.result.output.substring(0, maxLen) + ' --excluded--'
+            // error.answer.result.output = error.answer.result.output.substring(0, maxLen) + ' --excluded--'
           }
         }
         return utils.formatJSON(error)

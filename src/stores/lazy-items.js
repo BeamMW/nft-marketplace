@@ -27,7 +27,7 @@ export default class ItemsStore {
   //  owned       -> keys: owned
   //  owned:sale  -> keys: [owned+sale]
   //  artist:sold -> keys: [author+owned]
-  //  liker:liked -> keys: [satus+my_impression]
+  //  liker:liked -> keys: [satus+my_like]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
     this._loading = false
@@ -84,7 +84,7 @@ export default class ItemsStore {
       }
 
       if (mode == 'liker:liked') {
-        keyset.add('[status+my_impression]')
+        keyset.add('[status+my_like]')
       }
     }
 
@@ -193,7 +193,7 @@ export default class ItemsStore {
       loader: (store) => {
         console.log(`loader for liker:liked:${this._store_name}`)
         return store
-          .where(['status', 'my_impression'])
+          .where(['status', 'my_like'])
           .equals(['approved', 1])
       }
     })
@@ -390,11 +390,10 @@ export default class ItemsStore {
       // item would be written to database
       // we add some calculated props for convenience
       //
-      item.liked = item.impressions ? 1 : 0
       item.sale  = (item.price || {}).amount > 0 ? 1 : 0
       item.approved = (item.status === 'approved') ? 1 : 0 
       item.pending  = (item.status === 'pending') ? 1 : 0
-      item.rejected = (!item.aproved && !item.pending) ? 1 : 0
+      item.rejected = (!item.approved && !item.pending) ? 1 : 0
 
       try {
         if (!item.label) {
@@ -505,14 +504,14 @@ export default class ItemsStore {
         //
         // ... and liked by someone
         //
-        if (old.liked) {
+        if (old.likes > 0) {
           status.approved_liked--
         }
 
         //
         // ... and liked by me
         //
-        if (old.my_impression) {
+        if (old.my_like) {
           status.approved_i_liked--
         }
 
@@ -528,14 +527,14 @@ export default class ItemsStore {
         //
         // ... and liked by someone
         //
-        if (item.liked) {
+        if (item.likes > 0) {
           status.approved_liked++
         }
 
         //
         // ... and liked by me
         //
-        if (item.my_impression) {
+        if (item.my_like) {
           item.approved_i_liked++
         }
 

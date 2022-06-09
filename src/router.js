@@ -38,7 +38,7 @@ const router = createRouter({
     {
       path: '/nft/:id', 
       component: nftPage, 
-      name: 'artwork',
+      name: 'nft',
       props: (route) => {
         return {
           id: Number(route.params.id),

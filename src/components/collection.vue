@@ -26,8 +26,8 @@
         <hr class="line"/>
         <div class="items-info" :class="{'error': item.error}">
           <div class="count">
-            <div class="text">{{ item.artworks_count }}</div>
-            <div>{{ item.artworks_count == 1 ? 'NFT' : 'NFTs' }}</div>
+            <div class="text">{{ item.nfts_count || 0 }}</div>
+            <div>{{ item.nfts_count == 1 ? 'NFT' : 'NFTs' }}</div>
           </div>
           <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>

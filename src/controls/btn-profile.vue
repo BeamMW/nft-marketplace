@@ -18,18 +18,24 @@ export default {
     btn
   },
   computed: {
+    self () {
+      return artistsStore.self || {}
+    },
+    is_artist() {
+      return artistsStore.is_artist
+    },
     btn_color() {
-      if (artistsStore.self.approved) return 'transparent'
-      if (artistsStore.self.pending) return '#ed69ff'
+      if (!this.is_artist || this.self.approved) return undefined
+      if (this.self.pending) return '#ed69ff'
       return 'red'
     },
     btn_image() {
-      if (artistsStore.self.approved) return require('assets/user.svg')
-      if (artistsStore.self.pending) return require('assets/user-blue.svg')
+      if (!this.is_artist || this.self.approved) return require('assets/user.svg')
+      if (this.self.pending) return require('assets/user-blue.svg')
       return require('assets/user-blue.svg')
     },
     my_name () {
-      return (artistsStore.self || {}).label
+      return this.self.label
     },
   }
 }

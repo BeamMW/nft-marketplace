@@ -40,14 +40,17 @@ export default {
     in_set_artist() {
       return !!artistsStore.artist_tx
     },
+    self () {
+      return artistsStore.self || {}
+    },
     edit_btn_color() {
-      if (artistsStore.self.approved) return 'transparent'
-      if (artistsStore.self.pending) return '#ed69ff'
+      if (this.self.approved) return undefined
+      if (this.self.pending) return '#ed69ff'
       return 'red'
     },
     edit_btn_icon() {
-      if (artistsStore.self.approved) return require('assets/pencil.svg')
-      if (artistsStore.self.pending) return require('assets/pencil-blue.svg')
+      if (this.self.approved) return require('assets/pencil.svg')
+      if (this.self.pending) return require('assets/pencil-blue.svg')
       return require('assets/pencil-blue.svg')
     }
   },

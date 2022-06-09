@@ -38,7 +38,7 @@
   background-color: rgba(255, 255, 255, 0.05)
   border-radius: 10px
   box-sizing: border-box
-  padding: 20px 20px 10px 70px
+  padding: 20px 20px 20px 70px
   display:flex
   flex-direction: column
   font-size: 14px

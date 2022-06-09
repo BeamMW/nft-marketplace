@@ -15,7 +15,7 @@ import router from 'router'
 class NFTSStore extends LazyItems {
   constructor () {
     super({
-      objname: 'artwork', 
+      objname: 'nft', 
       versions: [versions.NFT_VERSION],
       modes: [
         'moderator', 
@@ -38,7 +38,7 @@ class NFTSStore extends LazyItems {
             console.log(`loader for artist:collection:liked:${collid}`)
             return store
               .where({'collection': collid})
-              .and(item => item.impressions > 0)
+              .and(item => item.lkes > 0)
           }
         }
       }, 
@@ -68,7 +68,7 @@ class NFTSStore extends LazyItems {
                 'collection': collid,
                 'status': 'approved'
               })
-              .and(item => item.impressions > 0)
+              .and(item => item.likes > 0)
           }
         }
       }, 
@@ -165,14 +165,16 @@ class NFTSStore extends LazyItems {
     awork.safe_by_author = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
-      if (awork.approved) `by <span style="color:#00f6d2">${author.label}</span>`
+      // Author name cannot be changed, so if already ever approved (approved_cnt > 0) it is safe to display
+      if (author.approved_cnt) `by <span style="color:#00f6d2">${author.label}</span>`
       return '[author is in modeation]'
     })
 
     awork.safe_author_name = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
-      if (author.approved) return  author.label
+      // Author name cannot be changed, so if already ever approved (approved_cnt > 0) it is safe to display
+      if (author.approved_cnt) return  author.label
       return '[author is in moderation]'
     })
 
@@ -215,7 +217,7 @@ class NFTSStore extends LazyItems {
     
     let args = {
       role: 'artist',
-      action: 'set_artwork',
+      action: 'set_nft',
       collection_id: collid,
       label, data, cid
     }
@@ -248,7 +250,7 @@ class NFTSStore extends LazyItems {
   async getSales(id) {
     let {res} = await utils.invokeContractAsync({
       role: 'manager',
-      action: 'view_artwork_sales',
+      action: 'view_nft_sales',
       id, cid
     })
     return res.sales

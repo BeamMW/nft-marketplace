@@ -18,7 +18,6 @@ function defaultState() {
     cid: contract.cid,
     is_admin: false,
     is_moderator: false,
-    is_artist: false,
     my_active_tab: my_tabs.OWNED_NFTS,
     coll_active_tab: 0,
     admin_active_tab: 0,
@@ -218,6 +217,10 @@ const store = {
         this.state.my_active_tab = my_tabs.COLLECTIONS
       }
     }
+
+    if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {
+      this.state.my_active_tab = my_tabs.OWNED_NFTS
+    }
   },
 
   async withdrawBEAM () {
@@ -237,7 +240,7 @@ const store = {
   async approveNFTs(ids, approve) {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
-      action: 'set_artwork_status',
+      action: 'set_nft_status',
       ids: ids.join(','),
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid

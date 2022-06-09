@@ -9,7 +9,7 @@
     >
       <moderationStatus :item="item"/>
       <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
-        <div>{{ likes_cnt }}</div>
+        <div>{{ likes }}</div>
         <img :src="like_icon"/>
       </div>
     </preview>
@@ -95,7 +95,7 @@
       border-radius: 10px
 
       & > div {
-        padding: 8px 6px 9px 8px
+        padding: 6px 0px 8px 12px
       }
       
       & > img {
@@ -169,17 +169,17 @@ export default {
     },
 
     liked () {
-      return !!this.item.my_impression
+      return !!this.item.my_like
     },
 
-    likes_cnt () {
-      return this.item.impressions
+    likes () {
+      return this.item.likes || 0
     },
 
     like_icon() {
       let liked = require('assets/heart-red.svg')
       let unliked = require('assets/heart.svg')
-      return this.liked ? liked : unliked
+      return this.likes ? liked : unliked
     },
 
     by_author() {
