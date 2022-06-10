@@ -4,17 +4,17 @@
 
 namespace gallery {
 static const ShaderID s_SID_0 = {
-    0xbe, 0x18, 0xe6, 0x34, 0x11, 0xa7, 0x1e, 0x7b, 0x56, 0x6a, 0xae,
-    0xf8, 0xc8, 0x0c, 0x31, 0x20, 0x7b, 0xa8, 0x76, 0x86, 0x50, 0x3c,
-    0x72, 0x02, 0x72, 0x00, 0x8c, 0xfd, 0xa2, 0xfe, 0xd7, 0x95};
+    0x8d, 0x64, 0xdf, 0xbb, 0xed, 0x65, 0xde, 0x27, 0x74, 0x64, 0x94,
+    0xab, 0x65, 0x35, 0x1c, 0xf1, 0xcc, 0x03, 0x5d, 0x88, 0xdb, 0x48,
+    0xdc, 0x0c, 0x1f, 0xb5, 0x07, 0x5f, 0xe0, 0x47, 0x19, 0x70};
 #pragma pack(push, 1)
 
 using Hash256 = Opaque<32>;
 
-inline Hash256 GetLabelHash(const std::string_view& label) {
-    Hash256 res;
-    HashProcessor::Sha256 hp;
-    hp.Write(label.begin(), label.size());
+inline Hash256 GetLabelHash(std::string_view label) {
+    Hash256 res{};
+    HashProcessor::Sha256 hp{};
+    hp.Write(label.data(), label.size());
     hp >> res;
     return res;
 }
@@ -140,7 +140,7 @@ struct Collection {
         // The order is crucial: tag must be the first
         Tag tag = Tag::kCollection;
         Id id;
-        explicit Key(const Id& id) : id{id} {
+        explicit Key(Id id) : id{id} {
         }
         Key() : id{} {
         }
@@ -189,7 +189,7 @@ struct Nft {
         // The order is crucial: tag must be the first
         Tag tag = Tag::kNft;
         Id id;
-        explicit Key(const Id& id) : id{id} {
+        explicit Key(Id id) : id{id} {
         }
         Key() : id{} {
         }

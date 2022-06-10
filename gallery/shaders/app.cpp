@@ -5,6 +5,7 @@
 #include "Shaders/upgradable2/app_common_impl.h"
 
 #include <array>
+#include <limits>
 #include <string_view>
 #include <type_traits>
 #include <vector>
@@ -170,11 +171,11 @@ BEAM_EXPORT void Method_0() {
 /*
  * Forward declarations
  */
-const std::string_view StatusToString(const gallery::Status& status);
+const std::string_view StatusToString(gallery::Status status);
 static inline bool IsOwner(const ContractID& cid, const PubKey& owner,
-                           const gallery::Nft::Id& nft_id);
+                           gallery::Nft::Id nft_id);
 template <class Id>
-std::vector<Id> ParseIds(const std::string_view& ids);
+std::vector<Id> ParseIds(std::string_view ids);
 
 /*
  * Structures
@@ -199,13 +200,13 @@ struct Owner {
         Env::Memcpy(seed, kOwnerMeta.data(), kOwnerMeta.size());
     }
 
-    Owner(const ContractID& cid, const gallery::Nft::Id& nft_id)
+    Owner(const ContractID& cid, gallery::Nft::Id nft_id)
         : cid{cid}, nft_id{nft_id} {
         Env::Memcpy(seed, kOwnerMeta.data(), kOwnerMeta.size());
     }
 
     PubKey Get() const {
-        PubKey pk;
+        PubKey pk{};
         Env::DerivePk(pk, this, sizeof(*this));
         return pk;
     }
@@ -378,7 +379,7 @@ private:
 struct AppCollection : public gallery::Collection {
     std::array<char, kTotalMaxLen + 2> label_and_data;
 
-    void Print(const ContractID& cid, const Id& id) {
+    void Print(const ContractID& cid, Id id) {
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
         Env::DocAddNum32("updated", updated);
@@ -437,7 +438,7 @@ struct AppCollection : public gallery::Collection {
     }
 
 private:
-    void PrintNfts_(const ContractID& cid, const Id& id) {
+    void PrintNfts_(const ContractID& cid, Id id) {
         using CAKey =
             gallery::Index<gallery::Tag::kCollectionNftIdx,
                            gallery::Collection::Id, gallery::Nft>::Key;
@@ -465,7 +466,7 @@ struct AppNft : public gallery::Nft {
     std::array<char, kLabelMaxLen + 1> label;
     std::array<char, kDataMaxLen + 1> data;
 
-    void Print(const ContractID& cid, const Id& id) {
+    void Print(const ContractID& cid, Id id) {
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
         Env::DocAddNum32("updated", updated);
@@ -580,7 +581,7 @@ public:
         }
     }
 
-    void Print(const std::string_view& ids) {
+    void Print(std::string_view ids) {
         Env::DocArray gr0("items");
 
         std::vector<typename T::Id> ids_vec(ParseIds<typename T::Id>(ids));
@@ -609,18 +610,20 @@ public:
     }
 
     void Print(Height h0, uint32_t count) {
+        const Height kMaxHeight = std::numeric_limits<Height>::max();
+
         Env::Key_T<typename HeightIdx::Key> k0, k1;
         k0.m_Prefix.m_Cid = cid_;
         k1.m_Prefix.m_Cid = cid_;
         k0.m_KeyInContract.id = Utils::FromBE(h0);
-        k1.m_KeyInContract.id = static_cast<Height>(-1);
+        k1.m_KeyInContract.id = kMaxHeight;
         _POD_(k0.m_KeyInContract.t_id).SetZero();
         _POD_(k1.m_KeyInContract.t_id).SetObject(0xff);
 
         Env::VarReader r(k0, k1);
 
-        int cur_cnt = 0;
-        Height prev_h = -1, last_printed_h = -1;
+        uint32_t cur_cnt = 0;
+        Height prev_h = kMaxHeight, last_printed_h = kMaxHeight;
         bool exists;
         {
             Env::DocArray gr0("items");
@@ -634,7 +637,7 @@ public:
                 prev_h = k0.m_KeyInContract.id;
             }
         }
-        if (last_printed_h != -1)
+        if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
     }
 
@@ -710,12 +713,12 @@ struct BalanceWalkerOwner : public BalanceWalker {
 /*
  * Functions
  */
-void OnError(const std::string_view& err) {
+void OnError(std::string_view err) {
     Env::DocAddText("error", err.data());
 }
 
 template <class Id>
-std::vector<Id> ParseIds(const std::string_view& ids) {
+std::vector<Id> ParseIds(std::string_view ids) {
     union {
         Id id;
         uint8_t a[sizeof(Id)];
@@ -745,7 +748,7 @@ std::vector<Id> ParseIds(const std::string_view& ids) {
     return res;
 }
 
-gallery::Status StringToStatus(const std::string_view& str_status) {
+gallery::Status StringToStatus(std::string_view str_status) {
     gallery::Status ret_status;
     if (str_status == "pending") {
         ret_status = gallery::Status::kPending;
@@ -759,7 +762,7 @@ gallery::Status StringToStatus(const std::string_view& str_status) {
     return ret_status;
 }
 
-const std::string_view StatusToString(const gallery::Status& status) {
+const std::string_view StatusToString(gallery::Status status) {
     if (status == gallery::Status::kPending) {
         return "pending";
     } else if (status == gallery::Status::kApproved) {
@@ -772,7 +775,7 @@ const std::string_view StatusToString(const gallery::Status& status) {
 }
 
 static inline bool IsOwner(const ContractID& cid, const PubKey& owner,
-                           const gallery::Nft::Id& nft_id) {
+                           gallery::Nft::Id nft_id) {
     return _POD_(owner) == key_material::Owner{cid, nft_id}.Get();
 }
 
@@ -787,7 +790,7 @@ bool my_artist_exists(const ContractID& cid) {
 }
 
 gallery::Collection::Id collection_id_by_label(const ContractID& cid,
-                                               const std::string_view& label) {
+                                               std::string_view label) {
     Env::Key_T<gallery::Collection::LabelKey> lk;
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
@@ -798,7 +801,7 @@ gallery::Collection::Id collection_id_by_label(const ContractID& cid,
 }
 
 gallery::Artist::Id artist_id_by_label(const ContractID& cid,
-                                       const std::string_view& label) {
+                                       std::string_view label) {
     Env::Key_T<gallery::Artist::LabelKey> lk;
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
@@ -892,7 +895,7 @@ void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
 
     std::vector<gallery::Collection::Id> ids_vec(
         ParseIds<gallery::Collection::Id>(buf));
-    
+
     size_t args_size = sizeof(gallery::method::SetCollectionStatus) +
                        sizeof(gallery::Collection::Id) * ids_vec.size();
     std::unique_ptr<gallery::method::SetCollectionStatus> args(
@@ -1363,7 +1366,7 @@ ON_METHOD(artist, set_collection) {
     std::string_view label(d.label_and_data, d.args.label_len);
     gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
     if ((d.args.collection_id && collection_id &&
-            collection_id != d.args.collection_id) ||
+         collection_id != d.args.collection_id) ||
         (!d.args.collection_id && collection_id)) {
         OnError("label already exists");
         return;

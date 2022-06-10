@@ -146,7 +146,7 @@ BEAM_EXPORT void Method_6(const method::SetArtistStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    for (int i = 0; i < r.ids_num; ++i) {
+    for (uint32_t i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!GalleryObject::Load(a, r.ids[i], sizeof(a)));
         a.status = r.status;
         a.approved_cnt += (r.status == Status::kApproved);
@@ -173,7 +173,7 @@ BEAM_EXPORT void Method_7(const method::SetCollectionStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    for (int i = 0; i < r.ids_num; ++i) {
+    for (uint32_t i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!GalleryObject::Load(c, r.ids[i], sizeof(c)));
         c.status = r.status;
         Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
@@ -329,7 +329,7 @@ BEAM_EXPORT void Method_10(const method::SetNftStatus& r) {
     else
         Env::AddSig(r.signer);
 
-    for (int i = 0; i < r.ids_num; ++i) {
+    for (uint32_t i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!GalleryObject::Load(n, r.ids[i]));
         n.status = r.status;
         Index<Tag::kHeightNftIdx, Height, Nft>::Update(n.updated, cur_height,
