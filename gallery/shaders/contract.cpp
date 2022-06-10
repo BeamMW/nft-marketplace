@@ -136,7 +136,7 @@ BEAM_EXPORT void Method_6(const method::SetArtistStatus& r) {
 
     Height cur_height = Env::get_Height();
     struct ArtistPlus : public Artist {
-        char m_szLabelData[kDataMaxLen];
+        char data[kDataMaxLen];
     } a;
 
     Moderator m;
@@ -163,7 +163,7 @@ BEAM_EXPORT void Method_7(const method::SetCollectionStatus& r) {
 
     Height cur_height = Env::get_Height();
     struct CollectionPlus : public Collection {
-        char m_szLabelData[kTotalMaxLen];
+        char label_and_data[kTotalMaxLen];
     } c;
 
     Moderator m;
@@ -191,7 +191,7 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
 
     Height cur_height = Env::get_Height();
     struct CollectionPlus : public Collection {
-        char m_szLabelData[kTotalMaxLen];
+        char label_and_data[kTotalMaxLen];
     } c;
 
     Collection::Id c_id = r.collection_id;
@@ -206,7 +206,7 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
                                                                        c_id);
 
         struct ArtistPlus : public Artist {
-            char m_szLabelData[kDataMaxLen];
+            char data[kDataMaxLen];
         } a;
 
         GalleryObject::Load(a, r.artist_id, sizeof(a));
@@ -223,7 +223,7 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
     Env::Halt_if(_POD_(c.author) != r.artist_id);
 
     Collection::LabelKey lk{r.artist_id, GetLabelHash(std::string_view(
-                                             c.m_szLabelData, c.label_len))};
+                                             c.label_and_data, c.label_len))};
     Env::DelVar_T(lk);
 
     auto label_ptr = reinterpret_cast<const char*>(&r + 1);
@@ -231,7 +231,7 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
     // if already exists
     Env::Halt_if(Env::SaveVar_T(lk, c_id));
 
-    Env::Memcpy(c.m_szLabelData, &r + 1, r.label_len + r.data_len);
+    Env::Memcpy(c.label_and_data, &r + 1, r.label_len + r.data_len);
     c.label_len = r.label_len;
     c.data_len = r.data_len;
     c.status = Status::kPending;
@@ -267,7 +267,7 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
                                                              m.id);
 
     struct CollectionPlus : public Collection {
-        char m_szLabelData[kTotalMaxLen];
+        char label_and_data[kTotalMaxLen];
     } c;
 
     // assert: collection exists
@@ -282,7 +282,7 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
 
     // verify artist
     struct ArtistPlus : public Artist {
-        char m_szLabelData[kDataMaxLen];
+        char data[kDataMaxLen];
     } a;
 
     // assert: artist exists
@@ -359,7 +359,7 @@ BEAM_EXPORT void Method_12(const method::Buy& r) {
                  (r.has_aid != (!!m.aid)));
 
     struct CollectionPlus : public Collection {
-        char m_szLabelData[kTotalMaxLen];
+        char label_and_data[kTotalMaxLen];
     } c;
 
     GalleryObject::Load(c, m.collection_id, sizeof(c));
@@ -523,7 +523,7 @@ BEAM_EXPORT void Method_19(const method::Transfer& r) {
     Env::EmitLog_T(esk, es);
 
     struct CollectionPlus : public Collection {
-        char m_szLabelData[kTotalMaxLen];
+        char label_and_data[kTotalMaxLen];
     } c;
 
     GalleryObject::Load(c, m.collection_id, sizeof(c));
