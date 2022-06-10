@@ -26,8 +26,8 @@
         <hr class="line"/>
         <div class="items-info" :class="{'error': item.error}">
           <div class="count">
-            <div class="text">{{ item.nfts_count || 0 }}</div>
-            <div>{{ item.nfts_count == 1 ? 'NFT' : 'NFTs' }}</div>
+            <div class="text">{{ nfts_count }}</div>
+            <div>{{ nfts_count == 1 ? 'NFT' : 'NFTs' }}</div>
           </div>
           <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
         </div>
@@ -156,6 +156,9 @@ export default {
     },
     by_author() {
       return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.by_author : this.item.safe_by_author
+    },
+    nfts_count() {
+      return (this.mode === 'artist' ? this.item.nfts_count : this.item.approved_nfts_count) || 0
     }
   },
 

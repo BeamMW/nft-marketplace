@@ -227,6 +227,7 @@
             text-align: center
             margin-top: -42px
             margin-bottom: 26px
+            border: 1px solid red
 
             & > p {
               font-style: italic
@@ -343,7 +344,7 @@ export default {
       return !this.banner || !this.banner_error
     },
     avatar_valid() {
-      return !this.avatar || validators.image(this.avatar)
+      return !this.avatar || !this.avatar_error
     },
     can_submit () {
       return this.label && this.label_valid &&

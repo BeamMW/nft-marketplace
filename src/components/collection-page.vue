@@ -8,7 +8,13 @@
     <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
       <div class="info-container">
         <div class="left">
-          <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
+          <preview :class="{'error': collection.author_error}" 
+                   :image="avatar" 
+                   :default="def_avatar" 
+                   :show_text="false" 
+                   radius="36px 36px" 
+                   class="avatar"
+          />
           <div class="info">
             <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
@@ -397,7 +403,7 @@ export default {
       return this.show_safe ? this.collection.safe_description : this.collection.description
     },
     nfts_count() {
-      return (this.collection.nfts_count || 0)
+      return (this.show_safe ? this.collection.approved_nfts_count : this.collection.nfts_count) || 0
     },
     min_price() {
       let value = this.collection.min_price.value 

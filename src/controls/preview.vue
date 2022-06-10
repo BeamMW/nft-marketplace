@@ -1,6 +1,6 @@
 <template>
   <div class="preview-container" :style="style">
-    <div v-if="loading && show_text" class="loading">Loading...</div>
+    <div v-if="loading && show_text" class="loading">Loading</div>
     <img v-if="src" class="preview" :src="src" :style="image_style"/>
     <slot></slot>
   </div>  
@@ -25,6 +25,11 @@
     &>.loading {
       position: absolute
       z-index: 100
+      border-radius: 10px
+      backdrop-filter: blur(30px) brightness(70%)
+      padding: 3px 10px 6px 10px
+      color: rgba(255, 255, 255, 0.85)
+      font-size: 14px
     }
 
     &>.error {
