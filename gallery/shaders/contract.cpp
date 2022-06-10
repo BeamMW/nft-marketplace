@@ -11,7 +11,7 @@ struct ContractState : public State {
         Env::LoadVar_T(static_cast<uint8_t>(kKey), *this);
     }
 
-    ContractState(bool) {
+    explicit ContractState(bool) {
         // no auto-load
     }
 
@@ -329,8 +329,22 @@ BEAM_EXPORT void Method_10(const method::SetNftStatus& r) {
     else
         Env::AddSig(r.signer);
 
+    struct CollectionPlus : public Collection {
+        char label_and_data[kTotalMaxLen];
+    } c;
+
     for (uint32_t i = 0; i < r.ids_num; ++i) {
         Env::Halt_if(!GalleryObject::Load(n, r.ids[i]));
+        Env::Halt_if(!GalleryObject::Load(c, n.collection_id, sizeof(c)));
+        if (r.status == Status::kApproved && n.status != Status::kApproved)
+            ++c.approved_nfts_num;
+        else if (r.status != Status::kApproved && n.status == Status::kApproved)
+            --c.approved_nfts_num;
+        Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
+            c.updated, cur_height, n.collection_id);
+        c.updated = cur_height;
+        GalleryObject::Save(c, n.collection_id,
+                            sizeof(Collection) + c.label_len + c.data_len);
         n.status = r.status;
         Index<Tag::kHeightNftIdx, Height, Nft>::Update(n.updated, cur_height,
                                                        n.id);

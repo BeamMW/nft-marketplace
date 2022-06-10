@@ -393,6 +393,7 @@ struct AppCollection : public gallery::Collection {
         Env::DocAddText("data", label_and_data.data() + label_len);
         Env::DocAddBlob_T("author", author);
         Env::DocAddNum32("nfts_count", nfts_num);
+        Env::DocAddNum32("approved_nfts_count", approved_nfts_num);
         Env::DocAddText("status", StatusToString(status).data());
         {
             Env::DocGroup gr_sold("total_sold");
@@ -560,7 +561,7 @@ struct AppNft : public gallery::Nft {
 template <class T, class HeightIdx>
 class GalleryObjectPrinter {
 public:
-    GalleryObjectPrinter(const ContractID& cid) : cid_{cid} {
+    explicit GalleryObjectPrinter(const ContractID& cid) : cid_{cid} {
     }
 
     void Print() {
@@ -622,10 +623,10 @@ public:
 
         Env::VarReader r(k0, k1);
 
-        uint32_t cur_cnt = 0;
         Height prev_h = kMaxHeight, last_printed_h = kMaxHeight;
-        bool exists;
         {
+            bool exists;
+            uint32_t cur_cnt = 0;
             Env::DocArray gr0("items");
             while (r.MoveNext_T(k0, exists) &&
                    (cur_cnt++ < count || prev_h == k0.m_KeyInContract.id)) {
@@ -837,9 +838,15 @@ void SetNftStatusCommon(const ContractID& cid, const PubKey& signer,
         ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
-        2 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
+        4 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
         args->ids_num * Env::Cost::LoadVar_For(sizeof(gallery::Nft)) +
         args->ids_num * Env::Cost::SaveVar_For(sizeof(gallery::Nft)) +
+        args->ids_num *
+            Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
+                                   gallery::Collection::kTotalMaxLen) +
+        args->ids_num *
+            Env::Cost::SaveVar_For(sizeof(gallery::Collection) +
+                                   gallery::Collection::kTotalMaxLen) +
         Env::Cost::LoadVar_For(sizeof(gallery::Moderator)) + Env::Cost::AddSig +
         Env::Cost::Cycle * 300;
 
