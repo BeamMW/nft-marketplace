@@ -10,7 +10,6 @@
         <div class="left">
           <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
-            {{ history }}
             <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
           </div>
@@ -359,7 +358,10 @@ export default {
       return this.show_safe ? this.collection.safe_author_name : this.collection.author_name
     },
     author_about() {
-      return this.show_safe && this.approved ? '' : this.collection.author_about
+      if(this.show_safe) {
+        return this.collection.author_approved ? this.collection.author_about : ''
+      }
+      return this.collection.author_about
     },
     author_key() {
       return this.collection.author

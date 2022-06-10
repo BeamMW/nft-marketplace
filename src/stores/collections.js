@@ -24,6 +24,10 @@ class CollectionsStore extends LazyItems {
       return author.error
     })
 
+    coll.author_approved = computed(() => {
+      return author.approved
+    })
+    
     coll.author_name = computed(() => {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
