@@ -6,6 +6,7 @@
              height="140px" 
              cover
     >
+      <div v-if="error && debug" class="debug error">{{ error }}</div>
       <btnEdit :item="item"/> 
       <moderationStatus :item="item"/>
     </preview>
@@ -46,6 +47,12 @@
     position: relative
     overflow: hidden
     cursor: pointer
+
+    & .debug {
+      text-align: center
+      color: black
+      padding: 0px 5px
+    }
 
     & > .info-row {
       display: flex
@@ -149,7 +156,7 @@ export default {
 
   computed: {
     coll_name () {
-      return this.item.label
+      return this.$state.debug ? `[${this.item.id}] - ${this.item.label}` : this.item.label
     },
     avatar() {
       return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.avatar : this.item.safe_avatar
@@ -159,6 +166,12 @@ export default {
     },
     nfts_count() {
       return (this.mode === 'artist' ? this.item.nfts_count : this.item.approved_nfts_count) || 0
+    },
+    debug() {
+      return this.$state.debug
+    },
+    error() {
+      return this.item.error || this.item.author_error
     }
   },
 

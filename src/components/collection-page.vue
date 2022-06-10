@@ -85,6 +85,9 @@
            @click="full_text = false"
       /> 
     </div>
+    <div v-if="debug && collection.error" class="debug error">
+      {{ collection.error }}
+    </div>
     <tabsctrl v-model="active_tab" :tabs="tabs"/>
     <!--- TODO: set collection to the current one when opening 'new-nft' -->
     <list v-if="show_all"
@@ -129,6 +132,12 @@
     width: 100%
     height: 100%
     overflow: hidden
+
+    & > .debug {
+      width: 100%
+      margin-bottom: 10px
+      text-align: center
+    }
 
     & > .list {
       margin-top: 20px
@@ -341,8 +350,9 @@ export default {
     },
     title () {
       if (!this.collection) return 'Loading...'
-      if (this.collection.error) return 'Failed to load collection'
-      return this.show_safe ? this.collection.safe_label : this.collection.label
+      let prefix = this.$state.debug ? `[${this.collection.id}] - ` : ''
+      if (this.collection.error) return [prefix, 'Failed to load collection'].join('')
+      return [prefix, this.show_safe ? this.collection.safe_label : this.collection.label].join('')
     },
     avatar() {
       return this.collection.safe_avatar
@@ -361,6 +371,9 @@ export default {
       return this.show_safe ? this.collection.safe_cover : this.collection.cover
     },
     author_name() {
+      if (this.$state.debug && this.collection.author_error) {
+        return this.collection.author_error
+      }
       return this.show_safe ? this.collection.safe_author_name : this.collection.author_name
     },
     author_about() {
@@ -433,6 +446,9 @@ export default {
     nftsStore() {
       return nftsStore
     },
+    debug() {
+      return this.$state.debug
+    }
   },
 
   updated() {

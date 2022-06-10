@@ -32,6 +32,16 @@ export default {
     loading () {
       return this.$state.loading
     }
+  },
+  mounted() {
+    document.addEventListener('keydown', event => {
+      if (event.isComposing || event.keyCode === 229) {
+        return
+      }
+      if (event.code === 'KeyD' && event.ctrlKey && event.shiftKey) {
+        this.$store.toggleDebug()
+      }
+    }, true)
   }
 }
 </script>

@@ -7,6 +7,7 @@
              text_color="dimgray"
              contain
     >
+      <div v-if="error && debug" class="debug error">{{ error }}</div>
       <moderationStatus :item="item"/>
       <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
         <div>{{ likes }}</div>
@@ -20,7 +21,7 @@
     <!---- First info row ---->
     <div class="info-row">
       <!---- Title ---->
-      <div class="title" :class="{'error': item.error}">{{ item.label }}</div>
+      <div class="title" :class="{'error': item.error}">{{ label }}</div>
     </div>
 
     <!---- Second info row, author ---->
@@ -46,6 +47,12 @@
     position:relative
     overflow: hidden
     cursor: pointer
+
+    & .debug {
+      text-align: center
+      color: black
+      padding: 0px 5px
+    }
 
     & > .delete {
       position: absolute
@@ -148,6 +155,10 @@ export default {
   },
 
   computed: {
+    label () {
+      return this.$state.debug ? `[${this.item.id}] - ${this.item.label}` : this.item.label
+    },
+
     is_admin () {
       return this.$state.is_admin
     },
@@ -184,6 +195,14 @@ export default {
 
     by_author() {
       return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.by_author : this.item.safe_by_author
+    },
+
+    error() {
+      return this.item.error
+    },
+
+    debug() {
+      return this.$state.debug
     }
   },
 

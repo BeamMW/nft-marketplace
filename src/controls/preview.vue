@@ -105,6 +105,10 @@ export default {
       return (this.image || {}).error
     },
 
+    debug () {
+      return this.$state.debug
+    },
+
     style () {
       let res = {
         'border-radius': this.radius,

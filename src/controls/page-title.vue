@@ -17,11 +17,6 @@
     align-items: center
     user-select: none
 
-    & > * {
-      flex-grow: 1
-      flex-basis: 0
-    }
-
     & > .title {
       display: flex
       justify-content: center
@@ -33,6 +28,7 @@
       text-transform: uppercase
       letter-spacing: 3.1px
       color: #fff
+      flex: 1
     }
 
     & > .title-slot {

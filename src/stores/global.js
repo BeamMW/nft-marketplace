@@ -25,7 +25,7 @@ function defaultState() {
     balance_beam: 0,
     balance_reward: 0,
     is_headless: false,
-    debug: true
+    debug: false
   }
   
   return state
@@ -44,6 +44,10 @@ function appstate() {
 
 const store = {
   state: appstate(),
+
+  toggleDebug() {
+    this.state.debug = !this.state.debug
+  },
 
   //
   // Errors

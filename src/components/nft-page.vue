@@ -15,6 +15,7 @@
                      height="360px" 
                      radius="0"
             >
+              <div v-if="error && debug" class="debug error">[{{ nft.id }}] - {{ error }}</div>
               <moderationStatus :item="nft"/>
             </preview>
           </div>
@@ -89,6 +90,12 @@
       display: flex
       flex-direction: column
       flex: 1
+
+      & .debug {
+        text-align: center
+        color: black
+        padding: 0px 10px
+      }
 
       & .table-title {
         box-sizing: border-box
@@ -378,7 +385,11 @@ export default {
 
   computed: {
     error () {
-      return !!this.nft.error
+      return this.nft.error
+    },
+
+    debug () {
+      return this.$state.debug
     },
 
     approved() {
