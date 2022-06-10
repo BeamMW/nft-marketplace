@@ -7,7 +7,6 @@
        -->
       <template v-if="delay_passed">
         <img src="~assets/empty-gallery.svg"/>
-        
         <div class="text">Loading {{ items_name }}...</div>
       </template>
     </div>
@@ -171,7 +170,7 @@ export default {
     }
   },
 
-  data () {5000
+  data () {
     return {
       delay_passed: false
     }

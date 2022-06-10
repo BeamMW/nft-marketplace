@@ -204,11 +204,13 @@ export default {
     onCancel() {
       this.active_selected.length = 0
     },
-    onReject() {
-      this.active_approve.call(this.$store, this.active_selected, false)
+    async onReject() {
+      let txid = await this.active_approve.call(this.$store, this.active_selected, false)
+      if (txid) this.active_selected.length = 0
     },
-    onApprove() {
-      this.active_approve.call(this.$store, this.active_selected, true)
+    async onApprove() {
+      let txid = await this.active_approve.call(this.$store, this.active_selected, true)
+      if (txid) this.active_selected.length = 0
     }
   }
 }

@@ -10,6 +10,7 @@
         <div class="left">
           <preview :class="{'error': collection.author_error}" :image="avatar" :default="def_avatar" radius="36px 36px" class="avatar"/>
           <div class="info">
+            {{ history }}
             <span class="name">{{ author_name }}</span>
             <span class="about">{{ author_about }}</span>
           </div>

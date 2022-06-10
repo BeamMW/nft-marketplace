@@ -346,6 +346,10 @@ const store = {
     router.push({
       name: 'moderator'
     })
+  },
+
+  getPrevPage() {
+    return router.options.history.state.back
   }
 }
 

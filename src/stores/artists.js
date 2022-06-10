@@ -209,6 +209,8 @@ class ArtistsStore {
         this._state.artist_tx = ''
       }
     }, 1000)
+
+    return txid
   }
 
   async toContract (label, data) {

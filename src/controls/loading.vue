@@ -1,5 +1,5 @@
 <template>
-  <div class="app-loading">
+  <div v-if="!wait" class="app-loading">
     <img src="~assets/loading.svg"/>
     <div class="title">{{ text }}</div>
     <div>Please wait...</div>
@@ -36,6 +36,24 @@ export default {
       type: String,
       default: 'BEAM Gallery is loading'
     }
+  },
+  data() {
+    return {
+      wait: false
+    }
+  },
+  mounted() {
+    /* 
+      If we switch between pages in gallery loader appears and then disappears quickly. 
+      This looks like blinking. So we delay it and display only if items are taking long time to load.
+    */
+    this.history = this.$store.getPrevPage()
+    if (this.history) {
+      this.wait = true
+    }
+    setTimeout(() => {
+      this.wait = false
+    }, 1500)
   }
 }
 </script>

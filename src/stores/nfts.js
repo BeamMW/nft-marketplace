@@ -166,7 +166,7 @@ class NFTSStore extends LazyItems {
       if (author.loading) return 'Loading...'
       if (author.error) return 'Failed to load author'
       // Author name cannot be changed, so if already ever approved (approved_cnt > 0) it is safe to display
-      if (author.approved_cnt) `by <span style="color:#00f6d2">${author.label}</span>`
+      if (author.approved_cnt) return `by <span style="color:#00f6d2">${author.label}</span>`
       return '[author is in modeation]'
     })
 
