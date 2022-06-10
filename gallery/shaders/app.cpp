@@ -721,6 +721,8 @@ std::vector<Id> ParseIds(const std::string_view& ids) {
         uint8_t a[sizeof(Id)];
     } blob;
 
+    _POD_(blob).SetZero();
+
     std::vector<Id> res;
     int pos = 0;
     for (auto c : ids) {
@@ -778,7 +780,6 @@ bool my_artist_exists(const ContractID& cid) {
     Env::Key_T<gallery::Artist::Key> k;
     k.m_Prefix.m_Cid = cid;
     k.m_KeyInContract.id = AppArtist::id(cid);
-    AppArtist a;
     Env::VarReader r(k, k);
     uint32_t key_size = 0;
     uint32_t val_size = 0;
@@ -791,7 +792,7 @@ gallery::Collection::Id collection_id_by_label(const ContractID& cid,
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
     lk.m_KeyInContract.artist_id = AppArtist::id(cid);
-    gallery::Collection::Id collection_id;
+    gallery::Collection::Id collection_id{};
     Env::VarReader::Read_T(lk, collection_id);
     return collection_id;
 }
@@ -801,7 +802,7 @@ gallery::Artist::Id artist_id_by_label(const ContractID& cid,
     Env::Key_T<gallery::Artist::LabelKey> lk;
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
-    gallery::Artist::Id artist_id;
+    gallery::Artist::Id artist_id{};
     Env::VarReader::Read_T(lk, artist_id);
     return artist_id;
 }
@@ -888,9 +889,10 @@ void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
                                const SigRequest* sig) {
     char buf[256];
     Env::DocGetText("ids", buf, sizeof(buf));
+
     std::vector<gallery::Collection::Id> ids_vec(
         ParseIds<gallery::Collection::Id>(buf));
-
+    
     size_t args_size = sizeof(gallery::method::SetCollectionStatus) +
                        sizeof(gallery::Collection::Id) * ids_vec.size();
     std::unique_ptr<gallery::method::SetCollectionStatus> args(
@@ -952,7 +954,7 @@ ON_METHOD(manager, set_moderator) {
     args.approved = enable;
     key_material::Admin akm;
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &akm, 1, "Set moderator", 136835);
+                        &akm, 1, "Set moderator", 238015);
 }
 
 ON_METHOD(manager, view_params) {
@@ -1360,9 +1362,9 @@ ON_METHOD(artist, set_collection) {
 
     std::string_view label(d.label_and_data, d.args.label_len);
     gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
-    if (d.args.collection_id && collection_id &&
-            collection_id != d.args.collection_id ||
-        !d.args.collection_id && collection_id) {
+    if ((d.args.collection_id && collection_id &&
+            collection_id != d.args.collection_id) ||
+        (!d.args.collection_id && collection_id)) {
         OnError("label already exists");
         return;
     }
@@ -1483,7 +1485,7 @@ ON_METHOD(user, set_price) {
         args.price.amount ? "Set item price" : "Remove from sale";
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &sig, 1, comment, 113709);
+                        &sig, 1, comment, 213709);
 }
 
 ON_METHOD(user, transfer) {
@@ -1510,7 +1512,7 @@ ON_METHOD(user, transfer) {
     }
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &sig, 1, "Transfer item", 202135);
+                        &sig, 1, "Transfer item", 302135);
 }
 
 ON_METHOD(user, buy) {
@@ -1560,7 +1562,7 @@ ON_METHOD(user, buy) {
 
     Secp_scalar_data e;
     Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
-                                &args.user, 1, "Buy item", 1795645, cur_height,
+                                &args.user, 1, "Buy item", 1895645, cur_height,
                                 cur_height + 5, krn_blind, full_nonce, e,
                                 kSlotKrnBlind, kSlotKrnNonce, &e);
     Secp::Scalar s;
@@ -1570,7 +1572,7 @@ ON_METHOD(user, buy) {
     s.Export(e);
 
     Env::GenerateKernelAdvanced(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
-                                &args.user, 1, "Buy item", 1795645, cur_height,
+                                &args.user, 1, "Buy item", 1895645, cur_height,
                                 cur_height + 5, krn_blind, full_nonce, e,
                                 kSlotKrnBlind, kSlotKrnNonce, nullptr);
 }
@@ -1656,7 +1658,7 @@ ON_METHOD(user, vote) {
     sig.m_nID = sizeof(km);
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
-                        1, "Vote", 180050);
+                        1, "Vote", 280050);
 }
 
 #undef ON_METHOD
