@@ -227,7 +227,6 @@
             text-align: center
             margin-top: -42px
             margin-bottom: 26px
-            border: 1px solid red
 
             & > p {
               font-style: italic

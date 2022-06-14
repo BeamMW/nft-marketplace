@@ -2,8 +2,12 @@ import {versions} from 'stores/consts'
 import {Dexie} from 'dexie'
 
 export default class Database extends Dexie {
-  constructor() {
-    super(['gallery', versions.DATABASE_VERSION].join('-'))
+  constructor(cid, key) {
+    // Database storage is per-gallery so we generate
+    // DB name as 'gallery' + db version + key + cid
+    // This allows to switch cids and wallets (wallet.db)
+    // Inside a single Wallet GUI 
+    super(['gallery', versions.DATABASE_VERSION, key, cid].join('-'))
   }
 
   async initAsync (stores) {     

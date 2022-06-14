@@ -278,7 +278,7 @@ class NFTSStore extends LazyItems {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'user',
       action: 'transfer',
-      pkNewOwner: to,
+      new_owner: to,
       id, cid
     })
   }

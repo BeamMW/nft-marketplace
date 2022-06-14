@@ -566,6 +566,7 @@ export default class ItemsStore {
 
     if (res.items.length > 0) {
       nextTick(() => this._loadAsyncInternal(++depth))
+      return
     }
 
     if (this._global.state.debug) {

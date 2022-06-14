@@ -406,7 +406,8 @@ export default {
     },
     
     title () {
-      return this.show_safe ? this.nft.safe_label : this.nft.label
+      // TODO: add computed title based on debug flag
+      return [this.debug ? `[${this.nft.id}] - ` : '', this.show_safe ? this.nft.safe_label : this.nft.label].join('')
     },
 
     description () {

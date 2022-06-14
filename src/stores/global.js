@@ -70,11 +70,21 @@ const store = {
   //
   async start () {
     //
-    // Reset state
+    // Download shader & start working with contract
+    // nextTick to not to block UI while downloading
     //
-    Object.assign(this.state, defaultState())
-    this.state.is_headless = utils.isHeadless()
+    nextTick(async () => {
+      Object.assign(this.state, defaultState())
+      this.state.is_headless = utils.isHeadless()
+      router.push({name: 'gallery'})
+      
+      await this.checkCID()
+      await this.initStuff()      
+      await this.refreshAllData()
+    })
+  },
 
+  async initStuff() {
     //
     // Reset database
     //
@@ -83,7 +93,19 @@ const store = {
       this._database = undefined
     }
 
-    this._database = new Database()
+    //
+    // get key
+    //
+    let {res} = await utils.invokeContractAsync({
+      role: 'artist',
+      action: 'get_id',
+      cid: this.state.cid
+    })
+
+    utils.ensureField(res, 'id', 'string')
+    let my_key = res.id
+
+    this._database = new Database(this.state.cid, my_key)
     await this._database.initAsync({
       ...collsStore.getDBStores(),
       ...nftsStore.getDBStores(),
@@ -98,20 +120,6 @@ const store = {
     artistsStore.reset(this, this._database)
     lazyArtistsStore.reset(this, this._database)
     imagesStore.reset(this, this._database)
-
-    //
-    // navigate to gallery
-    //
-    router.push({name: 'gallery'})
-  
-    //
-    // Download shader & start working with contract
-    // nextTick to not to block UI while downloading
-    //
-    nextTick(async () => {
-      await this.checkCID()
-      await this.refreshAllData()
-    })
   },
 
   onApiResult(err, res, full) {
@@ -133,7 +141,7 @@ const store = {
 
   async checkCID () {
     this.state.shader = await utils.downloadAsync('galleryManager.wasm')
-    
+
     /*
     utils.invokeContract('', 
       (err, res) => {
@@ -142,7 +150,6 @@ const store = {
       },
       this.state.shader
     )*/
-
     await utils.callApiAsync('ev_subunsub', {ev_system_state: true})
     let {res} = await utils.invokeContractAsync(
       {role: 'manager', action: 'view'}, 
@@ -245,7 +252,7 @@ const store = {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
       action: 'set_nft_status',
-      ids: ids.join(','),
+      ids: '"' + ids.join(';') + '"',
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
@@ -255,7 +262,7 @@ const store = {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
       action: 'set_collection_status',
-      ids: ids.join(','),
+      ids: '"' + ids.join(',') + '"',
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
@@ -265,7 +272,7 @@ const store = {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
       action: 'set_artist_status',
-      ids: ids.join(','),
+      ids: '"' + ids.join(',') + '"',
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
