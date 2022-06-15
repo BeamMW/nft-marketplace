@@ -95,7 +95,7 @@
           items_name="NFTs"
           component="nft"
           :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
-          :new_component_props="{'selected_collection': id}"
+          :new_component_props="{'selected_collection': id, limit_reached}"
           :mode="`${safe_mode}:collection:${id}`"
           :store="nftsStore"
           :component_props="{'mode': safe_mode}"
@@ -105,6 +105,7 @@
           items_name="NFTs"
           component="nft"
           :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+          :new_component_props="{'selected_collection': id, limit_reached}"
           :mode="`${safe_mode}:collection:sale:${id}`"
           :store="nftsStore"
           :component_props="{'mode': safe_mode}"
@@ -114,6 +115,7 @@
           items_name="NFTs"
           component="nft"
           :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+          :new_component_props="{'selected_collection': id, limit_reached}"
           :mode="`${safe_mode}:collection:liked:${id}`"
           :store="nftsStore"
           :component_props="{'mode': safe_mode}"
@@ -417,6 +419,10 @@ export default {
     },
     nfts_count() {
       return (this.show_safe ? this.collection.approved_nfts_count : this.collection.nfts_count) || 0
+    },
+    limit_reached() {
+      // TODO: get limit value from contract
+      return this.collection.nfts_count >= 500
     },
     max_sale() {
       let value = this.collection.max_price.value 

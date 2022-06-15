@@ -1,5 +1,9 @@
 <template>
-  <div v-if="has_collections" class="new-box" @click="onNewNFT">
+  <div v-if="limit_reached" class="new-box" @click="onNewCollection">
+    You cannot have more than<br>500 NFTs in one collection.<br><br>
+    Click here to create<br>new collection.
+  </div>
+  <div v-else-if="has_collections" class="new-box" @click="onNewNFT">
     Create new NFT
   </div>
   <div v-else class="new-box" @click="onNewCollection">
@@ -38,7 +42,11 @@ export default {
       type: Number,
       default: undefined,
       required: false
-    } 
+    },
+    limit_reached: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     has_collections() {
