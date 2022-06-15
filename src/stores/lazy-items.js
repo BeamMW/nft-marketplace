@@ -390,10 +390,11 @@ export default class ItemsStore {
       // item would be written to database
       // we add some calculated props for convenience
       //
-      item.sale  = (item.price || {}).amount > 0 ? 1 : 0
+      item.sale     = (item.price || {}).amount > 0 ? 1 : 0
       item.approved = (item.status === 'approved') ? 1 : 0 
       item.pending  = (item.status === 'pending') ? 1 : 0
       item.rejected = (!item.approved && !item.pending) ? 1 : 0
+      item.liked    = (item.likes > 0) ? 1 : 0
 
       try {
         if (!item.label) {
@@ -535,7 +536,7 @@ export default class ItemsStore {
         // ... and liked by me
         //
         if (item.my_like) {
-          item.approved_i_liked++
+          status.approved_i_liked++
         }
 
         //

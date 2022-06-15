@@ -45,9 +45,9 @@
             <div>
               <div>
                 <img src="~assets/beam.svg">
-                <span class="value">{{ min_price }}</span>
+                <span class="value">{{ max_sale }}</span>
               </div>
-              <span>floor price</span>
+              <span>max sale</span>
             </div>
             <div>
               <div>
@@ -418,8 +418,8 @@ export default {
     nfts_count() {
       return (this.show_safe ? this.collection.approved_nfts_count : this.collection.nfts_count) || 0
     },
-    min_price() {
-      let value = this.collection.min_price.value 
+    max_sale() {
+      let value = this.collection.max_price.value 
       return utils.formatAmount3(value / common.GROTHS_IN_BEAM)
     },
     trade_volume() {
