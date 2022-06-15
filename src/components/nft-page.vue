@@ -8,17 +8,16 @@
     <div v-else class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
         <div class="nft-container">
-          <div>
-            <preview :image="image" 
-                     :default="def_nft" 
-                     contain
-                     height="360px" 
-                     radius="0"
-            >
-              <div v-if="error && debug" class="debug error">[{{ nft.id }}] - {{ error }}</div>
-              <moderationStatus :item="nft"/>
-            </preview>
-          </div>
+          <preview :image="image" 
+                   :default="def_nft" 
+                   contain
+                   height="360px" 
+                   radius="0"
+          >
+            <div v-if="error && debug" class="debug error">[{{ nft.id }}] - {{ error }}</div>
+            <moderationStatus :item="nft"/>
+            <likes class="likes" :item="nft"/>
+          </preview>
         </div>
         <div class="info-container">
           <div class="info-box">
@@ -224,16 +223,18 @@
         }
 
         & .nft-container {
-          width: 370px
-          box-sizing: border-box
-          max-width: 50%
-          padding-right: 10px
-
-          & > div {
-            background-color: rgba(255, 255, 255, 0.05)
-            border-radius: 10px
-            min-height: 360px
-            overflow: hidden
+          width: 360px
+          height: 360px
+          background-color: rgba(255, 255, 255, 0.05)
+          border-radius: 10px
+          min-height: 360px
+          margin-right: 10px
+          overflow: hidden
+          
+          & .likes {
+            position: absolute
+            bottom: 9px
+            right: 9px
           }
         }
 
@@ -332,6 +333,7 @@ import loading from 'controls/loading'
 import pageTitle from 'controls/page-title'
 import moderationStatus from 'controls/moderation-status'
 import notFound from 'controls/not-found'
+import likes from 'controls/likes'
 import artistsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
@@ -352,6 +354,7 @@ export default {
     pageTitle,
     loading,
     notFound,
+    likes,
     moderationStatus,
     messageModal,
     transferModal

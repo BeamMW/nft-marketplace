@@ -9,10 +9,7 @@
     >
       <div v-if="error && debug" class="debug error">{{ error }}</div>
       <moderationStatus :item="item"/>
-      <div v-if="is_approved" class="likes" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
-        <div>{{ likes }}</div>
-        <img :src="like_icon"/>
-      </div>
+      <likes class="likes" :item="item"/>
     </preview>
     
     <!---- Delete NFT Button ---->
@@ -91,23 +88,9 @@
     }
 
     & .likes {
-      display: flex
       position: absolute
       bottom: 9px
       right: 8px
-      align-items: center
-      cursor: pointer
-      box-sizing: border-box
-      background-color: rgba(0, 0, 0, 0.6)
-      border-radius: 10px
-
-      & > div {
-        padding: 6px 0px 8px 12px
-      }
-      
-      & > img {
-        padding: 8px
-      }
     }
 
     & .price-row {
@@ -124,6 +107,7 @@
 <script>
 import price from 'controls/price'
 import preview from 'controls/preview'
+import likes from 'controls/likes'
 import moderationStatus from 'controls/moderation-status'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
@@ -133,6 +117,7 @@ export default {
   components: {
     price,
     preview,
+    likes,
     moderationStatus
   },
 
@@ -171,28 +156,6 @@ export default {
       return this.item.id
     },
 
-    is_approved() {
-      return this.item.approved
-    },
-                
-    can_vote () {
-      return !this.item.error && this.$state.balance_reward > 0
-    },
-
-    liked () {
-      return !!this.item.my_like
-    },
-
-    likes () {
-      return this.item.likes || 0
-    },
-
-    like_icon() {
-      let liked = require('assets/heart-red.svg')
-      let unliked = require('assets/heart.svg')
-      return this.likes ? liked : unliked
-    },
-
     by_author() {
       return this.mode === 'artist' && this.item.author === artistsStore.my_key ? this.item.by_author : this.item.safe_by_author
     },
@@ -207,32 +170,6 @@ export default {
   },
 
   methods: {
-    onLike (ev) {
-      if (this.is_headless) {
-        return this.$store.switchToHeaded()  
-      } 
-
-      if (this.can_vote) {
-        nftsStore.likeNFT(this.id)
-      }
-
-      ev.stopPropagation()
-      return false
-    },
-
-    onUnlike (ev) {
-      if (this.is_headless) {
-        return this.$store.switchToHeaded()  
-      } 
-
-      if (this.can_vote) {
-        nftsStore.unlikeNFT(this.id)
-      }
-
-      ev.stopPropagation()
-      return false
-    },
-
     onDelete (id) {
       this.$store.deleteNFT(this.id)
     },
