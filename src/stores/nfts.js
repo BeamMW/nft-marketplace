@@ -37,8 +37,7 @@ class NFTSStore extends LazyItems {
           return (store) => {
             console.log(`loader for artist:collection:liked:${collid}`)
             return store
-              .where({'collection': collid})
-              .and(item => item.lkes > 0)
+              .where({'collection': collid, 'liked': 1})
           }
         }
       }, 
