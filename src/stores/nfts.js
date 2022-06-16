@@ -47,7 +47,7 @@ class NFTSStore extends LazyItems {
           return (store) => {
             console.log(`loader for artist:collection:sale:${collid}`)
             return store
-              .where({'collection': collid, 'owned': 1, 'sale': 1})
+              .where({'collection': collid, 'sale': 1})
           }
         }
       },
@@ -79,7 +79,6 @@ class NFTSStore extends LazyItems {
             return store
               .where({
                 'collection': collid, 
-                'owned': 1, 
                 'sale': 1,
                 'status': 'approved'
               })

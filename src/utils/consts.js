@@ -1,6 +1,6 @@
 export const common = { 
   GROTHS_IN_BEAM: 100000000,
-  ITEMS_PER_PAGE: 2,
+  ITEMS_PER_PAGE: 10,
   MAX_IMAGE_SIZE: 500 * 1024
 }
 
