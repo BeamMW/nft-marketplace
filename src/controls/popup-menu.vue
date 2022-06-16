@@ -1,7 +1,9 @@
 <template>
-  <div v-show="show" class="popup-menu" :style="style" tabindex="0">
-    <slot></slot>
-  </div>
+  <Teleport to="#modals">
+    <div v-show="show" ref="menu" class="popup-menu" :style="style" tabindex="0">
+      <slot></slot>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped lang="stylus">
@@ -19,6 +21,8 @@
       display: flex
       align-items: center
       line-height: normal !important
+      white-space: nowrap
+      user-select: none
 
       &:hover {
         color: #00f6d2
@@ -65,41 +69,53 @@ export default {
       this.show = true
       
       nextTick(() => {
-        const elementHeight = this.$el.offsetHeight
-        const largestHeight = window.innerHeight - elementHeight
-        const elementWidth  = this.$el.offsetWidth
-        const largestWidth  = window.innerWidth - elementWidth
+        let menu = this.$refs.menu
+        let menuRect  = menu.getBoundingClientRect()
+
+        const largestHeight = window.innerHeight 
+        const largestWidth  = window.innerWidth
 
         let top = ev.clientY
-        if (top > largestHeight) {
-          top = largestHeight
+        if (top + menuRect.height > largestHeight) {
+          top = largestHeight - menuRect.height
         }
 
         let left = ev.clientX
-        if (left > largestWidth) {
-          left = largestWidth
+        if (left + menuRect.width > largestWidth) {
+          left = largestWidth - menuRect.width
         }
 
         this.left = left
         this.top = top
 
+        let removeListeners 
+
         let downAway = evc => {
-          if (!this.$el.contains(evc.target)) {
-            document.removeEventListener('mousedown', downAway, true)
+          if (evc.which === 3 && !this.$refs.menu.contains(evc.target)) {
+            evc.stopPropagation()
+            removeListeners()
             this.close()
           }
         }
 
         let clickAway = evc => {
-          if (ev != evc) {
-            document.removeEventListener('click', clickAway, true)
-            this.close()
+          console.log('click away')
+          if (!this.$refs.menu.contains(evc.target)) {
+            evc.stopPropagation()
           }
+          removeListeners()
+          this.close()
         }
         
         let scrollAway = evc => {
-          document.removeEventListener('scroll', scrollAway, scroll)
+          removeListeners()
           this.close()
+        }
+
+        removeListeners = () => {
+          document.removeEventListener('mousedown', downAway, true)
+          document.removeEventListener('click', clickAway, true)
+          document.removeEventListener('scroll', scrollAway, true)
         }
 
         document.addEventListener('mousedown', downAway, true)

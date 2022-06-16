@@ -1,6 +1,7 @@
 <template>
   <!--selectItem-->
-  <div :class="{'collection': true, 'error': item.error}" @click="onDetails">
+  <div :class="{'collection': true, 'error': item.error}" @click="onDetails" @contextmenu="onMenu">
+    <moderationMenu ref="moderationMenu" :item="item"/>
     <preview :image="item.cover"
              :default="def_cover"
              height="140px" 
@@ -127,13 +128,15 @@ import btnEdit from 'controls/btn-edit'
 import collsStore from 'stores/collections'
 import artistsStore from 'stores/artists'
 import {def_images} from 'utils/consts'
+import moderationMenu from 'controls/moderation-menu'
 
 export default {
   components: {
     preview,
     amount,
     btnEdit,
-    moderationStatus
+    moderationStatus,
+    moderationMenu
   },
 
   props: {
@@ -181,6 +184,10 @@ export default {
   methods: {
     onDetails (ev) {
       collsStore.toDetails(this.item.id, this.mode)
+    },
+    onMenu (ev) {
+      ev.stopPropagation()
+      this.$refs.moderationMenu.open(ev)
     }
   }
 }

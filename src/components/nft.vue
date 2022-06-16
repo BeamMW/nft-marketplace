@@ -1,5 +1,7 @@
 <template>
-  <div :class="{'nft': true, 'error': item.error}" @click="onDetails">
+  <div :class="{'nft': true, 'error': item.error}" @click="onDetails" @contextmenu="onMenu">
+    <moderationMenu ref="moderationMenu" :item="item"/>
+
     <!---- Preview OR Loading ---->
     <preview :image="item.image" 
              :default="def_nft"
@@ -108,6 +110,7 @@
 import price from 'controls/price'
 import preview from 'controls/preview'
 import likes from 'controls/likes'
+import moderationMenu from 'controls/moderation-menu'
 import moderationStatus from 'controls/moderation-status'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
@@ -118,6 +121,7 @@ export default {
     price,
     preview,
     likes,
+    moderationMenu,
     moderationStatus
   },
 
@@ -176,6 +180,10 @@ export default {
 
     onDetails(ev) {
       nftsStore.toDetails(this.id, this.mode)
+    },
+
+    onMenu (ev) {
+      this.$refs.moderationMenu.open(ev)
     }
   }
 }

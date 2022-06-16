@@ -278,6 +278,18 @@ const store = {
     })
   },
 
+  // TODO: use this more general method in moderator page
+  //       refactor moderator page to be more general
+  async setItemsStatus(type, ids, status) {
+    return await utils.invokeContractAsyncAndMakeTx({
+      role: 'moderator',
+      action: `set_${type}_status`,
+      ids: '"' + ids.join(';') + '"',
+      status,
+      cid: this.state.cid
+    })
+  },
+
   //
   // Admin stuff
   //

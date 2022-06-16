@@ -390,6 +390,7 @@ export default class ItemsStore {
       // item would be written to database
       // we add some calculated props for convenience
       //
+      item.type     = this._objname
       item.sale     = (item.price || {}).amount > 0 ? 1 : 0
       item.approved = (item.status === 'approved') ? 1 : 0 
       item.pending  = (item.status === 'pending') ? 1 : 0
