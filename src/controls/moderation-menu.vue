@@ -1,5 +1,5 @@
 <template>
-  <popupMenu v-if="can_admin && item.approved" ref="moderationMenu">
+  <popupMenu ref="moderationMenu">
     <div class="item" @click="onReject">
       <img src="~assets/eye-crossed.svg"/>
       Reject and hide
@@ -34,8 +34,10 @@ export default {
 
   methods: {
     open(ev) {
-      ev.stopPropagation()
-      this.$refs.moderationMenu.open(ev)
+      if (this.can_admin && this.item.approved) {
+        ev.stopPropagation()
+        this.$refs.moderationMenu.open(ev)
+      }
     },
     onReject(ev) {
       ev.stopPropagation()
