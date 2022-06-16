@@ -3,10 +3,7 @@
 #include <string_view>
 
 namespace gallery {
-static const ShaderID s_SID_0 = {
-    0xa1, 0x80, 0x1f, 0x09, 0xd1, 0x6d, 0x24, 0xb4, 0x14, 0x62, 0x1c,
-    0x9c, 0xec, 0xf8, 0xbf, 0xfe, 0x35, 0x74, 0x59, 0x0c, 0xdf, 0x4d,
-    0x7f, 0x68, 0x66, 0x8a, 0x6f, 0x0c, 0xab, 0xe6, 0xc7, 0x22};
+static const ShaderID s_SID_0 = {0x47,0xaf,0xd4,0x24,0x0e,0x66,0xe8,0xe2,0xc5,0x16,0x30,0xa5,0x7c,0xd9,0xb0,0x4a,0x56,0x24,0x13,0x90,0xa9,0x6a,0x35,0xe2,0xd4,0x87,0x8e,0x57,0xd3,0xed,0x08,0x15};
 #pragma pack(push, 1)
 
 using Hash256 = Opaque<32>;
@@ -123,6 +120,8 @@ struct Artist {
     Height updated;
     Height last_created_object;
     Status status;
+    uint32_t total_sold;
+    Amount total_sold_price;
     uint32_t data_len;
     uint32_t collections_num;
     uint32_t nfts_num;
@@ -461,6 +460,35 @@ struct Transfer {
 struct SetRateLimit {
     static const uint32_t kMethod = 20;
     Amount amount;
+};
+
+struct MigrateArtist {
+    static const uint32_t kMethod = 21;
+    Artist::Id artist_id;
+    PubKey signer;
+    uint32_t label_len;
+    uint32_t data_len;
+    // followed by label and data
+};
+
+struct SetCollectionAdmin {
+    static const uint32_t kMethod = 22;
+    Artist::Id artist_id;
+    PubKey signer;
+    uint32_t label_len;
+    uint32_t data_len;
+    // followed by label and data without delimiter
+};
+
+struct SetNftAdmin {
+    static const uint32_t kMethod = 23;
+    Artist::Id artist_id;
+    PubKey signer;
+    uint32_t data_len;
+    uint32_t label_len;
+    Collection::Id collection_id;
+    AmountWithAsset price;
+    // followed by the data and label
 };
 }  // namespace method
 #pragma pack(pop)

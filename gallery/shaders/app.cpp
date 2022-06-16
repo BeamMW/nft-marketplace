@@ -64,6 +64,15 @@
 #define Gallery_manager_set_rate_limit(macro) \
     macro(ContractID, cid) macro(Amount, amount)
 
+#define Gallery_manager_set_nft(macro)                                    \
+    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id) \
+        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) macro(gallery::Artist::Id, artist_id)
+
+#define Gallery_manager_migrate_artist(macro) macro(ContractID, cid) macro(gallery::Artist::Id, id)
+
+#define Gallery_manager_set_collection(macro) \
+    macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
+
 #define GalleryRole_manager(macro)                                            \
     macro(manager, view) macro(manager, view_params) macro(                   \
         manager, view_artists_stats) macro(manager, view_moderators_stats)    \
@@ -78,7 +87,10 @@
                                     macro(manager, set_artist_status)         \
                                         macro(manager, set_collection_status) \
                                             macro(manager, set_fee_base)      \
-                                                macro(manager, set_rate_limit)
+                                                macro(manager, set_rate_limit) \
+                                macro(manager, set_nft)                \
+                                macro(manager, migrate_artist)                \
+                                macro(manager, set_collection)                \
 
 // MODERATOR
 
@@ -88,9 +100,21 @@
 
 #define Gallery_moderator_set_artist_status(macro) macro(ContractID, cid)
 
+#define Gallery_moderator_migrate_artist(macro) macro(ContractID, cid) macro(gallery::Artist::Id, id)
+
+#define Gallery_moderator_set_collection(macro) \
+    macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
+
+#define Gallery_moderator_set_nft(macro)                                    \
+    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id) \
+        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) macro(gallery::Artist::Id, artist_id)
+
 #define GalleryRole_moderator(macro)                                     \
     macro(moderator, set_nft_status) macro(moderator, set_artist_status) \
-        macro(moderator, set_collection_status)
+        macro(moderator, set_collection_status)\
+                                macro(moderator, set_nft)                \
+                                macro(moderator, migrate_artist)                \
+                                macro(moderator, set_collection)                \
 
 // ARTIST
 
@@ -107,7 +131,7 @@
 
 #define GalleryRole_artist(macro)                                          \
     macro(artist, get_id) macro(artist, set_nft) macro(artist, set_artist) \
-        macro(artist, set_collection)
+        macro(artist, set_collection) \
 
 // USER
 
@@ -276,6 +300,12 @@ struct AppArtist : public gallery::Artist {
         Env::DocAddNum("nfts_count", nfts_num);
         Env::DocAddNum("approved_cnt", approved_cnt);
         Env::DocAddText("status", StatusToString(status).data());
+        {
+            Env::DocGroup gr_sold("total_sold");
+            Env::DocAddNum("count", total_sold);
+            Env::DocAddNum("volume", total_sold_price);
+            Env::DocAddNum32("aid", 0);
+        }
 
         uint32_t print_nfts{};
         Env::DocGetNum32("nfts", &print_nfts);
@@ -481,7 +511,7 @@ struct AppNft : public gallery::Nft {
 
         if (!_POD_(owner).IsZero()) {
             uint32_t owned = IsOwner(cid, owner, 0) || IsOwner(cid, owner, id);
-            Env::DocAddBlob_T("owner", owner);
+            //Env::DocAddBlob_T("owner", owner);
             Env::DocAddNum("owned", owned);
 
             if (owned) {
@@ -1120,7 +1150,7 @@ ON_METHOD(artist, set_nft) {
         return;
     }
 
-    d.args.data_len = data_size - 1;
+    d.args.data_len = data_size ? data_size - 1 : data_size;
     uint32_t arg_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
 
     SigRequest sig;
@@ -1307,7 +1337,7 @@ ON_METHOD(artist, set_artist) {
         return;
     }
 
-    d.args.data_len = data_size - 1;
+    d.args.data_len = data_size ? data_size - 1 : data_size;
 
     uint32_t args_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
 
@@ -1388,7 +1418,7 @@ ON_METHOD(artist, set_collection) {
         return;
     }
 
-    d.args.data_len = data_size - 1;
+    d.args.data_len = data_size ? data_size - 1 : data_size;
     uint32_t args_size = sizeof(d.args) + d.args.data_len + d.args.label_len;
 
     SigRequest sig;
@@ -1553,6 +1583,10 @@ ON_METHOD(user, buy) {
     fc.m_Amount = nft.price.amount;
     fc.m_Aid = nft.price.aid;
 
+    Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
+                                &sig, 1, "Buy item", 1895645);
+
+    /*
     Height cur_height = Env::get_Height();
 
     const uint32_t kSlotNonceKey = 0;
@@ -1585,6 +1619,7 @@ ON_METHOD(user, buy) {
                                 &args.user, 1, "Buy item", 1895645, cur_height,
                                 cur_height + 5, krn_blind, full_nonce, e,
                                 kSlotKrnBlind, kSlotKrnNonce, nullptr);
+                                */
 }
 
 ON_METHOD(user, view_balance) {
@@ -1669,6 +1704,470 @@ ON_METHOD(user, vote) {
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
                         1, "Vote", 280050);
+}
+
+ON_METHOD(moderator, migrate_artist) {
+    struct {
+        gallery::method::MigrateArtist args;
+        char label_and_data[gallery::Artist::kTotalMaxLen + 1];
+    } d;
+
+    uint32_t label_size =
+        Env::DocGetText("label", d.label_and_data,
+                        gallery::Artist::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Artist::kLabelMaxLen + 1) {  // plus \0
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    std::string_view label(d.label_and_data, d.args.label_len);
+    gallery::Artist::Id artist_id = artist_id_by_label(cid, label);
+
+    if (!_POD_(artist_id).IsZero()) {
+        OnError("label already exists");
+        return;
+    }
+
+    uint32_t data_size =
+        Env::DocGetText("data", d.label_and_data + d.args.label_len,
+                        gallery::Artist::kDataMaxLen + 1);  // including 0-term
+
+    if (data_size > gallery::Artist::kDataMaxLen + 1) {
+        OnError("data is too long");
+        return;
+    }
+
+    d.args.data_len = data_size ? data_size - 1 : data_size;
+
+    uint32_t args_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
+
+    key_material::Owner km{cid};
+    d.args.artist_id = id;
+    d.args.signer = km.Get();
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+
+    std::string_view comment = "Setting an artist";
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        Env::Cost::Log_For(label_size) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist::Id)) +
+        Env::Cost::MemOpPerByte * (sizeof(gallery::Artist) + data_size) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) + data_size) +
+        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig;
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d, args_size, nullptr, 0, &sig,
+                        1, comment.data(),
+                        charge + s.fee_base);
+}
+
+ON_METHOD(manager, migrate_artist) {
+    struct {
+        gallery::method::MigrateArtist args;
+        char label_and_data[gallery::Artist::kTotalMaxLen + 1];
+    } d;
+
+    uint32_t label_size =
+        Env::DocGetText("label", d.label_and_data,
+                        gallery::Artist::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Artist::kLabelMaxLen + 1) {  // plus \0
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    std::string_view label(d.label_and_data, d.args.label_len);
+    gallery::Artist::Id artist_id = artist_id_by_label(cid, label);
+
+    if (!_POD_(artist_id).IsZero()) {
+        OnError("label already exists");
+        return;
+    }
+
+    uint32_t data_size =
+        Env::DocGetText("data", d.label_and_data + d.args.label_len,
+                        gallery::Artist::kDataMaxLen + 1);  // including 0-term
+
+    if (data_size > gallery::Artist::kDataMaxLen + 1) {
+        OnError("data is too long");
+        return;
+    }
+
+    d.args.data_len = data_size ? data_size - 1 : data_size;
+
+    uint32_t args_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
+
+    key_material::Admin kid;
+    kid.get_Pk(d.args.signer);
+    d.args.artist_id = id;
+
+    std::string_view comment = "Setting an artist";
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    Env::DocAddNum32("DEBUG_LABEL", d.args.label_len);
+    Env::DocAddNum32("DEBUG_DATA", d.args.data_len);
+    Env::DocAddBlob_T("ARTIST_ID", d.args.artist_id);
+
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        Env::Cost::Log_For(label_size) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist::Id)) +
+        Env::Cost::MemOpPerByte * (sizeof(gallery::Artist) + data_size) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) + data_size) +
+        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig;
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d, args_size, nullptr, 0, &kid,
+                        1, comment.data(),
+                        charge + s.fee_base / 10);
+}
+
+ON_METHOD(moderator, set_collection) {
+    struct {
+        gallery::method::SetCollectionAdmin args;
+        char label_and_data[gallery::Collection::kTotalMaxLen + 2];
+    } d;
+
+    key_material::Owner km{cid};
+    d.args.artist_id = artist_id;
+    d.args.signer = km.Get();
+
+    uint32_t label_size = Env::DocGetText(
+        "label", d.label_and_data,
+        gallery::Collection::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Collection::kLabelMaxLen + 1) {  // plus \0
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    std::string_view label(d.label_and_data, d.args.label_len);
+    gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
+    if (collection_id) {
+        OnError("label already exists");
+        return;
+    }
+
+    uint32_t data_size = Env::DocGetText(
+        "data", d.label_and_data + d.args.label_len,
+        gallery::Collection::kDataMaxLen + 1);  // including 0-term
+
+    if (data_size > gallery::Collection::kDataMaxLen + 1) {
+        OnError("data too long");
+        return;
+    }
+
+    d.args.data_len = data_size - 1;
+    uint32_t args_size = sizeof(d.args) + d.args.data_len + d.args.label_len;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
+                               label_size) +
+        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
+        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
+        (!collection_id ? 4 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
+        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                                                 gallery::Artist::kDataMaxLen)
+                        : 0) +
+        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                                                 gallery::Artist::kDataMaxLen)
+                        : 0) +
+        2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
+        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
+        Env::Cost::MemOpPerByte *
+            (sizeof(gallery::Collection) + label_size + data_size);
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
+                        &sig, 1, "Set collection",
+                        charge + s.fee_base / 10);
+}
+
+ON_METHOD(manager, set_collection) {
+    struct {
+        gallery::method::SetCollectionAdmin args;
+        char label_and_data[gallery::Collection::kTotalMaxLen + 2];
+    } d;
+
+    d.args.artist_id = artist_id;
+
+    uint32_t label_size = Env::DocGetText(
+        "label", d.label_and_data,
+        gallery::Collection::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Collection::kLabelMaxLen + 1) {  // plus \0
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    std::string_view label(d.label_and_data, d.args.label_len);
+    gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
+    if (collection_id) {
+        OnError("label already exists");
+        return;
+    }
+
+    uint32_t data_size = Env::DocGetText(
+        "data", d.label_and_data + d.args.label_len,
+        gallery::Collection::kDataMaxLen + 1);  // including 0-term
+
+    if (data_size > gallery::Collection::kDataMaxLen + 1) {
+        OnError("data too long");
+        return;
+    }
+
+    d.args.data_len = data_size ? data_size - 1 : data_size;
+    uint32_t args_size = sizeof(d.args) + d.args.data_len + d.args.label_len;
+
+    key_material::Admin kid;
+    kid.get_Pk(d.args.signer);
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
+                               label_size) +
+        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
+        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
+        (!collection_id ? 4 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
+        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                                                 gallery::Artist::kDataMaxLen)
+                        : 0) +
+        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                                                 gallery::Artist::kDataMaxLen)
+                        : 0) +
+        2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
+        2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
+        Env::Cost::MemOpPerByte *
+            (sizeof(gallery::Collection) + label_size + data_size);
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
+                        &kid, 1, "Set collection",
+                        charge + s.fee_base / 10);
+}
+
+ON_METHOD(moderator, set_nft) {
+    struct {
+        gallery::method::SetNftAdmin args;
+        char label_and_data[gallery::Nft::kTotalMaxLen];
+    } d;
+
+    key_material::Owner km{cid};
+    d.args.signer = km.Get();
+    d.args.artist_id = artist_id;
+    d.args.collection_id = collection_id;
+    d.args.price.amount = amount;
+    d.args.price.aid = aid;
+
+    if (!collection_id) {
+        OnError("collection_id must be specified");
+        return;
+    }
+
+    uint32_t label_size =
+        Env::DocGetText("label", d.label_and_data,
+                        gallery::Nft::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Nft::kLabelMaxLen + 1) {
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    uint32_t data_size =
+        Env::DocGetText("data", d.label_and_data + d.args.label_len,
+                        gallery::Nft::kDataMaxLen + 1);
+
+    if (data_size < 2) {
+        OnError("data must be specified");
+        return;
+    }
+    if (data_size > gallery::Nft::kDataMaxLen + 1) {
+        OnError("data is too long");
+        return;
+    }
+
+    d.args.data_len = data_size ? data_size - 1 : data_size;
+    uint32_t arg_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
+
+    SigRequest sig;
+    sig.m_pID = &km;
+    sig.m_nID = sizeof(km);
+
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        Env::Cost::LoadVar_For(sizeof(bool)) +
+        7 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Nft)) +
+        Env::Cost::Log_For(data_size) + Env::Cost::Log_For(label_size) +
+        Env::Cost::AddSig + Env::Cost::Cycle * 300;
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d, arg_size, nullptr, 0, &sig, 1,
+                        "Upload nft", charge + s.fee_base / 10);
+}
+
+ON_METHOD(manager, set_nft) {
+    struct {
+        gallery::method::SetNftAdmin args;
+        char label_and_data[gallery::Nft::kTotalMaxLen];
+    } d;
+
+    d.args.artist_id = artist_id;
+    d.args.collection_id = collection_id;
+    d.args.price.amount = amount;
+    d.args.price.aid = aid;
+
+    if (!collection_id) {
+        OnError("collection_id must be specified");
+        return;
+    }
+
+    uint32_t label_size =
+        Env::DocGetText("label", d.label_and_data,
+                        gallery::Nft::kLabelMaxLen + 1);  // including 0-term
+
+    if (label_size > gallery::Nft::kLabelMaxLen + 1) {
+        OnError("label is too long");
+        return;
+    }
+    if (label_size < 2) {
+        OnError("label is missing");
+        return;
+    }
+
+    d.args.label_len = label_size - 1;
+
+    uint32_t data_size =
+        Env::DocGetText("data", d.label_and_data + d.args.label_len,
+                        gallery::Nft::kDataMaxLen + 1);
+
+    if (data_size < 2) {
+        OnError("data must be specified");
+        return;
+    }
+    if (data_size > gallery::Nft::kDataMaxLen + 1) {
+        OnError("data is too long");
+        return;
+    }
+
+    d.args.data_len = data_size ? data_size - 1 : data_size;
+    uint32_t arg_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
+
+    key_material::Admin kid;
+    kid.get_Pk(d.args.signer);
+    
+    uint32_t charge =
+        ManagerUpgadable2::get_ChargeInvoke() +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        Env::Cost::LoadVar_For(sizeof(bool)) +
+        7 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Collection) +
+                               gallery::Collection::kTotalMaxLen) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Nft)) +
+        Env::Cost::Log_For(data_size) + Env::Cost::Log_For(label_size) +
+        Env::Cost::AddSig + Env::Cost::Cycle * 300;
+
+    StatePlus s;
+    if (!s.Init(cid)) {
+        OnError("no contract with such cid");
+        return;
+    }
+
+    Env::GenerateKernel(&cid, d.args.kMethod, &d, arg_size, nullptr, 0, &kid, 1,
+                        "Upload nft", charge + s.fee_base / 10);
 }
 
 #undef ON_METHOD
