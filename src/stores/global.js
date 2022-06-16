@@ -262,7 +262,7 @@ const store = {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
       action: 'set_collection_status',
-      ids: '"' + ids.join(',') + '"',
+      ids: '"' + ids.join(';') + '"',
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
@@ -272,7 +272,7 @@ const store = {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'moderator',
       action: 'set_artist_status',
-      ids: '"' + ids.join(',') + '"',
+      ids: '"' + ids.join(';') + '"',
       status: approve ? 'approved' : 'rejected',
       cid: this.state.cid
     })
