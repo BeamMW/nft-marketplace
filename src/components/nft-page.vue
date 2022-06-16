@@ -104,6 +104,7 @@
         text-transform: uppercase
         font-weight: bold
         letter-spacing: 3.1px
+        user-select: none
       }
       
       /*

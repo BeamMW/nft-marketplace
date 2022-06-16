@@ -1,139 +1,136 @@
 <template>
-  <!-- TODO: handle author loading error (first collection) -->
-  <pageTitle :title="title"/>
-  <loading v-if="collection === undefined" text="Loading Collection"/>
-  <notFound v-else-if="collection === null" text="Collection Not Found"/>
-  <div v-else class="collection-container">
-    <keyModal ref="keyModal" :name="author_error ? '' : author_name" :artist_key="author_key"/>
-    <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
-      <div class="info-container">
-        <div class="left">
-          <preview :class="{'error': collection.author_error}" 
-                   :image="avatar" 
-                   :default="def_avatar" 
-                   :show_text="false" 
-                   radius="36px 36px" 
-                   class="avatar"
-          />
-          <div class="info">
-            <span class="name">{{ author_name }}</span>
-            <span class="about">{{ author_about }}</span>
+  <div class="collection-container">
+    <!-- TODO: handle author loading error (first collection) -->
+    <pageTitle :title="title"/>
+    <loading v-if="collection === undefined" text="Loading Collection"/>
+    <notFound v-else-if="collection === null" text="Collection Not Found"/>
+    <template v-else>
+      <keyModal ref="keyModal" :name="author_error ? '' : author_name" :artist_key="author_key"/>
+      <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
+        <div class="info-container">
+          <div class="left">
+            <preview :class="{'error': collection.author_error}" 
+                     :image="avatar" 
+                     :default="def_avatar" 
+                     :show_text="false" 
+                     radius="36px 36px" 
+                     class="avatar"
+            />
+            <div class="info">
+              <span class="name">{{ author_name }}</span>
+              <span class="about">{{ author_about }}</span>
+            </div>
+          </div>
+          <div class="right">
+            <div class="social">
+              <div>
+                <btn v-if="website" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onWebsite">
+                  <img src="~assets/globe-green.svg">
+                </btn>
+                <btn v-if="twitter" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onTwitter">
+                  <img src="~assets/twitter-green.svg">
+                </btn>
+                <btn v-if="instagram" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onInstagram">
+                  <img src="~assets/instagram-green.svg">
+                </btn>
+                <btn color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onKey">
+                  <img src="~assets/key-small.svg">
+                </btn>
+              </div>  
+            </div>
+            <div class="stats">
+              <div>
+                <div class="value">{{ nfts_count }}</div>
+                <span>{{ nfts_count == 1 ? 'NFT' : 'NFTs' }}</span>
+              </div>
+              <div>
+                <div>
+                  <img src="~assets/beam.svg">
+                  <span class="value">{{ max_sale }}</span>
+                </div>
+                <span>max sale</span>
+              </div>
+              <div>
+                <div>
+                  <img src="~assets/beam.svg">
+                  <span class="value">{{ trade_volume }}</span>
+                </div>
+                <span>trade volume</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="right">
-          <div class="social">
-            <div>
-              <btn v-if="website" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onWebsite">
-                <img src="~assets/globe-green.svg">
-              </btn>
-              <btn v-if="twitter" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onTwitter">
-                <img src="~assets/twitter-green.svg">
-              </btn>
-              <btn v-if="instagram" color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onInstagram">
-                <img src="~assets/instagram-green.svg">
-              </btn>
-              <btn color="transparent" height="20px" padding="5px 7px 5px 7px" @click="onKey">
-                <img src="~assets/key-small.svg">
-              </btn>
-            </div>  
-          </div>
-          <div class="stats">
-            <div>
-              <div class="value">{{ nfts_count }}</div>
-              <span>{{ nfts_count == 1 ? 'NFT' : 'NFTs' }}</span>
-            </div>
-            <div>
-              <div>
-                <img src="~assets/beam.svg">
-                <span class="value">{{ max_sale }}</span>
-              </div>
-              <span>max sale</span>
-            </div>
-            <div>
-              <div>
-                <img src="~assets/beam.svg">
-                <span class="value">{{ trade_volume }}</span>
-              </div>
-              <span>trade volume</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </preview>  
+      </preview>  
 
-    <!-- TODO: same layout as in approve containers -->
-    <div :class="{'block': true, 'block-long': long_text}">
-      <span ref="desc" :class="{'desc-short': !full_text}">{{ description }}</span>
-      <btn v-if="long_text && !full_text"
-           class="btn-right"
-           text="See more" 
-           height="20px"
-           color="transparent"
-           text_color="green"
-           padding="0px 7px 0px 7px"
-           :text_bold="false"
-           @click="full_text = true"
-      />  
-      <btn v-if="long_text && full_text"
-           class="btn-center"
-           text="See less" 
-           height="20px"
-           color="transparent"
-           text_color="green"
-           padding="0px 7px 0px 7px"
-           :text_bold="false"
-           @click="full_text = false"
-      /> 
-    </div>
-    <div v-if="debug && collection.error" class="debug error">
-      {{ collection.error }}
-    </div>
-    <tabsctrl v-model="active_tab" :tabs="tabs"/>
-    <!--- TODO: set collection to the current one when opening 'new-nft' -->
-    <list v-if="show_all"
-          class="list"
-          items_name="NFTs"
-          component="nft"
-          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
-          :new_component_props="{'selected_collection': id, limit_reached}"
-          :mode="`${safe_mode}:collection:${id}`"
-          :store="nftsStore"
-          :component_props="{'mode': safe_mode}"
-    />
-    <list v-if="show_sale"
-          class="list"
-          items_name="NFTs"
-          component="nft"
-          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
-          :new_component_props="{'selected_collection': id, limit_reached}"
-          :mode="`${safe_mode}:collection:sale:${id}`"
-          :store="nftsStore"
-          :component_props="{'mode': safe_mode}"
-    />
-    <list v-if="show_liked"
-          class="list"
-          items_name="NFTs"
-          component="nft"
-          :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
-          :new_component_props="{'selected_collection': id, limit_reached}"
-          :mode="`${safe_mode}:collection:liked:${id}`"
-          :store="nftsStore"
-          :component_props="{'mode': safe_mode}"
-    />
+      <!-- TODO: same layout as in approve containers -->
+      <div :class="{'block': true, 'block-long': long_text}">
+        <span ref="desc" :class="{'desc-short': !full_text}">{{ description }}</span>
+        <btn v-if="long_text && !full_text"
+             class="btn-right"
+             text="See more" 
+             height="20px"
+             color="transparent"
+             text_color="green"
+             padding="0px 7px 0px 7px"
+             :text_bold="false"
+             @click="full_text = true"
+        />  
+        <btn v-if="long_text && full_text"
+             class="btn-center"
+             text="See less" 
+             height="20px"
+             color="transparent"
+             text_color="green"
+             padding="0px 7px 0px 7px"
+             :text_bold="false"
+             @click="full_text = false"
+        /> 
+      </div>
+      <div v-if="debug && collection.error" class="debug error">
+        {{ collection.error }}
+      </div>
+      <tabsctrl v-model="active_tab" :tabs="tabs"/>
+      <!--- TODO: set collection to the current one when opening 'new-nft' -->
+      <list v-if="show_all"
+            class="list"
+            items_name="NFTs"
+            component="nft"
+            :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+            :new_component_props="{'selected_collection': id, limit_reached}"
+            :mode="`${safe_mode}:collection:${id}`"
+            :store="nftsStore"
+            :component_props="{'mode': safe_mode}"
+      />
+      <list v-if="show_sale"
+            class="list"
+            items_name="NFTs"
+            component="nft"
+            :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+            :new_component_props="{'selected_collection': id, limit_reached}"
+            :mode="`${safe_mode}:collection:sale:${id}`"
+            :store="nftsStore"
+            :component_props="{'mode': safe_mode}"
+      />
+      <list v-if="show_liked"
+            class="list"
+            items_name="NFTs"
+            component="nft"
+            :new_component="owned && safe_mode == 'artist' ? 'create-nft' : ''"
+            :new_component_props="{'selected_collection': id, limit_reached}"
+            :mode="`${safe_mode}:collection:liked:${id}`"
+            :store="nftsStore"
+            :component_props="{'mode': safe_mode}"
+      />
+    </template>
   </div>
 </template>
 
 <style lang="stylus" scoped>
   .collection-container {
-    margin-top: 5px
-    border-top-left-radius: 10px
-    border-top-right-radius: 10px
     display: flex
     flex-direction: column
-    box-sizing: border-box
     width: 100%
     height: 100%
-    overflow: hidden
 
     & > .debug {
       width: 100%
