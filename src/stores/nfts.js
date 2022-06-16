@@ -183,7 +183,7 @@ class NFTSStore extends LazyItems {
     })
 
     awork.safe_description = computed(() => {
-      if (awork.approved) return awork.label
+      if (awork.approved) return awork.description
       return '[nft is in moderation]'
     })
 
