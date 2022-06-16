@@ -641,7 +641,7 @@ BEAM_EXPORT void Method_21(const method::MigrateArtist& r) {
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
 }
 
-BEAM_EXPORT void Method_22(const method::SetCollectionAdmin& r) {
+BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
     Env::Halt_if(r.label_len > Collection::kLabelMaxLen);
     Env::Halt_if(r.data_len > Collection::kDataMaxLen);
     Env::Halt_if(!r.label_len);
@@ -680,13 +680,9 @@ BEAM_EXPORT void Method_22(const method::SetCollectionAdmin& r) {
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.artist_id);
         a.updated = cur_height;
-        Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
-        a.last_created_object = cur_height;
         GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
         s.Save();
     }
-
-    Env::Halt_if(_POD_(c.author) != r.artist_id);
 
     Collection::LabelKey lk{r.artist_id, GetLabelHash(std::string_view(
                                              c.label_and_data, c.label_len))};

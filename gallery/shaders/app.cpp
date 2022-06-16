@@ -64,33 +64,34 @@
 #define Gallery_manager_set_rate_limit(macro) \
     macro(ContractID, cid) macro(Amount, amount)
 
-#define Gallery_manager_set_nft(macro)                                    \
-    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id) \
-        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) macro(gallery::Artist::Id, artist_id)
+#define Gallery_manager_set_nft(macro)                                        \
+    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id)      \
+        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) \
+            macro(gallery::Artist::Id, artist_id)
 
-#define Gallery_manager_migrate_artist(macro) macro(ContractID, cid) macro(gallery::Artist::Id, id)
+#define Gallery_manager_migrate_artist(macro) \
+    macro(ContractID, cid) macro(gallery::Artist::Id, id)
 
-#define Gallery_manager_set_collection(macro) \
+#define Gallery_manager_migrate_collection(macro) \
     macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
 
-#define GalleryRole_manager(macro)                                            \
-    macro(manager, view) macro(manager, view_params) macro(                   \
-        manager, view_artists_stats) macro(manager, view_moderators_stats)    \
-        macro(manager, view_artists) macro(manager, view_collections)         \
-            macro(manager, view_nfts) macro(manager, view_nft_sales)          \
-                macro(manager, view_collections_stats) macro(                 \
-                    manager, view_nfts_stats) macro(manager, view_balance)    \
-                    macro(manager, get_id) macro(manager, explicit_upgrade)   \
-                        macro(manager, set_moderator)                         \
-                            macro(manager, view_moderators)                   \
-                                macro(manager, set_nft_status)                \
-                                    macro(manager, set_artist_status)         \
-                                        macro(manager, set_collection_status) \
-                                            macro(manager, set_fee_base)      \
-                                                macro(manager, set_rate_limit) \
-                                macro(manager, set_nft)                \
-                                macro(manager, migrate_artist)                \
-                                macro(manager, set_collection)                \
+#define GalleryRole_manager(macro)                                             \
+    macro(manager, view) macro(manager, view_params) macro(                    \
+        manager, view_artists_stats) macro(manager, view_moderators_stats)     \
+        macro(manager, view_artists) macro(manager, view_collections) macro(   \
+            manager, view_nfts) macro(manager, view_nft_sales)                 \
+            macro(manager, view_collections_stats) macro(                      \
+                manager, view_nfts_stats) macro(manager, view_balance)         \
+                macro(manager, get_id) macro(manager, explicit_upgrade) macro( \
+                    manager, set_moderator) macro(manager, view_moderators)    \
+                    macro(manager, set_nft_status)                             \
+                        macro(manager, set_artist_status)                      \
+                            macro(manager, set_collection_status)              \
+                                macro(manager, set_fee_base)                   \
+                                    macro(manager, set_rate_limit)             \
+                                        macro(manager, set_nft) macro(         \
+                                            manager, migrate_artist)           \
+                                            macro(manager, migrate_collection)
 
 // MODERATOR
 
@@ -100,21 +101,22 @@
 
 #define Gallery_moderator_set_artist_status(macro) macro(ContractID, cid)
 
-#define Gallery_moderator_migrate_artist(macro) macro(ContractID, cid) macro(gallery::Artist::Id, id)
+#define Gallery_moderator_migrate_artist(macro) \
+    macro(ContractID, cid) macro(gallery::Artist::Id, id)
 
-#define Gallery_moderator_set_collection(macro) \
+#define Gallery_moderator_migrate_collection(macro) \
     macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
 
-#define Gallery_moderator_set_nft(macro)                                    \
-    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id) \
-        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) macro(gallery::Artist::Id, artist_id)
+#define Gallery_moderator_set_nft(macro)                                      \
+    macro(ContractID, cid) macro(gallery::Collection::Id, collection_id)      \
+        macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) \
+            macro(gallery::Artist::Id, artist_id)
 
-#define GalleryRole_moderator(macro)                                     \
-    macro(moderator, set_nft_status) macro(moderator, set_artist_status) \
-        macro(moderator, set_collection_status)\
-                                macro(moderator, set_nft)                \
-                                macro(moderator, migrate_artist)                \
-                                macro(moderator, set_collection)                \
+#define GalleryRole_moderator(macro)                                      \
+    macro(moderator, set_nft_status) macro(moderator, set_artist_status)  \
+        macro(moderator, set_collection_status) macro(moderator, set_nft) \
+            macro(moderator, migrate_artist)                              \
+                macro(moderator, migrate_collection)
 
 // ARTIST
 
@@ -131,7 +133,7 @@
 
 #define GalleryRole_artist(macro)                                          \
     macro(artist, get_id) macro(artist, set_nft) macro(artist, set_artist) \
-        macro(artist, set_collection) \
+        macro(artist, set_collection)
 
 // USER
 
@@ -511,7 +513,7 @@ struct AppNft : public gallery::Nft {
 
         if (!_POD_(owner).IsZero()) {
             uint32_t owned = IsOwner(cid, owner, 0) || IsOwner(cid, owner, id);
-            //Env::DocAddBlob_T("owner", owner);
+            // Env::DocAddBlob_T("owner", owner);
             Env::DocAddNum("owned", owned);
 
             if (owned) {
@@ -1583,8 +1585,8 @@ ON_METHOD(user, buy) {
     fc.m_Amount = nft.price.amount;
     fc.m_Aid = nft.price.aid;
 
-    Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
-                                &sig, 1, "Buy item", 1895645);
+    Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
+                        1, "Buy item", 1895645);
 
     /*
     Height cur_height = Env::get_Height();
@@ -1777,8 +1779,7 @@ ON_METHOD(moderator, migrate_artist) {
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig;
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d, args_size, nullptr, 0, &sig,
-                        1, comment.data(),
-                        charge + s.fee_base);
+                        1, comment.data(), charge + s.fee_base);
 }
 
 ON_METHOD(manager, migrate_artist) {
@@ -1852,13 +1853,12 @@ ON_METHOD(manager, migrate_artist) {
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig;
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d, args_size, nullptr, 0, &kid,
-                        1, comment.data(),
-                        charge + s.fee_base / 10);
+                        1, comment.data(), charge + s.fee_base / 10);
 }
 
-ON_METHOD(moderator, set_collection) {
+ON_METHOD(moderator, migrate_collection) {
     struct {
-        gallery::method::SetCollectionAdmin args;
+        gallery::method::MigrateCollection args;
         char label_and_data[gallery::Collection::kTotalMaxLen + 2];
     } d;
 
@@ -1916,28 +1916,25 @@ ON_METHOD(moderator, set_collection) {
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
                                label_size) +
-        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
-        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
-        (!collection_id ? 4 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
-        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
-                                                 gallery::Artist::kDataMaxLen)
-                        : 0) +
-        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
-                                                 gallery::Artist::kDataMaxLen)
-                        : 0) +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        4 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
         2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
         Env::Cost::MemOpPerByte *
             (sizeof(gallery::Collection) + label_size + data_size);
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
-                        &sig, 1, "Set collection",
-                        charge + s.fee_base / 10);
+                        &sig, 1, "Set collection", charge + s.fee_base / 10);
 }
 
-ON_METHOD(manager, set_collection) {
+ON_METHOD(manager, migrate_collection) {
     struct {
-        gallery::method::SetCollectionAdmin args;
+        gallery::method::MigrateCollection args;
         char label_and_data[gallery::Collection::kTotalMaxLen + 2];
     } d;
 
@@ -1992,23 +1989,20 @@ ON_METHOD(manager, set_collection) {
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
                                label_size) +
-        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
-        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
-        (!collection_id ? 4 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
-        (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
-                                                 gallery::Artist::kDataMaxLen)
-                        : 0) +
-        (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
-                                                 gallery::Artist::kDataMaxLen)
-                        : 0) +
+        Env::Cost::LoadVar_For(sizeof(gallery::State)) +
+        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
+        4 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
+        Env::Cost::SaveVar_For(sizeof(gallery::Artist) +
+                               gallery::Artist::kDataMaxLen) +
         2 * Env::Cost::SaveVar_For(sizeof(gallery::Collection::Id)) +
         2 * Env::Cost::SaveVar_For(sizeof(bool)) + Env::Cost::AddSig +
         Env::Cost::MemOpPerByte *
             (sizeof(gallery::Collection) + label_size + data_size);
 
     Env::GenerateKernel(&cid, d.args.kMethod, &d.args, args_size, nullptr, 0,
-                        &kid, 1, "Set collection",
-                        charge + s.fee_base / 10);
+                        &kid, 1, "Set collection", charge + s.fee_base / 10);
 }
 
 ON_METHOD(moderator, set_nft) {
@@ -2141,7 +2135,7 @@ ON_METHOD(manager, set_nft) {
 
     key_material::Admin kid;
     kid.get_Pk(d.args.signer);
-    
+
     uint32_t charge =
         ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
