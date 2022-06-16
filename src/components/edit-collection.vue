@@ -63,8 +63,8 @@
                   title="Add collection image<br>(*.jpg, *.png, *.svg)"
                   accept="image/jpeg;image/png;image/svg+xml"
                   height="135px"
-                  :min_width="914"
-                  :min_height="170"
+                  :min_width="1400"
+                  :min_height="260"
                   cover
         />
       </div>

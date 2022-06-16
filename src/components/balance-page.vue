@@ -107,7 +107,7 @@ export default {
 
     total_sold () {
       let self = artistsStore.self
-      return (self || {}).total_sold || 0
+      return (self || {}).total_sold  
     }
   },
 

@@ -59,7 +59,7 @@ export default {
     like_icon() {
       let liked = require('assets/heart-red.svg')
       let unliked = require('assets/heart.svg')
-      return this.likes ? liked : unliked
+      return this.liked ? liked : unliked
     },
   },
 

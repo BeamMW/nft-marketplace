@@ -70,8 +70,8 @@
                     height="135px"
                     cover
                     :show_error="false"
-                    :min_width="914"
-                    :min_height="170"
+                    :min_width="1400"
+                    :min_height="260"
                     :readonly="in_set_artist" 
           />
           <div class="ellipse" :style="ellipse_style">

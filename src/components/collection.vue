@@ -30,7 +30,7 @@
             <div class="text">{{ nfts_count }}</div>
             <div>{{ nfts_count == 1 ? 'NFT' : 'NFTs' }}</div>
           </div>
-          <amount :amount="item.total_sold_price" size="12px" info="trade volume" class="icon_styles"/>
+          <amount :amount="trade_volume" size="12px" info="trade volume" class="icon_styles"/>
         </div>
       </div>
     </div>
@@ -172,6 +172,9 @@ export default {
     },
     error() {
       return this.item.error || this.item.author_error
+    },
+    trade_volume() {
+      return this.item.total_sold.volume
     }
   },
 
