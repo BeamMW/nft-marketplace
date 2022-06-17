@@ -187,7 +187,7 @@ export default {
     clearDelay() {
       setTimeout(() => {
         this.delay_passed = true
-      }, 1500)
+      }, 100)
     },
     onScroll(ev) {
       let pos = ev.target.scrollTop
