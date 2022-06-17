@@ -113,7 +113,6 @@ class ImagesStore {
 
   async _ipfsLoad(what) {
     try {
-      console.log('load image', what.ipfs_hash)
       this._setLoading(what)
   
       let {res} = await utils.callApiAsync('ipfs_get', {hash: what.ipfs_hash})
