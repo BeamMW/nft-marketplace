@@ -1,6 +1,6 @@
 <template>
   <div v-if="!wait" class="app-loading">
-    <img src="~assets/loading.svg"/>
+    <img src="~assets/loading.svg" width="204" height="236"/>
     <div class="title">{{ text }}</div>
     <div>Please wait...</div>
   </div>
@@ -13,8 +13,8 @@
   height: 100%
   display: flex
   flex-direction: column
-  align-content: center
   justify-content: center
+  align-items: center
   box-sizing: border-box
   padding-bottom: 40px
   font-size: 14px
