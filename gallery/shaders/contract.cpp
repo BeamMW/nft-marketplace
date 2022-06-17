@@ -1,6 +1,7 @@
 #include "Shaders/common.h"
 #include "Shaders/Math.h"
 #include "contract.h"
+#include "Shaders/upgradable3/contract_impl.h"
 
 #include <algorithm>
 
@@ -47,20 +48,23 @@ void PayoutMove(const Payout::Key& key, Amount val, bool add) {
 }
 
 BEAM_EXPORT void Ctor(const method::Init& r) {
-    if (Env::get_CallDepth() > 1) {
-        ContractState s(false);
-        _POD_(s).SetZero();
-        _POD_(s.config) = r.config;
-        s.Save();
-    }
+    r.settings.TestNumApprovers();
+    r.settings.Save();
+    ContractState s(false);
+    _POD_(s).SetZero();
+    _POD_(s.config) = r.config;
+    s.Save();
 }
 
 BEAM_EXPORT void Dtor(void*) {
     // ignore
 }
 
-BEAM_EXPORT void Method_2(void*) {
-    // called on upgrade
+void Upgradable3::OnUpgraded(uint32_t /*nPrevVersion*/) {
+}
+
+uint32_t Upgradable3::get_CurrentVersion() {
+    return 0;
 }
 
 BEAM_EXPORT void Method_3(const method::SetFeeBase& r) {

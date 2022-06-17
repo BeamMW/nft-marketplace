@@ -4,11 +4,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-entry,--allow-undefined,--expor
 
 add_executable(contract contract.cpp)
 add_executable(app app.cpp)
-add_executable(app-admin app-admin.cpp)
 target_link_libraries(contract PRIVATE Beam::shader-lib)
 target_link_libraries(app PRIVATE Beam::shader-lib)
-target_link_libraries(app-admin PRIVATE Beam::shader-lib)
 
 generate_sid(contract)
 add_dependencies(app contract_header)
-add_dependencies(app-admin contract_header)

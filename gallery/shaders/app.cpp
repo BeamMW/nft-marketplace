@@ -1,8 +1,7 @@
 #include "Shaders/common.h"
 #include "Shaders/app_common_impl.h"
+#include "Shaders/upgradable3/app_common_impl.h"
 #include "contract.h"
-#include "Shaders/upgradable2/contract.h"
-#include "Shaders/upgradable2/app_common_impl.h"
 
 #include <array>
 #include <limits>
@@ -48,9 +47,18 @@
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
 
+#define Gallery_manager_create_contract(macro) macro(ContractID, cid) macro(Amount, vote_reward_amount) macro(AssetID, vote_reward_aid)
+
+#define Gallery_manager_replace_admin(macro) Upgradable3_replace_admin(macro)
+
+#define Gallery_manager_set_min_approvers(macro) \
+    Upgradable3_set_min_approvers(macro)
+
 #define Gallery_manager_get_id(macro)
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
+
+#define Gallery_manager_schedule_upgrade(macro) macro(ContractID, cid) macro(Height, target_height)
 
 #define Gallery_manager_set_nft_status(macro) macro(ContractID, cid)
 
@@ -80,13 +88,14 @@
     macro(ContractID, cid) macro(gallery::Nft::Id, nft_id)
 
 #define GalleryRole_manager(macro)                                             \
+    macro(manager, create_contract) macro(manager, replace_admin) macro(manager, set_min_approvers) \
     macro(manager, view) macro(manager, view_params) macro(                    \
         manager, view_artists_stats) macro(manager, view_moderators_stats)     \
         macro(manager, view_artists) macro(manager, view_collections) macro(   \
             manager, view_nfts) macro(manager, view_nft_sales)                 \
             macro(manager, view_collections_stats) macro(                      \
                 manager, view_nfts_stats) macro(manager, view_balance)         \
-                macro(manager, get_id) macro(manager, explicit_upgrade) macro( \
+                macro(manager, get_id) macro(manager, explicit_upgrade) macro(manager, schedule_upgrade) macro( \
                     manager, set_moderator) macro(manager, view_moderators)    \
                     macro(manager, set_nft_status)                             \
                         macro(manager, set_artist_status)                      \
@@ -204,12 +213,22 @@ BEAM_EXPORT void Method_0() {
 #define ON_METHOD(role, name) \
     void On_##role##_##name(Gallery_##role##_##name(THE_FIELD) int unused = 0)
 
+/*
+ * Constants
+ */
 // For migration purposes
 static const ContractID kOldGalleryCid = {
     0xb5, 0x1e, 0xfe, 0x78, 0xd3, 0xe7, 0xc8, 0x3c, 0x8d, 0xbc, 0x3d,
     0x59, 0xd5, 0xe0, 0x6b, 0x2b, 0xd7, 0x70, 0x13, 0x9e, 0x64, 0x5b,
     0xc1, 0x9e, 0x50, 0x65, 0x26, 0x32, 0xcb, 0xdd, 0x47, 0xd1};
 static const ContractID kEmptyCid = {};
+
+const ShaderID kSids[] = {
+    gallery::kSid0,
+    gallery::kSid1,
+};
+
+const Upgradable3::Manager::VerInfo kVerInfo = { kSids, _countof(kSids) };
 
 /*
  * Forward declarations
@@ -899,7 +918,6 @@ void SetNftStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Nft::Id) * ids_vec.size());
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         4 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
@@ -944,7 +962,6 @@ void SetArtistStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Artist::Id) * ids_vec.size());
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         2 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
@@ -984,7 +1001,6 @@ void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Collection::Id) * ids_vec.size());
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         2 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
@@ -1056,7 +1072,6 @@ void MigrateArtistCommon(const ContractID& cid, const PubKey& signer,
     }
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::Log_For(label_size) +
@@ -1122,7 +1137,6 @@ void MigrateCollectionCommon(const ContractID& cid, const PubKey& signer,
     }
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
@@ -1202,7 +1216,6 @@ void MigrateNftCommon(const ContractID& cid, const PubKey& signer,
     uint32_t arg_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(bool)) +
@@ -1247,7 +1260,6 @@ void MigrateSalesCommon(const ContractID& cid, const PubKey& signer,
     }
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(bool)) +
         4 * Env::Cost::SaveVar_For(sizeof(bool)) +
@@ -1274,22 +1286,42 @@ void MigrateSalesCommon(const ContractID& cid, const PubKey& signer,
 /*
  * On_Methods
  */
-ON_METHOD(manager, view) {
-    static const ShaderID kSids[] = {
-        gallery::s_SID_0,
-    };
-
-    ContractID versions[_countof(kSids)];
-    Height versions_deploy[_countof(kSids)];
-
-    ManagerUpgadable2::Walker wlk;
-    wlk.m_VerInfo.m_Count = _countof(kSids);
-    wlk.m_VerInfo.s_pSid = kSids;
-    wlk.m_VerInfo.m_pCid = versions;
-    wlk.m_VerInfo.m_pHeight = versions_deploy;
-
+ON_METHOD(manager, create_contract) {
     key_material::Admin kid;
-    wlk.ViewAll(&kid);
+    PubKey admin_key;
+    kid.get_Pk(admin_key);
+    gallery::method::Init args;
+    args.config.vote_reward.aid = vote_reward_aid;
+    args.config.vote_reward.amount = vote_reward_amount;
+    key_material::Admin().get_Pk(args.config.admin_id);
+    if (!kVerInfo.FillDeployArgs(args.settings, &admin_key)) {
+        return;
+    }
+    Env::GenerateKernel(nullptr, 0, &args, sizeof(args), nullptr, 0, nullptr, 0, "Deploy gallery contract", Upgradable3::Manager::get_ChargeDeploy() * 2);
+}
+
+ON_METHOD(manager, schedule_upgrade) {
+    key_material::Admin kid;
+    Upgradable3::Manager::MultiSigRitual::Perform_ScheduleUpgrade(kVerInfo, cid, kid, target_height);
+}
+
+ON_METHOD(manager, explicit_upgrade) {
+    key_material::Admin kid;
+    Upgradable3::Manager::MultiSigRitual::Perform_ExplicitUpgrade(cid);
+}
+
+ON_METHOD(manager, replace_admin) {
+    key_material::Admin kid;
+    Upgradable3::Manager::MultiSigRitual::Perform_ReplaceAdmin(cid, kid, iAdmin, pk);
+}
+
+ON_METHOD(manager, set_min_approvers) {
+    key_material::Admin kid;
+    Upgradable3::Manager::MultiSigRitual::Perform_SetApprovers(cid, kid, newVal);
+}
+
+ON_METHOD(manager, view) {
+    EnumAndDumpContracts(gallery::kSid1);
 }
 
 ON_METHOD(manager, set_moderator) {
@@ -1315,6 +1347,7 @@ ON_METHOD(manager, view_params) {
     Env::DocAddNum32("is_admin", (_POD_(s.config.admin_id) == admin_id));
     Env::DocAddNum32("is_moderator", moder.is_moderator(cid));
     Env::DocAddNum("fee_base", s.fee_base);
+    Env::DocAddNum("rate_limit", s.rate_limit);
 
     {
         Env::DocGroup gr1("vote_reward");
@@ -1462,7 +1495,6 @@ ON_METHOD(artist, set_nft) {
     sig.m_nID = sizeof(km);
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(bool)) +
@@ -1517,10 +1549,6 @@ ON_METHOD(manager, get_id) {
     PubKey pk;
     key_material::Admin().get_Pk(pk);
     Env::DocAddBlob_T("id", pk);
-}
-
-ON_METHOD(manager, explicit_upgrade) {
-    ManagerUpgadable2::MultiSigRitual::Perform_ExplicitUpgrade(cid);
 }
 
 ON_METHOD(manager, view_balance) {
@@ -1662,7 +1690,6 @@ ON_METHOD(artist, set_artist) {
     }
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         (!artist_exists ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
         (!artist_exists ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
         (!artist_exists ? Env::Cost::Log_For(label_size) : 0) +
@@ -1736,7 +1763,6 @@ ON_METHOD(artist, set_collection) {
     }
 
     uint32_t charge =
-        ManagerUpgadable2::get_ChargeInvoke() +
         Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) + data_size +
