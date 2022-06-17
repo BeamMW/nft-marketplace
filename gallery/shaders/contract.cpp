@@ -400,7 +400,7 @@ BEAM_EXPORT void Method_12(const method::Buy& r) {
     } a;
 
     if (_POD_(m.author) == m.owner) {
-        GalleryObject::Load(a, m.author, sizeof(c));
+        GalleryObject::Load(a, m.author, sizeof(a));
         ++a.total_sold;
         a.total_sold_price += m.price.amount;
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
@@ -709,6 +709,7 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     Env::Halt_if(!r.label_len);
     Env::Halt_if(!r.data_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
+    Env::Halt_if(_POD_(r.owner_id).IsZero());
 
     Height cur_height = Env::get_Height();
     Nft m;
@@ -721,7 +722,7 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
 
     m.id = r.nft_id;
     s.total_nfts = r.nft_id;
-    m.owner = r.artist_id;
+    m.owner = r.owner_id;
     m.author = r.artist_id;
     m.collection_id = r.collection_id;
     m.status = Status::kApproved;
@@ -765,17 +766,75 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     auto data_ptr = reinterpret_cast<const uint8_t*>(&r + 1) + r.label_len;
     Events::AddNftData::Key adk;
     adk.nft_id = m.id;
-    adk.artist_id = m.owner;
+    adk.artist_id = m.author;
     Env::EmitLog(&adk, sizeof(adk), data_ptr, r.data_len, KeyTag::Internal);
 
     auto label_ptr = reinterpret_cast<const uint8_t*>(&r + 1);
     Events::AddNftLabel::Key alk;
     alk.nft_id = m.id;
-    alk.artist_id = m.owner;
+    alk.artist_id = m.author;
     Env::EmitLog(&alk, sizeof(alk), label_ptr, r.label_len, KeyTag::Internal);
 
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height, m.id);
     m.updated = cur_height;
     GalleryObject::Save(m, m.id);
     s.Save();
+}
+
+BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
+    Height cur_height = Env::get_Height();
+    Nft m;
+    Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
+    Env::Halt_if(!r.sales_len);
+
+    struct CollectionPlus : public Collection {
+        char label_and_data[kTotalMaxLen];
+    } c;
+
+    GalleryObject::Load(c, m.collection_id, sizeof(c));
+    for (uint32_t i = 0; i < r.sales_len; ++i) {
+        ++c.total_sold;
+        c.total_sold_price += r.prices[i];
+        if (!c.max_sold.nft_id || r.prices[i] > c.max_sold.price.amount) {
+            c.max_sold.price.amount = r.prices[i];
+            c.max_sold.price.aid = 0;
+            c.max_sold.nft_id = r.nft_id;
+        }
+        if (!c.min_sold.nft_id || r.prices[i] < c.min_sold.price.amount) {
+            c.min_sold.price.amount = r.prices[i];
+            c.min_sold.price.aid = 0;
+            c.min_sold.nft_id = r.nft_id;
+        }
+        Events::Sell::Key esk;
+        esk.nft_id = r.nft_id;
+        Events::Sell es;
+        es.price.amount = r.prices[i];
+        es.price.aid = 0;
+        es.has_aid = 0;
+        Env::EmitLog_T(esk, es);
+    }
+    Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
+        c.updated, cur_height, m.collection_id);
+    c.updated = cur_height;
+    GalleryObject::Save(c, m.collection_id,
+                        sizeof(Collection) + c.label_len + c.data_len);
+
+    struct ArtistPlus : public Artist {
+        char data[kDataMaxLen];
+    } a;
+
+    GalleryObject::Load(a, m.author, sizeof(a));
+    ++a.total_sold;
+    a.total_sold_price += r.prices[0];
+    Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
+                                                         m.author);
+    a.updated = cur_height;
+    GalleryObject::Save(a, m.author, sizeof(Artist) + a.data_len);
+
+    Moderator moder;
+    ContractState s;
+    if (!GalleryObject::Load(moder, r.signer) || !moder.approved)
+        s.AddSigAdmin();
+    else
+        Env::AddSig(r.signer);
 }
