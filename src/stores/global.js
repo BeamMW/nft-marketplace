@@ -96,16 +96,20 @@ const store = {
     //
     // get key
     //
-    let {res} = await utils.invokeContractAsync({
-      role: 'artist',
-      action: 'get_id',
-      cid: this.state.cid
-    })
+    let db_id = 'headless'
 
-    utils.ensureField(res, 'id', 'string')
-    let my_key = res.id
+    if (!utils.isHeadless()) {
+      let {res} = await utils.invokeContractAsync({
+        role: 'artist',
+        action: 'get_id',
+        cid: this.state.cid
+      })
 
-    this._database = new Database(this.state.cid, my_key)
+      utils.ensureField(res, 'id', 'string')
+      db_id = res.id
+    }
+
+    this._database = new Database(this.state.cid, db_id)
     await this._database.initAsync({
       ...collsStore.getDBStores(),
       ...nftsStore.getDBStores(),

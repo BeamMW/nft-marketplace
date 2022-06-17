@@ -161,6 +161,8 @@ export default class Utils {
         }
       }
 
+      // TODO: add some delay before showing connecting message
+      //       if extension is installed and app is allowed it would filck
       window.addEventListener('message', listener, false)
       Utils.showLoading({
         headless: true,

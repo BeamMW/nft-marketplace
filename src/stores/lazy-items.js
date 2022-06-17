@@ -368,10 +368,6 @@ export default class ItemsStore {
     let status = await this._loadStatus()
     let hnext = status.hprocessed + 1
 
-    if (this._global.state.debug) {
-      console.log(`loading ${this._objname}s, h0 is ${hnext}`)
-    }
-
     let {res} = await utils.invokeContractAsync({
       role: 'manager',
       action: `view_${this._objname}s`,
@@ -379,6 +375,10 @@ export default class ItemsStore {
       count: 2,
       cid
     })
+
+    if (this._global.state.debug) {
+      console.log(`loading ${this._objname}s, depth ${depth}, h0 is ${hnext}, got ${res.length}`)
+    }
 
     // TODO: do not load unmoderated items for an average user. Drop db after user becomes a modeator
     // TODO: delete unapproved items for an average user
