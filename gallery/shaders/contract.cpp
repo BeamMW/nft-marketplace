@@ -703,7 +703,7 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
     GalleryObject::Save(c, c_id, sizeof(Collection) + c.label_len + c.data_len);
 }
 
-BEAM_EXPORT void Method_23(const method::SetNftAdmin& r) {
+BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     Env::Halt_if(r.label_len > Nft::kLabelMaxLen);
     Env::Halt_if(r.data_len > Nft::kDataMaxLen);
     Env::Halt_if(!r.label_len);
@@ -719,7 +719,8 @@ BEAM_EXPORT void Method_23(const method::SetNftAdmin& r) {
     else
         Env::AddSig(r.signer);
 
-    m.id = ++s.total_nfts;
+    m.id = r.nft_id;
+    s.total_nfts = r.nft_id;
     m.owner = r.artist_id;
     m.author = r.artist_id;
     m.collection_id = r.collection_id;
@@ -740,6 +741,7 @@ BEAM_EXPORT void Method_23(const method::SetNftAdmin& r) {
     // assert: collection exists
     Env::Halt_if(!GalleryObject::Load(c, r.collection_id, sizeof(c)));
     c.nfts_num++;
+    c.approved_nfts_num++;
     Env::Halt_if(c.nfts_num > c.kMaxNfts);
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, r.collection_id);
@@ -757,8 +759,6 @@ BEAM_EXPORT void Method_23(const method::SetNftAdmin& r) {
     ++a.nfts_num;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
-    Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
-    a.last_created_object = cur_height;
     a.updated = cur_height;
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
 

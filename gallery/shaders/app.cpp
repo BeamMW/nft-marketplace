@@ -64,7 +64,7 @@
 #define Gallery_manager_set_rate_limit(macro) \
     macro(ContractID, cid) macro(Amount, amount)
 
-#define Gallery_manager_set_nft(macro)                                        \
+#define Gallery_manager_migrate_nft(macro)                                        \
     macro(ContractID, cid) macro(gallery::Collection::Id, collection_id)      \
         macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) \
             macro(gallery::Artist::Id, artist_id)
@@ -89,7 +89,7 @@
                             macro(manager, set_collection_status)              \
                                 macro(manager, set_fee_base)                   \
                                     macro(manager, set_rate_limit)             \
-                                        macro(manager, set_nft) macro(         \
+                                        macro(manager, migrate_nft) macro(         \
                                             manager, migrate_artist)           \
                                             macro(manager, migrate_collection)
 
@@ -107,14 +107,14 @@
 #define Gallery_moderator_migrate_collection(macro) \
     macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
 
-#define Gallery_moderator_set_nft(macro)                                      \
+#define Gallery_moderator_migrate_nft(macro)                                      \
     macro(ContractID, cid) macro(gallery::Collection::Id, collection_id)      \
         macro(Amount, amount) macro(AssetID, aid) macro(gallery::Nft::Id, id) \
             macro(gallery::Artist::Id, artist_id)
 
 #define GalleryRole_moderator(macro)                                      \
     macro(moderator, set_nft_status) macro(moderator, set_artist_status)  \
-        macro(moderator, set_collection_status) macro(moderator, set_nft) \
+        macro(moderator, set_collection_status) macro(moderator, migrate_nft) \
             macro(moderator, migrate_artist)                              \
                 macro(moderator, migrate_collection)
 
@@ -2028,14 +2028,19 @@ ON_METHOD(manager, migrate_collection) {
                         &kid, 1, "Set collection", charge + s.fee_base / 10);
 }
 
-ON_METHOD(moderator, set_nft) {
+ON_METHOD(moderator, migrate_nft) {
     struct {
-        gallery::method::SetNftAdmin args;
+        gallery::method::MigrateNft args;
         char label_and_data[gallery::Nft::kTotalMaxLen];
     } d;
 
     key_material::Owner km{AppArtist::key_material(cid)};
+    if (!id) {
+        OnError("nft id must be specified");
+        return;
+    }
     d.args.signer = km.Get();
+    d.args.nft_id = id;
     d.args.artist_id = artist_id;
     d.args.collection_id = collection_id;
     d.args.price.amount = amount;
@@ -2109,12 +2114,17 @@ ON_METHOD(moderator, set_nft) {
                         "Upload nft", charge + s.fee_base / 10);
 }
 
-ON_METHOD(manager, set_nft) {
+ON_METHOD(manager, migrate_nft) {
     struct {
-        gallery::method::SetNftAdmin args;
+        gallery::method::MigrateNft args;
         char label_and_data[gallery::Nft::kTotalMaxLen];
     } d;
 
+    if (!id) {
+        OnError("nft id must be specified");
+        return;
+    }
+    d.args.nft_id = id;
     d.args.artist_id = artist_id;
     d.args.collection_id = collection_id;
     d.args.price.amount = amount;
