@@ -1,6 +1,6 @@
 <template>
   <messageModal ref="messageModal"/>
-  <div class="container">
+  <div class="edit-artist-container">
     <template v-if="edit_self">
       <pageTitle title="Edit your Artist"/>
       <p class="description">
@@ -17,104 +17,110 @@
         <i>After your account is created it would not be visible until reviewed by a moderator.</i>
       </p>
     </template>
-    <div class="fields">
-      <div class="col-first">
-        <formInput v-model="label"
-                   label="Artist Name*"
-                   :valid="label_valid"
-                   :max_length="25"
-                   :readonly="edit_self || in_set_artist"
-                   style="margin-bottom:58px;margin-top:0"
-        />
-        <formInput v-model="website"
-                   label="Website"
-                   placeholder="https://website.name/"
-                   img="globe"
-                   :max_length="150"
-                   :valid="website_valid"
-                   :readonly="in_set_artist"
-        />
-        <formInput v-model="twitter"
-                   label="Twitter"
-                   placeholder="twitter"
-                   img="twitter"
-                   :max_length="15"
-                   :valid="twitter_valid"
-                   :readonly="in_set_artist"
-                   :counter="false"
-                   :allowed="twitter_allowed"
-        />
-        <formInput v-model="instagram"
-                   label="Instagram"
-                   placeholder="instagram"
-                   img="instagram"
-                   :max_length="30"
-                   :valid="instagram_valid"
-                   :readonly="in_set_artist"
-                   :counter="false"
-                   :allowed="instagram_allowed"
-        />
-      </div>
-      <div class="col-second">
-        <textArea v-model="about"
-                  label="About me"
-                  :valid="about_valid"
-                  :max_length="75"
-                  :readonly="in_set_artist"
-        />
-        <div class="uploads-container" style="margin-top:45px;">
-          <addImage v-model="banner"
-                    v-model:error="banner_error"
-                    accept="image/jpeg;image/png;image/svg+xml"
-                    title="Add an artist banner<br>(*.jpg, *.png, *.svg)<br>&nbsp;"  
-                    height="135px"
-                    cover
-                    :show_error="false"
-                    :min_width="1400"
-                    :min_height="260"
-                    :readonly="in_set_artist" 
+    <div class="scrollable">
+      <div class="fields">
+        <div class="col-first">
+          <formInput v-model="label"
+                     label="Artist Name*"
+                     :valid="label_valid"
+                     :max_length="25"
+                     :readonly="edit_self || in_set_artist"
+                     style="margin-bottom:58px;margin-top:0"
           />
-          <div class="ellipse" :style="ellipse_style">
-            <addImage v-model="avatar"
-                      v-model:error="avatar_error"
+          <formInput v-model="website"
+                     label="Website"
+                     placeholder="https://website.name/"
+                     img="globe"
+                     :max_length="150"
+                     :valid="website_valid"
+                     :readonly="in_set_artist"
+          />
+          <formInput v-model="twitter"
+                     label="Twitter"
+                     placeholder="twitter"
+                     img="twitter"
+                     :max_length="15"
+                     :valid="twitter_valid"
+                     :readonly="in_set_artist"
+                     :counter="false"
+                     :allowed="twitter_allowed"
+          />
+          <formInput v-model="instagram"
+                     label="Instagram"
+                     placeholder="instagram"
+                     img="instagram"
+                     :max_length="30"
+                     :valid="instagram_valid"
+                     :readonly="in_set_artist"
+                     :counter="false"
+                     :allowed="instagram_allowed"
+          />
+        </div>
+        <div class="col-second">
+          <textArea v-model="about"
+                    label="About me"
+                    :valid="about_valid"
+                    :max_length="75"
+                    :readonly="in_set_artist"
+          />
+          <div class="uploads-container" style="margin-top:45px;">
+            <addImage v-model="banner"
+                      v-model:error="banner_error"
                       accept="image/jpeg;image/png;image/svg+xml"
-                      title="Add an artist image<br>(*.jpeg, *.png, *.svg)"
-                      height="136px"
-                      width="136px"
+                      title="Add an artist banner<br>(*.jpg, *.png, *.svg)<br>&nbsp;"  
+                      height="135px"
                       cover
-                      rounded
                       :show_error="false"
-                      :min_width="136"
-                      :min_height="136"
+                      :min_width="1400"
+                      :min_height="260"
                       :readonly="in_set_artist" 
-            />  
-          </div>
-          <div v-if="!avatar_valid || !banner_valid" class="error_msg">
-            <p class="error">{{ banner_error || avatar_error }}</p>
+            />
+            <div class="ellipse" :style="ellipse_style">
+              <addImage v-model="avatar"
+                        v-model:error="avatar_error"
+                        accept="image/jpeg;image/png;image/svg+xml"
+                        title="Add an artist image<br>(*.jpeg, *.png, *.svg)"
+                        height="136px"
+                        width="136px"
+                        cover
+                        rounded
+                        :show_error="false"
+                        :min_width="136"
+                        :min_height="136"
+                        :readonly="in_set_artist" 
+              />  
+            </div>
+            <div v-if="!avatar_valid || !banner_valid" class="error_msg">
+              <p class="error">{{ banner_error || avatar_error }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <p v-if="in_set_artist" class="intx_text">
-      Artist info cannot be changed while artist transaction is in progress
-    </p>
-    <div class="actions">
-      <btn text="cancel" @click="$router.go(-1)">
-        <img src="~assets/cancel.svg"/>
-      </btn>
-      <btn :text="edit_self ? 'update artist' : 'create account'" 
-           color="green" 
-           :disabled="!can_submit || in_set_artist" 
-           @click="onSetArtist"
-      >
-        <img src="~assets/create.svg"/>
-      </btn>
+      <p v-if="in_set_artist" class="intx_text">
+        Artist info cannot be changed while artist transaction is in progress
+      </p>
+      <div class="actions">
+        <btn text="cancel" @click="$router.go(-1)">
+          <img src="~assets/cancel.svg"/>
+        </btn>
+        <btn :text="edit_self ? 'update artist' : 'create account'" 
+             color="green" 
+             :disabled="!can_submit || in_set_artist" 
+             @click="onSetArtist"
+        >
+          <img src="~assets/create.svg"/>
+        </btn>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="stylus">
-  .container {
+  .edit-artist-container {
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
 
     .description {
       font-size: 14px
@@ -138,114 +144,120 @@
       font-family: 'SFProDisplay', sans-serif
     }
 
-    .fields {
-      padding: 0 30px
-      display: flex
+    .scrollable {
+      overflow-y: auto
+      overflow-x: hidden
+      flex: 1
 
-      .col-first {
-        flex-basis: 50%
+      .fields {
+        padding: 0 30px
+        display: flex
 
-        & > *:not(:last-child) {
-          margin-bottom: 20px
-        }
-      }
+        .col-first {
+          flex-basis: 50%
 
-      .col-second {
-        flex-basis: 50%
-        margin-left: 30px
-
-        & > *:not(:last-child) {
-          margin-bottom: 20px
+          & > *:not(:last-child) {
+            margin-bottom: 20px
+          }
         }
 
-        .uploads-container {
-          position: relative
+        .col-second {
+          flex-basis: 50%
+          padding-left: 30px
 
-          .ellipse {
-            border-radius: 74px
-            width: 150px
-            height: 150px
+          & > *:not(:last-child) {
+            margin-bottom: 20px
+          }
+
+          .uploads-container {
             position: relative
-            left: 50%
-            transform: translate(-50%, -30%)
-            display: flex
-            justify-content: center
-            align-items: center
 
-            .avatar {
-              height: 136px
-              width: 136px
-              background-color: rgba(26, 246, 214, 0.1)
-              border-radius: 68px
+            .ellipse {
+              border-radius: 74px
+              width: 150px
+              height: 150px
+              position: relative
+              left: 50%
+              transform: translate(-50%, -30%)
+              display: flex
+              justify-content: center
+              align-items: center
 
-              .text {
-                height: 100%
-                display: flex
-                justify-content: center
-                align-items: center
-                font-size: 14px
-                color: #1af6d6
-                cursor: pointer
+              .avatar {
+                height: 136px
+                width: 136px
+                background-color: rgba(26, 246, 214, 0.1)
+                border-radius: 68px
+
+                .text {
+                  height: 100%
+                  display: flex
+                  justify-content: center
+                  align-items: center
+                  font-size: 14px
+                  color: #1af6d6
+                  cursor: pointer
+
+                  &[readonly] {
+                    opacity: 0.6
+                  }
+                }
 
                 &[readonly] {
                   opacity: 0.6
                 }
-              }
 
-              &[readonly] {
-                opacity: 0.6
-              }
+                .remove {
+                  background-color: rgba(0, 0, 0, 0.7)
+                  position: absolute
+                  left: 50%
+                  top: 50%
+                  transform: translate(-50%,-50%)
+                  z-index: 2
+                  border-radius: 9999px
+                  padding: 7px 7px 3px 7px
+                  cursor: pointer
+                }
 
-              .remove {
-                background-color: rgba(0, 0, 0, 0.7)
-                position: absolute
-                left: 50%
-                top: 50%
-                transform: translate(-50%,-50%)
-                z-index: 2
-                border-radius: 9999px
-                padding: 7px 7px 3px 7px
-                cursor: pointer
-              }
-
-              .files {
-                visibility:hidden
-                width: 0
-              }
-            
-              .image {
-                width: 100%
-                height: 100%
-                object-fit: cover
-                border-radius: 9999px
-                border: 1px dashed transparent
+                .files {
+                  visibility:hidden
+                  width: 0
+                }
+              
+                .image {
+                  width: 100%
+                  height: 100%
+                  object-fit: cover
+                  border-radius: 9999px
+                  border: 1px dashed transparent
+                }
               }
             }
-          }
-        
-          .error_msg {
-            text-align: center
-            margin-top: -42px
-            margin-bottom: 26px
+          
+            .error_msg {
+              text-align: center
+              margin-top: -42px
+              margin-bottom: 26px
 
-            & > p {
-              font-style: italic
-              font-size: 12px
-              font-weight: 400
-              margin: 0
+              & > p {
+                font-style: italic
+                font-size: 12px
+                font-weight: 400
+                margin: 0
+              }
             }
           }
         }
       }
-    }
 
-    .actions {
-      display:flex
-      justify-content: center
-      margin-top: 40px
+      .actions {
+        display:flex
+        justify-content: center
+        margin-top: 40px
 
-      & > *:not(:first-child) {
-        margin-left: 30px
+        & > *:not(:first-child) {
+          margin-left: 30px
+        }
       }
     }
   }
