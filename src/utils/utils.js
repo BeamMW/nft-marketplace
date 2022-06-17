@@ -516,7 +516,7 @@ export default class Utils {
   static showLoading({headless, connecting, onCancel, onReconnect}) {
     const styles = Utils.getStyles()
     Utils.applyStyles(styles)
-    
+
     const topColor =  [styles.appsGradientOffset, 'px,'].join('')
     const mainColor = [styles.appsGradientTop, 'px,'].join('')
 
@@ -672,12 +672,12 @@ export default class Utils {
     notSupp.style.fontSize = '18px'
     notSupp.style.marginTop = '200px'
     let download = document.createElement('p')
-    download.innerText = 'Download chrome browser'
+    download.innerText = 'Download any Chromium-based browser'
     download.style.cursor = 'pointer'
     download.style.color = '#00f6d2'
 
     download.addEventListener('click', () => {
-      window.open('https://www.google.com/chrome/', 
+      window.open('https://download-chromium.appspot.com/', 
         '_blank')
     })
 
