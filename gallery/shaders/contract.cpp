@@ -786,7 +786,6 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
 }
 
 BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
-    Height cur_height = Env::get_Height();
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
     Env::Halt_if(!r.sales_len);
@@ -794,6 +793,8 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
     } c;
+
+    Height cur_height = Env::get_Height();
 
     GalleryObject::Load(c, m.collection_id, sizeof(c));
     for (uint32_t i = 0; i < r.sales_len; ++i) {

@@ -47,7 +47,9 @@
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
 
-#define Gallery_manager_create_contract(macro) macro(ContractID, cid) macro(Amount, vote_reward_amount) macro(AssetID, vote_reward_aid)
+#define Gallery_manager_create_contract(macro)               \
+    macro(ContractID, cid) macro(Amount, vote_reward_amount) \
+        macro(AssetID, vote_reward_aid)
 
 #define Gallery_manager_replace_admin(macro) Upgradable3_replace_admin(macro)
 
@@ -58,7 +60,8 @@
 
 #define Gallery_manager_explicit_upgrade(macro) macro(ContractID, cid)
 
-#define Gallery_manager_schedule_upgrade(macro) macro(ContractID, cid) macro(Height, target_height)
+#define Gallery_manager_schedule_upgrade(macro) \
+    macro(ContractID, cid) macro(Height, target_height)
 
 #define Gallery_manager_set_nft_status(macro) macro(ContractID, cid)
 
@@ -88,20 +91,23 @@
     macro(ContractID, cid) macro(gallery::Nft::Id, nft_id)
 
 #define GalleryRole_manager(macro)                                             \
-    macro(manager, create_contract) macro(manager, replace_admin) macro(manager, set_min_approvers) \
-    macro(manager, view) macro(manager, view_params) macro(                    \
-        manager, view_artists_stats) macro(manager, view_moderators_stats)     \
-        macro(manager, view_artists) macro(manager, view_collections) macro(   \
-            manager, view_nfts) macro(manager, view_nft_sales)                 \
-            macro(manager, view_collections_stats) macro(                      \
-                manager, view_nfts_stats) macro(manager, view_balance)         \
-                macro(manager, get_id) macro(manager, explicit_upgrade) macro(manager, schedule_upgrade) macro( \
-                    manager, set_moderator) macro(manager, view_moderators)    \
-                    macro(manager, set_nft_status)                             \
-                        macro(manager, set_artist_status)                      \
-                            macro(manager, set_collection_status)              \
-                                macro(manager, set_fee_base)                   \
-                                    macro(manager, set_rate_limit)             \
+    macro(manager, create_contract) macro(manager, replace_admin) macro(       \
+        manager, set_min_approvers) macro(manager, view)                       \
+        macro(manager, view_params) macro(manager, view_artists_stats) macro(  \
+            manager, view_moderators_stats) macro(manager, view_artists)       \
+            macro(manager, view_collections) macro(manager, view_nfts) macro(  \
+                manager, view_nft_sales)                                       \
+                macro(manager, view_collections_stats) macro(                  \
+                    manager, view_nfts_stats) macro(manager, view_balance)     \
+                    macro(manager, get_id) macro(manager, explicit_upgrade)    \
+                        macro(manager, schedule_upgrade) macro(manager,        \
+                                                               set_moderator)  \
+                            macro(manager, view_moderators) macro(             \
+                                manager, set_nft_status)                       \
+                                macro(manager, set_artist_status) macro(       \
+                                    manager, set_collection_status)            \
+                                    macro(manager, set_fee_base) macro(        \
+                                        manager, set_rate_limit)               \
                                         macro(manager, migrate_nft) macro(     \
                                             manager, migrate_artist)           \
                                             macro(manager, migrate_collection) \
@@ -225,10 +231,9 @@ static const ContractID kEmptyCid = {};
 
 const ShaderID kSids[] = {
     gallery::kSid0,
-    gallery::kSid1,
 };
 
-const Upgradable3::Manager::VerInfo kVerInfo = { kSids, _countof(kSids) };
+const Upgradable3::Manager::VerInfo kVerInfo = {kSids, _countof(kSids)};
 
 /*
  * Forward declarations
@@ -1297,12 +1302,15 @@ ON_METHOD(manager, create_contract) {
     if (!kVerInfo.FillDeployArgs(args.settings, &admin_key)) {
         return;
     }
-    Env::GenerateKernel(nullptr, 0, &args, sizeof(args), nullptr, 0, nullptr, 0, "Deploy gallery contract", Upgradable3::Manager::get_ChargeDeploy() * 2);
+    Env::GenerateKernel(nullptr, 0, &args, sizeof(args), nullptr, 0, nullptr, 0,
+                        "Deploy gallery contract",
+                        Upgradable3::Manager::get_ChargeDeploy() * 2);
 }
 
 ON_METHOD(manager, schedule_upgrade) {
     key_material::Admin kid;
-    Upgradable3::Manager::MultiSigRitual::Perform_ScheduleUpgrade(kVerInfo, cid, kid, target_height);
+    Upgradable3::Manager::MultiSigRitual::Perform_ScheduleUpgrade(
+        kVerInfo, cid, kid, target_height);
 }
 
 ON_METHOD(manager, explicit_upgrade) {
@@ -1312,16 +1320,18 @@ ON_METHOD(manager, explicit_upgrade) {
 
 ON_METHOD(manager, replace_admin) {
     key_material::Admin kid;
-    Upgradable3::Manager::MultiSigRitual::Perform_ReplaceAdmin(cid, kid, iAdmin, pk);
+    Upgradable3::Manager::MultiSigRitual::Perform_ReplaceAdmin(cid, kid, iAdmin,
+                                                               pk);
 }
 
 ON_METHOD(manager, set_min_approvers) {
     key_material::Admin kid;
-    Upgradable3::Manager::MultiSigRitual::Perform_SetApprovers(cid, kid, newVal);
+    Upgradable3::Manager::MultiSigRitual::Perform_SetApprovers(cid, kid,
+                                                               newVal);
 }
 
 ON_METHOD(manager, view) {
-    EnumAndDumpContracts(gallery::kSid1);
+    EnumAndDumpContracts(gallery::kSid0);
 }
 
 ON_METHOD(manager, set_moderator) {
