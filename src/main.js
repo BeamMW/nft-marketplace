@@ -52,7 +52,7 @@ utils.initialize(
     } = utils.getStyles()
 
     if (utils.isWeb()) {
-      document.body.style.padding = '5%'
+      document.body.style.padding = '30px 10px 20px 30px'
     }
 
     const topColor = [appsGradientOffset, 'px,'].join('')

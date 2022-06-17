@@ -112,11 +112,10 @@ export default {
   },
 
   methods: {
-    onShowKey () {
-      this.$refs.keyModal.open()
-    },
-
     onWithdrawClick () {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
       this.$store.withdrawBEAM()
     }
   }

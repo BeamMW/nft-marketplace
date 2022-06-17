@@ -1,6 +1,6 @@
 <template>
   <messageModal ref="messageModal"/>
-  <div class="container">
+  <div class="collection-container">
     <template v-if="edit_mode">
       <pageTitle title="Edit collection"/>
       <p v-if="collection" class="description">
@@ -85,7 +85,7 @@
 </template>
 
 <style scoped lang="stylus">
-  .container {
+  .collection-container {
     .description {
       font-size: 14px
       text-align: center
@@ -293,6 +293,10 @@ export default {
 
   methods: {   
     async onSetCollection() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+      
       try {
         let data = {
           website:     this.website,

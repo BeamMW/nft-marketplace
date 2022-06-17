@@ -5,10 +5,15 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let headlessNode = 'eu-node01.masternet.beam.mw:8200'
+let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
+let ipfsGateway  = 'http://3.16.160.95:6200/ipfs/'
 let InitParams   = undefined
 
 export default class Utils {
+  static get ipfsGateway() {
+    return ipfsGateway
+  }
+
   static isMobile () {
     const ua = navigator.userAgent
     return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
@@ -412,10 +417,6 @@ export default class Utils {
   }
 
   static applyStyles(style) {
-    if (!Utils.isDesktop()) {
-      document.head.innerHTML += '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-    }
-
     if (Utils.isMobile()) {
       document.body.classList.add('mobile')
     }
@@ -512,11 +513,10 @@ export default class Utils {
     return result
   }
 
-  static showLoading(params) {
-    const {headless, connecting, onCancel, onReconnect} = params
-
+  static showLoading({headless, connecting, onCancel, onReconnect}) {
     const styles = Utils.getStyles()
     Utils.applyStyles(styles)
+    
     const topColor =  [styles.appsGradientOffset, 'px,'].join('')
     const mainColor = [styles.appsGradientTop, 'px,'].join('')
 

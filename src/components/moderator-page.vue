@@ -205,10 +205,18 @@ export default {
       this.active_selected.length = 0
     },
     async onReject() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+
       let txid = await this.active_approve.call(this.$store, this.active_selected, false)
       if (txid) this.active_selected.length = 0
     },
     async onApprove() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+      
       let txid = await this.active_approve.call(this.$store, this.active_selected, true)
       if (txid) this.active_selected.length = 0
     }

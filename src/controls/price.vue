@@ -176,7 +176,9 @@ export default {
 
     onBuy (ev) {
       ev.stopPropagation()
-      if (this.is_headless) return this.$store.switchToHeaded()
+      if (this.is_headless) {
+        return this.$store.switchToHeaded()
+      }
       nftsStore.buyNFT(this.id)
     },
 

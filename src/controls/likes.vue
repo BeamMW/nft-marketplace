@@ -61,32 +61,38 @@ export default {
       let unliked = require('assets/heart.svg')
       return this.liked ? liked : unliked
     },
+
+    is_headless () {
+      return this.$state.is_headless
+    },
   },
 
   methods: {
     onLike (ev) {
+      ev.stopPropagation()
+
       if (this.is_headless) {
         return this.$store.switchToHeaded()  
       } 
 
       if (this.can_vote) {
-        nftsStore.likeNFT(this.id)
+        return nftsStore.likeNFT(this.id)
       }
-
-      ev.stopPropagation()
+      
       return false
     },
 
     onUnlike (ev) {
+      ev.stopPropagation()
+
       if (this.is_headless) {
         return this.$store.switchToHeaded()  
       } 
 
       if (this.can_vote) {
-        nftsStore.unlikeNFT(this.id)
+        return nftsStore.unlikeNFT(this.id)
       }
 
-      ev.stopPropagation()
       return false
     }
   }

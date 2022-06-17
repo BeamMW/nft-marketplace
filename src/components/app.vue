@@ -1,14 +1,14 @@
 <template>
   <span id="modals"/>
   <errorModal v-if="error" :error="error"/>
-  <loading v-if="loading" id="app-container" :text="loading"/>
-  <div v-else id="app-container" class="app-container">
+  <loading v-if="loading" id="container" :text="loading"/>
+  <div v-else id="container" class="container">
     <router-view/>
   </div>
 </template>
 
 <style lang="stylus" scoped>
-.app-container {
+.container {
   width: 100%
   height: 100%
 }

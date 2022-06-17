@@ -1,7 +1,7 @@
 <template>
   <div class="preview-container" :style="style">
     <div v-if="loading && show_text" class="loading">Loading</div>
-    <img v-if="src" class="preview" :src="src" :style="image_style"/>
+    <img v-if="src" :class="{'preview': true, 'error': error}" :src="src" :style="image_style"/>
     <slot></slot>
   </div>  
 </template>

@@ -57,9 +57,15 @@ export default {
 
   methods: {
     onEditArtist() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
       artistsStore.toEditSelf()
     },
     onBecomeArtist() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
       artistsStore.toBecomeArtist()
     }
   }

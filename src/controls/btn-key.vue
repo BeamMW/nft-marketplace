@@ -25,6 +25,9 @@ export default {
 
   methods: {
     onClick () {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
       this.$refs.keyModal.open()
     }
   }

@@ -1,7 +1,7 @@
 <template>
   <messageModal ref="messageModal"/>
   <transferModal :id="id" ref="transferModal"/>
-  <div id="container" class="nft-page-container">
+  <div class="nft-page-container">
     <pageTitle/>
     <loading v-if="nft === undefined" text="Loading NFT"/>
     <notFound v-else-if="nft == null" text="NFT Not Found"/>

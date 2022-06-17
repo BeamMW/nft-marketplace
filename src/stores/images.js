@@ -58,7 +58,7 @@ class ImagesStore {
       return cached
     }
 
-    this._ipfsLoad(image)
+    this._loadBytes(image)
     return this._state.images[image.ipfs_hash]
   }
 
@@ -111,14 +111,23 @@ class ImagesStore {
     })
   }
 
-  async _ipfsLoad(what) {
+  async _loadBytes(what) {
     try {
       this._setLoading(what)
-  
-      let {res} = await utils.callApiAsync('ipfs_get', {hash: what.ipfs_hash})
-      utils.ensureField(res, 'data', 'array')
+
+      let data = undefined
       
-      let u8arr = new Uint8Array(res.data)
+      if (utils.isDesktop()) {
+        let {res} = await utils.callApiAsync('ipfs_get', {hash: what.ipfs_hash})
+        utils.ensureField(res, 'data', 'array')  
+        data = res.data
+      }
+      else {
+        let url = [utils.ipfsGateway, what.ipfs_hash].join('')
+        data = await utils.downloadAsync(url)
+      }
+
+      let u8arr = new Uint8Array(data)
       let blob = new Blob([u8arr], {type: what.mime_type})
       let object = URL.createObjectURL(blob, {oneTimeOnly: false})
 
@@ -129,7 +138,7 @@ class ImagesStore {
       })
     }
     catch (err) {
-      console.log(`ImagesStore._ipfsLoad failed for hash ${what.ipfs_hash}`, err)
+      console.log(`ImagesStore._loadBytes failed for hash ${what.ipfs_hash}`, err)
       return this._setError(what, err)
     }
   }

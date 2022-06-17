@@ -439,6 +439,10 @@ export default {
 
   methods: {    
     async onSetArtist() {
+      if (this.$state.is_headless) {
+        return this.$store.switchToHeaded()  
+      } 
+
       try {
         let data = {
           website:   this.website,
