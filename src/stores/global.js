@@ -202,15 +202,17 @@ const store = {
     // totals can be missing if user has nothing at all
     // also there can be not only beam. We just interested
     // only in beam for now
+    let balance_beam = 0
     if (res.totals) {
       utils.ensureField(res, 'totals', 'array')
       for (let item of res.totals) {
         if (item.aid == 0) {
-          this.state.balance_beam = item.amount
+          balance_beam = item.amount
           break
         }
       }
     }
+    this.state.balance_beam = balance_beam
 
     //
     // Reload stores
