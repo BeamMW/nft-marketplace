@@ -131,12 +131,20 @@ const store = {
       return this.setError(new ErrorEx('API handling error', err))
     }
 
+    // We update state on each block
+    // TODO: save tip and check that it is really changed
     if (full.id == 'ev_system_state') {
-      // we update our data on each block
+      // if still not in sync doesn't have any sense to update
+      // all shader calls would be delayed by platform until in sync
+      if (!res.is_in_sync) {
+        return
+      }
+      
       if (!this.state.loading) {
-        console.log('new block')
+        console.log('new block reached, updating app state')
         this.refreshAllData()
       }
+      
       return
     }
 

@@ -6,7 +6,7 @@ let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
 let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
-let ipfsGateway  = 'http://3.16.160.95:6200/ipfs/'
+let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
 let InitParams   = undefined
 
 export default class Utils {

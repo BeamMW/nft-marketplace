@@ -372,7 +372,7 @@ export default class ItemsStore {
       role: 'manager',
       action: `view_${this._objname}s`,
       h0: hnext,
-      count: 2,
+      count: 20,
       cid
     })
 
