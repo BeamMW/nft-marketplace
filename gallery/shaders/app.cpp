@@ -17,7 +17,7 @@
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
 
 #define Gallery_manager_view_moderators(macro)                  \
-    macro(ContractID, cid) macro(Height, h0) macro(Height, h_n) \
+    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) \
         macro(uint32_t, count)
 
 #define Gallery_manager_set_moderator(macro)                 \
@@ -33,18 +33,18 @@
 #define Gallery_manager_view_nfts_stats(macro) macro(ContractID, cid)
 
 #define Gallery_manager_view_nfts(macro)                        \
-    macro(ContractID, cid) macro(Height, h0) macro(Height, h_n) \
+    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) \
         macro(Amount, count)
 
 #define Gallery_manager_view_nft_sales(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, id)
 
 #define Gallery_manager_view_collections(macro)                 \
-    macro(ContractID, cid) macro(Height, h0) macro(Height, h_n) \
+    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) \
         macro(uint32_t, count) macro(uint32_t, nfts)
 
 #define Gallery_manager_view_artists(macro)                            \
-    macro(ContractID, cid) macro(Height, h0) macro(Height, h_n) macro( \
+    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) macro( \
         uint32_t, count) macro(uint32_t, nfts) macro(uint32_t, collections)
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
@@ -1417,9 +1417,9 @@ ON_METHOD(manager, view_artists) {
         Height last_printed_h = a.Print<HeightArtistIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && h_n) {
+    } else if (count && hn) {
         Height last_printed_h =
-            a.Print<RHeightArtistIdx>(kMaxHeight - h_n, count);
+            a.Print<RHeightArtistIdx>(kMaxHeight - hn, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", kMaxHeight - last_printed_h);
     } else if (buf_len) {
@@ -1444,9 +1444,9 @@ ON_METHOD(manager, view_moderators) {
         Height last_printed_h = m.Print<HeightModeratorIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && h_n) {
+    } else if (count && hn) {
         Height last_printed_h =
-            m.Print<RHeightModeratorIdx>(kMaxHeight - h_n, count);
+            m.Print<RHeightModeratorIdx>(kMaxHeight - hn, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", kMaxHeight - last_printed_h);
     } else if (buf_len) {
@@ -1472,9 +1472,9 @@ ON_METHOD(manager, view_collections) {
         Height last_printed_h = c.Print<HeightCollectionIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && h_n) {
+    } else if (count && hn) {
         Height last_printed_h =
-            c.Print<RHeightCollectionIdx>(kMaxHeight - h_n, count);
+            c.Print<RHeightCollectionIdx>(kMaxHeight - hn, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", kMaxHeight - last_printed_h);
     } else if (buf_len) {
@@ -1865,8 +1865,8 @@ ON_METHOD(manager, view_nfts) {
         Height last_printed_h = a.Print<HeightNftIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && h_n) {
-        Height last_printed_h = a.Print<RHeightNftIdx>(kMaxHeight - h_n, count);
+    } else if (count && hn) {
+        Height last_printed_h = a.Print<RHeightNftIdx>(kMaxHeight - hn, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", kMaxHeight - last_printed_h);
     } else if (buf_len) {
