@@ -86,8 +86,9 @@
 #define Gallery_manager_migrate_artist(macro) \
     macro(ContractID, cid) macro(gallery::Artist::Id, id)
 
-#define Gallery_manager_migrate_collection(macro) \
-    macro(ContractID, cid) macro(gallery::Artist::Id, artist_id)
+#define Gallery_manager_migrate_collection(macro)                \
+    macro(ContractID, cid) macro(gallery::Artist::Id, artist_id) \
+        macro(gallery::Collection::Id, collection_id)
 
 #define Gallery_manager_migrate_sales(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, nft_id)
@@ -1880,6 +1881,7 @@ ON_METHOD(manager, migrate_collection) {
     } d;
 
     d.args.artist_id = artist_id;
+    d.args.collection_id = collection_id;
     kid.get_Pk(d.args.signer);
 
     uint32_t label_size = Env::DocGetText(
@@ -1898,8 +1900,8 @@ ON_METHOD(manager, migrate_collection) {
     d.args.label_len = label_size - 1;
 
     std::string_view label(d.label_and_data, d.args.label_len);
-    gallery::Collection::Id collection_id = collection_id_by_label(cid, label);
-    if (collection_id) {
+    gallery::Collection::Id collection_id_ = collection_id_by_label(cid, label);
+    if (collection_id_) {
         OnError("label already exists");
         return;
     }

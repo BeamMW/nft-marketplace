@@ -690,12 +690,12 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
         char label_and_data[kTotalMaxLen];
     } c;
 
-    Collection::Id c_id = 0;
+    Collection::Id c_id = r.collection_id;
 
     if (!GalleryObject::Load(c, c_id, sizeof(c))) {
-        Env::Halt_if(c_id);
+        Env::Halt_if(!c_id);
 
-        c_id = ++s.total_collections;
+        s.total_collections = std::max(s.total_collections, c_id);
         _POD_(c).SetZero();
         c.author = r.artist_id;
         c.updated = cur_height;
@@ -752,7 +752,7 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     s.AddSigAdmin();
 
     m.id = r.nft_id;
-    s.total_nfts = r.nft_id;
+    s.total_nfts = std::max(s.total_nfts, r.nft_id);
     m.owner = r.owner_id;
     m.author = r.artist_id;
     m.collection_id = r.collection_id;
