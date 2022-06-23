@@ -638,12 +638,8 @@ BEAM_EXPORT void Method_21(const method::MigrateArtist& r) {
     Env::Halt_if(!r.label_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
 
-    Moderator m;
     ContractState s;
-    if (!GalleryObject::Load(m, r.signer) || !m.approved)
-        s.AddSigAdmin();
-    else
-        Env::AddSig(r.signer);
+    s.AddSigAdmin();
 
     Height cur_height = Env::get_Height();
     struct ArtistPlus : public Artist {
@@ -686,12 +682,8 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
     Env::Halt_if(!r.label_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
 
-    Moderator m;
     ContractState s;
-    if (!GalleryObject::Load(m, r.signer) || !m.approved)
-        s.AddSigAdmin();
-    else
-        Env::AddSig(r.signer);
+    s.AddSigAdmin();
 
     Height cur_height = Env::get_Height();
     struct CollectionPlus : public Collection {
@@ -756,12 +748,8 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
 
     Height cur_height = Env::get_Height();
     Nft m;
-    Moderator moder;
     ContractState s;
-    if (!GalleryObject::Load(moder, r.signer) || !moder.approved)
-        s.AddSigAdmin();
-    else
-        Env::AddSig(r.signer);
+    s.AddSigAdmin();
 
     m.id = r.nft_id;
     s.total_nfts = r.nft_id;
@@ -885,10 +873,6 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
     a.updated = cur_height;
     GalleryObject::Save(a, m.author, sizeof(Artist) + a.data_len);
 
-    Moderator moder;
     ContractState s;
-    if (!GalleryObject::Load(moder, r.signer) || !moder.approved)
-        s.AddSigAdmin();
-    else
-        Env::AddSig(r.signer);
+    s.AddSigAdmin();
 }
