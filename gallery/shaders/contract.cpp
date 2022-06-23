@@ -619,6 +619,7 @@ BEAM_EXPORT void Method_19(const method::Transfer& r) {
                         sizeof(Collection) + c.label_len + c.data_len);
 
     _POD_(m.owner) = r.new_owner;
+    _POD_(m.price).SetZero();
     Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
         kMaxHeight - m.updated, kMaxHeight - cur_height, r.nft_id);
     m.updated = cur_height;
