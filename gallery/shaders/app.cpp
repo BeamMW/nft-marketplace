@@ -1292,14 +1292,11 @@ void MigrateSalesCommon(const ContractID& cid, const PubKey& signer,
  * On_Methods
  */
 ON_METHOD(manager, create_contract) {
-    key_material::Admin kid;
-    PubKey admin_key;
-    kid.get_Pk(admin_key);
     gallery::method::Init args;
     args.config.vote_reward.aid = vote_reward_aid;
     args.config.vote_reward.amount = vote_reward_amount;
     key_material::Admin().get_Pk(args.config.admin_id);
-    if (!kVerInfo.FillDeployArgs(args.settings, &admin_key)) {
+    if (!kVerInfo.FillDeployArgs(args.settings, &args.config.admin_id)) {
         return;
     }
     Env::GenerateKernel(nullptr, 0, &args, sizeof(args), nullptr, 0, nullptr, 0,
