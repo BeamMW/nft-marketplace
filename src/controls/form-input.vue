@@ -49,6 +49,7 @@
     border: none
     border-radius: 10px
     align-items: center
+    position: relative
 
     & > img {
       position: absolute
