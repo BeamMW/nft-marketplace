@@ -88,6 +88,7 @@
     & .content-wrapper {
       display: flex
       flex-direction: column
+      min-height: 0
       flex: 1
 
       & .debug {
