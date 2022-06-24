@@ -10,6 +10,8 @@
   position: relative
   cursor: pointer
   width: 100%
+  min-width: 0
+  box-sizing: border-box
 
   & > img {
     position: absolute

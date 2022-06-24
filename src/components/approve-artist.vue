@@ -71,7 +71,8 @@
 
     & > .info {
       display: block
-      width: 100%
+      min-width: 0
+      flex: 1
 
       & > div {
         &:not(:last-child) {
