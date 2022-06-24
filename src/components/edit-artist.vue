@@ -66,7 +66,7 @@
           <div class="uploads-container" style="margin-top:45px;">
             <addImage v-model="banner"
                       v-model:error="banner_error"
-                      accept="image/jpeg;image/png;image/svg+xml"
+                      accept="image/jpeg,image/png,image/svg+xml"
                       title="Add an artist banner<br>(*.jpg, *.png, *.svg)<br>&nbsp;"  
                       height="135px"
                       cover
@@ -78,7 +78,7 @@
             <div class="ellipse" :style="ellipse_style">
               <addImage v-model="avatar"
                         v-model:error="avatar_error"
-                        accept="image/jpeg;image/png;image/svg+xml"
+                        accept="image/jpeg,image/png,image/svg+xml"
                         title="Add an artist image<br>(*.jpeg, *.png, *.svg)"
                         height="136px"
                         width="136px"

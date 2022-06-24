@@ -61,7 +61,7 @@
         <addImage v-model="cover"
                   v-model:error="cover_error"
                   title="Add collection image<br>(*.jpg, *.png, *.svg)"
-                  accept="image/jpeg;image/png;image/svg+xml"
+                  accept="image/jpeg,image/png,image/svg+xml"
                   height="135px"
                   :min_width="1400"
                   :min_height="260"

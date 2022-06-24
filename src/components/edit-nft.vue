@@ -34,7 +34,7 @@
           <addImage v-model="image"
                     v-model:error="image_error"
                     class="add-image"
-                    accept="image/apng;image/gif;image/jpeg;image/png;image/svg+xml;image/webp"
+                    accept="image/apng,image/gif,image/jpeg,image/png,image/svg+xml,image/webp"
                     title="Add NFT image here<br>(*.apng, *.gif, *.jpeg, *.png, *.svg, *.webp)"
                     height="390px"
                     width="390px"
