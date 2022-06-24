@@ -1,4 +1,5 @@
 <template>
+  <messageModal ref="messageModal"/>
   <btn v-if="item.owned" 
        padding="0px" 
        radius="6px" 
@@ -23,10 +24,12 @@
 
 <script>
 import btn from 'controls/button'
+import messageModal from 'components/message-modal'
 
 export default {
   components: {
-    btn
+    btn,
+    messageModal
   },
 
   props: {
@@ -38,11 +41,15 @@ export default {
 
   methods: {
     onEdit(ev) {
+      ev.stopPropagation()
+      if (!this.$state.is_desktop) {
+        this.$refs.messageModal.open('Edit collection', 'It is not possible edit colleciton in web & mobile wallets.<br>Please download desktop wallet and try from there.')
+        return
+      }
       if (!this.item.owned || this.item.error) {
         return
       }
       this.item.store.toEditItem(this.item.id)
-      ev.stopPropagation()
     }
   }
 }

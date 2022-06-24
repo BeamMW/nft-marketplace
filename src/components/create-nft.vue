@@ -3,6 +3,10 @@
     You cannot have more than<br>500 NFTs in one collection.<br><br>
     Click here to create<br>new collection.
   </div>
+  <div v-else-if="!is_desktop" class="new-box">
+    It is not possible to create NFTs<br>in web and mobile wallets.<br><br>
+    Please download desktop wallet and try from there.
+  </div>
   <div v-else-if="has_collections" class="new-box" @click="onNewNFT">
     Create new NFT
   </div>
@@ -51,6 +55,9 @@ export default {
   computed: {
     has_collections() {
       return collsStore.getAllItemsCount('artist') > 0
+    },
+    is_desktop() {
+      return this.$state.is_desktop
     }
   },
 

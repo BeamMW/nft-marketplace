@@ -25,6 +25,7 @@ function defaultState() {
     balance_beam: 0,
     balance_reward: 0,
     is_headless: false,
+    is_desktop: true,
     debug: false
   }
   
@@ -76,6 +77,7 @@ const store = {
     nextTick(async () => {
       Object.assign(this.state, defaultState())
       this.state.is_headless = utils.isHeadless()
+      this.state.is_desktop = utils.isDesktop()
       router.push({name: 'gallery'})
       
       await this.checkCID()

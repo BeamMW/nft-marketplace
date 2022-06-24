@@ -1,5 +1,9 @@
 <template>
-  <div class="new-box" @click="onNewCollection">
+  <div v-if="!is_desktop" class="new-box">
+    It is not possible to create collections in web and mobile wallets.<br>
+    Please download desktop wallet and try from there.
+  </div>
+  <div v-else class="new-box" @click="onNewCollection">
     Create new collection
   </div>
 </template>
@@ -18,6 +22,7 @@
   display: flex
   align-items: center
   justify-content: center
+  text-align: center
 }
 </style>
 
@@ -25,6 +30,11 @@
 import collsStore from 'stores/collections'
 
 export default {
+  comuted: {
+    is_desktop() {
+      return this.$state.is_desktop
+    }
+  },
   methods: {
     onNewCollection () {
       collsStore.toNewItem()

@@ -1,4 +1,5 @@
 <template>
+  <messageModal ref="messageModal"/>
   <btn v-if="is_artist" 
        height="36px" 
        width="36px" 
@@ -27,10 +28,12 @@
 <script>
 import btn from 'controls/button'
 import artistsStore from 'stores/artists'
+import messageModal from 'components/message-modal'
 
 export default {
   components: {
-    btn
+    btn,
+    messageModal
   },
 
   computed: {
@@ -57,15 +60,17 @@ export default {
 
   methods: {
     onEditArtist() {
-      if (this.$state.is_headless) {
-        return this.$store.switchToHeaded()  
-      } 
+      if (!this.$state.is_desktop) {
+        this.$refs.messageModal.open('Edit an artist', 'It is not possible change an artist in web & mobile wallets.<br>Please download desktop wallet and try from there.')
+        return
+      }
       artistsStore.toEditSelf()
     },
     onBecomeArtist() {
-      if (this.$state.is_headless) {
-        return this.$store.switchToHeaded()  
-      } 
+      if (!this.$state.is_desktop) {
+        this.$refs.messageModal.open('Become an artist', 'It is not possible become an artist in web & mobile wallets.<br>Please download desktop wallet and try from there.')
+        return
+      }
       artistsStore.toBecomeArtist()
     }
   }
