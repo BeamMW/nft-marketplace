@@ -8,6 +8,7 @@
               :readonly="readonly"
               :style="input_style"
               @input="$emit('update:modelValue', $event.target.value)"
+              @keydown="onKeyDown"
     >
     </textarea>
     <charslen v-if="max_length" :readonly="readonly" :max_length="max_length" :value="modelValue.length"/>
@@ -75,6 +76,7 @@
 
 <script>
 import charslen from 'controls/charslen'
+import validators from 'utils/validators'
 
 export default {
   components: {
@@ -115,6 +117,11 @@ export default {
     height: {
       type: String,
       default: '79px'
+    },
+    allowed: {
+      type: Object,
+      default: validators.text_allowed(),
+      required: false
     }
   },
   
@@ -126,6 +133,15 @@ export default {
     input_style () {
       return {
         'min-height': this.height
+      }
+    }
+  },
+
+  methods: {
+    onKeyDown(ev) {
+      // TODO: merge 'allowed', 'valid' & 'max_chars' to one regex
+      if (this.allowed && !this.allowed.test(ev.key)) {
+        ev.preventDefault()
       }
     }
   }

@@ -110,6 +110,7 @@
 
 <script>
 import charslen from 'controls/charslen'
+import validators from 'utils/validators'
 
 export default {
   components: {
@@ -165,7 +166,7 @@ export default {
     },
     allowed: {
       type: Object,
-      default: undefined,
+      default: validators.text_allowed(),
       required: false
     }
   },

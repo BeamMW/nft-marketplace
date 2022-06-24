@@ -1,4 +1,8 @@
 export default class Validators {
+  static text_allowed () {
+    return /^[\x20-\x7F]*$/
+  }
+
   static twitter_allowed () {
     return /^[a-zA-Z0-9_]{1,15}$/
   }
