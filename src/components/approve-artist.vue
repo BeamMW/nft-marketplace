@@ -31,9 +31,10 @@
           </div>
         </div>
         <div>{{ item.label }}</div>
-        <div v-if="item.website"><span class="link clamp" @click="onWebsite">{{ item.website }}</span></div>
-        <div v-if="item.twitter"><span class="link" @click="onTwitter">@{{ item.twitter }}</span></div>
-        <div v-if="item.instagram"><span class="link" @click="onInstagram">@{{ item.instagram }}</span></div>
+        <!-- do not remove space and &nbsp; or clamp would not work -->
+        <div v-if="item.website" class="link clamp" @click="onWebsite">{{ item.website }} &nbsp;</div>
+        <div v-if="item.twitter" class="link" @click="onTwitter">@{{ item.twitter }}</div>
+        <div v-if="item.instagram" class="link" @click="onInstagram">@{{ item.instagram }}</div>
         <div v-if="item.about">{{ item.about }}</div>
       </div>
     </div>
@@ -45,7 +46,7 @@
   background-color: rgba(255, 255, 255, 0.05)
   border-radius: 10px
   box-sizing: border-box
-  padding: 20px 20px 20px 70px
+  padding: 20px 20px 4px 70px
   display:flex
   flex-direction: column
   font-size: 14px
@@ -79,7 +80,7 @@
           margin-bottom: 12px
         }
 
-        & > .link {
+        &.link {
           cursor: pointer
           color: rgba(0, 246, 210, 1)
           
@@ -99,9 +100,8 @@
       & > .images {
         float: right
         margin: 0px 0px 0px 15px !important
-        height: 204px
+        height: 220px
         position: relative
-        box-sizing: border-box
 
         .ellipse {
           position: absolute
