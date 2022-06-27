@@ -30,7 +30,7 @@
 import collsStore from 'stores/collections'
 
 export default {
-  comuted: {
+  computed: {
     is_desktop() {
       return this.$state.is_desktop
     }
