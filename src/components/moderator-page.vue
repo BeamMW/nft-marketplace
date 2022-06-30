@@ -37,7 +37,8 @@
             :selected="selected_artists"
             @selected="onArtistSelected"
       />
-      <div class="buttons">
+      <adminPage v-if="show_admin" class="list"/>
+      <div v-if="show_buttons" class="buttons">
         <btn text="cancel" 
              :disabled="!any_selected"
              @click="onCancel"
@@ -98,6 +99,7 @@
 </style>
 
 <script>
+import adminPage from 'components/admin-page'
 import tabsctrl from 'controls/tabs'
 import pageTitle from 'controls/page-title'
 import btn from 'controls/button'
@@ -117,17 +119,13 @@ export default {
     btnKey,
     btnWallet,
     btnProfile,
+    adminPage,
     list,
     btn
   },
 
   data() {
     return {
-      tabs: [
-        {id: admin_tabs.NFTS, name: 'NFTs'},
-        {id: admin_tabs.COLLECTIONS, name: 'Collections'},
-        {id: admin_tabs.ARTISTS, name: 'Artists'}
-      ],
       selected_nfts: [],
       selected_collections: [],
       selected_artists: []
@@ -137,6 +135,21 @@ export default {
   computed: {
     page_title() {
       return this.$state.is_admin ? 'admin panel' : 'moderator panel'
+    },
+    tabs () {
+      let tabs = []
+
+      if (this.$state.is_moderator) {
+        tabs.push({id: admin_tabs.NFTS, name: 'NFTs'})
+        tabs.push({id: admin_tabs.COLLECTIONS, name: 'Collections'})
+        tabs.push({id: admin_tabs.ARTISTS, name: 'Artists'})
+      }
+
+      if (this.$state.is_admin) {
+        tabs.push({id: admin_tabs.ADMIN, name: 'Admin'})
+      }
+
+      return tabs
     },
     active_tab: {
       get() {
@@ -154,6 +167,9 @@ export default {
     },
     show_nfts() {
       return this.active_tab == admin_tabs.NFTS
+    },
+    show_admin() {
+      return this.active_tab == admin_tabs.ADMIN
     },
     collsStore() {
       return collsStore

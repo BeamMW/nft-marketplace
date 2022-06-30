@@ -150,9 +150,6 @@ export default {
     is_artist() {
       return artistsStore.is_artist
     },
-    is_admin() {
-      return this.$state.is_admin
-    },
     show_collections() {
       return this.active_tab === my_tabs.COLLECTIONS
     },

@@ -44,18 +44,13 @@ export default class Utils {
   }
 
   static async createMobileAPI(apirescback) {
-    return new Promise((resolve) => {
-      if (Utils.isAndroid()) {
-        document.addEventListener('onCallWalletApiResult', (res) => {
-          apirescback(res.detail)
-        })
+    return new Promise((resolve, reject) => {
+      if (!window.BEAM) {
+        return reject()
       }
-      else {
-        window.BEAM.callWalletApiResult(apirescback)
-      }
-      resolve({
-        api: window.BEAM
-      })
+      if (Utils.isAndroid()) document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
+      else window.BEAM.callWalletApiResult(apirescback)
+      resolve(window.BEAM)
     })
   }
 
@@ -339,7 +334,7 @@ export default class Utils {
     APIResCB = params['apiResultHandler']
     let headless = params['headless']
         
-    try
+    try 
     {
       if (Utils.isDesktop()) {
         BEAM = await Utils.createDesktopAPI((...args) => Utils.handleApiResult(...args))
@@ -710,7 +705,7 @@ export default class Utils {
     ].join(' ')
 
     let downloadLink = document.createElement('p')
-    downloadLink.innerText = 'Download beam wallet'
+    downloadLink.innerHTML = `To use ${InitParams.appname}<br>please download BEAM wallet`
     downloadLink.style.marginTop = '100px'
     downloadLink.style.fontSize = '20px'
     downloadLink.style.color = '#00f6d2'
@@ -793,11 +788,12 @@ export default class Utils {
     return res == '{}' ? obj.toString() : res
   }
 
-  static formatAmount8(amount) {
-    return (amount / 100000000).toFixed(8).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+  static formatAmountFixed(amount, fixed) {
+    return (amount / 100000000).toFixed(4).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
   }
 
   static formatAmount3(amount) {
+    amount = amount / 100000000
     const fixedNum = amount.toFixed(3)
   
     if (amount == 0) {

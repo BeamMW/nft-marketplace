@@ -62,7 +62,7 @@
             <img src="~assets/beam.svg"/>
             <span class="curr">BEAM</span>
           </div>
-          <div class="text">{{ formatAmount8(sale.amount) }}</div>
+          <div class="text">{{ formatAmountFixed(sale.amount) }}</div>
           <div class="text">{{ formatHeight(sale.height) }}</div>
         </div>
       </div>
@@ -455,8 +455,8 @@ export default {
   },
 
   methods: {  
-    formatAmount8(amount) {
-      return utils.formatAmount8(amount)
+    formatAmountFixed(amount) {
+      return utils.formatAmountFixed(amount, 8)
     },
     formatHeight(height) {
       return utils.formatHeight(height)

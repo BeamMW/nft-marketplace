@@ -172,7 +172,7 @@ export default {
 
   data () {
     return {
-      delay_passed: false
+      delay_passed: true
     }
   },
 

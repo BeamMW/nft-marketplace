@@ -296,7 +296,7 @@ import collsStore from 'stores/collections'
 import artistsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
 import utils from 'utils/utils'
-import {coll_tabs, def_images, common} from 'utils/consts'
+import {coll_tabs, def_images} from 'utils/consts'
 
 export default {
   components: {
@@ -423,11 +423,11 @@ export default {
     },
     max_sale() {
       let value = this.collection.max_price.value 
-      return utils.formatAmount3(value / common.GROTHS_IN_BEAM)
+      return utils.formatAmount3(value)
     },
     trade_volume() {
       let value = this.collection.total_sold.volume
-      return utils.formatAmount3(value / common.GROTHS_IN_BEAM)
+      return utils.formatAmount3(value)
     },
     active_tab: {
       get() {

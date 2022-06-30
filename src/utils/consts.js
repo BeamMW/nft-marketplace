@@ -1,20 +1,21 @@
 export const common = { 
   GROTHS_IN_BEAM: 100000000,
-  ITEMS_PER_PAGE: 10,
+  ITEMS_PER_PAGE: 20,
   MAX_IMAGE_SIZE: 500 * 1024
 }
 
 export const user_tabs = {
-  COLLECTIONS: 0,
-  NFTS: 1,
+  NFTS: 0,
+  COLLECTIONS: 1,
   SALE_NFTS: 2,
-  LIKED_NFTS: 3,
+  LIKED_NFTS: 3
 }
 
 export const admin_tabs = {
   NFTS: 0,
   COLLECTIONS: 1,
-  ARTISTS: 2
+  ARTISTS: 2,
+  ADMIN: 3
 }
 
 export const my_tabs = {
@@ -41,7 +42,7 @@ export const sort = {
 }
 
 export const contract = {
-  cid: '6736a6f47af610283ac8c4e73ae1d0e6a3c6bdbe456d949bc555dfea7fb20262'
+  cid: '0e6794e2e75db121d3feaa069500bc6e5bf572599a3d6766e758facaf752525d'
 }
 
 export const def_images = {

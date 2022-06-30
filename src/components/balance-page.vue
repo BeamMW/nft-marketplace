@@ -27,12 +27,12 @@
     <div class="balance">
       <div>
         <div class="description">Total sold NFT amount</div>
-        <amount/>
+        <amount :amount="total_sold.volume"/>
       </div>
 
       <div>
         <div class="description">NFT sold</div>
-        <div>{{ total_sold }}</div>
+        <div>{{ total_sold.count }}</div>
       </div>
     </div>
   </div>
@@ -107,7 +107,8 @@ export default {
 
     total_sold () {
       let self = artistsStore.self
-      return (self || {}).total_sold  
+      if (self) return self.total_sold
+      return {count: 0, volume: 0, aid: 0}
     }
   },
 

@@ -15,7 +15,7 @@
     </preview>
     
     <!---- Delete NFT Button ---->
-    <img v-if="is_admin" class="delete" src="~assets/delete.svg" @click="onDelete"/>
+    <img v-if="can_delete" class="delete" src="~assets/delete.svg" @click="onDelete"/>
 
     <!---- First info row ---->
     <div class="info-row">
@@ -148,8 +148,8 @@ export default {
       return this.$state.debug ? `[${this.item.id}] - ${this.item.label}` : this.item.label
     },
 
-    is_admin () {
-      return this.$state.is_admin
+    can_delete () {
+      return this.$state.is_moderator && this.$state.is_admin
     },
 
     is_headless () {
@@ -174,8 +174,9 @@ export default {
   },
 
   methods: {
-    onDelete (id) {
-      this.$store.deleteNFT(this.id)
+    onDelete (ev) {
+      ev.stopPropagation()
+      this.$store.approveNFTs([this.id], false)
     },
 
     onDetails(ev) {

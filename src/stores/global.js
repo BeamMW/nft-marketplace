@@ -9,6 +9,7 @@ import utils from 'utils/utils'
 import ErrorEx from 'utils/errorex'
 import {reactive, nextTick, computed} from 'vue'
 import {common, contract, my_tabs} from 'utils/consts'
+import {admin_tabs} from '../utils/consts'
 
 function defaultState() {
   let state = {  
@@ -16,8 +17,10 @@ function defaultState() {
     error: undefined,
     shader: undefined,
     cid: contract.cid,
+    height: 0,
     is_admin: false,
     is_moderator: false,
+    moderators: [],
     my_active_tab: my_tabs.OWNED_NFTS,
     coll_active_tab: 0,
     admin_active_tab: 0,
@@ -141,7 +144,8 @@ const store = {
       if (!res.is_in_sync) {
         return
       }
-      
+
+      this.state.height = res.current_height
       if (!this.state.loading) {
         console.log('new block reached, updating app state')
         this.refreshAllData()
@@ -193,7 +197,12 @@ const store = {
    
     this.state.is_admin = !!res.is_admin
     this.state.is_moderator = !!res.is_moderator
-    this.state.balance_reward = res.vote_reward.balance;
+    this.state.balance_reward = res.vote_reward.balance
+    if (this.state.is_admin) this.loadModerators()
+
+    if (this.state.is_admin && !this.state.is_moderator) {
+      this.state.admin_active_tab = admin_tabs.ADMIN
+    }
     
     ({res} = await utils.invokeContractAsync({
       role: 'user', 
@@ -248,6 +257,26 @@ const store = {
     if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {
       this.state.my_active_tab = my_tabs.OWNED_NFTS
     }
+  },
+
+  async loadModerators() {
+    let {res} = await utils.invokeContractAsync({
+      role: 'manager',
+      action: 'view_moderators',
+      cid: this.state.cid
+    })
+    utils.ensureField(res, 'items', 'array')
+    this.state.moderators = res.items
+  },
+
+  async setModerator(id, enable) {
+    await utils.invokeContractAsyncAndMakeTx({
+      role: 'manager',
+      action: 'set_moderator',
+      id,
+      enable,
+      cid: this.state.cid
+    })
   },
 
   async withdrawBEAM () {
@@ -311,9 +340,10 @@ const store = {
   //
   async addRewards (amount) {
     return await utils.invokeContractAsyncAndMakeTx({
-      role: 'manager',
+      role: 'user',
       action: 'add_rewards',
-      num: amount,
+      aid: 0,
+      amount,
       cid: this.state.cid
     })
   },

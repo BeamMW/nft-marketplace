@@ -28,19 +28,19 @@
     </tabsctrl>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
     {{ search }} -->
-    <list v-if="show_collections"
-          class="list"
-          items_name="collections"
-          component="collection"
-          mode="user"
-          :store="collsStore"
-    />
     <list v-if="show_nfts"
           class="list"
           items_name="NFTs"
           component="nft"
           mode="user"
           :store="nftsStore"
+    />
+    <list v-if="show_collections"
+          class="list"
+          items_name="collections"
+          component="collection"
+          mode="user"
+          :store="collsStore"
     />
     <list v-if="show_sale"
           class="list"
@@ -122,8 +122,8 @@ export default {
   data () {
     return {
       tabs: [
-        {id: user_tabs.COLLECTIONS, name: 'Collections'},
         {id: user_tabs.NFTS, name: 'NFTs'},
+        {id: user_tabs.COLLECTIONS, name: 'Collections'},
         {id: user_tabs.SALE_NFTS, name: 'On Sale'},
         {id: user_tabs.LIKED_NFTS, name: 'Liked'},
       ],

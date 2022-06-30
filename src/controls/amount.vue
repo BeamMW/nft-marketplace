@@ -38,11 +38,15 @@ export default {
       type: String,
       default: ''
     },
+    compact: {
+      type: Boolean,
+      default: false
+    }
   },
 
   computed: {
     value () {
-      return utils.formatAmount8(this.amount)
+      return utils.formatAmountFixed(this.amount, 3)
     },
     text_style () {
       return {
