@@ -112,6 +112,7 @@ class ImagesStore {
   }
 
   async _loadBytes(what) {
+    console.log('_loadBytes')
     try {
       this._setLoading(what)
 

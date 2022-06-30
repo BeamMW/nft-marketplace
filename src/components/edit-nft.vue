@@ -223,7 +223,11 @@ export default {
       }
       let collID = this.collections[this.collection].id
       let price  = parseFloat(this.price) * common.GROTHS_IN_BEAM
-      await nftsStore.createNFT(collID, this.name, data, price)
+      let txid = await nftsStore.createNFT(collID, this.name, data, price)
+      if (!txid) {
+        // user cancelled
+        return
+      }
       router.go(-1)
     }
   }

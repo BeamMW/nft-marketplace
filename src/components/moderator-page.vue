@@ -171,6 +171,9 @@ export default {
     show_admin() {
       return this.active_tab == admin_tabs.ADMIN
     },
+    show_buttons() {
+      return !this.show_admin
+    },
     collsStore() {
       return collsStore
     },

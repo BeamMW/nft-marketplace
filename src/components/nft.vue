@@ -13,9 +13,6 @@
       <moderationStatus :item="item"/>
       <likes class="likes" :item="item"/>
     </preview>
-    
-    <!---- Delete NFT Button ---->
-    <img v-if="can_delete" class="delete" src="~assets/delete.svg" @click="onDelete"/>
 
     <!---- First info row ---->
     <div class="info-row">
@@ -146,10 +143,6 @@ export default {
   computed: {
     label () {
       return this.$state.debug ? `[${this.item.id}] - ${this.item.label}` : this.item.label
-    },
-
-    can_delete () {
-      return this.$state.is_moderator && this.$state.is_admin
     },
 
     is_headless () {

@@ -30,7 +30,6 @@ export default class ItemsStore {
   //  liker:liked -> keys: [satus+my_like]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
-    this._loading = false
     this._objname = objname
     this._per_page = perPage || common.ITEMS_PER_PAGE
     this._versions = versions
@@ -93,7 +92,8 @@ export default class ItemsStore {
 
   defaultState() {
     return {
-      my_key: ''
+      my_key: '',
+      loading: false
     }
   }
 
@@ -353,11 +353,11 @@ export default class ItemsStore {
   }
 
   async loadAsync () {
-    if (this._loading) {
+    if (this._state.loading) {
       return false
     }
 
-    this._loading = true
+    this._state.loading = true
     await this._loadAsyncInternal(0)
   }
 
@@ -575,7 +575,7 @@ export default class ItemsStore {
       console.log(`Finished loading ${this._objname}s, at ${status.hprocessed}`)
     }
 
-    this._loading = false
+    this._state.loading = false
     return true
   }
 
