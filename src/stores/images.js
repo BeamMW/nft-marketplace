@@ -1,6 +1,8 @@
 import utils from 'utils/utils'
 import {reactive} from 'vue'
 
+const WAIT_TIME_LOAD = 500
+
 class ImagesStore {
   constructor() {
     this.reset()
@@ -143,7 +145,7 @@ class ImagesStore {
     //
     this._waiting_image = true
     await Promise.any([
-      utils.waitAsync(500),
+      utils.waitAsync(WAIT_TIME_LOAD),
       this._loadBytesImp(what)
     ])
     this._waiting_image = false
