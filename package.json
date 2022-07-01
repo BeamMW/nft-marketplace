@@ -26,7 +26,6 @@
     "html-webpack-plugin": "^5.5.0",
     "install": "^0.13.0",
     "mini-css-extract-plugin": "^2.4.3",
-    "promise.any": "^2.0.4",
     "rxjs": "^7.5.5",
     "stylelint": "^14.5.3",
     "stylelint-plugin-stylus": "^0.13.1",

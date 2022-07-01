@@ -1,6 +1,5 @@
 import utils from 'utils/utils'
 import {reactive} from 'vue'
-import any from 'promise.any'
 
 const WAIT_TIME_LOAD = 500
 
@@ -145,7 +144,7 @@ class ImagesStore {
     // it can stuck in loading state forever
     //
     this._waiting_image = true
-    await any([
+    await Promise.race([
       utils.waitAsync(WAIT_TIME_LOAD),
       this._loadBytesImp(what)
     ])
