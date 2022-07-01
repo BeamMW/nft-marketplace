@@ -3,7 +3,7 @@ import formats from 'stores/formats'
 import router from 'router'
 import {cid} from 'stores/consts'
 import {common} from 'utils/consts'
-import {computed, nextTick, reactive} from 'vue'
+import {computed, reactive} from 'vue'
 import {liveQuery} from 'dexie'
 import {useObservable} from '@vueuse/rxjs'
 
@@ -261,7 +261,6 @@ export default class ItemsStore {
   }
   
   getLazyPageItems(modename) {
-    // TODO: convert to computed with error + loading flags
     let mode = this._getMode(modename)
     if (!mode.loader) {
       throw new Error(`No loader for mode ${modename}`)
@@ -567,7 +566,7 @@ export default class ItemsStore {
     this._getMode('liker:liked').total  = status.approved_i_liked
 
     if (res.items.length > 0) {
-      nextTick(() => this._loadAsyncInternal(++depth))
+      setTimeout(() => this._loadAsyncInternal(++depth), 10)
       return
     }
 

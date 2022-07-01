@@ -92,8 +92,7 @@
 <script>
 import paginator from 'controls/paginator'
 import selectItem from 'controls/select-item'
-import {useObservable} from '@vueuse/rxjs'
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 
 export default {
   components: {
@@ -154,7 +153,22 @@ export default {
   ],
 
   setup (props) {
-    const itemsObservable = computed(() => useObservable(props.store.getLazyPageItems(props.mode)))
+    let subscription = undefined
+    const itemsObservable = computed(() => {
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+
+      const value = ref(undefined)
+      const lazyItems = props.store.getLazyPageItems(props.mode)
+      subscription = lazyItems.subscribe({
+        next: val => value.value = val,
+        error: () => {throw new Error('observable failed')}
+      })
+
+      return value
+    })
+
     const items = computed(() => itemsObservable.value.value)
     const page = computed(() => props.store.getPage(props.mode))
     const pages = computed(() => props.store.getPages(props.mode))
@@ -172,7 +186,7 @@ export default {
 
   data () {
     return {
-      delay_passed: true
+      delay_passed: true,
     }
   },
 
@@ -185,6 +199,7 @@ export default {
 
   methods: {
     clearDelay() {
+      this.delay_passed = false
       setTimeout(() => {
         this.delay_passed = true
       }, 100)
@@ -195,7 +210,6 @@ export default {
     },
     onPage(page) {
       this.$refs.itemslist.scrollTop = 0
-      this.delay_passed = false
       this.store.setPage(this.mode, page)
       this.clearDelay()
     },
