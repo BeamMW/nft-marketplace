@@ -877,4 +877,8 @@ export default class Utils {
       document.body.removeChild(textArea)
     }
   }
+
+  static waitAsync(msecs) {
+    return new Promise(resolve => setTimeout(() => resolve(), msecs))
+  }
 }

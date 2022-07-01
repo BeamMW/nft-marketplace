@@ -8,9 +8,18 @@ class ImagesStore {
 
   reset () {
     this._cache_size = 100
+    this._waiting_image = false
+
+    if (this._state) {
+      for (let key in this._state.images) {
+        let image = this._state.images[key]
+        if (image.object) URL.revokeObjectURL(image.object)
+      }
+    }
+
     this._state = reactive({
       images: {},
-      track: []
+      track: [],  
     })
   }
 
@@ -58,6 +67,7 @@ class ImagesStore {
       return cached
     }
 
+    this._setLoading(image)
     this._loadBytes(image)
     return this._state.images[image.ipfs_hash]
   }
@@ -103,6 +113,15 @@ class ImagesStore {
     })
   }
 
+  _setRequested(image) {
+    return this._setImage({
+      ipfs_hash: image.ipfs_hash,
+      mime_type: image.mime_type,
+      loading: true,
+      requested: true
+    })
+  }
+
   _setError(image, error) {
     return this._setImage({
       ipfs_hash: image.ipfs_hash,
@@ -112,12 +131,37 @@ class ImagesStore {
   }
 
   async _loadBytes(what) {
-    console.log('_loadBytes')
-    try {
-      this._setLoading(what)
+    if (this._waiting_image) {
+      return
+    }
 
+    //
+    // We do not allow multiple images to load at once
+    // This can overload user PC
+    // But we also do not wait too long for a single image
+    // it can stuck in loading state forever
+    //
+    this._waiting_image = true
+    await Promise.any([
+      utils.waitAsync(500),
+      this._loadBytesImp(what)
+    ])
+    this._waiting_image = false
+
+    for (let key in this._state.images) {
+      let image = this._state.images[key]
+      if (image.loading && !image.requested) {
+        this._loadBytes(image)
+        break
+      }
+    }
+  }
+
+  async _loadBytesImp(what) {
+    try {    
       let data = undefined
-      
+      this._setRequested(what)
+
       if (utils.isDesktop()) {
         let {res} = await utils.callApiAsync('ipfs_get', {hash: what.ipfs_hash})
         utils.ensureField(res, 'data', 'array')  
@@ -128,15 +172,19 @@ class ImagesStore {
         data = await utils.downloadAsync(url)
       }
 
-      let u8arr = new Uint8Array(data)
-      let blob = new Blob([u8arr], {type: what.mime_type})
-      let object = URL.createObjectURL(blob, {oneTimeOnly: false})
+      // May be image has been loading for a long time 
+      // and user already moved to another page
+      if (this._state.images[what.ipfs_hash]) {
+        let u8arr = new Uint8Array(data)
+        let blob = new Blob([u8arr], {type: what.mime_type})
+        let object = URL.createObjectURL(blob, {oneTimeOnly: false})
 
-      return this._setImage({
-        ipfs_hash: what.ipfs_hash, 
-        mime_type: what.mime_type,
-        object
-      })
+        this._setImage({
+          ipfs_hash: what.ipfs_hash, 
+          mime_type: what.mime_type,
+          object
+        })
+      }
     }
     catch (err) {
       console.log(`ImagesStore._loadBytes failed for hash ${what.ipfs_hash}`, err)
