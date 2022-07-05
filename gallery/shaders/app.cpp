@@ -179,10 +179,14 @@
 #define Gallery_user_vote(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, id) macro(uint32_t, val)
 
+#define Gallery_user_is_my_key(macro)                      \
+    macro(ContractID, cid) macro(gallery::Nft::Id, nft_id) \
+        macro(gallery::Artist::Id, key)
+
 #define GalleryRole_user(macro)                                           \
     macro(user, set_price) macro(user, transfer) macro(user, buy)         \
         macro(user, view_balance) macro(user, withdraw) macro(user, vote) \
-            macro(user, add_rewards)
+            macro(user, add_rewards) macro(user, is_my_key)
 
 #define GalleryRoles_All(macro) \
     macro(manager) macro(moderator) macro(artist) macro(user)
@@ -1732,6 +1736,10 @@ ON_METHOD(user, withdraw) {
         if (max_count == ++count)
             break;
     }
+}
+
+ON_METHOD(user, is_my_key) {
+    Env::DocAddNum32("key", IsOwner(cid, key, 0) || IsOwner(cid, key, nft_id));
 }
 
 ON_METHOD(user, vote) {
