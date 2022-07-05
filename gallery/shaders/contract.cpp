@@ -89,8 +89,6 @@ BEAM_EXPORT void Method_4(const method::SetModerator& r) {
     }
     Index<Tag::kHeightModeratorIdx, Height, Moderator>::Update(
         m.updated, cur_height, r.id);
-    Index<Tag::kRHeightModeratorIdx, Height, Moderator>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, r.id);
     m.approved = r.approved;
     m.updated = cur_height;
     GalleryObject::Save(m, r.id);
@@ -132,8 +130,6 @@ BEAM_EXPORT void Method_5(const method::SetArtist& r) {
     a.status = Status::kPending;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
-    Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-        kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
     a.updated = cur_height;
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
     Env::AddSig(r.artist_id);
@@ -161,8 +157,6 @@ BEAM_EXPORT void Method_6(const method::SetArtistStatus& r) {
         a.approved_cnt += (r.status == Status::kApproved);
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.ids[i]);
-        Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-            kMaxHeight - a.updated, kMaxHeight - cur_height, r.ids[i]);
         a.updated = cur_height;
         GalleryObject::Save(a, r.ids[i], sizeof(Artist) + a.data_len);
     }
@@ -189,8 +183,6 @@ BEAM_EXPORT void Method_7(const method::SetCollectionStatus& r) {
         c.status = r.status;
         Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
             c.updated, cur_height, r.ids[i]);
-        Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-            kMaxHeight - c.updated, kMaxHeight - cur_height, r.ids[i]);
         c.updated = cur_height;
         GalleryObject::Save(c, r.ids[i],
                             sizeof(Collection) + c.label_len + c.data_len);
@@ -229,8 +221,6 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
         ++a.collections_num;
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.artist_id);
-        Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-            kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
         a.updated = cur_height;
         Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
         a.last_created_object = cur_height;
@@ -255,8 +245,6 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
     c.status = Status::kPending;
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, c_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, c_id);
     c.updated = cur_height;
     GalleryObject::Save(c, c_id, sizeof(Collection) + c.label_len + c.data_len);
     Env::AddSig(r.artist_id);
@@ -297,8 +285,6 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     Env::Halt_if(c.nfts_num > c.kMaxNfts);
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, r.collection_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, r.collection_id);
     c.updated = cur_height;
     GalleryObject::Save(c, r.collection_id,
                         sizeof(Collection) + c.label_len + c.data_len);
@@ -313,8 +299,6 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     ++a.nfts_num;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
-    Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-        kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
     Env::Halt_if(cur_height - a.last_created_object <= s.rate_limit);
     a.last_created_object = cur_height;
     a.updated = cur_height;
@@ -333,8 +317,6 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     Env::EmitLog(&alk, sizeof(alk), label_ptr, r.label_len, KeyTag::Internal);
 
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height, m.id);
-    Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, m.id);
     m.updated = cur_height;
     GalleryObject::Save(m, m.id);
     s.Save();
@@ -367,16 +349,12 @@ BEAM_EXPORT void Method_10(const method::SetNftStatus& r) {
             --c.approved_nfts_num;
         Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
             c.updated, cur_height, n.collection_id);
-        Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-            kMaxHeight - c.updated, kMaxHeight - cur_height, n.collection_id);
         c.updated = cur_height;
         GalleryObject::Save(c, n.collection_id,
                             sizeof(Collection) + c.label_len + c.data_len);
         n.status = r.status;
         Index<Tag::kHeightNftIdx, Height, Nft>::Update(n.updated, cur_height,
                                                        n.id);
-        Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-            kMaxHeight - n.updated, kMaxHeight - cur_height, n.id);
         n.updated = cur_height;
         GalleryObject::Save(n, n.id);
     }
@@ -389,8 +367,6 @@ BEAM_EXPORT void Method_11(const method::SetPrice& r) {
     Height cur_height = Env::get_Height();
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                    r.nft_id);
-    Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, r.nft_id);
     m.updated = cur_height;
     GalleryObject::Save(m, r.nft_id);
     Env::AddSig(m.owner);  // would fail if no current owner (i.e. checked out)
@@ -420,8 +396,6 @@ BEAM_EXPORT void Method_12(const method::Buy& r) {
     }
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, m.collection_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, m.collection_id);
     c.updated = cur_height;
     GalleryObject::Save(c, m.collection_id,
                         sizeof(Collection) + c.label_len + c.data_len);
@@ -436,8 +410,6 @@ BEAM_EXPORT void Method_12(const method::Buy& r) {
         a.total_sold_price += m.price.amount;
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, m.author);
-        Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-            kMaxHeight - a.updated, kMaxHeight - cur_height, m.author);
         a.updated = cur_height;
         GalleryObject::Save(a, m.author, sizeof(Artist) + a.data_len);
     }
@@ -461,8 +433,6 @@ BEAM_EXPORT void Method_12(const method::Buy& r) {
     _POD_(m.price).SetZero();  // not for sale until new owner sets the price
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                    r.nft_id);
-    Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, r.nft_id);
     m.updated = cur_height;
     GalleryObject::Save(m, r.nft_id);
     Env::AddSig(r.user);
@@ -576,8 +546,6 @@ BEAM_EXPORT void Method_17(const method::Vote& r) {
         Height cur_height = Env::get_Height();
         Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                        r.nft_id);
-        Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-            kMaxHeight - m.updated, kMaxHeight - cur_height, r.nft_id);
         m.updated = cur_height;
         GalleryObject::Save(m, r.nft_id);
     }
@@ -612,16 +580,16 @@ BEAM_EXPORT void Method_19(const method::Transfer& r) {
 
     GalleryObject::Load(c, m.collection_id, sizeof(c));
     ++c.total_sold;
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, m.collection_id);
+    Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
+        c.updated, cur_height, m.collection_id);
     c.updated = cur_height;
     GalleryObject::Save(c, m.collection_id,
                         sizeof(Collection) + c.label_len + c.data_len);
 
     _POD_(m.owner) = r.new_owner;
     _POD_(m.price).SetZero();
-    Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, r.nft_id);
+    Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
+                                                   r.nft_id);
     m.updated = cur_height;
     GalleryObject::Save(m, r.nft_id);
 }
@@ -671,8 +639,6 @@ BEAM_EXPORT void Method_21(const method::MigrateArtist& r) {
     a.approved_cnt = 1;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
-    Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-        kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
     a.updated = cur_height;
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
 }
@@ -711,8 +677,6 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
         ++a.collections_num;
         Index<Tag::kHeightArtistIdx, Height, Artist>::Update(
             a.updated, cur_height, r.artist_id);
-        Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-            kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
         a.updated = cur_height;
         GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
         s.Save();
@@ -733,8 +697,6 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
     c.status = Status::kApproved;
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, c_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, c_id);
     c.updated = cur_height;
     GalleryObject::Save(c, c_id, sizeof(Collection) + c.label_len + c.data_len);
 }
@@ -778,8 +740,6 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     Env::Halt_if(c.nfts_num > c.kMaxNfts);
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, r.collection_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, r.collection_id);
     c.updated = cur_height;
     GalleryObject::Save(c, r.collection_id,
                         sizeof(Collection) + c.label_len + c.data_len);
@@ -794,8 +754,6 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     ++a.nfts_num;
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          r.artist_id);
-    Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-        kMaxHeight - a.updated, kMaxHeight - cur_height, r.artist_id);
     a.updated = cur_height;
     GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
 
@@ -812,8 +770,6 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     Env::EmitLog(&alk, sizeof(alk), label_ptr, r.label_len, KeyTag::Internal);
 
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height, m.id);
-    Index<Tag::kRHeightNftIdx, Height, Nft>::Update(
-        kMaxHeight - m.updated, kMaxHeight - cur_height, m.id);
     m.updated = cur_height;
     GalleryObject::Save(m, m.id);
     s.Save();
@@ -854,8 +810,6 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
     }
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, m.collection_id);
-    Index<Tag::kRHeightCollectionIdx, Height, Collection>::Update(
-        kMaxHeight - c.updated, kMaxHeight - cur_height, m.collection_id);
     c.updated = cur_height;
     GalleryObject::Save(c, m.collection_id,
                         sizeof(Collection) + c.label_len + c.data_len);
@@ -869,8 +823,6 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
     a.total_sold_price += r.prices[0];
     Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
                                                          m.author);
-    Index<Tag::kRHeightArtistIdx, Height, Artist>::Update(
-        kMaxHeight - a.updated, kMaxHeight - cur_height, m.author);
     a.updated = cur_height;
     GalleryObject::Save(a, m.author, sizeof(Artist) + a.data_len);
 
