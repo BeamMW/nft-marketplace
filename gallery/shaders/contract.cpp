@@ -87,8 +87,6 @@ BEAM_EXPORT void Method_4(const method::SetModerator& r) {
         s.total_moderators++;
         s.Save();
     }
-    Index<Tag::kHeightModeratorIdx, Height, Moderator>::Update(
-        m.updated, cur_height, r.id);
     m.approved = r.approved;
     m.updated = cur_height;
     GalleryObject::Save(m, r.id);

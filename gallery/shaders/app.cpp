@@ -16,8 +16,7 @@
 
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
 
-#define Gallery_manager_view_moderators(macro) \
-    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count)
+#define Gallery_manager_view_moderators(macro) macro(ContractID, cid)
 
 #define Gallery_manager_set_moderator(macro)                 \
     macro(ContractID, cid) macro(gallery::Moderator::Id, id) \
@@ -1041,15 +1040,8 @@ ON_METHOD(manager, view_moderators) {
     char buf[1024];
     int buf_len = Env::DocGetText("ids", buf, sizeof(buf));
 
-    using HeightModeratorIdx = gallery::Index<gallery::Tag::kHeightModeratorIdx,
-                                              Height, gallery::Moderator>;
-
     GalleryObjectPrinter<AppModerator> m{cid};
-    if (count && h0) {
-        Height last_printed_h = m.Print<HeightModeratorIdx>(h0, count);
-        if (last_printed_h != kMaxHeight)
-            Env::DocAddNum("processed_height", last_printed_h);
-    } else if (buf_len) {
+    if (buf_len) {
         m.Print(buf);
     } else {
         m.Print();
