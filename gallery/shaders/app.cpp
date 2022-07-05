@@ -30,17 +30,28 @@
 
 #define Gallery_manager_view_nfts_stats(macro) macro(ContractID, cid)
 
-#define Gallery_manager_view_nfts(macro) \
-    macro(ContractID, cid) macro(Height, h0) macro(Amount, count)
+#define Gallery_manager_view_nfts(macro)                          \
+    macro(ContractID, cid) macro(Height, h0) macro(Amount, count) \
+        macro(gallery::Nft::Id, idx0)
 
 #define Gallery_manager_view_nft_sales(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, id)
 
-#define Gallery_manager_view_collections(macro) \
-    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count)
+#define Gallery_manager_view_collections(macro)                     \
+    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
+        macro(gallery::Collection::Id, idx0)
 
-#define Gallery_manager_view_artists(macro) \
-    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count)
+#define Gallery_manager_view_artists(macro)                         \
+    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
+        macro(gallery::Artist::Id, idx0)
+
+#define Gallery_manager_view_likes(macro)                               \
+    macro(ContractID, cid) macro(uint32_t, idx0) macro(uint32_t, count) \
+        macro(gallery::Artist::Id, artist_id)
+
+#define Gallery_manager_view_changed_likes(macro)              \
+    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) \
+        macro(gallery::Artist::Id, artist_id)
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
 
@@ -93,23 +104,27 @@
         manager, set_min_approvers) macro(manager, view)                       \
         macro(manager, view_params) macro(manager, view_artists_stats) macro(  \
             manager, view_moderators_stats) macro(manager, view_artists)       \
-            macro(manager, view_collections) macro(manager, view_nfts) macro(  \
-                manager, view_nft_sales)                                       \
-                macro(manager, view_collections_stats) macro(                  \
-                    manager, view_nfts_stats) macro(manager, view_balance)     \
-                    macro(manager, get_id) macro(manager, explicit_upgrade)    \
-                        macro(manager, schedule_upgrade) macro(manager,        \
-                                                               set_moderator)  \
-                            macro(manager, view_moderators) macro(             \
-                                manager, set_nft_status)                       \
-                                macro(manager, set_artist_status) macro(       \
-                                    manager, set_collection_status)            \
-                                    macro(manager, set_fee_base) macro(        \
-                                        manager, set_rate_limit)               \
-                                        macro(manager, migrate_nft) macro(     \
-                                            manager, migrate_artist)           \
-                                            macro(manager, migrate_collection) \
-                                                macro(manager, migrate_sales)
+            macro(manager, view_likes) macro(manager, view_changed_likes)      \
+                macro(manager, view_collections) macro(                        \
+                    manager, view_nfts) macro(manager, view_nft_sales)         \
+                    macro(manager, view_collections_stats) macro(              \
+                        manager, view_nfts_stats) macro(manager, view_balance) \
+                        macro(manager, get_id) macro(manager,                  \
+                                                     explicit_upgrade)         \
+                            macro(manager, schedule_upgrade) macro(            \
+                                manager, set_moderator)                        \
+                                macro(manager, view_moderators) macro(         \
+                                    manager, set_nft_status)                   \
+                                    macro(manager, set_artist_status) macro(   \
+                                        manager, set_collection_status)        \
+                                        macro(manager, set_fee_base) macro(    \
+                                            manager, set_rate_limit)           \
+                                            macro(manager, migrate_nft)        \
+                                                macro(manager, migrate_artist) \
+                                                    macro(manager,             \
+                                                          migrate_collection)  \
+                                                        macro(manager,         \
+                                                              migrate_sales)
 
 // MODERATOR
 
@@ -315,6 +330,7 @@ struct AppArtist : public gallery::Artist {
         Env::DocAddNum("nfts_count", nfts_num);
         Env::DocAddNum("approved_cnt", approved_cnt);
         Env::DocAddText("status", StatusToString(status).data());
+        Env::DocAddNum("likes_count", likes_num);
         {
             Env::DocGroup gr_sold("total_sold");
             Env::DocAddNum("count", total_sold);
@@ -489,16 +505,16 @@ struct AppNft : public gallery::Nft {
             }
         }
 
-        Env::Key_T<gallery::Like::Key> like_key;
-        like_key.m_Prefix.m_Cid = cid;
-        like_key.m_KeyInContract.artist_id = AppArtist::id(cid);
-        like_key.m_KeyInContract.nft_id = id;
-        uint32_t value{};
-        Env::VarReader::Read_T(like_key, value);
+        // Env::Key_T<gallery::Like::Key> like_key;
+        // like_key.m_Prefix.m_Cid = cid;
+        // like_key.m_KeyInContract.artist_id = AppArtist::id(cid);
+        // like_key.m_KeyInContract.nft_id = id;
+        // uint32_t value{};
+        // Env::VarReader::Read_T(like_key, value);
 
         Env::DocAddNum32("likes", likes_number);
-        if (value)
-            Env::DocAddNum("my_like", value);
+        // if (value)
+        // Env::DocAddNum("my_like", value);
     }
 
     bool ReadWithoutData(const ContractID& cid, Id id) {
@@ -545,6 +561,42 @@ template <class T>
 class GalleryObjectPrinter {
 public:
     explicit GalleryObjectPrinter(const ContractID& cid) : cid_{cid} {
+    }
+
+    typename T::Id Print(const typename T::Id& from, size_t count) {
+        Env::Key_T<typename T::Key> k0, k1;
+        _POD_(k0.m_Prefix.m_Cid) = cid_;
+        _POD_(k1.m_Prefix.m_Cid) = cid_;
+        if constexpr (std::is_same_v<typename T::Id, PubKey>) {
+            _POD_(k0.m_KeyInContract.id) = from;
+            _POD_(k1.m_KeyInContract.id).SetObject(0xff);
+        } else {
+            k0.m_KeyInContract.id = Utils::FromBE(from);
+            k1.m_KeyInContract.id =
+                Utils::FromBE(static_cast<typename T::Id>(from + count));
+        }
+
+        Env::VarReader r(k0, k1);
+        Env::DocArray gr0("items");
+
+        size_t printed_cnt = 0;
+        typename T::Id last_printed{};
+        while (object_.ReadNext(r, k0) && printed_cnt++ < count) {
+            if constexpr (std::is_same_v<typename T::Id, PubKey>)
+                object_.Print(cid_, k0.m_KeyInContract.id);
+            else
+                object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id));
+            last_printed = k0.m_KeyInContract.id;
+        }
+        typename T::Id not_printed;
+        if constexpr (std::is_same_v<typename T::Id, PubKey>) {
+            not_printed = k0.m_KeyInContract.id;
+        } else {
+            not_printed = Utils::FromBE(k0.m_KeyInContract.id);
+            last_printed = Utils::FromBE(last_printed);
+        }
+        return _POD_(not_printed) != last_printed ? not_printed
+                                                  : typename T::Id{};
     }
 
     void Print() {
@@ -1029,10 +1081,58 @@ ON_METHOD(manager, view_artists) {
         Height last_printed_h = a.Print<HeightArtistIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
+    } else if (count && !_POD_(idx0).IsZero()) {
+        gallery::Artist::Id not_printed = a.Print(idx0, count);
+        Env::DocAddBlob_T("next_id", not_printed);
     } else if (buf_len) {
         a.Print(buf);
     } else {
         a.Print();
+    }
+}
+
+ON_METHOD(manager, view_likes) {
+    Env::Key_T<gallery::Like::Key> k0, k1;
+    _POD_(k0.m_Prefix.m_Cid) = cid;
+    _POD_(k1.m_Prefix.m_Cid) = cid;
+    k0.m_KeyInContract.like_id = Utils::FromBE(idx0);
+    k1.m_KeyInContract.like_id =
+        Utils::FromBE(static_cast<uint32_t>(idx0 + count));
+    k0.m_KeyInContract.artist_id = artist_id;
+    k1.m_KeyInContract.artist_id = artist_id;
+    k0.m_KeyInContract.nft_id = 0;
+    k1.m_KeyInContract.nft_id = std::numeric_limits<gallery::Nft::Id>::max();
+
+    Env::VarReader r(k0, k1);
+    uint32_t value{};
+    Env::DocArray root{"likes"};
+    while (r.MoveNext_T(k0, value)) {
+        Env::DocGroup gr{""};
+        Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
+        Env::DocAddNum("value", value);
+    }
+}
+
+ON_METHOD(manager, view_changed_likes) {
+    Env::Key_T<gallery::Events::Like::Key> k0, k1;
+    _POD_(k0.m_Prefix.m_Cid) = cid;
+    _POD_(k1.m_Prefix.m_Cid) = cid;
+    k0.m_KeyInContract.artist_id = artist_id;
+    k1.m_KeyInContract.artist_id = artist_id;
+    k0.m_KeyInContract.nft_id = 0;
+    k1.m_KeyInContract.nft_id = std::numeric_limits<gallery::Nft::Id>::max();
+
+    HeightPos pos_min, pos_max;
+    pos_min.m_Height = h0;
+    pos_max.m_Height = hn;
+
+    Env::LogReader r(k0, k1, &pos_min, &pos_max);
+    uint32_t value{};
+    Env::DocArray root{"likes"};
+    while (r.MoveNext_T(k0, value)) {
+        Env::DocGroup gr{""};
+        Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
+        Env::DocAddNum("value", value);
     }
 }
 
@@ -1061,6 +1161,9 @@ ON_METHOD(manager, view_collections) {
         Height last_printed_h = c.Print<HeightCollectionIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
+    } else if (count && idx0) {
+        gallery::Collection::Id not_printed = c.Print(idx0, count);
+        Env::DocAddNum("next_id", not_printed);
     } else if (buf_len) {
         c.Print(buf);
     } else {
@@ -1447,6 +1550,9 @@ ON_METHOD(manager, view_nfts) {
         Height last_printed_h = a.Print<HeightNftIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
+    } else if (count && idx0) {
+        gallery::Nft::Id not_printed = a.Print(idx0, count);
+        Env::DocAddNum("next_id", not_printed);
     } else if (buf_len) {
         a.Print(buf);
     } else {

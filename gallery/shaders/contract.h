@@ -8,10 +8,10 @@
 const Height kMaxHeight = std::numeric_limits<Height>::max();
 
 namespace gallery {
-static const ShaderID kSid0 = {0xc0, 0x06, 0x7f, 0xf6, 0x40, 0xc8, 0xa5, 0xaf,
-                               0x98, 0xed, 0x82, 0x7e, 0x2c, 0x11, 0x57, 0x8d,
-                               0xae, 0xbb, 0xca, 0xc4, 0x90, 0x7a, 0xce, 0x5f,
-                               0xa9, 0x6c, 0x8d, 0x40, 0x0b, 0xe2, 0xe8, 0x01};
+static const ShaderID kSid0 = {0x0c, 0xa8, 0x7c, 0xbd, 0x06, 0xda, 0xe5, 0x6d,
+                               0x3a, 0x7c, 0xa5, 0x2c, 0xa8, 0x59, 0x5a, 0x03,
+                               0x5c, 0x11, 0xd8, 0xf2, 0x07, 0xa0, 0x24, 0xdc,
+                               0x4c, 0x67, 0x4f, 0x7b, 0x23, 0xa9, 0x40, 0xc7};
 #pragma pack(push, 1)
 
 using Hash256 = Opaque<32>;
@@ -131,6 +131,7 @@ struct Artist {
     uint32_t collections_num;
     uint32_t nfts_num;
     uint32_t approved_cnt;
+    uint32_t likes_num;
 
     // followed by label and data without delimiter
     static const uint32_t kLabelMaxLen = 200;
@@ -219,8 +220,9 @@ struct Like {
     struct Key {
         // The order is crucial: tag must be the first
         Tag tag = Tag::kLike;
-        Nft::Id nft_id;
         Artist::Id artist_id;
+        uint32_t like_id;
+        Nft::Id nft_id;
     };
     uint32_t value;
 };
@@ -294,6 +296,16 @@ struct Events {
         };
         AmountWithAsset price;
         uint8_t has_aid;
+    };
+
+    struct Like {
+        struct Key {
+            // The order is crucial: prefix must be the first
+            uint8_t prefix = 4;
+            Artist::Id artist_id;
+            Nft::Id nft_id;
+        };
+        uint32_t value;
     };
 };
 
