@@ -210,8 +210,6 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
         _POD_(c).SetZero();
         c.author = r.artist_id;
         c.updated = cur_height;
-        Index<Tag::kArtistCollectionIdx, Artist::Id, Collection>::Save(c.author,
-                                                                       c_id);
 
         struct ArtistPlus : public Artist {
             char data[kDataMaxLen];
@@ -268,12 +266,6 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     m.status = Status::kPending;
     m.likes_number = 0;
     _POD_(m.price) = r.price;
-    // assert: artist owns collection
-    Env::Halt_if(
-        !Index<Tag::kArtistCollectionIdx, Artist::Id, Collection>::Load(
-            r.artist_id, r.collection_id));
-    Index<Tag::kCollectionNftIdx, Collection::Id, Nft>::Save(r.collection_id,
-                                                             m.id);
 
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
@@ -283,6 +275,8 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     Env::Halt_if(!GalleryObject::Load(c, r.collection_id, sizeof(c)));
     c.nfts_num++;
     Env::Halt_if(c.nfts_num > c.kMaxNfts);
+    // assert: artist owns collection
+    Env::Halt_if(_POD_(c.author) != r.artist_id);
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, r.collection_id);
     c.updated = cur_height;
@@ -666,8 +660,6 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
         _POD_(c).SetZero();
         c.author = r.artist_id;
         c.updated = cur_height;
-        Index<Tag::kArtistCollectionIdx, Artist::Id, Collection>::Save(c.author,
-                                                                       c_id);
 
         struct ArtistPlus : public Artist {
             char data[kDataMaxLen];
@@ -722,12 +714,6 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     m.status = Status::kApproved;
     m.likes_number = 0;
     _POD_(m.price) = r.price;
-    // assert: artist owns collection
-    Env::Halt_if(
-        !Index<Tag::kArtistCollectionIdx, Artist::Id, Collection>::Load(
-            r.artist_id, r.collection_id));
-    Index<Tag::kCollectionNftIdx, Collection::Id, Nft>::Save(r.collection_id,
-                                                             m.id);
 
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
@@ -738,6 +724,8 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     c.nfts_num++;
     c.approved_nfts_num++;
     Env::Halt_if(c.nfts_num > c.kMaxNfts);
+    // assert: artist owns collection
+    Env::Halt_if(_POD_(c.author) != r.artist_id);
     Index<Tag::kHeightCollectionIdx, Height, Collection>::Update(
         c.updated, cur_height, r.collection_id);
     c.updated = cur_height;

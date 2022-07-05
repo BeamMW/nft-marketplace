@@ -37,13 +37,11 @@
 #define Gallery_manager_view_nft_sales(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, id)
 
-#define Gallery_manager_view_collections(macro)                     \
-    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
-        macro(uint32_t, nfts)
+#define Gallery_manager_view_collections(macro) \
+    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count)
 
-#define Gallery_manager_view_artists(macro)                         \
-    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
-        macro(uint32_t, nfts) macro(uint32_t, collections)
+#define Gallery_manager_view_artists(macro) \
+    macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count)
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
 
@@ -324,16 +322,6 @@ struct AppArtist : public gallery::Artist {
             Env::DocAddNum("volume", total_sold_price);
             Env::DocAddNum32("aid", 0);
         }
-
-        uint32_t print_nfts{};
-        Env::DocGetNum32("nfts", &print_nfts);
-        if (print_nfts)
-            PrintNfts_(cid, id);
-
-        uint32_t print_collections{};
-        Env::DocGetNum32("collections", &print_collections);
-        if (print_collections)
-            PrintCollections_(cid, id);
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Key>& key) {
@@ -362,63 +350,6 @@ struct AppArtist : public gallery::Artist {
         label[std::min(val_size, kLabelMaxLen)] = 0;
 
         return true;
-    }
-
-private:
-    void PrintNfts_(const ContractID& cid, const Id& id) {
-        using ACKey =
-            gallery::Index<gallery::Tag::kArtistCollectionIdx,
-                           gallery::Artist::Id, gallery::Collection>::Key;
-        using CAKey =
-            gallery::Index<gallery::Tag::kCollectionNftIdx,
-                           gallery::Collection::Id, gallery::Nft>::Key;
-
-        Env::Key_T<ACKey> ack0, ack1;
-        _POD_(ack0.m_Prefix.m_Cid) = cid;
-        _POD_(ack1.m_Prefix.m_Cid) = cid;
-        ack0.m_KeyInContract.id = id;
-        ack1.m_KeyInContract.id = id;
-        ack0.m_KeyInContract.t_id = 0;
-        ack1.m_KeyInContract.t_id = static_cast<gallery::Collection::Id>(-1);
-        Env::VarReader rac(ack0, ack1);
-
-        bool exists;
-        Env::DocArray gr("nfts");
-        while (rac.MoveNext_T(ack0, exists)) {
-            Env::Key_T<CAKey> cak0, cak1;
-            _POD_(cak0.m_Prefix.m_Cid) = cid;
-            _POD_(cak1.m_Prefix.m_Cid) = cid;
-            cak0.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
-            cak1.m_KeyInContract.id = ack0.m_KeyInContract.t_id;
-            cak0.m_KeyInContract.t_id = 0;
-            cak1.m_KeyInContract.t_id = static_cast<gallery::Nft::Id>(-1);
-            Env::VarReader rca(cak0, cak1);
-
-            while (rca.MoveNext_T(cak0, exists)) {
-                Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.t_id));
-            }
-        }
-    }
-
-    void PrintCollections_(const ContractID& cid, const Id& id) {
-        using ACKey =
-            gallery::Index<gallery::Tag::kArtistCollectionIdx,
-                           gallery::Artist::Id, gallery::Collection>::Key;
-
-        Env::Key_T<ACKey> ack0, ack1;
-        _POD_(ack0.m_Prefix.m_Cid) = cid;
-        _POD_(ack1.m_Prefix.m_Cid) = cid;
-        ack0.m_KeyInContract.id = id;
-        ack1.m_KeyInContract.id = id;
-        ack0.m_KeyInContract.t_id = 0;
-        ack1.m_KeyInContract.t_id = static_cast<gallery::Collection::Id>(-1);
-
-        Env::VarReader rac(ack0, ack1);
-        Env::DocArray gr("collections");
-        bool exists;
-        while (rac.MoveNext_T(ack0, exists)) {
-            Env::DocAddNum32("", Utils::FromBE(ack0.m_KeyInContract.t_id));
-        }
     }
 };
 #pragma pack(pop)
@@ -494,12 +425,6 @@ struct AppCollection : public gallery::Collection {
             Env::DocAddNum("aid", min_sold.price.aid);
             Env::DocAddNum32("nft_id", min_sold.nft_id);
         }
-
-        uint32_t print_nfts{};
-        Env::DocGetNum32("nfts", &print_nfts);
-
-        if (print_nfts)
-            PrintNfts_(cid, id);
     }
 
     bool ReadNext(Env::VarReader& r, Env::Key_T<Key>& key) {
@@ -517,28 +442,6 @@ struct AppCollection : public gallery::Collection {
             break;
         }
         return true;
-    }
-
-private:
-    void PrintNfts_(const ContractID& cid, Id id) {
-        using CAKey =
-            gallery::Index<gallery::Tag::kCollectionNftIdx,
-                           gallery::Collection::Id, gallery::Nft>::Key;
-
-        Env::Key_T<CAKey> cak0, cak1;
-        _POD_(cak0.m_Prefix.m_Cid) = cid;
-        _POD_(cak1.m_Prefix.m_Cid) = cid;
-        cak0.m_KeyInContract.id = Utils::FromBE(id);
-        cak1.m_KeyInContract.id = Utils::FromBE(id);
-        cak0.m_KeyInContract.t_id = 0;
-        cak1.m_KeyInContract.t_id = static_cast<gallery::Nft::Id>(-1);
-        Env::VarReader rca(cak0, cak1);
-
-        Env::DocArray gr("nfts");
-        bool exists;
-        while (rca.MoveNext_T(cak0, exists)) {
-            Env::DocAddNum32("", Utils::FromBE(cak0.m_KeyInContract.t_id));
-        }
     }
 };
 #pragma pack(pop)

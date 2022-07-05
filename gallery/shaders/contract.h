@@ -8,10 +8,10 @@
 const Height kMaxHeight = std::numeric_limits<Height>::max();
 
 namespace gallery {
-static const ShaderID kSid0 = {0x13, 0x97, 0x95, 0xef, 0x16, 0x46, 0x57, 0xeb,
-                               0x64, 0x0a, 0x3d, 0x5a, 0xf5, 0xfd, 0xc7, 0xfe,
-                               0xf3, 0x28, 0xa3, 0x78, 0x85, 0x20, 0xef, 0x02,
-                               0x95, 0x0a, 0xce, 0xe2, 0x8e, 0x2b, 0x72, 0xb2};
+static const ShaderID kSid0 = {0xb8, 0xdf, 0xc9, 0x53, 0x57, 0x83, 0xde, 0x93,
+                               0x56, 0x3f, 0xcd, 0x0d, 0xa0, 0x4a, 0xac, 0x19,
+                               0x6b, 0xf4, 0x9c, 0x0e, 0x67, 0xc7, 0x60, 0x65,
+                               0x1d, 0xf0, 0xe7, 0xd0, 0x0b, 0x20, 0x05, 0x20};
 #pragma pack(push, 1)
 
 using Hash256 = Opaque<32>;
@@ -31,14 +31,12 @@ enum class Tag : uint8_t {
     kModerator = 4,
     kLike = 5,
     kCollection = 6,
-    kArtistCollectionIdx = 7,
-    kCollectionNftIdx = 8,
-    kHeightArtistIdx = 9,
-    kHeightModeratorIdx = 10,
-    kHeightNftIdx = 11,
-    kHeightCollectionIdx = 12,
-    kArtistLabelHash = 13,
-    kCollectionLabelHash = 14,
+    kHeightArtistIdx = 7,
+    kHeightModeratorIdx = 8,
+    kHeightNftIdx = 9,
+    kHeightCollectionIdx = 10,
+    kArtistLabelHash = 11,
+    kCollectionLabelHash = 12,
 };
 
 enum class Status : uint8_t {
