@@ -32,21 +32,21 @@
 
 #define Gallery_manager_view_nfts(macro)                          \
     macro(ContractID, cid) macro(Height, h0) macro(Amount, count) \
-        macro(gallery::Nft::Id, idx0)
+        macro(gallery::Nft::Id, id0)
 
 #define Gallery_manager_view_nft_sales(macro) \
     macro(ContractID, cid) macro(gallery::Nft::Id, id)
 
 #define Gallery_manager_view_collections(macro)                     \
     macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
-        macro(gallery::Collection::Id, idx0)
+        macro(gallery::Collection::Id, id0)
 
 #define Gallery_manager_view_artists(macro)                         \
     macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
-        macro(gallery::Artist::Id, idx0)
+        macro(gallery::Artist::Id, id0)
 
 #define Gallery_manager_view_likes(macro)                               \
-    macro(ContractID, cid) macro(uint32_t, idx0) macro(uint32_t, count) \
+    macro(ContractID, cid) macro(uint32_t, id0) macro(uint32_t, count) \
         macro(gallery::Artist::Id, artist_id)
 
 #define Gallery_manager_view_changed_likes(macro)              \
@@ -1085,8 +1085,8 @@ ON_METHOD(manager, view_artists) {
         Height last_printed_h = a.Print<HeightArtistIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && !_POD_(idx0).IsZero()) {
-        gallery::Artist::Id not_printed = a.Print(idx0, count);
+    } else if (count && !_POD_(id0).IsZero()) {
+        gallery::Artist::Id not_printed = a.Print(id0, count);
         Env::DocAddBlob_T("next_id", not_printed);
     } else if (buf_len) {
         a.Print(buf);
@@ -1099,9 +1099,9 @@ ON_METHOD(manager, view_likes) {
     Env::Key_T<gallery::Like::Key> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
     _POD_(k1.m_Prefix.m_Cid) = cid;
-    k0.m_KeyInContract.like_id = Utils::FromBE(idx0);
+    k0.m_KeyInContract.like_id = Utils::FromBE(id0);
     k1.m_KeyInContract.like_id =
-        Utils::FromBE(static_cast<uint32_t>(idx0 + count));
+        Utils::FromBE(static_cast<uint32_t>(id0 + count));
     k0.m_KeyInContract.artist_id = artist_id;
     k1.m_KeyInContract.artist_id = artist_id;
     k0.m_KeyInContract.nft_id = 0;
@@ -1165,8 +1165,8 @@ ON_METHOD(manager, view_collections) {
         Height last_printed_h = c.Print<HeightCollectionIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && idx0) {
-        gallery::Collection::Id not_printed = c.Print(idx0, count);
+    } else if (count && id0) {
+        gallery::Collection::Id not_printed = c.Print(id0, count);
         Env::DocAddNum("next_id", not_printed);
     } else if (buf_len) {
         c.Print(buf);
@@ -1554,8 +1554,8 @@ ON_METHOD(manager, view_nfts) {
         Height last_printed_h = a.Print<HeightNftIdx>(h0, count);
         if (last_printed_h != kMaxHeight)
             Env::DocAddNum("processed_height", last_printed_h);
-    } else if (count && idx0) {
-        gallery::Nft::Id not_printed = a.Print(idx0, count);
+    } else if (count && id0) {
+        gallery::Nft::Id not_printed = a.Print(id0, count);
         Env::DocAddNum("next_id", not_printed);
     } else if (buf_len) {
         a.Print(buf);
