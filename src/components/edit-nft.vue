@@ -8,7 +8,6 @@
         <i>After NFT is created it would not be visible<br>
           until reviewed by a moderator.</i>
       </p>
-      <!-- TODO: center form, not scale -->
       <div class="fields">
         <div class="col-first">
           <formInput v-model="name"

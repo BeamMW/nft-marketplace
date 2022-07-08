@@ -29,9 +29,9 @@ export default class ItemsStore extends LazyLoader {
   //  liker:liked -> keys: [satus+my_like]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
-    super({objname, versions})
+    super({objname, extraDBKeys})
+    this._versions = versions
     this._per_page = perPage || common.ITEMS_PER_PAGE
-    this._store_name = `${objname}s`
     this._modes = [...modes]
     
     //

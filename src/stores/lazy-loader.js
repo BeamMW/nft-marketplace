@@ -10,9 +10,9 @@ const AC_LOAD = 1
 const AC_UPDATE = 2
 
 export default class LazyLoader {
-  constructor({objname, versions}) {
+  constructor({objname}) {
     this._objname = objname
-    this._versions = versions
+    this._store_name = `${objname}s`
     this._metastore_name = `${objname}s_meta`
   }
 
@@ -34,6 +34,7 @@ export default class LazyLoader {
 
   getDBStores() {
     let res = {} 
+    res[this._store_name] ='id'
     res[this._metastore_name] = 'name'
     return res
   }

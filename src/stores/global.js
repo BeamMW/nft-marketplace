@@ -3,6 +3,7 @@ import imagesStore from 'stores/images'
 import lazyArtistsStore from 'stores/artists-lazy'
 import artistsStore from 'stores/artists'
 import collsStore from 'stores/collections'
+import likesStore from 'stores/likes'
 import nftsStore from 'stores/nfts'
 import Database from 'stores/database'
 import utils from 'utils/utils'
@@ -117,14 +118,16 @@ const store = {
     this._database = new Database(this.state.cid, db_id)
     await this._database.initAsync({
       ...collsStore.getDBStores(),
-      ...nftsStore.getDBStores(),
-      ...lazyArtistsStore.getDBStores()
+      ...lazyArtistsStore.getDBStores(),
+      ...likesStore.getDBStores(),
+      ...nftsStore.getDBStores()
     })
 
     //
     // Reset stores
     //
     nftsStore.reset(this, this._database)
+    likesStore.reset(this, this._database)
     collsStore.reset(this, this._database)
     artistsStore.reset(this, this._database)
     lazyArtistsStore.reset(this, this._database)
@@ -237,6 +240,9 @@ const store = {
 
       this.state.loading = 'Loading Collections'
       await collsStore.loadAsync()
+
+      this.state.loading = 'Loading Likes'
+      //await likesStore.loadAsync()
       
       this.state.loading = 'Loading NFTs'
       await nftsStore.loadAsync()
@@ -249,6 +255,7 @@ const store = {
     else {
       await lazyArtistsStore.updateAsync()
       await collsStore.updateAsync()
+      //await likesStore.updateAsync()
       await nftsStore.updateAsync()
     }
 

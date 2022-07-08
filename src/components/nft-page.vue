@@ -36,8 +36,9 @@
             <div class="bottom">
               <div class="separator"/>
               <div class="author" :class="{'error': error}">Creator: <span>{{ author_name }}</span></div>
-              <!-- TODO: make collection clickable and navigate to it on click -->
-              <div class="collection" :class="{'error': error || collection_error}">Collection: <span>{{ collection_name }}</span></div>
+              <div class="collection" :class="{'error': error || collection_error}">
+                Collection: <span :class="{'link': !(error || collection_error)}" @click="toCollection">{{ collection_name }}</span>
+              </div>
               <div class="separator"/>
               <price :nft="nft"/>
             </div>
@@ -411,7 +412,6 @@ export default {
     },
     
     title () {
-      // TODO: add computed title based on debug flag
       return [this.debug ? `[${this.nft.id}] - ` : '', this.show_safe ? this.nft.safe_label : this.nft.label].join('')
     },
 
@@ -469,8 +469,11 @@ export default {
     onTransfer() {
       this.$refs.transferModal.open()
     },
-    onAuthor () {
+    toAuthor () {
       // FUTURE
+    },
+    toCollection () {
+      collsStore.toDetails(this.nft.collection, this.mode)
     }
   }
 }
