@@ -1096,14 +1096,20 @@ ON_METHOD(manager, view_artists) {
 }
 
 ON_METHOD(manager, view_likes) {
+    PubKey artist_id_;
+    if (_POD_(artist_id).IsZero()) {
+        _POD_(artist_id_) = AppArtist::id(cid);
+    } else {
+        _POD_(artist_id_) = artist_id;
+    }
     Env::Key_T<gallery::Like::Key> k0, k1;
     _POD_(k0.m_Prefix.m_Cid) = cid;
     _POD_(k1.m_Prefix.m_Cid) = cid;
     k0.m_KeyInContract.like_id = Utils::FromBE(id0);
     k1.m_KeyInContract.like_id =
         Utils::FromBE(static_cast<uint32_t>(id0 + count));
-    k0.m_KeyInContract.artist_id = artist_id;
-    k1.m_KeyInContract.artist_id = artist_id;
+    k0.m_KeyInContract.artist_id = artist_id_;
+    k1.m_KeyInContract.artist_id = artist_id_;
     k0.m_KeyInContract.nft_id = 0;
     k1.m_KeyInContract.nft_id = std::numeric_limits<gallery::Nft::Id>::max();
 
