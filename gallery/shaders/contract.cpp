@@ -537,6 +537,8 @@ BEAM_EXPORT void Method_17(const method::Vote& r) {
         m.likes_number++;
         nft_updated = true;
     }
+    Height cur_height = Env::get_Height();
+    like.updated = cur_height;
     like.value = r.value;
     Env::SaveVar_T(like_key, like);
 
@@ -545,7 +547,6 @@ BEAM_EXPORT void Method_17(const method::Vote& r) {
     like_evt_key.nft_id = r.nft_id;
     Env::EmitLog_T(like_evt_key, r.value);
 
-    Height cur_height = Env::get_Height();
     if (nft_updated) {
         Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                        r.nft_id);

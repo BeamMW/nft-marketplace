@@ -1109,12 +1109,13 @@ ON_METHOD(manager, view_likes) {
             std::numeric_limits<gallery::Nft::Id>::max();
 
         Env::VarReader r(k0, k1);
-        uint32_t value{};
+        gallery::Like like{};
         Env::DocArray root{"likes"};
-        while (r.MoveNext_T(k0, value)) {
+        while (r.MoveNext_T(k0, like)) {
             Env::DocGroup gr{""};
             Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
-            Env::DocAddNum("value", value);
+            Env::DocAddNum("value", like.value);
+            Env::DocAddNum("updated", like.updated);
         }
     } else {
         Env::Key_T<gallery::Events::Like::Key> k0, k1;
@@ -1127,18 +1128,19 @@ ON_METHOD(manager, view_likes) {
             std::numeric_limits<gallery::Nft::Id>::max();
 
         HeightPos pos_min, pos_max;
-        pos_min.m_Height = h0;
-        pos_max.m_Height = hn ? hn : Env::get_Height();
+        pos_min.m_Height = h0 + 1;
+        pos_max.m_Height = hn ? hn + 1 : Env::get_Height() + 1;
 
         Env::LogReader r(k0, k1, &pos_min, &pos_max);
-        uint32_t value{};
         Env::DocArray root{"likes"};
+        uint32_t value{};
         uint32_t cur_cnt{};
         while (r.MoveNext_T(k0, value) &&
                (!count || (count && cur_cnt++ < count))) {
             Env::DocGroup gr{""};
             Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
             Env::DocAddNum("value", value);
+            Env::DocAddNum("updated", r.m_Pos.m_Height - 1);
         }
     }
 }
