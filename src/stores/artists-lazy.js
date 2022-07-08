@@ -20,6 +20,10 @@ class ArtistsStore extends LazyItems {
   fromContract(artist) {
     return ArtistsCommon.fromContract(artist)
   }
+
+  getFirstIDX() {
+    return '000000000000000000000000000000000000000000000000000000000000000001'
+  }
 }
 
 let artistsStore = new ArtistsStore()

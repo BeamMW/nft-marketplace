@@ -18,6 +18,7 @@ function defaultState() {
     shader: undefined,
     cid: contract.cid,
     height: 0,
+    my_key: false,
     is_admin: false,
     is_moderator: false,
     moderators: [],
@@ -101,19 +102,18 @@ const store = {
     //
     // get key
     //
-    let db_id = 'headless'
+    let {res} = await utils.invokeContractAsync({
+      role: 'artist',
+      action: 'get_id',
+      cid: this.state.cid
+    })
+    utils.ensureField(res, 'id', 'string')
+    this.state.my_key = res.id
 
-    if (!utils.isHeadless()) {
-      let {res} = await utils.invokeContractAsync({
-        role: 'artist',
-        action: 'get_id',
-        cid: this.state.cid
-      })
-
-      utils.ensureField(res, 'id', 'string')
-      db_id = res.id
-    }
-
+    //
+    // Initialize database
+    //
+    let db_id = utils.isHeadless() ? 'headless' : this.state.my_key
     this._database = new Database(this.state.cid, db_id)
     await this._database.initAsync({
       ...collsStore.getDBStores(),
@@ -229,29 +229,27 @@ const store = {
     // Reload stores
     //
     await imagesStore.loadAsync()
-  
+    await artistsStore.loadAsync()
+
     if (this.state.loading) {
       this.state.loading = 'Loading Artists'
-    }
+      await lazyArtistsStore.loadAsync()
 
-    await artistsStore.loadAsync()
-    await lazyArtistsStore.loadAsync()
-    
-    if (this.state.loading) {
       this.state.loading = 'Loading Collections'
-    }
-    await collsStore.loadAsync()
-  
-    if (this.state.loading) {
+      await collsStore.loadAsync()
+      
       this.state.loading = 'Loading NFTs'
-    }
-    await nftsStore.loadAsync()
-
-    if (this.state.loading) { 
+      await nftsStore.loadAsync()
+      
       this.state.loading = false
       if (artistsStore.is_artist) {
         this.state.my_active_tab = my_tabs.COLLECTIONS
       }
+    } 
+    else {
+      await lazyArtistsStore.updateAsync()
+      await collsStore.updateAsync()
+      await nftsStore.updateAsync()
     }
 
     if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {

@@ -1,13 +1,12 @@
-import utils from 'utils/utils'
 import formats from 'stores/formats'
 import router from 'router'
-import {cid} from 'stores/consts'
 import {common} from 'utils/consts'
-import {computed, reactive} from 'vue'
+import {computed} from 'vue'
 import {liveQuery} from 'dexie'
 import {useObservable} from '@vueuse/rxjs'
+import LazyLoader from 'stores/lazy-loader'
 
-export default class ItemsStore {
+export default class ItemsStore extends LazyLoader {
   // Keys 
   //  for all items: id
   //
@@ -30,11 +29,9 @@ export default class ItemsStore {
   //  liker:liked -> keys: [satus+my_like]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
-    this._objname = objname
+    super({objname, versions})
     this._per_page = perPage || common.ITEMS_PER_PAGE
-    this._versions = versions
     this._store_name = `${objname}s`
-    this._metastore_name = `${objname}s_meta`
     this._modes = [...modes]
     
     //
@@ -90,23 +87,8 @@ export default class ItemsStore {
     this._db_keys = Array.from(keyset)
   }
 
-  defaultState() {
-    return {
-      my_key: '',
-      loading: false
-    }
-  }
-
-  get my_key () {
-    return this._state.my_key
-  }
-
   reset (global, db) {
-    this._global = global
-    this._db = db
-
-    let clean_state = this.defaultState()
-    this._state = reactive(clean_state)
+    super.reset(global, db)
 
     this._allocMode({
       mode: 'user', 
@@ -226,9 +208,8 @@ export default class ItemsStore {
   }
 
   getDBStores() {
-    let res = {} 
+    let res = super.getDBStores()
     res[this._store_name] = this._db_keys.join(',')
-    res[this._metastore_name] = 'name'
     return res
   }
 
@@ -294,288 +275,196 @@ export default class ItemsStore {
     })
   }
 
-  async _loadKeyAsync() {
-    if(this.my_key) {
-      return this.my_key
-    }
-
-    let {res} = await utils.invokeContractAsync({
-      role: 'artist',
-      action: 'get_id',
-      cid
+  defaultStatus() {
+    let status = super.defaultStatus()
+    return Object.assign(status, {
+      'approved': 0,
+      'pending': 0,
+      'rejected': 0,
+      'artist': 0,
+      'artist_sold': 0, 
+      'owned': 0,
+      'owned_sale': 0, 
+      'approved_liked': 0, 
+      'approved_i_liked': 0,
+      'approved_sale': 0,
     })
-
-    utils.ensureField(res, 'id', 'string')
-    this._state.my_key = res.id
-    
-    return this._state.my_key
   }
 
-  async _loadStatus() {
-    let db = this._db 
-    let names = [
-      'hprocessed', 
-      'approved', 
-      'pending', 
-      'rejected', 
-      'artist', 
-      'artist_sold', 
-      'owned', 
-      'owned_sale', 
-      'approved_liked', 
-      'approved_i_liked', 
-      'approved_sale'
-    ]
-    let values = await db[this._metastore_name].bulkGet(names)
+  async onItem(status, item) {
+    //
+    // item would be written to database
+    // we add some calculated props for convenience
+    //
+    item.type     = this._objname
+    item.sale     = (item.price || {}).amount > 0 ? 1 : 0
+    item.approved = (item.status === 'approved') ? 1 : 0 
+    item.pending  = (item.status === 'pending') ? 1 : 0
+    item.rejected = (!item.approved && !item.pending) ? 1 : 0
+    item.liked    = (item.likes > 0) ? 1 : 0
 
-    let loadValue = (item, defval) => {
-      if (!item || !item.value ) return defval
-      return item.value
-    }
-
-    let res = {}
-    for(let idx in names) {
-      let name = names[idx]
-      res[name] = loadValue(values[idx], 0)
-    }
-
-    return res
-  }
-
-  async _saveStatus(status) {
-    let save = []
-    for (let key in status) {
-      save.push({name: key, value: status[key]})
-    }
-    let db = this._db 
-    await db[this._metastore_name].bulkPut(save)
-  }
-
-  async loadAsync () {
-    if (this._state.loading) {
-      return false
-    }
-
-    this._state.loading = true
-    await this._loadAsyncInternal(0)
-  }
-
-  async _loadAsyncInternal(depth) {
-    console.log(`_loadAsyncInternal for ${this._objname}s with depth ${depth}`)
-    
-    await this._loadKeyAsync()
-    let status = await this._loadStatus()
-    let hnext = status.hprocessed + 1
-
-    let {res} = await utils.invokeContractAsync({
-      role: 'manager',
-      action: `view_${this._objname}s`,
-      h0: hnext,
-      count: 20,
-      cid
-    })
-
-    if (this._global.state.debug) {
-      console.log(`loading ${this._objname}s, depth ${depth}, h0 is ${hnext}, got ${res.length}`)
-    }
-
-    // TODO: do not load unmoderated items for an average user. Drop db after user becomes a modeator
-    // TODO: delete unapproved items for an average user
-    utils.ensureField(res, 'items', 'array')
-    let db = this._db
-
-    for(let item of res.items) {
-      //
-      // item would be written to database
-      // we add some calculated props for convenience
-      //
-      item.type     = this._objname
-      item.sale     = (item.price || {}).amount > 0 ? 1 : 0
-      item.approved = (item.status === 'approved') ? 1 : 0 
-      item.pending  = (item.status === 'pending') ? 1 : 0
-      item.rejected = (!item.approved && !item.pending) ? 1 : 0
-      item.liked    = (item.likes > 0) ? 1 : 0
-
-      try {
-        if (!item.label) {
-          throw new Error('label cannot be empty')
-        }
-
-        if (!item.data) {
-          throw new Error('empty data on item') 
-        }
-        
-        item.label = formats.fromContract(item.label)
-        item.data  = formats.fromContract(item.data, this._versions) 
-
-        // fromContract  
-        // - changes some props in the item
-        // - add props to the item
-        // - all data would be stored in db
-        // - must not create a copy
-        let fcitem = this.fromContract(item)
-
-        if (fcitem !== item) {
-          throw new Error('fromContract copied the item')
-        }
-
-        if (this._global.debug) {
-          console.log('item loaded with label', item.label)
-        }
-      }
-      catch(err) {
-        item.error = err
-        item.label = `Failed to load ${this._objname}`
+    try {
+      if (!item.label) {
+        throw new Error('label cannot be empty')
       }
 
-      let old = await db[this._store_name].get(item.id)
-
-      //
-      // Status
-      // 
-      if (old !== undefined && old.status !== item.status) {
-        if (old.approved) {
-          status.approved--
-        }
-        if (old.pending) {
-          status.pending--
-        }
-        if (old.rejected) {
-          status.rejected--
-        }
+      if (!item.data) {
+        throw new Error('empty data on item') 
       }
       
-      if (old === undefined || old.status !== item.status) {
-        if (item.approved) {
-          status.approved++
-        }
-        if (item.pending) {
-          status.pending++
-        }
-        if (item.rejected) {
-          status.rejected++
-        }
+      item.label = formats.fromContract(item.label)
+      item.data  = formats.fromContract(item.data, this._versions) 
+
+      // fromContract  
+      // - changes some props in the item
+      // - add props to the item
+      // - all data would be stored in db
+      // - must not create a copy
+      let fcitem = this.fromContract(item)
+
+      if (fcitem !== item) {
+        throw new Error('fromContract copied the item')
       }
 
-      //
-      // Author can't be changed, so we check it only if old object doesn't exist
-      //
-      if (old === undefined && item.author === this.my_key) {
-        status.artist++
+      if (this._global.debug) {
+        console.log('item loaded with label', item.label)
       }
+    }
+    catch(err) {
+      item.error = err
+      item.label = `Failed to load ${this._objname}`
+    }
 
-      //
-      // Owned status
-      //
-      if (old != undefined && old.owned) {
-        status.owned--
+    let db = this._db
+    let old = await db[this._store_name].get(item.id)
+
+    //
+    // Status
+    // 
+    if (old !== undefined && old.status !== item.status) {
+      if (old.approved) {
+        status.approved--
       }
-
-      if (item.owned) {
-        status.owned++
+      if (old.pending) {
+        status.pending--
       }
-
-      //
-      // Owned & sale
-      //
-      if (old != undefined && old.owned && old.sale) {
-        status.owned_sale--
+      if (old.rejected) {
+        status.rejected--
       }
-
-      if (item.owned && item.sale) {
-        status.owned_sale++
-      }
-
-      //
-      // Artist & sold
-      //
-      // TODO!!!: check how first sale works
-      if (old != undefined && old.author == this.my_key && !!old.first_sale) {
-        status.artist_sold--
-      }
-
-      if (item.author == this.my_key && !!item.first_sale) {
-        status.artist_sold++
-      }
-
-      //
-      // Approved and ...
-      //
-      if (old && old.approved) {
-        //
-        // ... and liked by someone
-        //
-        if (old.likes > 0) {
-          status.approved_liked--
-        }
-
-        //
-        // ... and liked by me
-        //
-        if (old.my_like) {
-          status.approved_i_liked--
-        }
-
-        //
-        // ... on sale
-        //
-        if (old.sale) {
-          status.approved_sale--
-        }
-      }
-
+    }
+    
+    if (old === undefined || old.status !== item.status) {
       if (item.approved) {
-        //
-        // ... and liked by someone
-        //
-        if (item.likes > 0) {
-          status.approved_liked++
-        }
+        status.approved++
+      }
+      if (item.pending) {
+        status.pending++
+      }
+      if (item.rejected) {
+        status.rejected++
+      }
+    }
 
-        //
-        // ... and liked by me
-        //
-        if (item.my_like) {
-          status.approved_i_liked++
-        }
+    //
+    // Author can't be changed, so we check it only if old object doesn't exist
+    //
+    if (old === undefined && item.author === this.my_key) {
+      status.artist++
+    }
 
-        //
-        // ... on sale
-        //
-        if (item.sale) {
-          status.approved_sale++
-        }
+    //
+    // Owned status
+    //
+    if (old != undefined && old.owned) {
+      status.owned--
+    }
+
+    if (item.owned) {
+      status.owned++
+    }
+
+    //
+    // Owned & sale
+    //
+    if (old != undefined && old.owned && old.sale) {
+      status.owned_sale--
+    }
+
+    if (item.owned && item.sale) {
+      status.owned_sale++
+    }
+
+    //
+    // Artist & sold
+    //
+    if (old != undefined && old.author == this.my_key && !!old.first_sale) {
+      status.artist_sold--
+    }
+
+    if (item.author == this.my_key && !!item.first_sale) {
+      status.artist_sold++
+    }
+
+    //
+    // Approved and ...
+    //
+    if (old && old.approved) {
+      //
+      // ... and liked by someone
+      //
+      if (old.likes > 0) {
+        status.approved_liked--
       }
 
-      status.hprocessed = Math.max(status.hprocessed, item.updated)
+      //
+      // ... and liked by me
+      //
+      if (old.my_like) {
+        status.approved_i_liked--
+      }
+
+      //
+      // ... on sale
+      //
+      if (old.sale) {
+        status.approved_sale--
+      }
     }
 
-    await db.transaction('rw!', db[this._store_name], db[this._metastore_name], async () => {
-      await db[this._store_name].bulkPut(res.items)
-      await this._saveStatus(status)
-    })
+    if (item.approved) {
+      //
+      // ... and liked by someone
+      //
+      if (item.likes > 0) {
+        status.approved_liked++
+      }
 
-    this._getMode('moderator').total    = status.pending
-    this._getMode('user').total         = status.approved
-    this._getMode('user:sale').total    = status.approved_sale
-    this._getMode('user:liked').total   = status.approved_liked
-    this._getMode('artist').total       = status.artist
-    this._getMode('artist:sold').total  = status.artist_sold
-    this._getMode('owned').total        = status.owned
-    this._getMode('owned:sale').total   = status.owned_sale
-    this._getMode('liker:liked').total  = status.approved_i_liked
+      //
+      // ... and liked by me
+      //
+      if (item.my_like) {
+        status.approved_i_liked++
+      }
 
-    if (res.items.length > 0) {
-      setTimeout(() => this._loadAsyncInternal(++depth), 10)
-      return
+      //
+      // ... on sale
+      //
+      if (item.sale) {
+        status.approved_sale++
+      }
     }
+  }
 
-    if (this._global.state.debug) {
-      console.log(`Finished loading ${this._objname}s, at ${status.hprocessed}`)
-    }
-
-    this._state.loading = false
-    return true
+  async onEnd(status) {
+    this._getMode('moderator').total   = status.pending
+    this._getMode('user').total        = status.approved
+    this._getMode('user:sale').total   = status.approved_sale
+    this._getMode('user:liked').total  = status.approved_liked
+    this._getMode('artist').total      = status.artist
+    this._getMode('artist:sold').total = status.artist_sold
+    this._getMode('owned').total       = status.owned
+    this._getMode('owned:sale').total  = status.owned_sale
+    this._getMode('liker:liked').total = status.approved_i_liked
   }
 
   toNewItem() {
