@@ -45,13 +45,9 @@
     macro(ContractID, cid) macro(Height, h0) macro(uint32_t, count) \
         macro(gallery::Artist::Id, id0)
 
-#define Gallery_manager_view_likes(macro)                               \
-    macro(ContractID, cid) macro(uint32_t, id0) macro(uint32_t, count) \
-        macro(gallery::Artist::Id, artist_id)
-
-#define Gallery_manager_view_changed_likes(macro)              \
-    macro(ContractID, cid) macro(Height, h0) macro(Height, hn) \
-        macro(gallery::Artist::Id, artist_id)
+#define Gallery_manager_view_likes(macro)                                     \
+    macro(ContractID, cid) macro(uint32_t, id0) macro(uint32_t, count) macro( \
+        gallery::Artist::Id, artist_id) macro(Height, h0) macro(Height, hn)
 
 #define Gallery_manager_view_balance(macro) macro(ContractID, cid)
 
@@ -104,27 +100,23 @@
         manager, set_min_approvers) macro(manager, view)                       \
         macro(manager, view_params) macro(manager, view_artists_stats) macro(  \
             manager, view_moderators_stats) macro(manager, view_artists)       \
-            macro(manager, view_likes) macro(manager, view_changed_likes)      \
-                macro(manager, view_collections) macro(                        \
-                    manager, view_nfts) macro(manager, view_nft_sales)         \
-                    macro(manager, view_collections_stats) macro(              \
-                        manager, view_nfts_stats) macro(manager, view_balance) \
-                        macro(manager, get_id) macro(manager,                  \
-                                                     explicit_upgrade)         \
-                            macro(manager, schedule_upgrade) macro(            \
-                                manager, set_moderator)                        \
-                                macro(manager, view_moderators) macro(         \
-                                    manager, set_nft_status)                   \
-                                    macro(manager, set_artist_status) macro(   \
-                                        manager, set_collection_status)        \
-                                        macro(manager, set_fee_base) macro(    \
-                                            manager, set_rate_limit)           \
-                                            macro(manager, migrate_nft)        \
-                                                macro(manager, migrate_artist) \
-                                                    macro(manager,             \
-                                                          migrate_collection)  \
-                                                        macro(manager,         \
-                                                              migrate_sales)
+            macro(manager, view_likes) macro(manager, view_collections) macro( \
+                manager, view_nfts) macro(manager, view_nft_sales)             \
+                macro(manager, view_collections_stats) macro(                  \
+                    manager, view_nfts_stats) macro(manager, view_balance)     \
+                    macro(manager, get_id) macro(manager, explicit_upgrade)    \
+                        macro(manager, schedule_upgrade) macro(manager,        \
+                                                               set_moderator)  \
+                            macro(manager, view_moderators) macro(             \
+                                manager, set_nft_status)                       \
+                                macro(manager, set_artist_status) macro(       \
+                                    manager, set_collection_status)            \
+                                    macro(manager, set_fee_base) macro(        \
+                                        manager, set_rate_limit)               \
+                                        macro(manager, migrate_nft) macro(     \
+                                            manager, migrate_artist)           \
+                                            macro(manager, migrate_collection) \
+                                                macro(manager, migrate_sales)
 
 // MODERATOR
 
@@ -1102,47 +1094,52 @@ ON_METHOD(manager, view_likes) {
     } else {
         _POD_(artist_id_) = artist_id;
     }
-    Env::Key_T<gallery::Like::Key> k0, k1;
-    _POD_(k0.m_Prefix.m_Cid) = cid;
-    _POD_(k1.m_Prefix.m_Cid) = cid;
-    k0.m_KeyInContract.like_id = Utils::FromBE(id0);
-    k1.m_KeyInContract.like_id =
-        Utils::FromBE(static_cast<uint32_t>(id0 + count));
-    k0.m_KeyInContract.artist_id = artist_id_;
-    k1.m_KeyInContract.artist_id = artist_id_;
-    k0.m_KeyInContract.nft_id = 0;
-    k1.m_KeyInContract.nft_id = std::numeric_limits<gallery::Nft::Id>::max();
 
-    Env::VarReader r(k0, k1);
-    uint32_t value{};
-    Env::DocArray root{"likes"};
-    while (r.MoveNext_T(k0, value)) {
-        Env::DocGroup gr{""};
-        Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
-        Env::DocAddNum("value", value);
-    }
-}
+    if (id0 && count) {
+        Env::Key_T<gallery::Like::Key> k0, k1;
+        _POD_(k0.m_Prefix.m_Cid) = cid;
+        _POD_(k1.m_Prefix.m_Cid) = cid;
+        k0.m_KeyInContract.like_id = Utils::FromBE(id0);
+        k1.m_KeyInContract.like_id =
+            Utils::FromBE(static_cast<uint32_t>(id0 + count));
+        k0.m_KeyInContract.artist_id = artist_id_;
+        k1.m_KeyInContract.artist_id = artist_id_;
+        k0.m_KeyInContract.nft_id = 0;
+        k1.m_KeyInContract.nft_id =
+            std::numeric_limits<gallery::Nft::Id>::max();
 
-ON_METHOD(manager, view_changed_likes) {
-    Env::Key_T<gallery::Events::Like::Key> k0, k1;
-    _POD_(k0.m_Prefix.m_Cid) = cid;
-    _POD_(k1.m_Prefix.m_Cid) = cid;
-    k0.m_KeyInContract.artist_id = artist_id;
-    k1.m_KeyInContract.artist_id = artist_id;
-    k0.m_KeyInContract.nft_id = 0;
-    k1.m_KeyInContract.nft_id = std::numeric_limits<gallery::Nft::Id>::max();
+        Env::VarReader r(k0, k1);
+        uint32_t value{};
+        Env::DocArray root{"likes"};
+        while (r.MoveNext_T(k0, value)) {
+            Env::DocGroup gr{""};
+            Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
+            Env::DocAddNum("value", value);
+        }
+    } else {
+        Env::Key_T<gallery::Events::Like::Key> k0, k1;
+        _POD_(k0.m_Prefix.m_Cid) = cid;
+        _POD_(k1.m_Prefix.m_Cid) = cid;
+        k0.m_KeyInContract.artist_id = artist_id_;
+        k1.m_KeyInContract.artist_id = artist_id_;
+        k0.m_KeyInContract.nft_id = 0;
+        k1.m_KeyInContract.nft_id =
+            std::numeric_limits<gallery::Nft::Id>::max();
 
-    HeightPos pos_min, pos_max;
-    pos_min.m_Height = h0;
-    pos_max.m_Height = hn;
+        HeightPos pos_min, pos_max;
+        pos_min.m_Height = h0;
+        pos_max.m_Height = hn ? hn : Env::get_Height();
 
-    Env::LogReader r(k0, k1, &pos_min, &pos_max);
-    uint32_t value{};
-    Env::DocArray root{"likes"};
-    while (r.MoveNext_T(k0, value)) {
-        Env::DocGroup gr{""};
-        Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
-        Env::DocAddNum("value", value);
+        Env::LogReader r(k0, k1, &pos_min, &pos_max);
+        uint32_t value{};
+        Env::DocArray root{"likes"};
+        uint32_t cur_cnt{};
+        while (r.MoveNext_T(k0, value) &&
+               (!count || (count && cur_cnt++ < count))) {
+            Env::DocGroup gr{""};
+            Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
+            Env::DocAddNum("value", value);
+        }
     }
 }
 
