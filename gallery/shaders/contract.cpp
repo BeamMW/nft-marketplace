@@ -510,15 +510,10 @@ BEAM_EXPORT void Method_16(const method::CheckIn& r) {
 BEAM_EXPORT void Method_17(const method::Vote& r) {
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
-    struct ArtistPlus : public Artist {
-        char data[kDataMaxLen];
-    } a;
-    Env::Halt_if(!GalleryObject::Load(a, r.artist_id, sizeof(a)));
 
     Like::Key like_key;
-    like_key.nft_id = r.nft_id;
+    like_key.nft_id = Utils::FromBE(r.nft_id);
     like_key.artist_id = r.artist_id;
-    like_key.like_id = Utils::FromBE(++a.likes_num);
 
     Like like;
     if (!Env::LoadVar_T(like_key, like)) {
@@ -553,10 +548,6 @@ BEAM_EXPORT void Method_17(const method::Vote& r) {
         m.updated = cur_height;
         GalleryObject::Save(m, r.nft_id);
     }
-    Index<Tag::kHeightArtistIdx, Height, Artist>::Update(a.updated, cur_height,
-                                                         r.artist_id);
-    a.updated = cur_height;
-    GalleryObject::Save(a, r.artist_id, sizeof(Artist) + a.data_len);
     Env::AddSig(r.artist_id);
 }
 

@@ -326,7 +326,6 @@ struct AppArtist : public gallery::Artist {
         Env::DocAddNum("nfts_count", nfts_num);
         Env::DocAddNum("approved_cnt", approved_cnt);
         Env::DocAddText("status", StatusToString(status).data());
-        Env::DocAddNum("likes_count", likes_num);
         {
             Env::DocGroup gr_sold("total_sold");
             Env::DocAddNum("count", total_sold);
@@ -577,6 +576,7 @@ public:
 
         size_t printed_cnt = 0;
         typename T::Id last_printed{};
+        _POD_(last_printed) = k0.m_KeyInContract.id;
         while (object_.ReadNext(r, k0) && printed_cnt++ < count) {
             if constexpr (std::is_same_v<typename T::Id, PubKey>)
                 object_.Print(cid_, k0.m_KeyInContract.id);
@@ -584,7 +584,7 @@ public:
                 object_.Print(cid_, Utils::FromBE(k0.m_KeyInContract.id));
             last_printed = k0.m_KeyInContract.id;
         }
-        typename T::Id not_printed;
+        typename T::Id not_printed{};
         if constexpr (std::is_same_v<typename T::Id, PubKey>) {
             not_printed = k0.m_KeyInContract.id;
         } else {
@@ -1099,24 +1099,29 @@ ON_METHOD(manager, view_likes) {
         Env::Key_T<gallery::Like::Key> k0, k1;
         _POD_(k0.m_Prefix.m_Cid) = cid;
         _POD_(k1.m_Prefix.m_Cid) = cid;
-        k0.m_KeyInContract.like_id = Utils::FromBE(id0);
-        k1.m_KeyInContract.like_id =
-            Utils::FromBE(static_cast<uint32_t>(id0 + count));
         k0.m_KeyInContract.artist_id = artist_id_;
         k1.m_KeyInContract.artist_id = artist_id_;
-        k0.m_KeyInContract.nft_id = 0;
+        k0.m_KeyInContract.nft_id = Utils::FromBE(id0);
         k1.m_KeyInContract.nft_id =
             std::numeric_limits<gallery::Nft::Id>::max();
 
         Env::VarReader r(k0, k1);
+        Env::DocArray root{"items"};
+        uint32_t printed_cnt{};
+        uint32_t last_printed = k0.m_KeyInContract.nft_id;
         gallery::Like like{};
-        Env::DocArray root{"likes"};
-        while (r.MoveNext_T(k0, like)) {
+        while (r.MoveNext_T(k0, like) && printed_cnt++ < count) {
             Env::DocGroup gr{""};
-            Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
+            Env::DocAddNum("id", Utils::FromBE(k0.m_KeyInContract.nft_id));
+            Env::DocAddNum("nft", Utils::FromBE(k0.m_KeyInContract.nft_id));
             Env::DocAddNum("value", like.value);
             Env::DocAddNum("updated", like.updated);
+            last_printed = k0.m_KeyInContract.nft_id;
         }
+        uint32_t not_printed{};
+        if (last_printed != k0.m_KeyInContract.nft_id)
+            not_printed = Utils::FromBE(k0.m_KeyInContract.nft_id);
+        Env::DocAddNum("next_id", not_printed);
     } else {
         Env::Key_T<gallery::Events::Like::Key> k0, k1;
         _POD_(k0.m_Prefix.m_Cid) = cid;
@@ -1132,12 +1137,13 @@ ON_METHOD(manager, view_likes) {
         pos_max.m_Height = hn ? hn + 1 : Env::get_Height() + 1;
 
         Env::LogReader r(k0, k1, &pos_min, &pos_max);
-        Env::DocArray root{"likes"};
+        Env::DocArray root{"items"};
         uint32_t value{};
         uint32_t cur_cnt{};
         while (r.MoveNext_T(k0, value) &&
                (!count || (count && cur_cnt++ < count))) {
             Env::DocGroup gr{""};
+            Env::DocAddNum("id", k0.m_KeyInContract.nft_id);
             Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
             Env::DocAddNum("value", value);
             Env::DocAddNum("updated", r.m_Pos.m_Height - 1);
