@@ -854,7 +854,6 @@ void SetNftStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Nft::Id) * ids_vec.size());
 
     uint32_t charge =
-        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         4 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
         args->ids_num * Env::Cost::LoadVar_For(sizeof(gallery::Nft)) +
@@ -898,7 +897,6 @@ void SetArtistStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Artist::Id) * ids_vec.size());
 
     uint32_t charge =
-        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         2 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
         args->ids_num * Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
@@ -937,7 +935,6 @@ void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
                 sizeof(gallery::Collection::Id) * ids_vec.size());
 
     uint32_t charge =
-        Env::Cost::SaveVar_For(sizeof(gallery::State)) +
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         2 * args->ids_num * Env::Cost::SaveVar_For(sizeof(bool)) +
         args->ids_num *
@@ -1002,7 +999,7 @@ ON_METHOD(manager, set_moderator) {
     args.approved = enable;
     key_material::Admin akm;
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &akm, 1, "Set moderator", 238015);
+                        &akm, 1, "Set moderator", 0);
 }
 
 ON_METHOD(manager, view_params) {
@@ -1106,21 +1103,23 @@ ON_METHOD(manager, view_likes) {
             std::numeric_limits<gallery::Nft::Id>::max();
 
         Env::VarReader r(k0, k1);
-        Env::DocArray root{"items"};
-        uint32_t printed_cnt{};
-        uint32_t last_printed = k0.m_KeyInContract.nft_id;
-        gallery::Like like{};
-        while (r.MoveNext_T(k0, like) && printed_cnt++ < count) {
-            Env::DocGroup gr{""};
-            Env::DocAddNum("id", Utils::FromBE(k0.m_KeyInContract.nft_id));
-            Env::DocAddNum("nft", Utils::FromBE(k0.m_KeyInContract.nft_id));
-            Env::DocAddNum("value", like.value);
-            Env::DocAddNum("updated", like.updated);
-            last_printed = k0.m_KeyInContract.nft_id;
-        }
         uint32_t not_printed{};
-        if (last_printed != k0.m_KeyInContract.nft_id)
-            not_printed = Utils::FromBE(k0.m_KeyInContract.nft_id);
+        {
+            Env::DocArray root{"items"};
+            uint32_t printed_cnt{};
+            uint32_t last_printed = k0.m_KeyInContract.nft_id;
+            gallery::Like like{};
+            while (r.MoveNext_T(k0, like) && printed_cnt++ < count) {
+                Env::DocGroup gr{""};
+                Env::DocAddNum("id", Utils::FromBE(k0.m_KeyInContract.nft_id));
+                Env::DocAddNum("nft", Utils::FromBE(k0.m_KeyInContract.nft_id));
+                Env::DocAddNum("value", like.value);
+                Env::DocAddNum("updated", like.updated);
+                last_printed = k0.m_KeyInContract.nft_id;
+            }
+            if (last_printed != k0.m_KeyInContract.nft_id)
+                not_printed = Utils::FromBE(k0.m_KeyInContract.nft_id);
+        }
         Env::DocAddNum("next_id", not_printed);
     } else {
         Env::Key_T<gallery::Events::Like::Key> k0, k1;
@@ -1241,8 +1240,7 @@ ON_METHOD(artist, set_nft) {
     uint32_t charge =
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
-        Env::Cost::LoadVar_For(sizeof(bool)) +
-        7 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        6 * Env::Cost::SaveVar_For(sizeof(bool)) +
         Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) +
@@ -1253,7 +1251,7 @@ ON_METHOD(artist, set_nft) {
                                gallery::Artist::kDataMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Nft)) +
         Env::Cost::Log_For(data_size) + Env::Cost::Log_For(label_size) +
-        Env::Cost::AddSig + Env::Cost::Cycle * 300;
+        Env::Cost::AddSig + Env::Cost::Cycle * 1500;
 
     StatePlus s;
     if (!s.Init(cid)) {
@@ -1437,8 +1435,6 @@ ON_METHOD(artist, set_artist) {
         (!artist_exists ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
         (!artist_exists ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
         (!artist_exists ? Env::Cost::Log_For(label_size) : 0) +
-        (!artist_exists ? Env::Cost::SaveVar_For(sizeof(gallery::Artist::Id))
-                        : 0) +
         Env::Cost::MemOpPerByte * (sizeof(gallery::Artist) + data_size) +
         Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
                                gallery::Artist::kDataMaxLen) +
@@ -1513,7 +1509,7 @@ ON_METHOD(artist, set_collection) {
                                label_size) +
         (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::State)) : 0) +
         (!collection_id ? Env::Cost::SaveVar_For(sizeof(gallery::State)) : 0) +
-        (!collection_id ? 4 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
+        (!collection_id ? 2 * Env::Cost::SaveVar_For(sizeof(bool)) : 0) +
         (!collection_id ? Env::Cost::LoadVar_For(sizeof(gallery::Artist) +
                                                  gallery::Artist::kDataMaxLen)
                         : 0) +
@@ -1605,7 +1601,7 @@ ON_METHOD(user, set_price) {
         args.price.amount ? "Set item price" : "Remove from sale";
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &sig, 1, comment, 213709);
+                        &sig, 1, comment, 0);
 }
 
 ON_METHOD(user, transfer) {
@@ -1632,7 +1628,7 @@ ON_METHOD(user, transfer) {
     }
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
-                        &sig, 1, "Transfer item", 302135);
+                        &sig, 1, "Transfer item", 1848900);
 }
 
 ON_METHOD(user, buy) {
@@ -1664,7 +1660,7 @@ ON_METHOD(user, buy) {
     fc.m_Aid = nft.price.aid;
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
-                        1, "Buy item", 1895645);
+                        1, "Buy item", 3397731);
 
     /*
     Height cur_height = Env::get_Height();
@@ -1772,10 +1768,10 @@ ON_METHOD(user, vote) {
     {
         Env::Key_T<gallery::Like::Key> key;
         key.m_Prefix.m_Cid = cid;
-        key.m_KeyInContract.nft_id = id;
+        key.m_KeyInContract.nft_id = Utils::FromBE(id);
         key.m_KeyInContract.artist_id = args.artist_id;
 
-        uint32_t like{};
+        gallery::Like like{};
         bool already_voted = Env::VarReader::Read_T(key, like);
 
         fc.m_Amount = already_voted ? 0 : s.config.vote_reward.amount;
@@ -1788,7 +1784,7 @@ ON_METHOD(user, vote) {
     sig.m_nID = sizeof(km);
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1, &sig,
-                        1, "Vote", 280050);
+                        1, "Vote", 187200);
 }
 
 ON_METHOD(manager, migrate_artist) {
@@ -1993,8 +1989,7 @@ ON_METHOD(manager, migrate_nft) {
     uint32_t charge =
         Env::Cost::LoadVar_For(sizeof(gallery::State)) +
         Env::Cost::SaveVar_For(sizeof(gallery::State)) +
-        Env::Cost::LoadVar_For(sizeof(bool)) +
-        7 * Env::Cost::SaveVar_For(sizeof(bool)) +
+        6 * Env::Cost::SaveVar_For(sizeof(bool)) +
         Env::Cost::LoadVar_For(sizeof(gallery::Collection) +
                                gallery::Collection::kTotalMaxLen) +
         Env::Cost::SaveVar_For(sizeof(gallery::Collection) +
