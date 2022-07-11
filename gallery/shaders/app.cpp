@@ -2013,6 +2013,17 @@ ON_METHOD(manager, migrate_nft) {
 }
 
 ON_METHOD(manager, migrate_sales) {
+    Env::Key_T<gallery::Events::Sell::Key> key;
+    _POD_(key.m_Prefix.m_Cid) = cid;
+    key.m_KeyInContract.nft_id = nft_id;
+
+    Env::LogReader r(key, key);
+    gallery::Events::Sell evt;
+    if (r.MoveNext_T(key, evt)) {
+        OnError("sales for the nft has already been migrated");
+        return;
+    }
+
     key_material::Admin kid;
 
     char buf[256];
