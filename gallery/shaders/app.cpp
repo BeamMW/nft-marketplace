@@ -1132,8 +1132,8 @@ ON_METHOD(manager, view_likes) {
             std::numeric_limits<gallery::Nft::Id>::max();
 
         HeightPos pos_min{}, pos_max{};
-        pos_min.m_Height = h0 + 1;
-        pos_max.m_Height = hn ? hn + 1 : Env::get_Height() + 1;
+        pos_min.m_Height = h0;
+        pos_max.m_Height = hn ? hn : Env::get_Height();
 
         Env::LogReader r(k0, k1, &pos_min, &pos_max);
         Env::DocArray root{"items"};
@@ -1145,7 +1145,7 @@ ON_METHOD(manager, view_likes) {
             Env::DocAddNum("id", k0.m_KeyInContract.nft_id);
             Env::DocAddNum("nft", k0.m_KeyInContract.nft_id);
             Env::DocAddNum("value", value);
-            Env::DocAddNum("updated", r.m_Pos.m_Height - 1);
+            Env::DocAddNum("updated", r.m_Pos.m_Height);
         }
     }
 }

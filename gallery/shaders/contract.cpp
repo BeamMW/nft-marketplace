@@ -78,7 +78,7 @@ BEAM_EXPORT void Method_3(const method::SetFeeBase& r) {
 BEAM_EXPORT void Method_4(const method::SetModerator& r) {
     Env::Halt_if(_POD_(r.id).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     ContractState s;
     Moderator m;
     if (!GalleryObject::Load(m, r.id)) {
@@ -99,7 +99,7 @@ BEAM_EXPORT void Method_5(const method::SetArtist& r) {
     Env::Halt_if(!r.label_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct ArtistPlus : public Artist {
         char data[kDataMaxLen];
     } a;
@@ -137,7 +137,7 @@ BEAM_EXPORT void Method_6(const method::SetArtistStatus& r) {
     Env::Halt_if(r.status == Status::kNone);
     Env::Halt_if(!r.ids_num);
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct ArtistPlus : public Artist {
         char data[kDataMaxLen];
     } a;
@@ -164,7 +164,7 @@ BEAM_EXPORT void Method_7(const method::SetCollectionStatus& r) {
     Env::Halt_if(r.status == Status::kNone);
     Env::Halt_if(!r.ids_num);
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
     } c;
@@ -193,7 +193,7 @@ BEAM_EXPORT void Method_8(const method::SetCollection& r) {
     Env::Halt_if(!r.label_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
     } c;
@@ -253,7 +253,7 @@ BEAM_EXPORT void Method_9(const method::SetNft& r) {
     Env::Halt_if(!r.data_len);
     Env::Halt_if(_POD_(r.artist_id).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Nft m;
     ContractState s;
 
@@ -319,7 +319,7 @@ BEAM_EXPORT void Method_10(const method::SetNftStatus& r) {
     Env::Halt_if(r.status == Status::kNone);
     Env::Halt_if(!r.ids_num);
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Nft n;
     Moderator m;
     ContractState s;
@@ -356,7 +356,7 @@ BEAM_EXPORT void Method_11(const method::SetPrice& r) {
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
     _POD_(m.price) = r.price;
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Index<Tag::kHeightNftIdx, Height, Nft>::Update(m.updated, cur_height,
                                                    r.nft_id);
     m.updated = cur_height;
@@ -365,7 +365,7 @@ BEAM_EXPORT void Method_11(const method::SetPrice& r) {
 }
 
 BEAM_EXPORT void Method_12(const method::Buy& r) {
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
     Env::Halt_if(!m.price.amount ||  // not for sale!
@@ -532,7 +532,7 @@ BEAM_EXPORT void Method_17(const method::Vote& r) {
         m.likes_number++;
         nft_updated = true;
     }
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     like.updated = cur_height;
     like.value = r.value;
     Env::SaveVar_T(like_key, like);
@@ -561,7 +561,7 @@ BEAM_EXPORT void Method_18(const method::AddVoteRewards& r) {
 BEAM_EXPORT void Method_19(const method::Transfer& r) {
     Env::Halt_if(_POD_(r.new_owner).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Nft m;
     Env::Halt_if(!GalleryObject::Load(m, r.nft_id));
     Env::AddSig(m.owner);
@@ -609,7 +609,7 @@ BEAM_EXPORT void Method_21(const method::MigrateArtist& r) {
     ContractState s;
     s.AddSigAdmin();
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct ArtistPlus : public Artist {
         char data[kDataMaxLen];
     } a;
@@ -651,7 +651,7 @@ BEAM_EXPORT void Method_22(const method::MigrateCollection& r) {
     ContractState s;
     s.AddSigAdmin();
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     struct CollectionPlus : public Collection {
         char label_and_data[kTotalMaxLen];
     } c;
@@ -706,7 +706,7 @@ BEAM_EXPORT void Method_23(const method::MigrateNft& r) {
     Env::Halt_if(_POD_(r.artist_id).IsZero());
     Env::Halt_if(_POD_(r.owner_id).IsZero());
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
     Nft m;
     ContractState s;
     s.AddSigAdmin();
@@ -777,7 +777,7 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
         char label_and_data[kTotalMaxLen];
     } c;
 
-    Height cur_height = Env::get_Height();
+    Height cur_height = Env::get_Height() + 1;
 
     GalleryObject::Load(c, m.collection_id, sizeof(c));
     for (uint32_t i = 0; i < r.sales_len; ++i) {
