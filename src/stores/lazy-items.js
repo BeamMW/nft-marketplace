@@ -22,11 +22,9 @@ export default class ItemsStore extends LazyLoader {
   //  moderator   -> keys: status
   //  user        -> keys: status
   //  user:sale   -> keys: [status+sale]
-  //  user:liked  -> keys: [status+liked]
   //  owned       -> keys: owned
   //  owned:sale  -> keys: [owned+sale]
   //  artist:sold -> keys: [author+owned]
-  //  liker:liked -> keys: [satus+my_like]
   //
   constructor({objname, versions, perPage, extraDBKeys, modes}) {
     super({objname, extraDBKeys})
@@ -63,10 +61,6 @@ export default class ItemsStore extends LazyLoader {
         keyset.add('[status+sale]')
       }
 
-      if (mode == 'user:liked') {
-        keyset.add('[status+liked]')
-      }
-
       if (mode == 'owned') {
         keyset.add('owned')
       }
@@ -77,10 +71,6 @@ export default class ItemsStore extends LazyLoader {
 
       if (mode == 'artist:sold') {
         keyset.add('[author+owned]')
-      }
-
-      if (mode == 'liker:liked') {
-        keyset.add('[status+my_like]')
       }
     }
 
@@ -101,19 +91,9 @@ export default class ItemsStore extends LazyLoader {
     })
 
     this._allocMode({
-      mode: 'user:liked', 
-      loader: (store) => {
-        console.log(`loader for user:liked:${this._store_name}`)
-        return store
-          .where(['status', 'liked'])
-          .equals(['approved', 1])
-      }
-    })
-
-    this._allocMode({
       mode: 'user:sale', 
       loader: (store) => {
-        console.log(`loader for user:liked:${this._store_name}`)
+        console.log(`loader for user:sale:${this._store_name}`)
         return store
           .where(['status', 'sale'])
           .equals(['approved', 1])
@@ -167,16 +147,6 @@ export default class ItemsStore extends LazyLoader {
         return store
           .where(['author', 'owned'])
           .equals([mykey, 0])
-      }
-    })
-
-    this._allocMode({
-      mode: 'liker:liked', 
-      loader: (store) => {
-        console.log(`loader for liker:liked:${this._store_name}`)
-        return store
-          .where(['status', 'my_like'])
-          .equals(['approved', 1])
       }
     })
   }
@@ -282,12 +252,10 @@ export default class ItemsStore extends LazyLoader {
       'pending': 0,
       'rejected': 0,
       'artist': 0,
-      'artist_sold': 0, 
+      'artist_sold': 0, // TODO: move to NFTs store same as done with likes
       'owned': 0,
-      'owned_sale': 0, 
-      'approved_liked': 0, 
-      'approved_i_liked': 0,
-      'approved_sale': 0,
+      'owned_sale': 0, // TODO: move to NFTs store same as with likes
+      'approved_sale': 0, // TODO: move to NFTs store same as with likes
     })
   }
 
@@ -301,7 +269,6 @@ export default class ItemsStore extends LazyLoader {
     item.approved = (item.status === 'approved') ? 1 : 0 
     item.pending  = (item.status === 'pending') ? 1 : 0
     item.rejected = (!item.approved && !item.pending) ? 1 : 0
-    item.liked    = (item.likes > 0) ? 1 : 0
 
     try {
       if (!item.label) {
@@ -410,20 +377,6 @@ export default class ItemsStore extends LazyLoader {
     //
     if (old && old.approved) {
       //
-      // ... and liked by someone
-      //
-      if (old.likes > 0) {
-        status.approved_liked--
-      }
-
-      //
-      // ... and liked by me
-      //
-      if (old.my_like) {
-        status.approved_i_liked--
-      }
-
-      //
       // ... on sale
       //
       if (old.sale) {
@@ -433,38 +386,24 @@ export default class ItemsStore extends LazyLoader {
 
     if (item.approved) {
       //
-      // ... and liked by someone
-      //
-      if (item.likes > 0) {
-        status.approved_liked++
-      }
-
-      //
-      // ... and liked by me
-      //
-      if (item.my_like) {
-        status.approved_i_liked++
-      }
-
-      //
       // ... on sale
       //
       if (item.sale) {
         status.approved_sale++
       }
     }
+
+    return old
   }
 
   async onEnd(status) {
     this._getMode('moderator').total   = status.pending
     this._getMode('user').total        = status.approved
     this._getMode('user:sale').total   = status.approved_sale
-    this._getMode('user:liked').total  = status.approved_liked
     this._getMode('artist').total      = status.artist
     this._getMode('artist:sold').total = status.artist_sold
     this._getMode('owned').total       = status.owned
     this._getMode('owned:sale').total  = status.owned_sale
-    this._getMode('liker:liked').total = status.approved_i_liked
   }
 
   toNewItem() {

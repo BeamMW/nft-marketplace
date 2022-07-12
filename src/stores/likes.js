@@ -13,7 +13,8 @@ class LikesStore extends LazyLoader {
     return like
   }
 
-  async onItem(status, item) {
+  async getLikes(ids) {
+    return await this._db[this._store_name].bulkGet(ids)
   }
 }
 

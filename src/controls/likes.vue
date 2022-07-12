@@ -90,6 +90,7 @@ export default {
       } 
 
       if (this.can_vote) {
+        alert('unlike')
         return nftsStore.unlikeNFT(this.id)
       }
 

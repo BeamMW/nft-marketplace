@@ -24,6 +24,10 @@ class ArtistsStore extends LazyItems {
   getFirstIDX() {
     return '000000000000000000000000000000000000000000000000000000000000000001'
   }
+
+  getZeroIDX() {
+    return '000000000000000000000000000000000000000000000000000000000000000000'
+  }
 }
 
 let artistsStore = new ArtistsStore()

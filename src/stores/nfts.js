@@ -6,12 +6,14 @@ import {versions, cid} from 'stores/consts'
 import {computed} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
+import likesStore from './likes'
 
 //
 // Custom modes
 //   user:collection     -> keys: collection, status
 //   artist:collection   -> keys: collection
-//
+//   user:liked          -> keys: [status+liked]
+//   liker:liked         -> keys: [satus+my_like]
 class NFTSStore extends LazyItems {
   constructor () {
     super({
@@ -21,13 +23,15 @@ class NFTSStore extends LazyItems {
         'moderator', 
         'user', 
         'user:sale', 
-        'user:liked', 
         'owned', 
         'owned:sale', 
         'artist:sold', 
-        'liker:liked'
       ],
-      extraDBKeys: ['collection']
+      extraDBKeys: [
+        'collection',
+        '[status+liked]',
+        '[status+my_like]'
+      ]
     })
     
     this._current_coll_mode = undefined
@@ -97,6 +101,38 @@ class NFTSStore extends LazyItems {
         }
       }
     ]
+  }
+
+  defaultStatus() {
+    let status = super.defaultStatus()
+    return Object.assign(status, {
+      'approved_liked': 0, 
+      'approved_i_liked': 0
+    })
+  }
+
+  reset (global, db) {
+    super.reset(global, db)
+
+    this._allocMode({
+      mode: 'user:liked', 
+      loader: (store) => {
+        console.log(`loader for user:liked:${this._store_name}`)
+        return store
+          .where(['status', 'liked'])
+          .equals(['approved', 1])
+      }
+    })
+
+    this._allocMode({
+      mode: 'liker:liked', 
+      loader: (store) => {
+        console.log(`loader for liker:liked:${this._store_name}`)
+        return store
+          .where(['status', 'my_like'])
+          .equals(['approved', 1])
+      }
+    })
   }
 
   _getMode(mode) {
@@ -209,6 +245,72 @@ class NFTSStore extends LazyItems {
       label: formats.toContract(label),
       data: formats.toContract(data, versions.NFT_VERSION)
     }
+  }
+
+  async onStart(status, items) {
+    await super.onStart(status, items)
+    
+    let ids = items.map(item => item.id)
+    let rawLikes = await likesStore.getLikes(ids)
+
+    let likes = {}
+    for(let idx in ids) {
+      let id = ids[idx]
+      likes[id] = rawLikes[idx]
+    }
+
+    status.likes = likes
+  }
+
+  async onItem(status, item) {
+    let old = await super.onItem(status, item)
+
+    item.my_like = (status.likes[item.id] || {}).value ? 1 : 0
+    item.liked = (item.likes > 0) ? 1 : 0
+
+    //
+    // Approved and ...
+    //
+    if (old && old.approved) {
+      //
+      // ... and liked by someone
+      //
+      if (old.likes > 0) {
+        status.approved_liked--
+      }
+
+      //
+      // ... and liked by me
+      //
+      if (old.my_like) {
+        status.approved_i_liked--
+      }
+    }
+
+    if (item.approved) {
+      //
+      // ... and liked by someone
+      //
+      if (item.likes > 0) {
+        status.approved_liked++
+      }
+
+      //
+      // ... and liked by me
+      //
+      if (item.my_like) {
+        status.approved_i_liked++
+      }
+    }
+
+    return old
+  }
+
+  async onEnd(status) {
+    await super.onEnd(status)
+    this._getMode('user:liked').total  = status.approved_liked
+    this._getMode('liker:liked').total = status.approved_i_liked
+    delete status.likes
   }
 
   async createNFT(collid, label, data, price) {

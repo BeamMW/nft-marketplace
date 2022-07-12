@@ -41,7 +41,6 @@ export default class LazyLoader {
 
   defaultStatus () {
     return {
-      'itotal': 0, 
       'iprocessed': 0,
       'inext': 0,
       'hprocessed': 0 
@@ -79,6 +78,10 @@ export default class LazyLoader {
     return 1
   }
 
+  getZeroIDX() {
+    return 0
+  }
+
   async loadAsync () {
     if (this._state.loading) {
       return false
@@ -97,38 +100,26 @@ export default class LazyLoader {
     await this._loadAsyncInternal(AC_UPDATE, 0)
   }
 
-  async onStart(status) {
+  async onStart(status, items) {
   }
 
   async onItem(status, item) {
   }
 
-  async onEnd(status) {
+  async onEnd(status, items) {
   }
 
   async _loadAsyncInternal(action, depth) {
     console.log(`_loadAsyncInternal for ${this._objname}s, AC ${action} with depth ${depth}`)
-    
     let status = await this._loadStatus()
-    await this.onStart(status)
 
     if (action == AC_LOAD) {
-      if (status.itotal && status.iprocessed >= status.itotal) {
+      if (status.iprocessed && status.inext == this.getZeroIDX()) {
         // initial loading already completed
         // nothig left to do
         await this.onEnd(status)
         console.log(`_loadAsyncInternal for ${this._objname}s completed`)
         return
-      }
-
-      if (status.itotal === 0) {
-        let {res} = await utils.invokeContractAsync({
-          role: 'manager',
-          action: `view_${this._objname}s_stats`,
-          cid
-        })
-        utils.ensureField(res, 'total', 'number')
-        status.itotal = res.total
       }
 
       // tell to start sync from the current height
@@ -169,16 +160,17 @@ export default class LazyLoader {
     }
 
     if (action == AC_LOAD) {
-      let inext = status.inext ? status.inext : this.getFirstIDX();
+      let inext = status.iprocessed ? status.inext : this.getFirstIDX();
       ({res} = await utils.invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
-        idx0: inext,
-        count: 20,
+        id0: inext,
+        count: 200,
         cid
       }))
       utils.ensureField(res, 'items', 'array')
-      utils.ensureField(res, 'next_id') // no type, can be string or number
+      utils.ensureField(res, 'next_id') 
+      
       items = res.items
       console.log(`loading ${this._objname}s, depth ${depth}, id0 is ${inext}, got ${items.length} items`)
     }
@@ -186,11 +178,18 @@ export default class LazyLoader {
     // TODO: do not load unmoderated items for an average user. Drop db after user becomes a modeator
     // TODO: delete unapproved items for an average user
     // TODO: import headless db when switching to headed
-    for(let item of items) {
-      await this.onItem(status, item)
-      if (action === AC_UPDATE) {
-        status.hprocessed = Math.max(status.hprocessed, item.updated)
+    {
+      await this.onStart(status, items)
+    
+      for(let item of items) {
+        await this.onItem(status, item)
+        if (action === AC_UPDATE) {
+          console.log(`${this._objname} ${item.id} processed`)
+          status.hprocessed = Math.max(status.hprocessed, item.updated)
+        }
       }
+     
+      await this.onEnd(status, items)
     }
 
     if (action === AC_LOAD) {

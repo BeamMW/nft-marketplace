@@ -242,7 +242,7 @@ const store = {
       await collsStore.loadAsync()
 
       this.state.loading = 'Loading Likes'
-      //await likesStore.loadAsync()
+      await likesStore.loadAsync()
       
       this.state.loading = 'Loading NFTs'
       await nftsStore.loadAsync()
@@ -255,7 +255,7 @@ const store = {
     else {
       await lazyArtistsStore.updateAsync()
       await collsStore.updateAsync()
-      //await likesStore.updateAsync()
+      await likesStore.updateAsync()
       await nftsStore.updateAsync()
     }
 

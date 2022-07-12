@@ -7,7 +7,8 @@ import ErrorEx from 'utils/errorex'
 import {cid, versions} from 'stores/consts'
 import {reactive} from 'vue'
 
-// TODO: use lazy store where possible
+// TODO: direct artists store works slow in browser
+//      use lazy store where possible or remove at all
 class ArtistsStore {
   constructor () {
     this.reset()
