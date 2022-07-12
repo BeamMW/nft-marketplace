@@ -70,6 +70,7 @@
 <script>
 import utils from 'utils/utils'
 import artistsStore from 'stores/artists'
+import {common} from 'utils/consts'
 import {computed} from 'vue'
 
 export default {
@@ -98,7 +99,7 @@ export default {
       if (amount == null) {
         return
       }
-      await this.$store.addRewards(parseInt(amount))
+      await this.$store.addRewards(parseInt(amount) * common.GROTHS_IN_BEAM)
     },
     async onAction(id, status) {
       await this.$store.setModerator(id, status === 'approved' ? 0 : 1)

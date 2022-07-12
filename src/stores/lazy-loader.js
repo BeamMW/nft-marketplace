@@ -122,9 +122,12 @@ export default class LazyLoader {
         return
       }
 
-      // tell to start sync from the current height
-      status.hprocessed = this._global.state.height
-      await this._saveStatus(status)
+      if (status.hprocessed == 0) {
+        // first AC_LOAD, tell to start sync from the current height
+        status.hprocessed = this._global.state.height
+        console.log(`${this._objname} - AC_LOAD set processed block for update to ${this._global.state.height}`)
+        await this._saveStatus(status)
+      }
     }
 
     if (action == AC_UPDATE) {
@@ -146,11 +149,12 @@ export default class LazyLoader {
     let height = this._global.height
 
     if (action == AC_UPDATE) {
-      let hnext = status.hprocessed + 1;
+      let hnext = status.hprocessed + 1
       ({res} = await utils.invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
         h0: hnext,
+        artist_id: this._global.state.my_key,
         count: 20,
         cid
       }))
@@ -164,8 +168,9 @@ export default class LazyLoader {
       ({res} = await utils.invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
+        artist_id: this._global.state.my_key,
         id0: inext,
-        count: 200,
+        count: 20,
         cid
       }))
       utils.ensureField(res, 'items', 'array')
