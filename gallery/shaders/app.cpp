@@ -811,7 +811,7 @@ static inline bool IsOwner(const ContractID& cid, const PubKey& owner,
 
 gallery::Collection::Id collection_id_by_label(const ContractID& cid,
                                                std::string_view label) {
-    Env::Key_T<gallery::Collection::LabelKey> lk;
+    Env::Key_T<gallery::Collection::LabelKey> lk{};
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
     lk.m_KeyInContract.artist_id = AppArtist::id(cid);
@@ -822,7 +822,7 @@ gallery::Collection::Id collection_id_by_label(const ContractID& cid,
 
 gallery::Artist::Id artist_id_by_label(const ContractID& cid,
                                        std::string_view label) {
-    Env::Key_T<gallery::Artist::LabelKey> lk;
+    Env::Key_T<gallery::Artist::LabelKey> lk{};
     lk.m_Prefix.m_Cid = cid;
     lk.m_KeyInContract.label_hash = gallery::GetLabelHash(label);
     gallery::Artist::Id artist_id{};
@@ -954,7 +954,7 @@ void SetCollectionStatusCommon(const ContractID& cid, const PubKey& signer,
  * On_Methods
  */
 ON_METHOD(manager, create_contract) {
-    gallery::method::Init args;
+    gallery::method::Init args{};
     args.config.vote_reward.aid = vote_reward_aid;
     args.config.vote_reward.amount = vote_reward_amount;
     key_material::Admin().get_Pk(args.config.admin_id);
@@ -967,24 +967,24 @@ ON_METHOD(manager, create_contract) {
 }
 
 ON_METHOD(manager, schedule_upgrade) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Upgradable3::Manager::MultiSigRitual::Perform_ScheduleUpgrade(
         kVerInfo, cid, kid, target_height);
 }
 
 ON_METHOD(manager, explicit_upgrade) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Upgradable3::Manager::MultiSigRitual::Perform_ExplicitUpgrade(cid);
 }
 
 ON_METHOD(manager, replace_admin) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Upgradable3::Manager::MultiSigRitual::Perform_ReplaceAdmin(cid, kid, iAdmin,
                                                                pk);
 }
 
 ON_METHOD(manager, set_min_approvers) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Upgradable3::Manager::MultiSigRitual::Perform_SetApprovers(cid, kid,
                                                                newVal);
 }
@@ -994,10 +994,10 @@ ON_METHOD(manager, view) {
 }
 
 ON_METHOD(manager, set_moderator) {
-    gallery::method::SetModerator args;
+    gallery::method::SetModerator args{};
     args.id = id;
     args.approved = enable;
-    key_material::Admin akm;
+    key_material::Admin akm{};
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
                         &akm, 1, "Set moderator", 0);
 }
@@ -1009,7 +1009,7 @@ ON_METHOD(manager, view_params) {
         return;
     }
 
-    PubKey admin_id;
+    PubKey admin_id{};
     key_material::Admin().get_Pk(admin_id);
 
     AppModerator moder;
@@ -1131,7 +1131,7 @@ ON_METHOD(manager, view_likes) {
         k1.m_KeyInContract.nft_id =
             std::numeric_limits<gallery::Nft::Id>::max();
 
-        HeightPos pos_min, pos_max;
+        HeightPos pos_min{}, pos_max{};
         pos_min.m_Height = h0 + 1;
         pos_max.m_Height = hn ? hn + 1 : Env::get_Height() + 1;
 
@@ -1233,7 +1233,7 @@ ON_METHOD(artist, set_nft) {
     d.args.data_len = data_size ? data_size - 1 : data_size;
     uint32_t arg_size = sizeof(d.args) + d.args.label_len + d.args.data_len;
 
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
@@ -1270,7 +1270,7 @@ ON_METHOD(user, add_rewards) {
         return;
     }
 
-    gallery::method::AddVoteRewards args;
+    gallery::method::AddVoteRewards args{};
     args.amount = amount;
 
     if (!args.amount) {
@@ -1278,7 +1278,7 @@ ON_METHOD(user, add_rewards) {
         return;
     }
 
-    FundsChange fc;
+    FundsChange fc{};
     fc.m_Aid = s.config.vote_reward.aid;
     fc.m_Amount = args.amount;
     fc.m_Consume = 1;
@@ -1288,13 +1288,13 @@ ON_METHOD(user, add_rewards) {
 }
 
 ON_METHOD(manager, get_id) {
-    PubKey pk;
+    PubKey pk{};
     key_material::Admin().get_Pk(pk);
     Env::DocAddBlob_T("id", pk);
 }
 
 ON_METHOD(manager, view_balance) {
-    BalanceWalker wlk;
+    BalanceWalker wlk{};
     {
         Env::DocArray gr0("items");
         for (wlk.Enum(cid); wlk.MoveNext();) {
@@ -1307,15 +1307,15 @@ ON_METHOD(manager, view_balance) {
 }
 
 ON_METHOD(manager, set_nft_status) {
-    key_material::Admin kid;
-    PubKey signer;
+    key_material::Admin kid{};
+    PubKey signer{};
     kid.get_Pk(signer);
     SetNftStatusCommon(cid, signer, &kid);
 }
 
 ON_METHOD(moderator, set_nft_status) {
     key_material::Owner km{AppArtist::key_material(cid)};
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     SetNftStatusCommon(cid, km.Get(), &sig);
@@ -1323,46 +1323,46 @@ ON_METHOD(moderator, set_nft_status) {
 
 ON_METHOD(moderator, set_artist_status) {
     key_material::Owner km{AppArtist::key_material(cid)};
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     SetArtistStatusCommon(cid, km.Get(), &sig);
 }
 
 ON_METHOD(manager, set_artist_status) {
-    key_material::Admin kid;
-    PubKey signer;
+    key_material::Admin kid{};
+    PubKey signer{};
     kid.get_Pk(signer);
     SetArtistStatusCommon(cid, signer, &kid);
 }
 
 ON_METHOD(manager, set_collection_status) {
-    key_material::Admin kid;
-    PubKey signer;
+    key_material::Admin kid{};
+    PubKey signer{};
     kid.get_Pk(signer);
     SetCollectionStatusCommon(cid, signer, &kid);
 }
 
 ON_METHOD(moderator, set_collection_status) {
     key_material::Owner km{AppArtist::key_material(cid)};
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
     SetCollectionStatusCommon(cid, km.Get(), &sig);
 }
 
 ON_METHOD(manager, set_fee_base) {
-    gallery::method::SetFeeBase args;
+    gallery::method::SetFeeBase args{};
     args.amount = amount;
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
                         &kid, 1, "Set fee base", 0);
 }
 
 ON_METHOD(manager, set_rate_limit) {
-    gallery::method::SetRateLimit args;
+    gallery::method::SetRateLimit args{};
     args.amount = amount;
-    key_material::Admin kid;
+    key_material::Admin kid{};
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
                         &kid, 1, "Set rate limit", 0);
 }
@@ -1418,7 +1418,7 @@ ON_METHOD(artist, set_artist) {
     key_material::Owner km{AppArtist::key_material(cid)};
     d.args.artist_id = km.Get();
 
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
@@ -1492,7 +1492,7 @@ ON_METHOD(artist, set_collection) {
     d.args.data_len = data_size ? data_size - 1 : data_size;
     uint32_t args_size = sizeof(d.args) + d.args.data_len + d.args.label_len;
 
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
@@ -1531,14 +1531,14 @@ ON_METHOD(artist, get_id) {
 }
 
 ON_METHOD(manager, view_nft_sales) {
-    Env::Key_T<gallery::Events::Sell::Key> key;
+    Env::Key_T<gallery::Events::Sell::Key> key{};
     _POD_(key.m_Prefix.m_Cid) = cid;
     key.m_KeyInContract.nft_id = id;
 
     Env::DocArray gr0("sales");
 
     for (Env::LogReader r(key, key);;) {
-        gallery::Events::Sell evt;
+        gallery::Events::Sell evt{};
         if (!r.MoveNext_T(key, evt))
             break;
 
@@ -1588,12 +1588,12 @@ ON_METHOD(user, set_price) {
         km.nft_id = id;
     }
 
-    gallery::method::SetPrice args;
+    gallery::method::SetPrice args{};
     args.nft_id = id;
     args.price.amount = amount;
     args.price.aid = aid;
 
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
@@ -1611,14 +1611,14 @@ ON_METHOD(user, transfer) {
         return;
     }
 
-    gallery::method::Transfer args;
+    gallery::method::Transfer args{};
     args.nft_id = id;
     _POD_(args.new_owner) = new_owner;
 
     key_material::Owner km_owner{AppArtist::key_material(cid, id)};
     key_material::Owner km_author{AppArtist::key_material(cid)};
 
-    SigRequest sig;
+    SigRequest sig{};
     if (_POD_(m.owner) == km_author.Get()) {
         sig.m_pID = &km_author;
         sig.m_nID = sizeof(km_author);
@@ -1643,18 +1643,18 @@ ON_METHOD(user, buy) {
         return;
     }
 
-    gallery::method::Buy args;
+    gallery::method::Buy args{};
     args.nft_id = id;
     args.has_aid = !!nft.aid;
 
     key_material::Owner km{AppArtist::key_material(cid, id)};
     args.user = km.Get();
 
-    SigRequest sig;
+    SigRequest sig{};
     sig.m_pID = &km;
     sig.m_nID = sizeof(km);
 
-    FundsChange fc;
+    FundsChange fc{};
     fc.m_Consume = 1;
     fc.m_Amount = nft.price.amount;
     fc.m_Aid = nft.price.aid;
@@ -1715,11 +1715,11 @@ ON_METHOD(user, withdraw) {
     BalanceWalkerOwner wlk{cid};
     uint32_t count = 0;
     for (wlk.Enum(cid); wlk.MoveNext();) {
-        gallery::method::Withdraw args;
+        gallery::method::Withdraw args{};
         _POD_(args.key) = wlk.key.m_KeyInContract;
         args.value = wlk.payout.amount;  // everything
 
-        FundsChange fc;
+        FundsChange fc{};
         fc.m_Consume = 0;
         fc.m_Aid = wlk.key.m_KeyInContract.aid;
         fc.m_Amount = wlk.payout.amount;
@@ -1728,7 +1728,7 @@ ON_METHOD(user, withdraw) {
             AppArtist::key_material(cid, wlk.key.m_KeyInContract.nft_id)};
         key_material::Owner km_author{AppArtist::key_material(cid)};
 
-        SigRequest sig;
+        SigRequest sig{};
         if (_POD_(wlk.key.m_KeyInContract.user) == km_author.Get()) {
             sig.m_pID = &km_author;
             sig.m_nID = sizeof(km_author);
@@ -1756,17 +1756,17 @@ ON_METHOD(user, vote) {
         return;
     }
 
-    gallery::method::Vote args;
+    gallery::method::Vote args{};
     args.nft_id = id;
     args.value = val;
     args.artist_id = AppArtist::id(cid);
 
-    FundsChange fc;
+    FundsChange fc{};
     fc.m_Consume = 0;
     fc.m_Aid = s.config.vote_reward.aid;
 
     {
-        Env::Key_T<gallery::Like::Key> key;
+        Env::Key_T<gallery::Like::Key> key{};
         key.m_Prefix.m_Cid = cid;
         key.m_KeyInContract.nft_id = Utils::FromBE(id);
         key.m_KeyInContract.artist_id = args.artist_id;
@@ -1788,7 +1788,7 @@ ON_METHOD(user, vote) {
 }
 
 ON_METHOD(manager, migrate_artist) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
 
     struct {
         gallery::method::MigrateArtist args;
@@ -1858,7 +1858,7 @@ ON_METHOD(manager, migrate_artist) {
 }
 
 ON_METHOD(manager, migrate_collection) {
-    key_material::Admin kid;
+    key_material::Admin kid{};
 
     struct {
         gallery::method::MigrateCollection args;
@@ -2013,18 +2013,18 @@ ON_METHOD(manager, migrate_nft) {
 }
 
 ON_METHOD(manager, migrate_sales) {
-    Env::Key_T<gallery::Events::Sell::Key> key;
+    Env::Key_T<gallery::Events::Sell::Key> key{};
     _POD_(key.m_Prefix.m_Cid) = cid;
     key.m_KeyInContract.nft_id = nft_id;
 
     Env::LogReader r(key, key);
-    gallery::Events::Sell evt;
+    gallery::Events::Sell evt{};
     if (r.MoveNext_T(key, evt)) {
         OnError("sales for the nft has already been migrated");
         return;
     }
 
-    key_material::Admin kid;
+    key_material::Admin kid{};
 
     char buf[256];
     Env::DocGetText("prices", buf, sizeof(buf));
