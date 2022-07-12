@@ -1271,7 +1271,7 @@ ON_METHOD(user, add_rewards) {
     }
 
     gallery::method::AddVoteRewards args;
-    args.amount = s.config.vote_reward.amount * amount;
+    args.amount = amount;
 
     if (!args.amount) {
         OnError("no rewards");
