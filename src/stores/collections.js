@@ -160,6 +160,7 @@ class CollectionsStore extends LazyItems {
       role: 'user',
       action: 'is_my_key',
       key: item.author,
+      nft_id: 0,
       cid
     })
     
