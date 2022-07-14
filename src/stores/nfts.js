@@ -313,6 +313,23 @@ class NFTSStore extends LazyItems {
     delete status.likes
   }
 
+  async detectOwned(item) {
+    if (!utils.isWeb()) {
+      return item.owned
+    }
+    
+    let {res} = await utils.invokeContractAsync({
+      role: 'user',
+      action: 'is_my_key',
+      nft_id: item.id,
+      key: item.owner,
+      cid
+    })
+    
+    utils.ensureField(res, 'key', 'number')
+    return res.key
+  }
+
   async createNFT(collid, label, data, price) {
     ({label, data} = await this.toContract(label, data))
     

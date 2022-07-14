@@ -259,6 +259,10 @@ export default class ItemsStore extends LazyLoader {
     })
   }
 
+  async detectOwned(item) {
+    return item.owned
+  }
+
   async onItem(status, item) {
     //
     // item would be written to database
@@ -269,6 +273,11 @@ export default class ItemsStore extends LazyLoader {
     item.approved = (item.status === 'approved') ? 1 : 0 
     item.pending  = (item.status === 'pending') ? 1 : 0
     item.rejected = (!item.approved && !item.pending) ? 1 : 0
+    
+    let owned = await this.detectOwned(item)
+    if (owned !== undefined) {
+      item.owned = owned
+    }
 
     try {
       if (!item.label) {

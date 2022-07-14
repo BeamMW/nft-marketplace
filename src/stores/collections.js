@@ -150,6 +150,22 @@ class CollectionsStore extends LazyItems {
 
     return await utils.invokeContractAsyncAndMakeTx(args)
   }
+
+  async detectOwned(item) {
+    if (!utils.isWeb()) {
+      return item.owned
+    }
+    
+    let {res} = await utils.invokeContractAsync({
+      role: 'user',
+      action: 'is_my_key',
+      key: item.author,
+      cid
+    })
+    
+    utils.ensureField(res, 'key', 'number')
+    return res.key
+  }
 }
 
 let collectionsStore = new CollectionsStore()

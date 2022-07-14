@@ -109,6 +109,51 @@ export default class LazyLoader {
   async onEnd(status, items) {
   }
 
+  async _req_AC_LOAD(id0, count) {
+    let res = undefined 
+
+    if (utils.isWeb()) {
+      let request = `${utils.webGateway}view_${this._objname}s?id0=${id0}&count=${count}`
+      res = await utils.downloadAsync(request, 'json')
+    }
+
+    if (!utils.isWeb()) {
+      ({res} = await utils.invokeContractAsync({
+        role: 'manager',
+        action: `view_${this._objname}s`,
+        id0,
+        count,
+        cid
+      }))
+    }
+    
+    utils.ensureField(res, 'items', 'array')
+    utils.ensureField(res, 'next_id')
+    return res
+  }
+
+  async _req_AC_UPDATE(h0, count) {
+    let res = undefined 
+    
+    if (utils.isWeb()) {
+      let request = `${utils.webGateway}view_${this._objname}s?h0=${h0}&count=${count}`
+      res = await utils.downloadAsync(request, 'json')
+    }
+
+    if (!utils.isWeb()) {
+      ({res} = await utils.invokeContractAsync({
+        role: 'manager',
+        action: `view_${this._objname}s`,
+        h0,
+        count,
+        cid
+      }))
+    }
+
+    utils.ensureField(res, 'items', 'array')
+    return res
+  }
+
   async _loadAsyncInternal(action, depth) {
     console.log(`_loadAsyncInternal for ${this._objname}s, AC ${action} with depth ${depth}`)
     let status = await this._loadStatus()
@@ -150,33 +195,23 @@ export default class LazyLoader {
 
     if (action == AC_UPDATE) {
       let hnext = status.hprocessed + 1
-      ({res} = await utils.invokeContractAsync({
-        role: 'manager',
-        action: `view_${this._objname}s`,
-        h0: hnext,
-        artist_id: this._global.state.my_key,
-        count: 20,
-        cid
-      }))
-      utils.ensureField(res, 'items', 'array')
+      res = await this._req_AC_UPDATE(hnext, 20)
       items = res.items
+      if (items === undefined) {
+        // eslint-disable-next-line no-debugger
+        debugger
+      }
       console.log(`loading ${this._objname}s, depth ${depth}, h0 is ${hnext}, got ${items.length} items`)
     }
 
     if (action == AC_LOAD) {
-      let inext = status.iprocessed ? status.inext : this.getFirstIDX();
-      ({res} = await utils.invokeContractAsync({
-        role: 'manager',
-        action: `view_${this._objname}s`,
-        artist_id: this._global.state.my_key,
-        id0: inext,
-        count: 20,
-        cid
-      }))
-      utils.ensureField(res, 'items', 'array')
-      utils.ensureField(res, 'next_id') 
-      
+      let inext = status.iprocessed ? status.inext : this.getFirstIDX()
+      res = await this._req_AC_LOAD(inext, 20)
       items = res.items
+      if (items === undefined) {
+        // eslint-disable-next-line no-debugger
+        debugger
+      }
       console.log(`loading ${this._objname}s, depth ${depth}, id0 is ${inext}, got ${items.length} items`)
     }
 

@@ -43,9 +43,7 @@ class ImagesStore {
     }
 
     let err = this._ensureFields(image)
-
-    if (err)
-      alert('image error, id ' + image.id + ', err ' + err)
+    if (err) console.log(`Image failed to load: ${image.id}, ${err}`)
       
     return {
       ipfs_hash: image.ipfs_hash,

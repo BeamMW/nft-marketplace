@@ -7,40 +7,65 @@ let Calls        = {}
 let APIResCB     = undefined
 let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
 let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
+let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
 let InitParams   = undefined
 
 export default class Utils {
+  static is_desktop = undefined
+  static is_mobile  = undefined
+  static is_android = undefined
+  static is_web     = undefined
+  static is_chrome  = undefined
+
   static get ipfsGateway() {
     return ipfsGateway
   }
 
-  static isMobile () {
-    const ua = navigator.userAgent
-    return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
+  static get webGateway() {
+    return webGateway
   }
-    
-  static isAndroid () {
-    const ua = navigator.userAgent
-    return (/android/i.test(ua))
+
+  static isMobile () {
+    if (Utils.is_mobile === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_mobile  = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
+    }
+    return Utils.is_mobile
   }
 
   static isDesktop () {
-    const ua = navigator.userAgent
-    return (/QtWebEngine/i.test(ua))
+    if (Utils.is_mobile === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_desktop = (/QtWebEngine/i.test(ua))
+    }
+    return Utils.is_desktop
   }
 
   static isWeb () {
-    return !Utils.isDesktop() && !Utils.isMobile()
+    if (Utils.is_web === undefined) {
+      Utils.is_web = (!Utils.is_desktop && ! Utils.is_mobile)
+    }
+    return Utils.is_web
+  }
+    
+  static isAndroid () {
+    if (Utils.is_android === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_android = (/android/i.test(ua))
+    }
+    return Utils.is_android
+  }
+
+  static isChrome () {
+    if (Utils.is_chrome === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_chrome = (/chrome|chromium|crios/i.test(ua) && ua.indexOf('Edg') == -1)
+    }
+    return Utils.is_chrome
   }
 
   static isHeadless () {
     return BEAM && BEAM.headless
-  }
-
-  static isChrome () {
-    const userAgent = navigator.userAgent
-    const isChrome = userAgent.match(/chrome|chromium|crios/i)
-    return isChrome && userAgent.indexOf('Edg') == -1
   }
 
   static async createMobileAPI(apirescback) {
@@ -463,7 +488,7 @@ export default class Utils {
     Utils.getById(id).classList.add('hidden')
   }
 
-  static downloadAsync(url, cback) {
+  static downloadAsync(url, type) {
     return new Promise((resolve, reject) => {
       var xhr = new XMLHttpRequest()
       xhr.onreadystatechange = () => {
@@ -472,6 +497,10 @@ export default class Utils {
         }
         
         if (xhr.status === 200) {
+          if (type) {
+            return resolve(xhr.response)
+          }
+
           let buffer    = xhr.response
           let byteArray = new Uint8Array(buffer)
           let array     = Array.from(byteArray)
@@ -488,7 +517,7 @@ export default class Utils {
       }
 
       xhr.open('GET', url, true)
-      xhr.responseType = 'arraybuffer'
+      xhr.responseType = type ? type : 'arraybuffer'
       xhr.send(null)
     })
   }
