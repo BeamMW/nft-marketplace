@@ -806,7 +806,11 @@ const std::string_view StatusToString(gallery::Status status) {
 
 static inline bool IsOwner(const ContractID& cid, const PubKey& owner,
                            gallery::Nft::Id nft_id) {
-    return _POD_(owner) == AppArtist::key_material(cid, nft_id).Get();
+    auto zero_km = key_material::Owner{kEmptyCid, nft_id};
+    auto old_km = key_material::Owner{kOldGalleryCid, nft_id};
+    auto new_km = key_material::Owner{cid, nft_id};
+    return (_POD_(owner) == zero_km.Get() || _POD_(owner) == old_km.Get() ||
+            _POD_(owner) == new_km.Get());
 }
 
 gallery::Collection::Id collection_id_by_label(const ContractID& cid,
