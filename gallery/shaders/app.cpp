@@ -1138,6 +1138,7 @@ ON_METHOD(manager, view_likes) {
         HeightPos pos_min{}, pos_max{};
         pos_min.m_Height = h0;
         pos_max.m_Height = hn ? hn : Env::get_Height();
+        pos_max.m_Pos = std::numeric_limits<uint32_t>::max();
 
         Env::LogReader r(k0, k1, &pos_min, &pos_max);
         Env::DocArray root{"items"};
