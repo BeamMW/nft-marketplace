@@ -176,7 +176,6 @@ class NFTSStore extends LazyItems {
   }
 
   fromDB(awork) {
-    console.log('ntfts - from DB', awork.id)
     awork = Object.assign({}, awork)
     awork.store = this
 
