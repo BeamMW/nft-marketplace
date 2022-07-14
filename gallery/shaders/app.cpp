@@ -161,7 +161,7 @@
     macro(ContractID, cid) macro(gallery::Nft::Id, id)
 
 #define Gallery_user_add_rewards(macro) \
-    macro(ContractID, cid) macro(uint32_t, amount)
+    macro(ContractID, cid) macro(Amount, amount)
 
 #define Gallery_user_view_balance(macro) macro(ContractID, cid)
 
