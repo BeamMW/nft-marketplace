@@ -475,7 +475,7 @@ struct AppNft : public gallery::Nft {
 
         if (!_POD_(owner).IsZero()) {
             uint32_t owned = IsOwner(cid, owner, 0) || IsOwner(cid, owner, id);
-            // Env::DocAddBlob_T("owner", owner);
+            Env::DocAddBlob_T("owner", owner);
             Env::DocAddNum("owned", owned);
 
             if (owned) {
