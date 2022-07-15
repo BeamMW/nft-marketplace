@@ -288,15 +288,15 @@ struct AppArtist : public gallery::Artist {
 
     static key_material::Owner key_material(const ContractID& cid,
                                             gallery::Nft::Id id = 0) {
-        auto zero_km = key_material::Owner{kEmptyCid, id};
-        auto old_km = key_material::Owner{kOldGalleryCid, id};
-        auto new_km = key_material::Owner{cid, id};
-        if (Exists(cid, zero_km.Get()))
-            return zero_km;
+        auto zero_km = key_material::Owner{kEmptyCid};
+        auto old_km = key_material::Owner{kOldGalleryCid};
+        auto new_km = key_material::Owner{cid};
+        if (Exists(cid, zero_km.Get())) 
+            return key_material::Owner{kEmptyCid, id};
         else if (Exists(cid, old_km.Get()))
-            return old_km;
+            return key_material::Owner{kOldGalleryCid, id};
         else
-            return new_km;
+            return key_material::Owner{cid, id};
     }
 
     static PubKey id(const ContractID& cid) {
