@@ -291,7 +291,7 @@ struct AppArtist : public gallery::Artist {
         auto zero_km = key_material::Owner{kEmptyCid};
         auto old_km = key_material::Owner{kOldGalleryCid};
         auto new_km = key_material::Owner{cid};
-        if (Exists(cid, zero_km.Get())) 
+        if (Exists(cid, zero_km.Get()))
             return key_material::Owner{kEmptyCid, id};
         else if (Exists(cid, old_km.Get()))
             return key_material::Owner{kOldGalleryCid, id};
@@ -737,6 +737,39 @@ struct BalanceWalkerOwner : public BalanceWalker {
                 break;
         }
         return true;
+    }
+};
+
+struct OwnerInfo {
+    key_material::Owner km;
+
+    OwnerInfo() : km{kEmptyCid} {
+    }
+
+    bool DeduceOwner(const ContractID& cid, const PubKey& owner,
+                     gallery::Nft::Id nft_id) {
+        _POD_(km).SetZero();
+        return DeduceOwner_(cid, owner, nft_id) || DeduceOwner_(cid, owner, 0);
+    }
+
+private:
+    bool DeduceOwner_(const ContractID& cid, const PubKey& owner,
+                      gallery::Nft::Id nft_id) {
+        auto zero_km = key_material::Owner{kEmptyCid, nft_id};
+        auto old_km = key_material::Owner{kOldGalleryCid, nft_id};
+        auto new_km = key_material::Owner{cid, nft_id};
+        Env::DocAddBlob_T("DEBUG_OWNER", owner);
+        if (_POD_(owner) == zero_km.Get()) {
+            Env::DocAddBlob_T("ZERO_OWNER", zero_km.Get());
+            _POD_(km) = zero_km;
+        } else if (_POD_(owner) == old_km.Get()) {
+            Env::DocAddBlob_T("OLD_OWNER", zero_km.Get());
+            _POD_(km) = old_km;
+        } else if (_POD_(owner) == new_km.Get()) {
+            Env::DocAddBlob_T("NEW_OWNER", zero_km.Get());
+            _POD_(km) = new_km;
+        }
+        return !_POD_(km).IsZero();
     }
 };
 
@@ -1581,17 +1614,13 @@ ON_METHOD(user, set_price) {
     if (!m.ReadWithoutData(cid, id))
         return;
 
-    key_material::Owner km{AppArtist::key_material(cid)};
-    if (!IsOwner(cid, m.owner, id)) {
-        if (!IsOwner(cid, m.owner, 0)) {
-            OnError("not owned");
-            return;
-        } else {
-            km.nft_id = 0;
-        }
-    } else {
-        km.nft_id = id;
+    OwnerInfo oi{};
+    if (!oi.DeduceOwner(cid, m.owner, id)) {
+        OnError("not owned");
+        return;
     }
+
+    Env::DocAddBlob_T("KEY_DEBUG", oi.km.Get());
 
     gallery::method::SetPrice args{};
     args.nft_id = id;
@@ -1599,8 +1628,8 @@ ON_METHOD(user, set_price) {
     args.price.aid = aid;
 
     SigRequest sig{};
-    sig.m_pID = &km;
-    sig.m_nID = sizeof(km);
+    sig.m_pID = &oi.km;
+    sig.m_nID = sizeof(oi.km);
 
     const char* comment =
         args.price.amount ? "Set item price" : "Remove from sale";
@@ -1620,17 +1649,15 @@ ON_METHOD(user, transfer) {
     args.nft_id = id;
     _POD_(args.new_owner) = new_owner;
 
-    key_material::Owner km_owner{AppArtist::key_material(cid, id)};
-    key_material::Owner km_author{AppArtist::key_material(cid)};
+    OwnerInfo oi{};
+    if (!oi.DeduceOwner(cid, m.owner, id)) {
+        OnError("not owned");
+        return;
+    }
 
     SigRequest sig{};
-    if (_POD_(m.owner) == km_author.Get()) {
-        sig.m_pID = &km_author;
-        sig.m_nID = sizeof(km_author);
-    } else {
-        sig.m_pID = &km_owner;
-        sig.m_nID = sizeof(km_owner);
-    }
+    sig.m_pID = &oi.km;
+    sig.m_nID = sizeof(oi.km);
 
     Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), nullptr, 0,
                         &sig, 1, "Transfer item", 1848900);
@@ -1729,18 +1756,13 @@ ON_METHOD(user, withdraw) {
         fc.m_Aid = wlk.key.m_KeyInContract.aid;
         fc.m_Amount = wlk.payout.amount;
 
-        key_material::Owner km_owner{
-            AppArtist::key_material(cid, wlk.key.m_KeyInContract.nft_id)};
-        key_material::Owner km_author{AppArtist::key_material(cid)};
+        OwnerInfo oi{};
+        oi.DeduceOwner(cid, wlk.key.m_KeyInContract.user,
+                       wlk.key.m_KeyInContract.nft_id);
 
         SigRequest sig{};
-        if (_POD_(wlk.key.m_KeyInContract.user) == km_author.Get()) {
-            sig.m_pID = &km_author;
-            sig.m_nID = sizeof(km_author);
-        } else {
-            sig.m_pID = &km_owner;
-            sig.m_nID = sizeof(km_owner);
-        }
+        sig.m_pID = &oi.km;
+        sig.m_nID = sizeof(oi.km);
 
         Env::GenerateKernel(&cid, args.kMethod, &args, sizeof(args), &fc, 1,
                             &sig, 1, count ? "" : "Withdraw", 0);
