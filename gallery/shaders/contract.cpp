@@ -1,5 +1,5 @@
-#include "../common.h"
-#include "../Math.h"
+#include "Shaders/common.h"
+#include "Shaders/Math.h"
 #include "contract.h"
 
 struct MyState
@@ -78,6 +78,8 @@ BEAM_EXPORT void Method_2(void*)
 
 BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 {
+    Env::Halt();
+    /*
     Gallery::Artist::Key ak;
     _POD_(ak.m_pkUser) = r.m_pkArtist;
 
@@ -96,10 +98,12 @@ BEAM_EXPORT void Method_10(const Gallery::Method::ManageArtist& r)
 
     MyState s;
     s.AddSigAdmin();
+    */
 }
 
 BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
 {
+    /*
     MyState s;
 
     Gallery::Masterpiece::Key mk;
@@ -141,11 +145,13 @@ BEAM_EXPORT void Method_3(const Gallery::Method::AddExhibit& r)
         nData -= nMaxEventSize;
         pData += nMaxEventSize;
     }
-    
+    */
+    Env::Halt(); 
 }
 
 BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -155,10 +161,13 @@ BEAM_EXPORT void Method_4(const Gallery::Method::SetPrice& r)
     Env::SaveVar_T(mk, m);
 
     Env::AddSig(m.m_pkOwner); // would fail if no current owner (i.e. checked out)
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -194,6 +203,8 @@ BEAM_EXPORT void Method_5(const Gallery::Method::Buy& r)
     Env::SaveVar_T(mk, m);
 
     //Env::AddSig(r.m_pkUser);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r)
@@ -205,6 +216,7 @@ BEAM_EXPORT void Method_6(const Gallery::Method::Withdraw& r)
 
 BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -225,10 +237,13 @@ BEAM_EXPORT void Method_7(const Gallery::Method::CheckPrepare& r)
     }
 
     Env::SaveVar_T(mk, m);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -242,10 +257,13 @@ BEAM_EXPORT void Method_8(const Gallery::Method::CheckOut& r)
     _POD_(m.m_Price).SetZero();
 
     Env::SaveVar_T(mk, m);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -258,10 +276,13 @@ BEAM_EXPORT void Method_9(const Gallery::Method::CheckIn& r)
     Env::SaveVar_T(mk, m);
 
     //Env::AddSig(r.m_pkUser);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
 {
+    /*
     Gallery::Impression::Key impk;
     _POD_(impk.m_ID) = r.m_ID;
 
@@ -285,19 +306,25 @@ BEAM_EXPORT void Method_11(const Gallery::Method::Vote& r)
     Env::SaveVar_T(impk, imp);
 
     Env::AddSig(impk.m_ID.m_pkUser);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_12(const Gallery::Method::AddVoteRewards& r)
 {
+    /*
     MyState s;
     Strict::Add(s.m_VoteBalance, r.m_Amount);
     s.Save();
 
     Env::FundsLock(s.m_Config.m_VoteReward.m_Aid, r.m_Amount);
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 {
+    /*
     // ensure the masterpiece doesn't have aid
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
@@ -310,10 +337,13 @@ BEAM_EXPORT void Method_13(const Gallery::Method::AdminDelete& r)
 
     MyState s;
     s.AddSigAdmin();
+    */
+    Env::Halt();
 }
 
 BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r)
 {
+    /*
     Gallery::Masterpiece::Key mk;
     mk.m_ID = r.m_ID;
     Gallery::Masterpiece m;
@@ -323,6 +353,7 @@ BEAM_EXPORT void Method_14(const Gallery::Method::Transfer& r)
     _POD_(m.m_pkOwner) = r.m_pkNewOwner;
 
     Env::SaveVar_T(mk, m);
-
+    */
+    Env::Halt();
 }
 

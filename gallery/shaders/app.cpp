@@ -1,8 +1,8 @@
-#include "../common.h"
-#include "../app_common_impl.h"
+#include "Shaders/common.h"
+#include "Shaders/app_common_impl.h"
 #include "contract.h"
-#include "../upgradable2/contract.h"
-#include "../upgradable2/app_common_impl.h"
+#include "Shaders/upgradable2/contract.h"
+#include "Shaders/upgradable2/app_common_impl.h"
 
 #define Gallery_manager_view(macro)
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
@@ -187,6 +187,7 @@ ON_METHOD(manager, view)
     static const ShaderID s_pSid[] = {
         Gallery::s_SID_0,
         Gallery::s_SID_1,
+        Gallery::s_SID_2,
     };
 
     ContractID pVerCid[_countof(s_pSid)];
