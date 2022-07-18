@@ -316,7 +316,8 @@ class NFTSStore extends LazyItems {
     if (!utils.isWeb()) {
       return item.owned
     }
-    
+
+    utils.ensureField(item, 'owner', 'string')
     let {res} = await utils.invokeContractAsync({
       role: 'user',
       action: 'is_my_key',

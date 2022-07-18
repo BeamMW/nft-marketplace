@@ -82,22 +82,22 @@ export default class LazyLoader {
     return 0
   }
 
-  async loadAsync () {
+  async loadAsync (autoContinue) {
     if (this._state.loading) {
       return false
     }
 
     this._state.loading = true
-    await this._loadAsyncInternal(AC_LOAD, 0)
+    return await this._loadAsyncInternal(AC_LOAD, 0, autoContinue)
   }
 
-  async updateAsync () {
+  async updateAsync (autoContinue) {
     if (this._state.updating) {
       return false
     }
 
     this._state.updating = true
-    await this._loadAsyncInternal(AC_UPDATE, 0)
+    return await this._loadAsyncInternal(AC_UPDATE, 0, autoContinue)
   }
 
   async onStart(status, items) {
@@ -154,8 +154,8 @@ export default class LazyLoader {
     return res
   }
 
-  async _loadAsyncInternal(action, depth) {
-    console.log(`_loadAsyncInternal for ${this._objname}s, AC ${action} with depth ${depth}`)
+  async _loadAsyncInternal(action, depth, autoContinue) {
+    console.log(`_loadAsyncInternal for ${this._objname}s, ${action == AC_LOAD ? 'AC_LOAD' : 'AC_UPDATE'} with depth ${depth}`)
     let status = await this._loadStatus()
 
     if (action == AC_LOAD) {
@@ -164,7 +164,7 @@ export default class LazyLoader {
         // nothig left to do
         await this.onEnd(status)
         console.log(`_loadAsyncInternal for ${this._objname}s completed`)
-        return
+        return false
       }
 
       if (status.hprocessed == 0) {
@@ -181,7 +181,7 @@ export default class LazyLoader {
         // a few msecs before new block. Usually should not happen
         console.log(`_loadAsyncInternal for ${this._objname}s ignored/not initialized`)
         await this.onEnd(status)
-        return
+        return false
       }
     }
 
@@ -245,8 +245,11 @@ export default class LazyLoader {
     await this.onEnd(status)
 
     if (items.length > 0 || (action == AC_UPDATE && height < this._global.state.height)) {
-      setTimeout(() => this._loadAsyncInternal(action, ++depth), 10)
-      return
+      let further = async () => {return await this._loadAsyncInternal(action, ++depth, autoContinue)}
+      if (autoContinue) {
+        setTimeout(further, 10)
+      }
+      return further
     }
 
     if (action == AC_LOAD) {
@@ -259,6 +262,6 @@ export default class LazyLoader {
       this._state.updating = false
     }
 
-    return true
+    return false
   }
 }

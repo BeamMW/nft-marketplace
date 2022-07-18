@@ -250,9 +250,9 @@ export default class Utils {
 
   static async invokeContractAsync(args, bytes) {
     return new Promise((resolve, reject) => {
-      Utils.invokeContract(args, (err, res, full) => {
+      Utils.invokeContract(args, (err, res, full, request) => {
         if (err) return reject(err)
-        return resolve({res, full})
+        return resolve({res, full, request})
       },
       bytes)
     })
@@ -338,11 +338,11 @@ export default class Utils {
             request
           })
         }
-        return cback(null, shaderAnswer, answer)
+        return cback(null, shaderAnswer, answer, request)
       }
       else
       {
-        return cback(null, answer.result, answer)
+        return cback(null, answer.result, answer, request)
       }
     }
     catch (err)
@@ -818,7 +818,16 @@ export default class Utils {
   }
 
   static formatAmountFixed(amount, fixed) {
-    return (amount / 100000000).toFixed(4).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+    let str = (amount / 100000000).toFixed(fixed)
+    if (parseFloat(str) == 0) {
+      let res = '< 0.'
+      for (let i = 0; i < fixed - 1; ++i) {
+        res += '0'
+      }
+      res += '1'
+      return res
+    }
+    return str.replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
   }
 
   static formatAmount3(amount) {

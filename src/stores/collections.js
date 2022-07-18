@@ -156,6 +156,7 @@ class CollectionsStore extends LazyItems {
       return item.owned
     }
     
+    utils.ensureField(item, 'author', 'string')
     let {res} = await utils.invokeContractAsync({
       role: 'user',
       action: 'is_my_key',

@@ -15,6 +15,7 @@ import {admin_tabs} from '../utils/consts'
 function defaultState() {
   let state = {  
     loading: 'BEAM Gallery is loading',
+    first_refresh: true,
     error: undefined,
     shader: undefined,
     cid: contract.cid,
@@ -87,7 +88,9 @@ const store = {
       
       await this.checkCID()
       await this.initStuff()      
-      await this.refreshAllData()
+
+      // state event would trigger data refresh
+      await utils.callApiAsync('ev_subunsub', {ev_system_state: true})
     })
   },
 
@@ -149,11 +152,9 @@ const store = {
       }
 
       this.state.height = res.current_height
-      if (!this.state.loading) {
-        console.log('new block reached, updating app state')
-        this.refreshAllData()
-      }
-      
+      console.log('new block reached, updating app state')
+      this.refreshAllData()
+
       return
     }
 
@@ -171,7 +172,6 @@ const store = {
       },
       this.state.shader
     )*/
-    await utils.callApiAsync('ev_subunsub', {ev_system_state: true})
     let {res} = await utils.invokeContractAsync(
       {role: 'manager', action: 'view'}, 
       this.state.shader
@@ -183,6 +183,14 @@ const store = {
   },
 
   async refreshAllData () {
+    if (!this.state.first_refresh) {
+      // do not refresh anything until loaded
+      if (this.state.loading) {
+        return
+      }
+    }
+
+    this.state.first_refresh = false
     let {res} = await utils.invokeContractAsync({
       role: 'manager', 
       action: 'view_params', 
@@ -236,28 +244,62 @@ const store = {
 
     if (this.state.loading) {
       this.state.loading = 'Loading Artists'
-      await lazyArtistsStore.loadAsync()
+      await lazyArtistsStore.loadAsync(true)
 
       this.state.loading = 'Loading Collections'
-      await collsStore.loadAsync()
+      await collsStore.loadAsync(true)
 
-      this.state.loading = 'Loading Likes'
-      await likesStore.loadAsync()
-      
       this.state.loading = 'Loading NFTs'
-      await nftsStore.loadAsync()
       
+      let loader = undefined
+      loader = async(loadLikes, loadNfts) => {
+        if (loadLikes) loadLikes = await loadLikes()
+        if (loadNfts) loadNfts  = await loadNfts()
+        if (loadLikes || loadNfts) setTimeout(() => loader(loadLikes, loadNfts), 10)
+      }
+
+      //
+      // We make nfts store depend on likes store and do not 
+      // allow them to load in parallel. Likes iteration should
+      // always complete before nft iteration. This ensures that
+      // NFT would always load updated likes information
+      //
+      await loader(
+        async () => await likesStore.loadAsync(false), 
+        async () => await nftsStore.loadAsync(false)
+      )
+
       this.state.loading = false
       if (artistsStore.is_artist) {
         this.state.my_active_tab = my_tabs.COLLECTIONS
       }
     } 
-    else {
-      await lazyArtistsStore.updateAsync()
-      await collsStore.updateAsync()
-      await likesStore.updateAsync()
-      await nftsStore.updateAsync()
+    
+    await lazyArtistsStore.updateAsync(true)
+    await collsStore.updateAsync(true)
+
+    let storesLoader = async () => {
+      //
+      // We make nfts store depend on likes store and do not 
+      // allow them to load in parallel. Likes iteration should
+      // always complete before nft iteration. This ensures that
+      // NFT would always load updated likes information
+      //
+      let updater = undefined
+      updater = async(updateLikes, updateNfts) => {
+        if (updateLikes) updateLikes = await updateLikes()
+        if (updateNfts) updateNfts  = await updateNfts()
+        if (updateLikes || updateNfts) setTimeout(() => updater(updateLikes, updateNfts), 10)
+      }
+
+      await updater(
+        async () => await likesStore.updateAsync(false), 
+        async () => await nftsStore.updateAsync(false)
+      )
     }
+
+    // In web mode we let cache server time to be updates
+    setTimeout(storesLoader, utils.isWeb() ? 5 : 0)
 
     if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {
       this.state.my_active_tab = my_tabs.OWNED_NFTS
