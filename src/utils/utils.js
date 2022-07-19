@@ -7,7 +7,7 @@ let Calls        = {}
 let APIResCB     = undefined
 let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
 let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
-let headlessNode = "eu-node01.mainnet.beam.mw:8200"
+let headlessNode = 'eu-node01.mainnet.beam.mw:8200'
 let InitParams   = undefined
 
 export default class Utils {
