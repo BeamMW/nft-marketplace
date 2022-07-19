@@ -1,40 +1,47 @@
 <template>
-    <error v-if="error" v-bind:error="error.error" v-bind:context="error.context"/>
-    <loading v-else-if='loading'/>
-    <template v-else>
-        <div class="warning">
-            V1 gallery is in read-only mode. You can only view content and withdraw funds.
-        </div>
-        <router-view></router-view>
-    </template>    
+  <span id="modals"/>
+  <errorModal v-if="error" :error="error"/>
+  <loading v-if="loading" id="container" :text="loading"/>
+  <div v-else id="container" class="container">
+    <router-view/>
+  </div>
 </template>
 
-<style scoped lang="stylus">
-.warning {
-    border: 1px solid rgba(255, 0, 0, 0.8)
-    text-align: center
-    padding: 5px 0px 8px 0px
-    margin-bottom: 20px
-    background-color: rgba(255, 0, 0, 0.5)
+<style lang="stylus" scoped>
+.container {
+  width: 100%
+  height: 100%
 }
 </style>
 
 <script>
-import loading from './loading.vue'
-import error from './error.vue'
+import errorModal from 'components/error-modal'
+import loading from 'controls/loading'
 
 export default {
-    computed: {
-        loading () {
-            return  this.$state.loading
-        },
-        error () {
-            return this.$state.error
-        }
+  components: { 
+    loading, errorModal
+  },
+  computed: {
+    error () {
+      return this.$state.error
     },
-
-    components: { 
-        loading, error
+    debug () {
+      return this.$state.debug
+    },
+    loading () {
+      return this.$state.loading
     }
+  },
+  mounted() {
+    document.addEventListener('keydown', event => {
+      if (event.isComposing || event.keyCode === 229) {
+        return
+      }
+      if (event.code === 'KeyD' && event.ctrlKey && event.shiftKey) {
+        this.$store.toggleDebug()
+      }
+    }, true)
+  }
 }
 </script>
