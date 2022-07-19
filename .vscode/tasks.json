@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": [],
+      "label": "watch",
+      "detail": "npm run watch",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "type": "npm",
+      "script": "serve",
+      "problemMatcher": [],
+      "label": "serve",
+      "detail": "npm run serve",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "clear": true
+      }
+    },
+    {
+      "label": "chrome",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "command": "chrome",
+      "windows": {
+        "command": "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+      },
+      "linux": {
+        "command": "/usr/bin/chromium-freeworld"
+      },
+      "args": [
+        "http://localhost:8080/"
+      ],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    }
+  ]
+}

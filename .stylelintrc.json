@@ -1,0 +1,35 @@
+{
+  "extends": [
+    "stylelint-plugin-stylus/standard"
+  ],
+  "plugins": [
+    "stylelint-plugin-stylus"
+  ],
+  "processors": [
+    "stylelint-processor-html"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.vue"
+      ],
+      "customSyntax": "postcss-styl"
+    }
+  ],
+  "rules": {
+    "stylus/pythonic": [
+      "never"
+    ],
+    "stylus/declaration-colon": [
+      "always"
+    ],
+    "stylus/single-line-comment": [
+      "never"
+    ],
+    "stylus/no-eol-whitespace": null
+  },
+  "ignoreFiles": [
+    "src/styles/fonts.css",
+    "src/styles/global.css"
+  ]
+}

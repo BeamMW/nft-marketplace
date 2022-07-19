@@ -1,0 +1,60 @@
+html, body {
+  font-family: 'SFProDisplay', sans-serif !important;
+  font-weight: normal;
+  height:      100%;
+  width:       100%;
+  overflow:    hidden;
+  margin:      0;
+  color:       white;
+  box-sizing:  border-box;
+}
+
+.pointer-cursor {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .2);
+  border: 3px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+.darker {
+  opacity: 0.5
+}
+
+.hidden {
+  display: none;
+}
+
+*[disabled="true"] {
+  cursor: default !important;
+  opacity: 0.5;
+}
+
+.error {
+  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
+}
+
+.link {
+  cursor: pointer;
+  color: rgba(0, 246, 210, 1);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
