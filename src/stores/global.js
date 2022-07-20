@@ -162,7 +162,10 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils.downloadAsync('./galleryManager.wasm')
+    let href = window.location.href
+    let ipos = href.indexOf('index.html')
+    let wasmPath = [href.substring(0, ipos), 'galleryManager.wasm'].join('')
+    this.state.shader = await utils.downloadAsync(wasmPath)
 
     /*
     utils.invokeContract('', 

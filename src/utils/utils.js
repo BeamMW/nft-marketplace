@@ -818,6 +818,7 @@ export default class Utils {
   }
 
   static formatAmountFixed(amount, fixed) {
+    if (amount == 0) return '0'
     let str = (amount / 100000000).toFixed(fixed)
     if (parseFloat(str) == 0) {
       let res = '< 0.'

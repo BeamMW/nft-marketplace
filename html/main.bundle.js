@@ -29725,14 +29725,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 ]))
               }), 128 /* KEYED_FRAGMENT */))
             ])
-          ]),
-          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-            type: "button",
-            value: "Add Moderator",
-            onClick: _cache[1] || (_cache[1] = (...args) => ($options.onAddModerator && $options.onAddModerator(...args)))
-          })
+          ])
         ]))
-      : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
+      : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "button",
+      value: "Add Moderator",
+      onClick: _cache[1] || (_cache[1] = (...args) => ($options.onAddModerator && $options.onAddModerator(...args)))
+    })
   ]))
 }
 
@@ -38796,7 +38796,10 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].downloadAsync('./galleryManager.wasm')
+    let href = window.location.href
+    let ipos = href.indexOf('index.html')
+    let wasmPath = [href.substring(0, ipos), 'galleryManager.wasm'].join('')
+    this.state.shader = await utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].downloadAsync(wasmPath)
 
     /*
     utils.invokeContract('', 
@@ -41548,6 +41551,7 @@ class Utils {
   }
 
   static formatAmountFixed(amount, fixed) {
+    if (amount == 0) return '0'
     let str = (amount / 100000000).toFixed(fixed)
     if (parseFloat(str) == 0) {
       let res = '< 0.'
