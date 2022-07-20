@@ -292,9 +292,9 @@ struct AppArtist : public gallery::Artist {
         auto old_km = key_material::Owner{kOldGalleryCid};
         auto new_km = key_material::Owner{cid};
         if (Exists(cid, zero_km.Get()))
-            return key_material::Owner{kEmptyCid, id};
+            return key_material::Owner{kEmptyCid, Utils::FromBE(id)};
         else if (Exists(cid, old_km.Get()))
-            return key_material::Owner{kOldGalleryCid, id};
+            return key_material::Owner{kOldGalleryCid, Utils::FromBE(id)};
         else
             return key_material::Owner{cid, id};
     }
@@ -755,18 +755,14 @@ struct OwnerInfo {
 private:
     bool DeduceOwner_(const ContractID& cid, const PubKey& owner,
                       gallery::Nft::Id nft_id) {
-        auto zero_km = key_material::Owner{kEmptyCid, nft_id};
-        auto old_km = key_material::Owner{kOldGalleryCid, nft_id};
+        auto zero_km = key_material::Owner{kEmptyCid, Utils::FromBE(nft_id)};
+        auto old_km = key_material::Owner{kOldGalleryCid, Utils::FromBE(nft_id)};
         auto new_km = key_material::Owner{cid, nft_id};
-        Env::DocAddBlob_T("DEBUG_OWNER", owner);
         if (_POD_(owner) == zero_km.Get()) {
-            Env::DocAddBlob_T("ZERO_OWNER", zero_km.Get());
             _POD_(km) = zero_km;
         } else if (_POD_(owner) == old_km.Get()) {
-            Env::DocAddBlob_T("OLD_OWNER", zero_km.Get());
             _POD_(km) = old_km;
         } else if (_POD_(owner) == new_km.Get()) {
-            Env::DocAddBlob_T("NEW_OWNER", zero_km.Get());
             _POD_(km) = new_km;
         }
         return !_POD_(km).IsZero();
@@ -839,8 +835,8 @@ const std::string_view StatusToString(gallery::Status status) {
 
 static inline bool IsOwner(const ContractID& cid, const PubKey& owner,
                            gallery::Nft::Id nft_id) {
-    auto zero_km = key_material::Owner{kEmptyCid, nft_id};
-    auto old_km = key_material::Owner{kOldGalleryCid, nft_id};
+    auto zero_km = key_material::Owner{kEmptyCid, Utils::FromBE(nft_id)};
+    auto old_km = key_material::Owner{kOldGalleryCid, Utils::FromBE(nft_id)};
     auto new_km = key_material::Owner{cid, nft_id};
     return (_POD_(owner) == zero_km.Get() || _POD_(owner) == old_km.Get() ||
             _POD_(owner) == new_km.Get());
@@ -1619,8 +1615,6 @@ ON_METHOD(user, set_price) {
         OnError("not owned");
         return;
     }
-
-    Env::DocAddBlob_T("KEY_DEBUG", oi.km.Get());
 
     gallery::method::SetPrice args{};
     args.nft_id = id;
