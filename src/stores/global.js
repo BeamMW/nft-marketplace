@@ -162,7 +162,7 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils.downloadAsync('galleryManager.wasm')
+    this.state.shader = await utils.downloadAsync('./galleryManager.wasm')
 
     /*
     utils.invokeContract('', 

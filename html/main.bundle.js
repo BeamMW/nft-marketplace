@@ -38796,7 +38796,7 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].downloadAsync('galleryManager.wasm')
+    this.state.shader = await utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].downloadAsync('./galleryManager.wasm')
 
     /*
     utils.invokeContract('', 
