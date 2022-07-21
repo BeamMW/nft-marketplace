@@ -291,10 +291,10 @@ struct AppArtist : public gallery::Artist {
         auto zero_km = key_material::Owner{kEmptyCid};
         auto old_km = key_material::Owner{kOldGalleryCid};
         auto new_km = key_material::Owner{cid};
-        if (Exists(cid, zero_km.Get()))
-            return key_material::Owner{kEmptyCid, Utils::FromBE(id)};
-        else if (Exists(cid, old_km.Get()))
+        if (Exists(cid, old_km.Get()))
             return key_material::Owner{kOldGalleryCid, Utils::FromBE(id)};
+        else if (Exists(cid, zero_km.Get()))
+            return key_material::Owner{kEmptyCid, Utils::FromBE(id)};
         else
             return key_material::Owner{cid, id};
     }
@@ -405,7 +405,7 @@ struct AppCollection : public gallery::Collection {
         Env::DocGroup gr1("");
         Env::DocAddNum32("id", id);
         Env::DocAddNum32("updated", updated);
-        Env::DocAddNum32("owned", _POD_(author) == AppArtist::id(cid));
+        Env::DocAddNum32("owned", IsOwner(cid, author, 0));
         // DocAddText prints char[] until it meets \0 symbol, but
         // m_szLabelData contains label + data without \0 symbol between them
         char tmp = 0;
