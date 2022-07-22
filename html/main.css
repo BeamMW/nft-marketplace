@@ -285,11 +285,11 @@ html, body {
   justify-content: flex-end;
   align-items: center;
 }
-.page-title-container .overlay > .title-slot > *[data-v-d942126c-s] {
+.page-title-container .overlay > .title-slot *[data-v-d942126c-s] {
   margin-left: 12px;
   margin-top: 5px;
 }
-.page-title-container .overlay > .title-slot > *[data-v-d942126c-s]:last-child {
+.page-title-container .overlay > .title-slot *[data-v-d942126c-s]:last-child {
   margin-right: 8px;
 }
 .page-title-container > .title[data-v-d942126c] {
@@ -1429,7 +1429,7 @@ html, body {
   font-family: 'SFProDisplay', sans-serif;
 }
 .edit-artist-container .scrollable[data-v-7ddc1d8a] {
-  overflow-y: auto;
+  overflow-y: overlay;
   overflow-x: hidden;
   flex: 1;
 }
@@ -1530,35 +1530,46 @@ html, body {
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/edit-collection.vue?vue&type=style&index=0&id=79c8483e&scoped=true&lang=stylus ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.collection-container[data-v-79c8483e] {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .collection-container .description[data-v-79c8483e] {
   font-size: 14px;
   text-align: center;
   color: #fff;
-  margin: 10px 0px 30px 0px;
+  margin: 10px 0px 20px 0px;
   font-family: 'SFProDisplay', sans-serif;
 }
 .collection-container .description > i[data-v-79c8483e] {
   opacity: 0.7;
   line-height: 29px;
 }
-.collection-container .fields[data-v-79c8483e] {
+.collection-container .scrollable[data-v-79c8483e] {
+  overflow-y: overlay;
+  overflow-x: hidden;
+  flex: 1;
+}
+.collection-container .scrollable .fields[data-v-79c8483e] {
   padding: 0 30px;
   display: flex;
 }
-.collection-container .fields .col-first[data-v-79c8483e] {
+.collection-container .scrollable .fields .col-first[data-v-79c8483e] {
   flex-basis: 50%;
 }
-.collection-container .fields .col-first > *[data-v-79c8483e]:not(:last-child) {
+.collection-container .scrollable .fields .col-first > *[data-v-79c8483e]:not(:last-child) {
   margin-bottom: 20px;
 }
-.collection-container .fields .col-second[data-v-79c8483e] {
+.collection-container .scrollable .fields .col-second[data-v-79c8483e] {
   flex-basis: 50%;
   margin-left: 30px;
 }
-.collection-container .fields .col-second > *[data-v-79c8483e]:not(:last-child) {
+.collection-container .scrollable .fields .col-second > *[data-v-79c8483e]:not(:last-child) {
   margin-bottom: 20px;
 }
-.collection-container .text[data-v-79c8483e] {
+.collection-container .scrollable .text[data-v-79c8483e] {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1568,12 +1579,12 @@ html, body {
   color: #1af6d6;
   cursor: pointer;
 }
-.actions[data-v-79c8483e] {
+.collection-container .actions[data-v-79c8483e] {
   display: flex;
   justify-content: center;
   margin-top: 50px;
 }
-.actions > *[data-v-79c8483e]:not(:first-child) {
+.collection-container .actions > *[data-v-79c8483e]:not(:first-child) {
   margin-left: 30px;
 }
 
@@ -1722,6 +1733,12 @@ html, body {
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/edit-nft.vue?vue&type=style&index=0&id=63addf09&scoped=true&lang=stylus ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.nft-container[data-v-63addf09] {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .nft-container .description[data-v-63addf09] {
   font-size: 14px;
   text-align: center;
@@ -1734,26 +1751,31 @@ html, body {
   display: block;
   margin-top: 6px;
 }
-.nft-container .fields[data-v-63addf09] {
+.nft-container .scrollable[data-v-63addf09] {
+  overflow-y: overlay;
+  overflow-x: hidden;
+  flex: 1;
+}
+.nft-container .scrollable .fields[data-v-63addf09] {
   padding: 0px 30px 0px 30px;
   display: flex;
 }
-.nft-container .fields .col-first[data-v-63addf09] {
+.nft-container .scrollable .fields .col-first[data-v-63addf09] {
   flex: 1;
 }
-.nft-container .fields .col-first > *[data-v-63addf09]:not(:last-child) {
+.nft-container .scrollable .fields .col-first > *[data-v-63addf09]:not(:last-child) {
   margin-bottom: 20px;
 }
-.nft-container .fields .col-second[data-v-63addf09] {
+.nft-container .scrollable .fields .col-second[data-v-63addf09] {
   margin-left: 30px;
   margin-top: 30px;
 }
-.actions[data-v-63addf09] {
+.nft-container .actions[data-v-63addf09] {
   display: flex;
   justify-content: center;
   margin-top: 50px;
 }
-.actions > *[data-v-63addf09]:not(:first-child) {
+.nft-container .actions > *[data-v-63addf09]:not(:first-child) {
   margin-left: 30px;
 }
 

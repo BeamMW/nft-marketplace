@@ -1,28 +1,30 @@
 <template>
-  <messageModal ref="messageModal"/>
-  <btn v-if="is_artist" 
-       height="36px" 
-       width="36px" 
-       :disabled="in_set_artist"
-       :color="edit_btn_color"
-       padding="0px" 
-       radius="10px" 
-       tooltip="edit artist info"
-       @click="onEditArtist"
-  >
-    <img :src="edit_btn_icon">
-  </btn>
-  <btn v-else
-       height="36px" 
-       width="36px" 
-       :disabled="in_set_artist"
-       radius="10px" 
-       padding="0px" 
-       tooltip="become an artist" 
-       @click="onBecomeArtist"
-  >
-    <img src="~assets/add-user.svg"/>
-  </btn>
+  <div>
+    <messageModal ref="messageModal"/>
+    <btn v-if="is_artist" 
+         height="36px" 
+         width="36px" 
+         :disabled="in_set_artist"
+         :color="edit_btn_color"
+         padding="0px" 
+         radius="10px" 
+         tooltip="edit artist info"
+         @click="onEditArtist"
+    >
+      <img :src="edit_btn_icon">
+    </btn>
+    <btn v-else
+         height="36px" 
+         width="36px" 
+         :disabled="in_set_artist"
+         radius="10px" 
+         padding="0px" 
+         tooltip="become an artist" 
+         @click="onBecomeArtist"
+    >
+      <img src="~assets/add-user.svg"/>
+    </btn>
+  </div>
 </template>
 
 <script>

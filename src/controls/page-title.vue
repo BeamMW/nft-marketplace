@@ -41,9 +41,10 @@
         justify-content: flex-end
         align-items: center
 
-        & > :slotted(*) {
+        & :slotted(*) {
           margin-left: 12px
           margin-top: 5px
+
           &:last-child {
             margin-right: 8px
           }

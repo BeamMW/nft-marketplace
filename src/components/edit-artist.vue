@@ -145,7 +145,7 @@
     }
 
     .scrollable {
-      overflow-y: auto
+      overflow-y: overlay
       overflow-x: hidden
       flex: 1
 

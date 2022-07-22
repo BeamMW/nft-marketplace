@@ -30960,13 +30960,14 @@ const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK
 ], -1 /* HOISTED */))
 const _hoisted_8 = {
   key: 4,
-  class: "fields"
+  class: "scrollable"
 }
-const _hoisted_9 = { class: "col-first" }
-const _hoisted_10 = { class: "col-second" }
-const _hoisted_11 = { class: "actions" }
-const _hoisted_12 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_cancel_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
-const _hoisted_13 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_create_svg__WEBPACK_IMPORTED_MODULE_2___default()) }, null, -1 /* HOISTED */))
+const _hoisted_9 = { class: "fields" }
+const _hoisted_10 = { class: "col-first" }
+const _hoisted_11 = { class: "col-second" }
+const _hoisted_12 = { class: "actions" }
+const _hoisted_13 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_cancel_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
+const _hoisted_14 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_create_svg__WEBPACK_IMPORTED_MODULE_2___default()) }, null, -1 /* HOISTED */))
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_messageModal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("messageModal")
@@ -31005,91 +31006,93 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }))
           : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
-                  modelValue: $options.label,
-                  "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($options.label) = $event)),
-                  label: "Collection Name*",
-                  valid: $options.label_valid,
-                  max_length: 40,
-                  style: {"margin-bottom":"55px","margin-top":"0"}
-                }, null, 8 /* PROPS */, ["modelValue", "valid"]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
-                  modelValue: $options.website,
-                  "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($options.website) = $event)),
-                  label: "Website",
-                  placeholder: "https://website.name/",
-                  img: "globe",
-                  max_length: 150,
-                  valid: $options.website_valid
-                }, null, 8 /* PROPS */, ["modelValue", "valid"]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
-                  modelValue: $options.twitter,
-                  "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($options.twitter) = $event)),
-                  label: "Twitter",
-                  placeholder: "twitter",
-                  img: "twitter",
-                  max_length: 15,
-                  valid: $options.twitter_valid,
-                  counter: false,
-                  allowed: $options.twitter_allowed
-                }, null, 8 /* PROPS */, ["modelValue", "valid", "allowed"]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
-                  modelValue: $options.instagram,
-                  "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($options.instagram) = $event)),
-                  label: "Instagram",
-                  placeholder: "instagram",
-                  img: "instagram",
-                  max_length: 30,
-                  valid: $options.instagram_valid,
-                  counter: false,
-                  allowed: $options.instagram_allowed
-                }, null, 8 /* PROPS */, ["modelValue", "valid", "allowed"])
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
+                    modelValue: $options.label,
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($options.label) = $event)),
+                    label: "Collection Name*",
+                    valid: $options.label_valid,
+                    max_length: 40,
+                    style: {"margin-bottom":"55px","margin-top":"0"}
+                  }, null, 8 /* PROPS */, ["modelValue", "valid"]),
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
+                    modelValue: $options.website,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($options.website) = $event)),
+                    label: "Website",
+                    placeholder: "https://website.name/",
+                    img: "globe",
+                    max_length: 150,
+                    valid: $options.website_valid
+                  }, null, 8 /* PROPS */, ["modelValue", "valid"]),
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
+                    modelValue: $options.twitter,
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($options.twitter) = $event)),
+                    label: "Twitter",
+                    placeholder: "twitter",
+                    img: "twitter",
+                    max_length: 15,
+                    valid: $options.twitter_valid,
+                    counter: false,
+                    allowed: $options.twitter_allowed
+                  }, null, 8 /* PROPS */, ["modelValue", "valid", "allowed"]),
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
+                    modelValue: $options.instagram,
+                    "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($options.instagram) = $event)),
+                    label: "Instagram",
+                    placeholder: "instagram",
+                    img: "instagram",
+                    max_length: 30,
+                    valid: $options.instagram_valid,
+                    counter: false,
+                    allowed: $options.instagram_allowed
+                  }, null, 8 /* PROPS */, ["modelValue", "valid", "allowed"])
+                ]),
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_textArea, {
+                    modelValue: $options.description,
+                    "onUpdate:modelValue": _cache[4] || (_cache[4] = $event => (($options.description) = $event)),
+                    label: "Description",
+                    height: "198px",
+                    valid: $options.description_valid,
+                    max_length: 1000
+                  }, null, 8 /* PROPS */, ["modelValue", "valid"]),
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_addImage, {
+                    modelValue: $options.cover,
+                    "onUpdate:modelValue": _cache[5] || (_cache[5] = $event => (($options.cover) = $event)),
+                    error: $data.cover_error,
+                    "onUpdate:error": _cache[6] || (_cache[6] = $event => (($data.cover_error) = $event)),
+                    title: "Add collection image<br>(*.jpg, *.png, *.svg)",
+                    accept: "image/jpeg,image/png,image/svg+xml",
+                    height: "135px",
+                    min_width: 1400,
+                    min_height: 260,
+                    cover: ""
+                  }, null, 8 /* PROPS */, ["modelValue", "error"])
+                ])
               ]),
-              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_textArea, {
-                  modelValue: $options.description,
-                  "onUpdate:modelValue": _cache[4] || (_cache[4] = $event => (($options.description) = $event)),
-                  label: "Description",
-                  height: "198px",
-                  valid: $options.description_valid,
-                  max_length: 1000
-                }, null, 8 /* PROPS */, ["modelValue", "valid"]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_addImage, {
-                  modelValue: $options.cover,
-                  "onUpdate:modelValue": _cache[5] || (_cache[5] = $event => (($options.cover) = $event)),
-                  error: $data.cover_error,
-                  "onUpdate:error": _cache[6] || (_cache[6] = $event => (($data.cover_error) = $event)),
-                  title: "Add collection image<br>(*.jpg, *.png, *.svg)",
-                  accept: "image/jpeg,image/png,image/svg+xml",
-                  height: "135px",
-                  min_width: 1400,
-                  min_height: 260,
-                  cover: ""
-                }, null, 8 /* PROPS */, ["modelValue", "error"])
+              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
+                  text: "cancel",
+                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
+                }, {
+                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                    _hoisted_13
+                  ]),
+                  _: 1 /* STABLE */
+                }),
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
+                  text: $options.edit_mode ? 'update collection' : 'create collection',
+                  color: "green",
+                  disabled: !$options.can_submit,
+                  onClick: $options.onSetCollection
+                }, {
+                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                    _hoisted_14
+                  ]),
+                  _: 1 /* STABLE */
+                }, 8 /* PROPS */, ["text", "disabled", "onClick"])
               ])
             ]))
-    ]),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
-        text: "cancel",
-        onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
-      }, {
-        default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-          _hoisted_12
-        ]),
-        _: 1 /* STABLE */
-      }),
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
-        text: $options.edit_mode ? 'update collection' : 'create collection',
-        color: "green",
-        disabled: !$options.can_submit,
-        onClick: $options.onSetCollection
-      }, {
-        default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-          _hoisted_13
-        ]),
-        _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["text", "disabled", "onClick"])
     ])
   ], 64 /* STABLE_FRAGMENT */))
 }
@@ -31126,12 +31129,13 @@ const _hoisted_2 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK
     /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" until reviewed by a moderator.")
   ])
 ], -1 /* HOISTED */))
-const _hoisted_3 = { class: "fields" }
-const _hoisted_4 = { class: "col-first" }
-const _hoisted_5 = { class: "col-second" }
-const _hoisted_6 = { class: "actions" }
-const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_cancel_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
-const _hoisted_8 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_create_svg__WEBPACK_IMPORTED_MODULE_2___default()) }, null, -1 /* HOISTED */))
+const _hoisted_3 = { class: "scrollable" }
+const _hoisted_4 = { class: "fields" }
+const _hoisted_5 = { class: "col-first" }
+const _hoisted_6 = { class: "col-second" }
+const _hoisted_7 = { class: "actions" }
+const _hoisted_8 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_cancel_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
+const _hoisted_9 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_create_svg__WEBPACK_IMPORTED_MODULE_2___default()) }, null, -1 /* HOISTED */))
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_pageTitle = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("pageTitle")
@@ -31145,24 +31149,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_addImage = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("addImage")
   const _component_btn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("btn")
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_pageTitle, { title: "Add NFT" }),
-      ($setup.collections === undefined)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_loading, {
-            key: 0,
-            text: "Loading collections"
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_pageTitle, { title: "Add NFT" }),
+    ($setup.collections === undefined)
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_loading, {
+          key: 0,
+          text: "Loading collections"
+        }))
+      : ($setup.collections == null)
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_notFound, {
+            key: 1,
+            text: "Failed to load collections",
+            error: ""
           }))
-        : ($setup.collections == null)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_notFound, {
-              key: 1,
-              text: "Failed to load collections",
-              error: ""
-            }))
-          : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 2 }, [
-              _hoisted_2,
-              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
+        : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 2 }, [
+            _hoisted_2,
+            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
+              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
                   (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_formInput, {
                     modelValue: $data.name,
                     "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.name) = $event)),
@@ -31194,7 +31198,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     label: "Not for sale"
                   }, null, 8 /* PROPS */, ["modelValue"])
                 ]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [
                   (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_addImage, {
                     modelValue: $data.image,
                     "onUpdate:modelValue": _cache[5] || (_cache[5] = $event => (($data.image) = $event)),
@@ -31210,32 +31214,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     contain: ""
                   }, null, 8 /* PROPS */, ["modelValue", "error"])
                 ])
+              ]),
+              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
+                  text: "cancel",
+                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
+                }, {
+                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                    _hoisted_8
+                  ]),
+                  _: 1 /* STABLE */
+                }),
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
+                  text: "upload NFT",
+                  color: "green",
+                  disabled: !$options.can_submit,
+                  onClick: $options.onUploadNFT
+                }, {
+                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                    _hoisted_9
+                  ]),
+                  _: 1 /* STABLE */
+                }, 8 /* PROPS */, ["disabled", "onClick"])
               ])
-            ], 64 /* STABLE_FRAGMENT */))
-    ]),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
-        text: "cancel",
-        onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
-      }, {
-        default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-          _hoisted_7
-        ]),
-        _: 1 /* STABLE */
-      }),
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
-        text: "upload NFT",
-        color: "green",
-        disabled: !$options.can_submit,
-        onClick: $options.onUploadNFT
-      }, {
-        default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-          _hoisted_8
-        ]),
-        _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["disabled", "onClick"])
-    ])
-  ], 64 /* STABLE_FRAGMENT */))
+            ])
+          ], 64 /* STABLE_FRAGMENT */))
+  ]))
 }
 
 /***/ }),
@@ -32545,7 +32549,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_messageModal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("messageModal")
   const _component_btn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("btn")
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_messageModal, { ref: "messageModal" }, null, 512 /* NEED_PATCH */),
     ($options.is_artist)
       ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
@@ -32579,7 +32583,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           ]),
           _: 1 /* STABLE */
         }, 8 /* PROPS */, ["disabled", "onClick"]))
-  ], 64 /* STABLE_FRAGMENT */))
+  ]))
 }
 
 /***/ }),

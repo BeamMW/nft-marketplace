@@ -8,55 +8,62 @@
         <i>After NFT is created it would not be visible<br>
           until reviewed by a moderator.</i>
       </p>
-      <div class="fields">
-        <div class="col-first">
-          <formInput v-model="name"
-                     label="NFT Name*"
-                     :valid="name_valid"
-                     :max_length="35"
-          />
-          <textArea v-model="description"
-                    label="Description"
-                    :valid="description_valid"
-                    :max_length="300"
-          />
-          <formSelect v-model="collection"
-                      title="Collection"
-                      :options="collections"
-          />
-          <priceInput v-model="price"
-                      label="Price"
-          />
-          <switchInput v-model="dontsell" label="Not for sale"/>
+      <div class="scrollable">
+        <div class="fields">
+          <div class="col-first">
+            <formInput v-model="name"
+                       label="NFT Name*"
+                       :valid="name_valid"
+                       :max_length="35"
+            />
+            <textArea v-model="description"
+                      label="Description"
+                      :valid="description_valid"
+                      :max_length="300"
+            />
+            <formSelect v-model="collection"
+                        title="Collection"
+                        :options="collections"
+            />
+            <priceInput v-model="price"
+                        label="Price"
+            />
+            <switchInput v-model="dontsell" label="Not for sale"/>
+          </div>
+          <div class="col-second">
+            <addImage v-model="image"
+                      v-model:error="image_error"
+                      class="add-image"
+                      accept="image/apng,image/gif,image/jpeg,image/png,image/svg+xml,image/webp"
+                      title="Add NFT image here<br>(*.apng, *.gif, *.jpeg, *.png, *.svg, *.webp)"
+                      height="390px"
+                      width="390px"
+                      :min_width="360"
+                      :min_height="360"
+                      contain
+            />
+          </div>
         </div>
-        <div class="col-second">
-          <addImage v-model="image"
-                    v-model:error="image_error"
-                    class="add-image"
-                    accept="image/apng,image/gif,image/jpeg,image/png,image/svg+xml,image/webp"
-                    title="Add NFT image here<br>(*.apng, *.gif, *.jpeg, *.png, *.svg, *.webp)"
-                    height="390px"
-                    width="390px"
-                    :min_width="360"
-                    :min_height="360"
-                    contain
-          />
+        <div class="actions">
+          <btn text="cancel" @click="$router.go(-1)">
+            <img src="~assets/cancel.svg"/>
+          </btn>
+          <btn text="upload NFT" color="green" :disabled="!can_submit" @click="onUploadNFT">
+            <img src="~assets/create.svg"/>
+          </btn>
         </div>
       </div>
-    </template>  
-  </div>
-  <div class="actions">
-    <btn text="cancel" @click="$router.go(-1)">
-      <img src="~assets/cancel.svg"/>
-    </btn>
-    <btn text="upload NFT" color="green" :disabled="!can_submit" @click="onUploadNFT">
-      <img src="~assets/create.svg"/>
-    </btn>
+    </template>
   </div>
 </template>
 
 <style scoped lang="stylus">
   .nft-container {
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
+
     .description {
       font-size: 14px
       text-align: center
@@ -71,32 +78,38 @@
       }
     }
 
-    .fields {
-      padding: 0px 30px 0px 30px
-      display: flex
+    .scrollable {
+      overflow-y: overlay
+      overflow-x: hidden
+      flex: 1
       
-      .col-first {
-        flex: 1
+      .fields {
+        padding: 0px 30px 0px 30px
+        display: flex
+        
+        .col-first {
+          flex: 1
 
-        & > *:not(:last-child) {
-          margin-bottom: 20px
+          & > *:not(:last-child) {
+            margin-bottom: 20px
+          }
+        }
+
+        .col-second {
+          margin-left: 30px
+          margin-top: 30px
         }
       }
-
-      .col-second {
-        margin-left: 30px
-        margin-top: 30px
-      }
     }
-  }
 
-  .actions {
-    display:flex
-    justify-content: center
-    margin-top: 50px
+    .actions {
+      display:flex
+      justify-content: center
+      margin-top: 50px
 
-    & > *:not(:first-child) {
-      margin-left: 30px
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
     }
   }
 </style>
