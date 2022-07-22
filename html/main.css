@@ -1446,6 +1446,7 @@ html, body {
 .edit-artist-container .scrollable .fields .col-second[data-v-7ddc1d8a] {
   flex-basis: 50%;
   padding-left: 30px;
+  height: 420px;
 }
 .edit-artist-container .scrollable .fields .col-second > *[data-v-7ddc1d8a]:not(:last-child) {
   margin-bottom: 20px;
@@ -1521,7 +1522,8 @@ html, body {
 .edit-artist-container .scrollable .actions[data-v-7ddc1d8a] {
   display: flex;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 30px;
+  margin-bottom: 10px;
 }
 .edit-artist-container .scrollable .actions > *[data-v-7ddc1d8a]:not(:first-child) {
   margin-left: 30px;
@@ -1582,7 +1584,8 @@ html, body {
 .collection-container .actions[data-v-79c8483e] {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 35px;
+  margin-bottom: 10px;
 }
 .collection-container .actions > *[data-v-79c8483e]:not(:first-child) {
   margin-left: 30px;
@@ -1773,7 +1776,8 @@ html, body {
 .nft-container .actions[data-v-63addf09] {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 25px;
+  margin-bottom: 10px;
 }
 .nft-container .actions > *[data-v-63addf09]:not(:first-child) {
   margin-left: 30px;

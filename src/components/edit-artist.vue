@@ -164,6 +164,7 @@
         .col-second {
           flex-basis: 50%
           padding-left: 30px
+          height: 420px
 
           & > *:not(:last-child) {
             margin-bottom: 20px
@@ -253,7 +254,8 @@
       .actions {
         display:flex
         justify-content: center
-        margin-top: 40px
+        margin-top: 30px
+        margin-bottom: 10px
 
         & > *:not(:first-child) {
           margin-left: 30px

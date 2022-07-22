@@ -148,7 +148,8 @@
     .actions {
       display: flex
       justify-content: center
-      margin-top: 50px
+      margin-top: 35px
+      margin-bottom: 10px
 
       & > *:not(:first-child) {
         margin-left: 30px
