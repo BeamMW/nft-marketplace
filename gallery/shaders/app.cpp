@@ -478,19 +478,17 @@ struct AppNft : public gallery::Nft {
             Env::DocAddBlob_T("owner", owner);
             Env::DocAddNum("owned", owned);
 
-            if (owned) {
-                Env::Key_T<gallery::Events::Sell::Key> key;
-                _POD_(key.m_Prefix.m_Cid) = cid;
-                key.m_KeyInContract.nft_id = id;
+            Env::Key_T<gallery::Events::Sell::Key> key;
+            _POD_(key.m_Prefix.m_Cid) = cid;
+            key.m_KeyInContract.nft_id = id;
 
-                Env::LogReader r(key, key);
-                gallery::Events::Sell evt;
-                if (r.MoveNext_T(key, evt)) {
-                    Env::DocGroup gr("first_sale");
-                    Env::DocAddNum("height", r.m_Pos.m_Height);
-                    Env::DocAddNum("amount", evt.price.amount);
-                    Env::DocAddNum("aid", evt.price.aid);
-                }
+            Env::LogReader r(key, key);
+            gallery::Events::Sell evt;
+            if (r.MoveNext_T(key, evt)) {
+                Env::DocGroup gr("first_sale");
+                Env::DocAddNum("height", r.m_Pos.m_Height);
+                Env::DocAddNum("amount", evt.price.amount);
+                Env::DocAddNum("aid", evt.price.aid);
             }
 
             if (price.amount) {
