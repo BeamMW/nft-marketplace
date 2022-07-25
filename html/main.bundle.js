@@ -38496,7 +38496,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const versions = {
-  DATABASE_VERSION:   122,
+  DATABASE_VERSION:   123,
   ARTIST_VERSION:     200,
   COLLECTION_VERSION: 200,
   NFT_VERSION:        200,
