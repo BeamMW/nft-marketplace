@@ -301,8 +301,8 @@ const store = {
       )
     }
 
-    // In web mode we let cache server time to be updates
-    setTimeout(storesLoader, utils.isWeb() ? 5 : 0)
+    // In cacahe service mode we let cache server time to be updated
+    setTimeout(storesLoader, utils.isDesktop() ? 0 : 5)
 
     if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {
       this.state.my_active_tab = my_tabs.OWNED_NFTS

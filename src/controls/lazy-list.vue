@@ -11,7 +11,7 @@
       </template>
     </div>
     <template v-else-if="items && items.length > 0 || new_component">
-      <div class="list-wrap">  
+      <div :class="mobile ? 'list-wrap-mobile' : 'list-wrap'">  
         <div ref="itemslist" class="list" @scroll="onScroll">
           <template v-if="selectable">
             <selectItem v-for="item in items" 
@@ -58,10 +58,27 @@
     & > .list-wrap {
       overflow-y: auto
       overflow-x: hidden
+      justify-content: center
 
       & > .list {
         display: flex
         flex-wrap: wrap        
+        margin: -8px -8px 0 -8px
+
+        & > * {
+          margin: 8px
+        }
+      }
+    }
+
+    & > .list-wrap-mobile {
+      overflow-y: overlay
+      overflow-x: hidden
+
+      & > .list {
+        display: flex
+        flex-wrap: wrap
+        justify-content: center
         margin: -8px -8px 0 -8px
 
         & > * {
@@ -92,6 +109,7 @@
 <script>
 import paginator from 'controls/paginator'
 import selectItem from 'controls/select-item'
+import utils from 'utils/utils'
 import {computed, ref} from 'vue'
 
 export default {
@@ -187,6 +205,7 @@ export default {
   data () {
     return {
       delay_passed: true,
+      mobile: utils.isMobile()
     }
   },
 

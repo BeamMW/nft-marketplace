@@ -479,6 +479,7 @@ html, body {
 .list-container > .list-wrap[data-v-7caa9852] {
   overflow-y: auto;
   overflow-x: hidden;
+  justify-content: center;
 }
 .list-container > .list-wrap > .list[data-v-7caa9852] {
   display: flex;
@@ -486,6 +487,19 @@ html, body {
   margin: -8px -8px 0 -8px;
 }
 .list-container > .list-wrap > .list > *[data-v-7caa9852] {
+  margin: 8px;
+}
+.list-container > .list-wrap-mobile[data-v-7caa9852] {
+  overflow-y: overlay;
+  overflow-x: hidden;
+}
+.list-container > .list-wrap-mobile > .list[data-v-7caa9852] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: -8px -8px 0 -8px;
+}
+.list-container > .list-wrap-mobile > .list > *[data-v-7caa9852] {
   margin: 8px;
 }
 .list-container .empty[data-v-7caa9852] {

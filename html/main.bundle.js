@@ -25665,7 +25665,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var controls_paginator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! controls/paginator */ "./src/controls/paginator.vue");
 /* harmony import */ var controls_select_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! controls/select-item */ "./src/controls/select-item.vue");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm-bundler.js");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm-bundler.js");
+
 
 
 
@@ -25731,12 +25733,12 @@ __webpack_require__.r(__webpack_exports__);
 
   setup (props) {
     let subscription = undefined
-    const itemsObservable = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => {
+    const itemsObservable = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => {
       if (subscription) {
         subscription.unsubscribe()
       }
 
-      const value = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(undefined)
+      const value = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(undefined)
       const lazyItems = props.store.getLazyPageItems(props.mode)
       subscription = lazyItems.subscribe({
         next: val => value.value = val,
@@ -25746,11 +25748,11 @@ __webpack_require__.r(__webpack_exports__);
       return value
     })
 
-    const items = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => itemsObservable.value.value)
-    const page = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => props.store.getPage(props.mode))
-    const pages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => props.store.getPages(props.mode))
-    const show_new = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => props.new_component && page.value === pages.value)
-    const selectable = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(() => !!props.selected)
+    const items = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => itemsObservable.value.value)
+    const page = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => props.store.getPage(props.mode))
+    const pages = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => props.store.getPages(props.mode))
+    const show_new = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => props.new_component && page.value === pages.value)
+    const selectable = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(() => !!props.selected)
 
     return {
       items,
@@ -25764,6 +25766,7 @@ __webpack_require__.r(__webpack_exports__);
   data () {
     return {
       delay_passed: true,
+      mobile: utils_utils__WEBPACK_IMPORTED_MODULE_2__["default"].isMobile()
     }
   },
 
@@ -32993,13 +32996,12 @@ const _hoisted_2 = {
 }
 const _hoisted_3 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_empty_gallery_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
 const _hoisted_4 = { class: "text" }
-const _hoisted_5 = { class: "list-wrap" }
-const _hoisted_6 = {
+const _hoisted_5 = {
   key: 2,
   class: "empty"
 }
-const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_empty_gallery_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
-const _hoisted_8 = { class: "text" }
+const _hoisted_6 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_empty_gallery_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
+const _hoisted_7 = { class: "text" }
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_selectItem = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("selectItem")
@@ -33018,7 +33020,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         ]))
       : ($setup.items && $setup.items.length > 0 || $props.new_component)
         ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 1 }, [
-            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
+            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.mobile ? 'list-wrap-mobile' : 'list-wrap')
+            }, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 ref: "itemslist",
                 class: "list",
@@ -33049,16 +33053,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDynamicComponent)($props.new_component), (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeProps)((0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)({ key: 2 }, $props.new_component_props)), null, 16 /* FULL_PROPS */))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
               ], 544 /* HYDRATE_EVENTS, NEED_PATCH */)
-            ]),
+            ], 2 /* CLASS */),
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_paginator, {
               current: $setup.page,
               total: $setup.pages,
               onPageChanged: $options.onPage
             }, null, 8 /* PROPS */, ["current", "total", "onPageChanged"])
           ], 64 /* STABLE_FRAGMENT */))
-        : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [
-            _hoisted_7,
-            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, "There are no " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.items_name) + " at the moment", 1 /* TEXT */)
+        : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [
+            _hoisted_6,
+            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, "There are no " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.items_name) + " at the moment", 1 /* TEXT */)
           ]))
   ]))
 }
@@ -37864,7 +37868,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const router = (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHashHistory)(window.location.pathname),
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHistory)(window.location.pathname),
   routes: [
     {path: '/', component: components_user_page__WEBPACK_IMPORTED_MODULE_1__["default"], name: 'gallery'},
     {path: '/my', component: components_my_page__WEBPACK_IMPORTED_MODULE_0__["default"], name: 'my'},
@@ -38457,7 +38461,7 @@ class CollectionsStore extends stores_lazy_items__WEBPACK_IMPORTED_MODULE_6__["d
   }
 
   async detectOwned(item) {
-    if (!utils_utils__WEBPACK_IMPORTED_MODULE_2__["default"].isWeb()) {
+    if (utils_utils__WEBPACK_IMPORTED_MODULE_2__["default"].isDesktop()) {
       return item.owned
     }
     
@@ -38939,8 +38943,8 @@ const store = {
       )
     }
 
-    // In web mode we let cache server time to be updates
-    setTimeout(storesLoader, utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isWeb() ? 5 : 0)
+    // In cacahe service mode we let cache server time to be updated
+    setTimeout(storesLoader, utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isDesktop() ? 0 : 5)
 
     if (this.state.my_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_11__.my_tabs.COLLECTIONS && !stores_artists__WEBPACK_IMPORTED_MODULE_3__["default"].is_artist) {
       this.state.my_active_tab = utils_consts__WEBPACK_IMPORTED_MODULE_11__.my_tabs.OWNED_NFTS
@@ -39296,7 +39300,8 @@ class ImagesStore {
         utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].ensureField(res, 'data', 'array')  
         data = res.data
       }
-      else {
+      
+      if (!utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isDesktop()) {
         let url = [utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].ipfsGateway, what.ipfs_hash].join('')
         data = await utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].downloadAsync(url)
       }
@@ -39955,12 +39960,12 @@ class LazyLoader {
   async _req_AC_LOAD(id0, count) {
     let res = undefined 
 
-    if (utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isWeb()) {
+    if (!utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isDesktop()) {
       let request = `${utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].webGateway}view_${this._objname}s?id0=${id0}&count=${count}`
       res = await utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].downloadAsync(request, 'json')
     }
 
-    if (!utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isWeb()) {
+    if (utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isDesktop()) {
       ({res} = await utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
@@ -39978,12 +39983,12 @@ class LazyLoader {
   async _req_AC_UPDATE(h0, count) {
     let res = undefined 
     
-    if (utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isWeb()) {
+    if (!utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isDesktop()) {
       let request = `${utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].webGateway}view_${this._objname}s?h0=${h0}&count=${count}`
       res = await utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].downloadAsync(request, 'json')
     }
 
-    if (!utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isWeb()) {
+    if (utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isDesktop()) {
       ({res} = await utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
@@ -40515,7 +40520,7 @@ class NFTSStore extends stores_lazy_items__WEBPACK_IMPORTED_MODULE_0__["default"
   }
 
   async detectOwned(item) {
-    if (!utils_utils__WEBPACK_IMPORTED_MODULE_6__["default"].isWeb()) {
+    if (utils_utils__WEBPACK_IMPORTED_MODULE_6__["default"].isDesktop()) {
       return item.owned
     }
 
