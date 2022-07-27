@@ -37864,7 +37864,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const router = (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHistory)(window.location.pathname),
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHashHistory)(window.location.pathname),
   routes: [
     {path: '/', component: components_user_page__WEBPACK_IMPORTED_MODULE_1__["default"], name: 'gallery'},
     {path: '/my', component: components_my_page__WEBPACK_IMPORTED_MODULE_0__["default"], name: 'my'},

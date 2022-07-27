@@ -7,10 +7,10 @@ import editArtist from 'components/edit-artist'
 import editCollection from 'components/edit-collection'
 import editNFT from 'components/edit-nft'
 import moderatorPage from 'components/moderator-page'
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(window.location.pathname),
+  history: createWebHashHistory(window.location.pathname),
   routes: [
     {path: '/', component: userPage, name: 'gallery'},
     {path: '/my', component: myPage, name: 'my'},
