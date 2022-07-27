@@ -383,6 +383,7 @@ html, body {
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
+  white-space: nowrap;
 }
 .tabs-container .tab-item .title[data-v-ed220ea4] {
   padding: 4px 16px;

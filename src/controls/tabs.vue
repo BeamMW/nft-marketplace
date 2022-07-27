@@ -33,6 +33,7 @@
       font-size: 12px
       font-weight: bold
       cursor: pointer
+      white-space: nowrap
 
       .title {
         padding: 4px 16px

@@ -40780,7 +40780,7 @@ class Utils {
 
   static isWeb () {
     if (Utils.is_web === undefined) {
-      Utils.is_web = (!Utils.is_desktop && ! Utils.is_mobile)
+      Utils.is_web = (!Utils.isDesktop() && !Utils.isMobile())
     }
     return Utils.is_web
   }
@@ -40810,9 +40810,15 @@ class Utils {
       if (!window.BEAM) {
         return reject()
       }
-      if (Utils.isAndroid()) document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
-      else window.BEAM.callWalletApiResult(apirescback)
-      resolve(window.BEAM)
+      if (Utils.isAndroid()) { 
+        document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
+      }
+      else {
+        window.BEAM.callWalletApiResult(apirescback)
+      }
+      resolve({
+        api: window.BEAM
+      })
     })
   }
 
