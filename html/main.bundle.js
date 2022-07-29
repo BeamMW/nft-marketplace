@@ -40836,7 +40836,7 @@ class Utils {
   }
 
   static isCompact () {
-    return true //Utils.is_mobile()
+    return Utils.is_mobile()
   }
 
   static isDesktop () {
