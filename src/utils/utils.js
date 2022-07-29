@@ -26,6 +26,8 @@ export default class Utils {
   }
 
   static isMobile () {
+    // eslint-disable-next-line no-debugger
+    debugger
     if (Utils.is_mobile === undefined) {
       const ua = navigator.userAgent
       Utils.is_mobile  = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
@@ -38,7 +40,7 @@ export default class Utils {
   }
 
   static isDesktop () {
-    if (Utils.is_mobile === undefined) {
+    if (Utils.is_desktop === undefined) {
       const ua = navigator.userAgent
       Utils.is_desktop = (/QtWebEngine/i.test(ua))
     }
