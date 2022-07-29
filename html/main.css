@@ -265,6 +265,9 @@ html, body {
   align-items: center;
   position: relative;
 }
+.page-title-container.compact[data-v-d942126c] {
+  padding: 0 5px;
+}
 .page-title-container .overlay[data-v-d942126c] {
   width: 100%;
   min-height: 100%;
@@ -389,6 +392,9 @@ html, body {
   padding: 4px 16px;
   text-transform: uppercase;
 }
+.tabs-container .tab-item .title.compact[data-v-ed220ea4] {
+  padding: 4px 8px;
+}
 .tabs-container .tab-active[data-v-ed220ea4] {
   color: #fff;
 }
@@ -489,17 +495,17 @@ html, body {
 .list-container > .list-wrap > .list > *[data-v-7caa9852] {
   margin: 8px;
 }
-.list-container > .list-wrap-mobile[data-v-7caa9852] {
+.list-container > .list-wrap-compact[data-v-7caa9852] {
   overflow-y: overlay;
   overflow-x: hidden;
 }
-.list-container > .list-wrap-mobile > .list[data-v-7caa9852] {
+.list-container > .list-wrap-compact > .list[data-v-7caa9852] {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   margin: -8px -8px 0 -8px;
 }
-.list-container > .list-wrap-mobile > .list > *[data-v-7caa9852] {
+.list-container > .list-wrap-compact > .list > *[data-v-7caa9852] {
   margin: 8px;
 }
 .list-container .empty[data-v-7caa9852] {
@@ -1100,6 +1106,9 @@ html, body {
   width: 100%;
   height: 100%;
 }
+.nft-page-container.compact[data-v-97fb47e0] {
+  padding: 0px 5px;
+}
 .nft-page-container .content-wrapper[data-v-97fb47e0] {
   display: flex;
   flex-direction: column;
@@ -1136,25 +1145,27 @@ html, body {
   display: flex;
 }
 .nft-page-container .content-wrapper .table-head > div[data-v-97fb47e0] {
-  padding: 9px 0px 12px 0px;
+  padding: 9px 5px 12px 5px;
   text-align: center;
+  box-sizing: border-box;
 }
 .nft-page-container .content-wrapper .table-head > div.sorted[data-v-97fb47e0] {
   color: #fff;
+  white-space: nowrap;
 }
 .nft-page-container .content-wrapper .table-head > div.sorted .arrow[data-v-97fb47e0] {
   width: 8px;
   height: 8px;
   margin-left: 3px;
 }
-.nft-page-container .content-wrapper .table-head > div[data-v-97fb47e0]:nth-child(1) {
-  width: 120px;
-}
-.nft-page-container .content-wrapper .table-head > div[data-v-97fb47e0]:nth-child(2) {
-  width: 200px;
-}
-.nft-page-container .content-wrapper .table-head > div[data-v-97fb47e0]:nth-child(3) {
+.nft-page-container .content-wrapper .table-head > div[data-v-97fb47e0]:not(:first-child) {
   flex: 1;
+}
+.nft-page-container .content-wrapper .table-head.compact > div[data-v-97fb47e0]:first-child {
+  width: 90px;
+}
+.nft-page-container .content-wrapper .table-head:not(.compact) > div[data-v-97fb47e0]:first-child {
+  width: 130px;
 }
 .nft-page-container .content-wrapper .table-body-loading[data-v-97fb47e0] {
   padding: 35px 25px 0 25px;
@@ -1181,6 +1192,23 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0px 5px;
+  box-sizing: border-box;
+}
+.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:first-child {
+  padding-left: 9px;
+}
+.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:last-child {
+  padding-right: 9px;
+}
+.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:not(:first-child) {
+  flex: 1;
+}
+.nft-page-container .content-wrapper .table-body .row.compact > div[data-v-97fb47e0]:first-child {
+  width: 90px;
+}
+.nft-page-container .content-wrapper .table-body .row:not(.compact) > div[data-v-97fb47e0]:first-child {
+  width: 130px;
 }
 .nft-page-container .content-wrapper .table-body .row .curr[data-v-97fb47e0] {
   padding: 0 0 3px 10px;
@@ -1188,16 +1216,7 @@ html, body {
   box-sizing: border-box;
 }
 .nft-page-container .content-wrapper .table-body .row .text[data-v-97fb47e0] {
-  padding: 0 0 3px 0;
-}
-.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:nth-child(1) {
-  width: 120px;
-}
-.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:nth-child(2) {
-  width: 200px;
-}
-.nft-page-container .content-wrapper .table-body .row > div[data-v-97fb47e0]:nth-child(3) {
-  flex: 1;
+  padding-bottom: 3px;
 }
 .nft-page-container .content-wrapper .table-body > div[data-v-97fb47e0]:nth-child(odd) {
   background: rgba(255,255,255,0.04);
@@ -1218,7 +1237,6 @@ html, body {
 }
 .nft-page-container .content-wrapper .details-row .nft-container[data-v-97fb47e0] {
   width: 360px;
-  height: 360px;
   background-color: rgba(255,255,255,0.05);
   border-radius: 10px;
   min-height: 360px;
@@ -1233,11 +1251,12 @@ html, body {
 .nft-page-container .content-wrapper .details-row .info-container[data-v-97fb47e0] {
   flex: 1;
   box-sizing: border-box;
+}
+.nft-page-container .content-wrapper .details-row .info-container[data-v-97fb47e0]:not(:first-child) {
   padding-left: 10px;
 }
 .nft-page-container .content-wrapper .details-row .info-container .info-box[data-v-97fb47e0] {
   background-color: rgba(255,255,255,0.05);
-  min-height: 360px;
   border-radius: 10px;
   height: 100%;
   box-sizing: border-box;

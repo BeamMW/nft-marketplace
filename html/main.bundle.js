@@ -21821,6 +21821,7 @@ __webpack_require__.r(__webpack_exports__);
 
   data() {
     return {
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_11__["default"].isCompact(),
       observer: undefined,
       full_text: false,
       long_text: false,
@@ -21948,10 +21949,12 @@ __webpack_require__.r(__webpack_exports__);
   updated() {
     if (!this.observer) {
       let desc = this.$refs.desc
-      this.observer = new ResizeObserver(() => {
-        this.calcLongText()
-      })
-      this.observer.observe(desc)
+      if (desc) {
+        this.observer = new ResizeObserver(() => {
+          this.calcLongText()
+        })
+        this.observer.observe(desc)
+      }
     }
   },
 
@@ -23721,8 +23724,9 @@ import { AgGridVue } from "ag-grid-vue3"
 
   setup(props) {
     let nft = stores_nfts__WEBPACK_IMPORTED_MODULE_11__["default"].getLazyItem(props.id)    
+    let compact = utils_utils__WEBPACK_IMPORTED_MODULE_13__["default"].isCompact()
     return {
-      nft
+      nft, compact
     }
   },
 
@@ -24693,13 +24697,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     text: {
       type: String,
       required: false,
-      default: 'back'
+      default: utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isCompact() ? '' : 'back'
     },
   }
 });
@@ -25766,7 +25773,8 @@ __webpack_require__.r(__webpack_exports__);
   data () {
     return {
       delay_passed: true,
-      mobile: utils_utils__WEBPACK_IMPORTED_MODULE_2__["default"].isMobile()
+      // TODO: make this global somehow
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_2__["default"].isCompact()
     }
   },
 
@@ -26349,6 +26357,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var controls_btn_back__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! controls/btn-back */ "./src/controls/btn-back.vue");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+
 
 
 
@@ -26362,6 +26372,12 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: false,
       default: ''
+    }
+  },
+
+  data () {
+    return {
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_1__["default"].isCompact()
     }
   }
 });
@@ -27234,8 +27250,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
 
-// TODO: headless
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     tabs: {
@@ -27251,7 +27269,13 @@ __webpack_require__.r(__webpack_exports__);
 
   emits: [
     'update:modelValue'
-  ]
+  ],
+
+  data () {
+    return {
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_0__["default"].isCompact()
+    }
+  }
 });
 
 
@@ -30243,7 +30267,7 @@ const _hoisted_18 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPAC
 const _hoisted_19 = { class: "value" }
 const _hoisted_20 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "trade volume", -1 /* HOISTED */))
 const _hoisted_21 = {
-  key: 0,
+  key: 2,
   class: "debug error"
 }
 
@@ -30276,147 +30300,153 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               name: $options.author_error ? '' : $options.author_name,
               artist_key: $options.author_key
             }, null, 8 /* PROPS */, ["name", "artist_key"]),
-            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_preview, {
-              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'error': $setup.collection.error}),
-              image: $options.cover,
-              width: "100%",
-              height: "170px",
-              default: $data.def_banner,
-              cover: ""
-            }, {
-              default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
-                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_preview, {
-                      class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{'error': $setup.collection.author_error}, "avatar"]),
-                      image: $options.avatar,
-                      default: $data.def_avatar,
-                      show_text: false,
-                      radius: "36px 36px"
-                    }, null, 8 /* PROPS */, ["class", "image", "default"]),
-                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.author_name), 1 /* TEXT */),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.author_about), 1 /* TEXT */)
+            (!$data.compact)
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_preview, {
+                  key: 0,
+                  class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'error': $setup.collection.error}),
+                  image: $options.cover,
+                  width: "100%",
+                  height: "170px",
+                  default: $data.def_banner,
+                  cover: ""
+                }, {
+                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_preview, {
+                          class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{'error': $setup.collection.author_error}, "avatar"]),
+                          image: $options.avatar,
+                          default: $data.def_avatar,
+                          show_text: false,
+                          radius: "36px 36px"
+                        }, null, 8 /* PROPS */, ["class", "image", "default"]),
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.author_name), 1 /* TEXT */),
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.author_about), 1 /* TEXT */)
+                        ])
+                      ]),
+                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                            ($options.website)
+                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
+                                  key: 0,
+                                  color: "transparent",
+                                  height: "20px",
+                                  padding: "5px 7px 5px 7px",
+                                  onClick: $options.onWebsite
+                                }, {
+                                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                                    _hoisted_9
+                                  ]),
+                                  _: 1 /* STABLE */
+                                }, 8 /* PROPS */, ["onClick"]))
+                              : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                            ($options.twitter)
+                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
+                                  key: 1,
+                                  color: "transparent",
+                                  height: "20px",
+                                  padding: "5px 7px 5px 7px",
+                                  onClick: $options.onTwitter
+                                }, {
+                                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                                    _hoisted_10
+                                  ]),
+                                  _: 1 /* STABLE */
+                                }, 8 /* PROPS */, ["onClick"]))
+                              : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                            ($options.instagram)
+                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
+                                  key: 2,
+                                  color: "transparent",
+                                  height: "20px",
+                                  padding: "5px 7px 5px 7px",
+                                  onClick: $options.onInstagram
+                                }, {
+                                  default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                                    _hoisted_11
+                                  ]),
+                                  _: 1 /* STABLE */
+                                }, 8 /* PROPS */, ["onClick"]))
+                              : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
+                              color: "transparent",
+                              height: "20px",
+                              padding: "5px 7px 5px 7px",
+                              onClick: $options.onKey
+                            }, {
+                              default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                                _hoisted_12
+                              ]),
+                              _: 1 /* STABLE */
+                            }, 8 /* PROPS */, ["onClick"])
+                          ])
+                        ]),
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.nfts_count), 1 /* TEXT */),
+                            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.nfts_count == 1 ? 'NFT' : 'NFTs'), 1 /* TEXT */)
+                          ]),
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                              _hoisted_15,
+                              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.max_sale), 1 /* TEXT */)
+                            ]),
+                            _hoisted_17
+                          ]),
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+                              _hoisted_18,
+                              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.trade_volume), 1 /* TEXT */)
+                            ]),
+                            _hoisted_20
+                          ])
+                        ])
+                      ])
                     ])
                   ]),
-                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [
-                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                        ($options.website)
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
-                              key: 0,
-                              color: "transparent",
-                              height: "20px",
-                              padding: "5px 7px 5px 7px",
-                              onClick: $options.onWebsite
-                            }, {
-                              default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                                _hoisted_9
-                              ]),
-                              _: 1 /* STABLE */
-                            }, 8 /* PROPS */, ["onClick"]))
-                          : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-                        ($options.twitter)
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
-                              key: 1,
-                              color: "transparent",
-                              height: "20px",
-                              padding: "5px 7px 5px 7px",
-                              onClick: $options.onTwitter
-                            }, {
-                              default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                                _hoisted_10
-                              ]),
-                              _: 1 /* STABLE */
-                            }, 8 /* PROPS */, ["onClick"]))
-                          : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-                        ($options.instagram)
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
-                              key: 2,
-                              color: "transparent",
-                              height: "20px",
-                              padding: "5px 7px 5px 7px",
-                              onClick: $options.onInstagram
-                            }, {
-                              default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                                _hoisted_11
-                              ]),
-                              _: 1 /* STABLE */
-                            }, 8 /* PROPS */, ["onClick"]))
-                          : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
-                          color: "transparent",
-                          height: "20px",
-                          padding: "5px 7px 5px 7px",
-                          onClick: $options.onKey
-                        }, {
-                          default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                            _hoisted_12
-                          ]),
-                          _: 1 /* STABLE */
-                        }, 8 /* PROPS */, ["onClick"])
-                      ])
-                    ]),
-                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.nfts_count), 1 /* TEXT */),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.nfts_count == 1 ? 'NFT' : 'NFTs'), 1 /* TEXT */)
-                      ]),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                          _hoisted_15,
-                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.max_sale), 1 /* TEXT */)
-                        ]),
-                        _hoisted_17
-                      ]),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-                          _hoisted_18,
-                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.trade_volume), 1 /* TEXT */)
-                        ]),
-                        _hoisted_20
-                      ])
-                    ])
-                  ])
-                ])
-              ]),
-              _: 1 /* STABLE */
-            }, 8 /* PROPS */, ["class", "image", "default"]),
+                  _: 1 /* STABLE */
+                }, 8 /* PROPS */, ["class", "image", "default"]))
+              : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" TODO: same layout as in approve containers "),
-            (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'block': true, 'block-long': $data.long_text})
-            }, [
-              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                ref: "desc",
-                class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'desc-short': !$data.full_text})
-              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.description), 3 /* TEXT, CLASS */),
-              ($data.long_text && !$data.full_text)
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
-                    key: 0,
-                    class: "btn-right",
-                    text: "See more",
-                    height: "20px",
-                    color: "transparent",
-                    text_color: "green",
-                    padding: "0px 7px 0px 7px",
-                    text_bold: false,
-                    onClick: _cache[0] || (_cache[0] = $event => ($data.full_text = true))
-                  }))
-                : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-              ($data.long_text && $data.full_text)
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
-                    key: 1,
-                    class: "btn-center",
-                    text: "See less",
-                    height: "20px",
-                    color: "transparent",
-                    text_color: "green",
-                    padding: "0px 7px 0px 7px",
-                    text_bold: false,
-                    onClick: _cache[1] || (_cache[1] = $event => ($data.full_text = false))
-                  }))
-                : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
-            ], 2 /* CLASS */),
+            (!$data.compact)
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                  key: 1,
+                  class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'block': true, 'block-long': $data.long_text})
+                }, [
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    ref: "desc",
+                    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'desc-short': !$data.full_text})
+                  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.description), 3 /* TEXT, CLASS */),
+                  ($data.long_text && !$data.full_text)
+                    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
+                        key: 0,
+                        class: "btn-right",
+                        text: "See more",
+                        height: "20px",
+                        color: "transparent",
+                        text_color: "green",
+                        padding: "0px 7px 0px 7px",
+                        text_bold: false,
+                        onClick: _cache[0] || (_cache[0] = $event => ($data.full_text = true))
+                      }))
+                    : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                  ($data.long_text && $data.full_text)
+                    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
+                        key: 1,
+                        class: "btn-center",
+                        text: "See less",
+                        height: "20px",
+                        color: "transparent",
+                        text_color: "green",
+                        padding: "0px 7px 0px 7px",
+                        text_bold: false,
+                        onClick: _cache[1] || (_cache[1] = $event => ($data.full_text = false))
+                      }))
+                    : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
+                ], 2 /* CLASS */))
+              : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
             ($options.debug && $setup.collection.error)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.collection.error), 1 /* TEXT */))
               : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
@@ -30428,7 +30458,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("- TODO: set collection to the current one when opening 'new-nft' "),
             ($options.show_all)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_list, {
-                  key: 1,
+                  key: 3,
                   class: "list",
                   items_name: "NFTs",
                   component: "nft",
@@ -30441,7 +30471,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
             ($options.show_sale)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_list, {
-                  key: 2,
+                  key: 4,
                   class: "list",
                   items_name: "NFTs",
                   component: "nft",
@@ -30454,7 +30484,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
             ($options.show_liked)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_list, {
-                  key: 3,
+                  key: 5,
                   class: "list",
                   items_name: "NFTs",
                   component: "nft",
@@ -31794,68 +31824,69 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const _withScopeId = n => ((0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-97fb47e0"),n=n(),(0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(),n)
-const _hoisted_1 = { class: "nft-page-container" }
-const _hoisted_2 = { class: "details-row" }
-const _hoisted_3 = { class: "nft-container" }
-const _hoisted_4 = {
+const _hoisted_1 = { class: "details-row" }
+const _hoisted_2 = {
+  key: 0,
+  class: "nft-container"
+}
+const _hoisted_3 = {
   key: 0,
   class: "debug error"
 }
-const _hoisted_5 = { class: "info-container" }
-const _hoisted_6 = { class: "info-box" }
-const _hoisted_7 = { class: "title" }
-const _hoisted_8 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+const _hoisted_4 = { class: "info-container" }
+const _hoisted_5 = { class: "info-box" }
+const _hoisted_6 = { class: "title" }
+const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   src: (assets_share_svg__WEBPACK_IMPORTED_MODULE_1___default()),
   width: "24"
 }, null, -1 /* HOISTED */))
-const _hoisted_9 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+const _hoisted_8 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   src: (assets_transfer_svg__WEBPACK_IMPORTED_MODULE_2___default()),
   width: "20"
 }, null, -1 /* HOISTED */))
-const _hoisted_10 = { class: "bottom" }
-const _hoisted_11 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "separator" }, null, -1 /* HOISTED */))
-const _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Creator: ")
-const _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Collection: ")
-const _hoisted_14 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "separator" }, null, -1 /* HOISTED */))
-const _hoisted_15 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "table-title" }, "Nft trading history", -1 /* HOISTED */))
-const _hoisted_16 = { class: "table-head" }
-const _hoisted_17 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { width: "120px" }, "Coin", -1 /* HOISTED */))
-const _hoisted_18 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { width: "200px" }, "Amount", -1 /* HOISTED */))
-const _hoisted_19 = {
+const _hoisted_9 = { class: "bottom" }
+const _hoisted_10 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "separator" }, null, -1 /* HOISTED */))
+const _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Creator: ")
+const _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Collection: ")
+const _hoisted_13 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "separator" }, null, -1 /* HOISTED */))
+const _hoisted_14 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "table-title" }, "Nft trading history", -1 /* HOISTED */))
+const _hoisted_15 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Coin", -1 /* HOISTED */))
+const _hoisted_16 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Amount", -1 /* HOISTED */))
+const _hoisted_17 = {
   key: 0,
   class: "sorted"
 }
-const _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Height ")
-const _hoisted_21 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+const _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Height ")
+const _hoisted_19 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   src: (assets_arrow_down_svg__WEBPACK_IMPORTED_MODULE_3___default()),
   class: "arrow"
 }, null, -1 /* HOISTED */))
-const _hoisted_22 = [
-  _hoisted_20,
-  _hoisted_21
+const _hoisted_20 = [
+  _hoisted_18,
+  _hoisted_19
 ]
-const _hoisted_23 = { key: 1 }
-const _hoisted_24 = {
+const _hoisted_21 = { key: 1 }
+const _hoisted_22 = {
   key: 0,
   class: "table-body"
 }
-const _hoisted_25 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
+const _hoisted_23 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
   /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_beam_svg__WEBPACK_IMPORTED_MODULE_4___default()) }),
   /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", { class: "curr" }, "BEAM")
 ], -1 /* HOISTED */))
-const _hoisted_26 = { class: "text" }
-const _hoisted_27 = { class: "text" }
-const _hoisted_28 = {
+const _hoisted_24 = { class: "text" }
+const _hoisted_25 = { class: "text" }
+const _hoisted_26 = {
   key: 1,
   class: "table-body-empty"
 }
-const _hoisted_29 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_empty_wallet_svg__WEBPACK_IMPORTED_MODULE_5___default()) }, null, -1 /* HOISTED */))
-const _hoisted_30 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Trading history is empty", -1 /* HOISTED */))
-const _hoisted_31 = [
-  _hoisted_29,
-  _hoisted_30
+const _hoisted_27 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_empty_wallet_svg__WEBPACK_IMPORTED_MODULE_5___default()) }, null, -1 /* HOISTED */))
+const _hoisted_28 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Trading history is empty", -1 /* HOISTED */))
+const _hoisted_29 = [
+  _hoisted_27,
+  _hoisted_28
 ]
-const _hoisted_32 = {
+const _hoisted_30 = {
   key: 2,
   class: "table-body-loading"
 }
@@ -31878,7 +31909,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       id: $props.id,
       ref: "transferModal"
     }, null, 8 /* PROPS */, ["id"]),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+      class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['nft-page-container', $setup.compact ? 'compact' : ''])
+    }, [
       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_pageTitle),
       ($setup.nft === undefined)
         ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_loading, {
@@ -31894,34 +31927,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               key: 2,
               class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["content-wrapper", {'error': $options.error}])
             }, [
-              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_preview, {
-                    image: $options.image,
-                    default: $data.def_nft,
-                    contain: "",
-                    height: "360px",
-                    radius: "0"
-                  }, {
-                    default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                      ($options.error && $options.debug)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, "[" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.nft.id) + "] - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.error), 1 /* TEXT */))
-                        : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_moderationStatus, { item: $setup.nft }, null, 8 /* PROPS */, ["item"]),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_likes, {
-                        class: "likes",
-                        item: $setup.nft
-                      }, null, 8 /* PROPS */, ["item"])
-                    ]),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["image", "default"])
-                ]),
-                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [
+              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [
+                (!$setup.compact)
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_preview, {
+                        image: $options.image,
+                        default: $data.def_nft,
+                        contain: "",
+                        height: "360px",
+                        radius: "0"
+                      }, {
+                        default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
+                          ($options.error && $options.debug)
+                            ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, "[" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.nft.id) + "] - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.error), 1 /* TEXT */))
+                            : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_moderationStatus, { item: $setup.nft }, null, 8 /* PROPS */, ["item"]),
+                          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_likes, {
+                            class: "likes",
+                            item: $setup.nft
+                          }, null, 8 /* PROPS */, ["item"])
+                        ]),
+                        _: 1 /* STABLE */
+                      }, 8 /* PROPS */, ["image", "default"])
+                    ]))
+                  : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+                (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
+                  (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
                     (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                       class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["title-row", {'error': $options.error}])
                     }, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.title), 1 /* TEXT */),
+                      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.title), 1 /* TEXT */),
                       ($options.approved)
                         ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
                             key: 0,
@@ -31931,7 +31966,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                             onClick: $options.onShare
                           }, {
                             default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                              _hoisted_8
+                              _hoisted_7
                             ]),
                             _: 1 /* STABLE */
                           }, 8 /* PROPS */, ["onClick"]))
@@ -31945,7 +31980,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                             onClick: $options.onTransfer
                           }, {
                             default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                              _hoisted_9
+                              _hoisted_8
                             ]),
                             _: 1 /* STABLE */
                           }, 8 /* PROPS */, ["onClick"]))
@@ -31954,55 +31989,57 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                       class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["description", {'error': $options.error}])
                     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.description), 3 /* TEXT, CLASS */),
-                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [
-                      _hoisted_11,
+                    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [
+                      _hoisted_10,
                       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["author", {'error': $options.error}])
                       }, [
-                        _hoisted_12,
+                        _hoisted_11,
                         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.author_name), 1 /* TEXT */)
                       ], 2 /* CLASS */),
                       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["collection", {'error': $options.error || $options.collection_error}])
                       }, [
-                        _hoisted_13,
+                        _hoisted_12,
                         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                           class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({'link': !($options.error || $options.collection_error)}),
                           onClick: _cache[0] || (_cache[0] = (...args) => ($options.toCollection && $options.toCollection(...args)))
                         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.collection_name), 3 /* TEXT, CLASS */)
                       ], 2 /* CLASS */),
-                      _hoisted_14,
+                      _hoisted_13,
                       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_price, { nft: $setup.nft }, null, 8 /* PROPS */, ["nft"])
                     ])
                   ])
                 ])
               ]),
-              _hoisted_15,
-              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [
-                _hoisted_17,
-                _hoisted_18,
+              _hoisted_14,
+              (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['table-head', $setup.compact ? 'compact' : ''])
+              }, [
+                _hoisted_15,
+                _hoisted_16,
                 ($data.sales && $data.sales.length)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_19, _hoisted_22))
-                  : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_23, " Height "))
-              ]),
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_17, _hoisted_20))
+                  : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, " Height "))
+              ], 2 /* CLASS */),
               ($data.sales != undefined && $data.sales.length)
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_24, [
+                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_22, [
                     ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.sales.slice().reverse(), (sale, index) => {
                       return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
                         key: `sale-${$data.sales.length - index}`,
-                        class: "row"
+                        class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['row', $setup.compact ? 'compact' : ''])
                       }, [
-                        _hoisted_25,
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatAmountFixed(sale.amount)), 1 /* TEXT */),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatHeight(sale.height)), 1 /* TEXT */)
-                      ]))
+                        _hoisted_23,
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatAmountFixed(sale.amount)), 1 /* TEXT */),
+                        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatHeight(sale.height)), 1 /* TEXT */)
+                      ], 2 /* CLASS */))
                     }), 128 /* KEYED_FRAGMENT */))
                   ]))
                 : ($data.sales !== undefined && !$data.sales.length)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_28, _hoisted_31))
-                  : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_32, " Loading... "))
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_26, _hoisted_29))
+                  : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_30, " Loading... "))
             ], 2 /* CLASS */))
-    ])
+    ], 2 /* CLASS */)
   ], 64 /* STABLE_FRAGMENT */))
 }
 
@@ -33021,7 +33058,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       : ($setup.items && $setup.items.length > 0 || $props.new_component)
         ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 1 }, [
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.mobile ? 'list-wrap-mobile' : 'list-wrap')
+              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.compact ? 'list-wrap-compact' : 'list-wrap')
             }, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 ref: "itemslist",
@@ -33310,25 +33347,26 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const _withScopeId = n => ((0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-d942126c"),n=n(),(0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(),n)
-const _hoisted_1 = { class: "page-title-container" }
-const _hoisted_2 = { class: "title" }
-const _hoisted_3 = { class: "overlay" }
-const _hoisted_4 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, null, -1 /* HOISTED */))
-const _hoisted_5 = { class: "title-slot" }
+const _hoisted_1 = { class: "title" }
+const _hoisted_2 = { class: "overlay" }
+const _hoisted_3 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, null, -1 /* HOISTED */))
+const _hoisted_4 = { class: "title-slot" }
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_backBtn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("backBtn")
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.title), 1 /* TEXT */),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['page-title-container', $data.compact ? 'compact' : ''])
+  }, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.title), 1 /* TEXT */),
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [
       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_backBtn),
-      _hoisted_4,
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
+      _hoisted_3,
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")
       ])
     ])
-  ]))
+  ], 2 /* CLASS */))
 }
 
 /***/ }),
@@ -33779,12 +33817,11 @@ __webpack_require__.r(__webpack_exports__);
 const _withScopeId = n => ((0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-ed220ea4"),n=n(),(0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(),n)
 const _hoisted_1 = { class: "tabs-container" }
 const _hoisted_2 = ["onClick"]
-const _hoisted_3 = { class: "title" }
-const _hoisted_4 = {
+const _hoisted_3 = {
   key: 0,
   class: "bottom-line"
 }
-const _hoisted_5 = { class: "slot" }
+const _hoisted_4 = { class: "slot" }
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
@@ -33794,13 +33831,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([ $props.modelValue === tab.id ? 'tab-active' : '','tab-item']),
         onClick: $event => (_ctx.$emit('update:modelValue', tab.id))
       }, [
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(tab.name), 1 /* TEXT */),
+        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['title', $data.compact ? 'compact': ''])
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(tab.name), 3 /* TEXT, CLASS */),
         ($props.modelValue === tab.id)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4))
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
       ], 10 /* CLASS, PROPS */, _hoisted_2))
     }), 128 /* KEYED_FRAGMENT */)),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
       (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default", {}, undefined, true)
     ])
   ]))
@@ -40775,6 +40814,10 @@ class Utils {
     return Utils.is_mobile
   }
 
+  static isCompact () {
+    return true //Utils.is_mobile()
+  }
+
   static isDesktop () {
     if (Utils.is_mobile === undefined) {
       const ua = navigator.userAgent
@@ -41193,6 +41236,10 @@ class Utils {
 
     if (Utils.isWeb()) {
       document.body.classList.add('web')
+    }
+
+    if (Utils.isCompact()) {
+      document.body.classList.add('compact')
     }
   }
     

@@ -11,7 +11,7 @@
       </template>
     </div>
     <template v-else-if="items && items.length > 0 || new_component">
-      <div :class="mobile ? 'list-wrap-mobile' : 'list-wrap'">  
+      <div :class="compact ? 'list-wrap-compact' : 'list-wrap'">  
         <div ref="itemslist" class="list" @scroll="onScroll">
           <template v-if="selectable">
             <selectItem v-for="item in items" 
@@ -71,7 +71,7 @@
       }
     }
 
-    & > .list-wrap-mobile {
+    & > .list-wrap-compact {
       overflow-y: overlay
       overflow-x: hidden
 
@@ -205,7 +205,8 @@ export default {
   data () {
     return {
       delay_passed: true,
-      mobile: utils.isMobile()
+      // TODO: make this global somehow
+      compact: utils.isCompact()
     }
   },
 

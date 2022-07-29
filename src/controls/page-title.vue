@@ -1,5 +1,5 @@
 <template>
-  <div class="page-title-container">
+  <div :class="['page-title-container', compact ? 'compact' : '']">
     <div class="title">{{ title }}</div>
     <div class="overlay">
       <backBtn/>
@@ -19,6 +19,10 @@
     justify-content: center
     align-items: center
     position: relative
+
+    &.compact {
+      padding: 0 5px
+    }
 
     .overlay {
       width: 100%
@@ -70,6 +74,7 @@
 
 <script>
 import backBtn from 'controls/btn-back'
+import utils from 'utils/utils'
 
 export default {
   components: {
@@ -81,6 +86,12 @@ export default {
       type: String,
       required: false,
       default: ''
+    }
+  },
+
+  data () {
+    return {
+      compact: utils.isCompact()
     }
   }
 }

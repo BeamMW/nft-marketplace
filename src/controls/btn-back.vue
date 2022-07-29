@@ -24,12 +24,14 @@
 </style>
 
 <script>
+import utils from 'utils/utils'
+
 export default {
   props: {
     text: {
       type: String,
       required: false,
-      default: 'back'
+      default: utils.isCompact() ? '' : 'back'
     },
   }
 }

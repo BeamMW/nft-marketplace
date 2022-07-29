@@ -1,13 +1,13 @@
 <template>
   <messageModal ref="messageModal"/>
   <transferModal :id="id" ref="transferModal"/>
-  <div class="nft-page-container">
+  <div :class="['nft-page-container', compact ? 'compact' : '']">
     <pageTitle/>
     <loading v-if="nft === undefined" text="Loading NFT"/>
     <notFound v-else-if="nft == null" text="NFT Not Found"/>
     <div v-else class="content-wrapper" :class="{'error': error}">
       <div class="details-row"> 
-        <div class="nft-container">
+        <div v-if="!compact" class="nft-container">
           <preview :image="image" 
                    :default="def_nft" 
                    contain
@@ -46,9 +46,9 @@
         </div>
       </div>
       <div class="table-title">Nft trading history</div>
-      <div class="table-head"> 
-        <div width="120px">Coin</div>
-        <div width="200px">Amount</div>
+      <div :class="['table-head', compact ? 'compact' : '']"> 
+        <div>Coin</div>
+        <div>Amount</div>
         <div v-if="sales && sales.length" class="sorted">
           Height
           <img src="~assets/arrow-down.svg" class="arrow"/>
@@ -58,7 +58,9 @@
         </div>
       </div>  
       <div v-if="sales != undefined && sales.length" class="table-body">
-        <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${sales.length - index}`" class="row">
+        <div v-for="(sale, index) in sales.slice().reverse()" :key="`sale-${sales.length - index}`" 
+             :class="['row', compact ? 'compact' : '']"
+        >
           <div>
             <img src="~assets/beam.svg"/>
             <span class="curr">BEAM</span>
@@ -85,6 +87,10 @@
     box-sizing: border-box
     width: 100%
     height: 100%
+
+    &.compact {
+      padding: 0px 5px
+    }
 
     & .content-wrapper {
       display: flex
@@ -117,15 +123,17 @@
         background-color: rgba(255, 255, 255, 0.08)
         font-weight: 700
         font-size: 14px
-        color: rgba(255, 255, 255, 0.5)
+        color: rgba(255, 255, 255, 0.5)     
         display: flex
 
         & > div {
-          padding: 9px 0px 12px 0px
+          padding: 9px 5px 12px 5px
           text-align: center
+          box-sizing: border-box
 
           &.sorted {
             color: #fff
+            white-space: nowrap
 
             .arrow {
               width:8px
@@ -133,18 +141,22 @@
               margin-left:3px
             }
           }
-        }
-        
-        & > div:nth-child(1) {
-          width: 120px
+
+          &:not(:first-child) {
+            flex: 1
+          }
         }
 
-        & > div:nth-child(2) {
-          width: 200px
+        &.compact > div {
+          &:first-child {
+            width: 90px
+          }
         }
 
-        & > div:nth-child(3) {
-          flex: 1
+        &:not(.compact) > div {
+          &:first-child {
+            width: 130px
+          }
         }
       }
 
@@ -179,6 +191,32 @@
             display: flex
             align-items: center
             justify-content: center
+            padding: 0px 5px
+            box-sizing: border-box
+
+            &:first-child {
+              padding-left: 9px
+            }
+
+            &:last-child {
+              padding-right: 9px
+            }
+          
+            &:not(:first-child) {
+              flex: 1
+            }
+          }
+
+          &.compact > div {
+            &:first-child {
+              width: 90px
+            }
+          }
+
+          &:not(.compact) > div {
+            &:first-child {
+              width: 130px
+            }
           }
 
           .curr {
@@ -188,19 +226,7 @@
           }
 
           .text {
-            padding: 0 0 3px 0
-          }
-
-          & > div:nth-child(1) {
-            width: 120px
-          }
-
-          & > div:nth-child(2) {
-            width: 200px
-          }
-
-          & > div:nth-child(3) {
-            flex: 1
+            padding-bottom: 3px
           }
         }
 
@@ -227,7 +253,6 @@
 
         & .nft-container {
           width: 360px
-          height: 360px
           background-color: rgba(255, 255, 255, 0.05)
           border-radius: 10px
           min-height: 360px
@@ -244,11 +269,13 @@
         & .info-container {
           flex: 1
           box-sizing: border-box
-          padding-left: 10px
+          
+          &:not(:first-child) {
+            padding-left: 10px
+          }
           
           & .info-box {
             background-color: rgba(255, 255, 255, 0.05)
-            min-height: 360px
             border-radius: 10px
             height: 100%
             box-sizing: border-box
@@ -376,8 +403,9 @@ export default {
 
   setup(props) {
     let nft = nftsStore.getLazyItem(props.id)    
+    let compact = utils.isCompact()
     return {
-      nft
+      nft, compact
     }
   },
 

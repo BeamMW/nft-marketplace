@@ -33,6 +33,10 @@ export default class Utils {
     return Utils.is_mobile
   }
 
+  static isCompact () {
+    return true //Utils.is_mobile()
+  }
+
   static isDesktop () {
     if (Utils.is_mobile === undefined) {
       const ua = navigator.userAgent
@@ -451,6 +455,10 @@ export default class Utils {
 
     if (Utils.isWeb()) {
       document.body.classList.add('web')
+    }
+
+    if (Utils.isCompact()) {
+      document.body.classList.add('compact')
     }
   }
     
