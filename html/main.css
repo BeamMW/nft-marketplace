@@ -258,7 +258,7 @@ html, body {
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/controls/page-title.vue?vue&type=style&index=0&id=d942126c&scoped=true&lang=stylus ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .page-title-container[data-v-d942126c] {
-  min-height: 45px;
+  min-height: 43px;
   user-select: none;
   display: flex;
   justify-content: center;
@@ -370,7 +370,6 @@ html, body {
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/controls/tabs.vue?vue&type=style&index=0&id=ed220ea4&scoped=true&lang=stylus ***!
   \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .tabs-container[data-v-ed220ea4] {
-  min-height: 45px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -615,11 +614,18 @@ html, body {
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/components/balance-page.vue?vue&type=style&index=0&id=201ddef0&lang=stylus&scoped=true ***!
   \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .balance-container[data-v-201ddef0] {
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+.balance-container[data-v-201ddef0]:not(.compact) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 20px;
-  margin-bottom: 10px;
-  margin-top: 20px;
+}
+.balance-container.compact[data-v-201ddef0] {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 20px;
 }
 .balance-container .balance[data-v-201ddef0] {
   background-color: rgba(255,255,255,0.1);

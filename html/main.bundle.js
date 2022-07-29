@@ -21663,6 +21663,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var controls_page_title__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! controls/page-title */ "./src/controls/page-title.vue");
 /* harmony import */ var controls_amount__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! controls/amount */ "./src/controls/amount.vue");
 /* harmony import */ var stores_artists__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! stores/artists */ "./src/stores/artists.js");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+
 
 
 
@@ -21685,7 +21687,13 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     nft_sold: {
       type: Number,
-      default: 14 // for example
+      default: 0
+    }
+  },
+
+  data () {
+    return {
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_7__["default"].isCompact()
     }
   },
 
@@ -23532,7 +23540,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var stores_collections__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! stores/collections */ "./src/stores/collections.js");
 /* harmony import */ var stores_nfts__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! stores/nfts */ "./src/stores/nfts.js");
 /* harmony import */ var stores_artists__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! stores/artists */ "./src/stores/artists.js");
-/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
+
 
 
 
@@ -23574,35 +23584,38 @@ __webpack_require__.r(__webpack_exports__);
       return stores_artists__WEBPACK_IMPORTED_MODULE_8__["default"].is_artist
     },
     show_collections() {
-      return this.active_tab === utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.COLLECTIONS
+      return this.active_tab === utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.COLLECTIONS
     },
     show_owned() {
-      return this.active_tab === utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.OWNED_NFTS
+      return this.active_tab === utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.OWNED_NFTS
     },
     show_sale() {
-      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.SALE_NFTS
+      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.SALE_NFTS
     },
     show_sold() {
-      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.SOLD_NFTS
+      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.SOLD_NFTS
     },
     show_liked() {
-      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.LIKED_NFTS
+      return this.active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.LIKED_NFTS
+    },
+    page_title() {
+      return utils_utils__WEBPACK_IMPORTED_MODULE_9__["default"].isCompact() ? '' : 'my page'
     },
     tabs() {
       let res = []
 
       if (this.is_artist) {
-        res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.COLLECTIONS, name: 'Collections'})
+        res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.COLLECTIONS, name: 'Collections'})
       }
 
-      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.OWNED_NFTS, name: 'Owned NFTs'})
-      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.SALE_NFTS,  name: 'On Sale'})
+      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.OWNED_NFTS, name: 'Owned NFTs'})
+      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.SALE_NFTS,  name: 'On Sale'})
 
       if (this.is_artist) {
-        res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.SOLD_NFTS,  name: 'Sold'})
+        res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.SOLD_NFTS,  name: 'Sold'})
       }
 
-      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.my_tabs.LIKED_NFTS, name: 'Liked by Me'})
+      res.push({id: utils_consts__WEBPACK_IMPORTED_MODULE_10__.my_tabs.LIKED_NFTS, name: 'Liked by Me'})
       return res
     },
     self_pending () {
@@ -24241,9 +24254,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var controls_lazy_list__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! controls/lazy-list */ "./src/controls/lazy-list.vue");
 /* harmony import */ var stores_nfts__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! stores/nfts */ "./src/stores/nfts.js");
 /* harmony import */ var stores_collections__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! stores/collections */ "./src/stores/collections.js");
-/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
 
-// TODO: headless
+
 
 
 
@@ -24266,20 +24280,21 @@ __webpack_require__.r(__webpack_exports__);
 
   data () {
     return {
+      compact: utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isCompact(),
       tabs: [
-        {id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.NFTS, name: 'NFTs'},
-        {id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.COLLECTIONS, name: 'Collections'},
-        {id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.SALE_NFTS, name: 'On Sale'},
-        {id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.LIKED_NFTS, name: 'Liked'},
+        {id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.NFTS, name: 'NFTs'},
+        {id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.COLLECTIONS, name: 'Collections'},
+        {id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.SALE_NFTS, name: 'On Sale'},
+        {id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.LIKED_NFTS, name: 'Liked'},
       ],
       search: '',
       selector_options: [
-        {name: 'Added: Oldest to Newest', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.OLDEST_TO_NEWEST},
-        {name: 'Added: Newest to Oldest', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.NEWEST_TO_OLDEST},
-        {name: 'Price: Low to High', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.PRICE_ASC},
-        {name: 'Price: High to Low', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.PRICE_DESC},
-        {name: 'Likes: Low to High', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.LIKES_ASC},
-        {name: 'Likes: High to Low', id: utils_consts__WEBPACK_IMPORTED_MODULE_8__.sort.LIKES_DESC}
+        {name: 'Added: Oldest to Newest', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.OLDEST_TO_NEWEST},
+        {name: 'Added: Newest to Oldest', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.NEWEST_TO_OLDEST},
+        {name: 'Price: Low to High', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.PRICE_ASC},
+        {name: 'Price: High to Low', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.PRICE_DESC},
+        {name: 'Likes: Low to High', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.LIKES_ASC},
+        {name: 'Likes: High to Low', id: utils_consts__WEBPACK_IMPORTED_MODULE_9__.sort.LIKES_DESC}
       ]
     }
   },
@@ -24310,16 +24325,16 @@ __webpack_require__.r(__webpack_exports__);
       return `Open ${role} panel`
     },
     show_collections () {
-      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.COLLECTIONS
+      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.COLLECTIONS
     },
     show_nfts () {
-      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.NFTS
+      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.NFTS
     },
     show_sale () {
-      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.SALE_NFTS
+      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.SALE_NFTS
     },
     show_liked () {
-      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_8__.user_tabs.LIKED_NFTS
+      return this.$state.user_active_tab == utils_consts__WEBPACK_IMPORTED_MODULE_9__.user_tabs.LIKED_NFTS
     },
     nftsStore () {
       return stores_nfts__WEBPACK_IMPORTED_MODULE_6__["default"]
@@ -24993,14 +25008,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var stores_artists__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! stores/artists */ "./src/stores/artists.js");
-/* harmony import */ var controls_button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! controls/button */ "./src/controls/button.vue");
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+/* harmony import */ var controls_button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! controls/button */ "./src/controls/button.vue");
+
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    btn: controls_button__WEBPACK_IMPORTED_MODULE_1__["default"]
+    btn: controls_button__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   computed: {
     self () {
@@ -25020,7 +25037,7 @@ __webpack_require__.r(__webpack_exports__);
       return __webpack_require__(/*! assets/user-blue.svg */ "./src/assets/user-blue.svg")
     },
     my_name () {
-      return this.self.label
+      return utils_utils__WEBPACK_IMPORTED_MODULE_1__["default"].isCompact() ? '' : this.self.label
     },
   }
 });
@@ -30144,17 +30161,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const _withScopeId = n => ((0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-201ddef0"),n=n(),(0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(),n)
-const _hoisted_1 = { class: "balance-container" }
-const _hoisted_2 = { class: "balance" }
-const _hoisted_3 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "Current balance", -1 /* HOISTED */))
-const _hoisted_4 = {
+const _hoisted_1 = { class: "balance" }
+const _hoisted_2 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "Current balance", -1 /* HOISTED */))
+const _hoisted_3 = {
   key: 0,
   class: "withdraw"
 }
-const _hoisted_5 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_receive_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
-const _hoisted_6 = { class: "balance" }
-const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "Total sold NFT amount", -1 /* HOISTED */))
-const _hoisted_8 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "NFT sold", -1 /* HOISTED */))
+const _hoisted_4 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", { src: (assets_receive_svg__WEBPACK_IMPORTED_MODULE_1___default()) }, null, -1 /* HOISTED */))
+const _hoisted_5 = { class: "balance" }
+const _hoisted_6 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "Total sold NFT amount", -1 /* HOISTED */))
+const _hoisted_7 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", { class: "description" }, "NFT sold", -1 /* HOISTED */))
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_keyModal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("keyModal")
@@ -30173,14 +30189,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ]),
       _: 1 /* STABLE */
     }),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+      class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['balance-container', $data.compact ? 'compact' : ''])
+    }, [
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-          _hoisted_3,
+          _hoisted_2,
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_amount, { amount: $options.balance }, null, 8 /* PROPS */, ["amount"])
         ]),
         ($options.balance)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
                 text: "withdraw",
                 text_color: "blue",
@@ -30190,26 +30208,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 onClick: $options.onWithdrawClick
               }, {
                 default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
-                  _hoisted_5
+                  _hoisted_4
                 ]),
                 _: 1 /* STABLE */
               }, 8 /* PROPS */, ["onClick"])
             ]))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)
       ]),
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-          _hoisted_7,
+          _hoisted_6,
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_amount, {
             amount: $options.total_sold.volume
           }, null, 8 /* PROPS */, ["amount"])
         ]),
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [
-          _hoisted_8,
+          _hoisted_7,
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.total_sold.count), 1 /* TEXT */)
         ])
       ])
-    ])
+    ], 2 /* CLASS */)
   ], 64 /* STABLE_FRAGMENT */))
 }
 
@@ -31710,14 +31728,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("list")
 
   return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_pageTitle, { title: "my page" }, {
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_pageTitle, { title: $options.page_title }, {
       default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnEditArtist),
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnWallet),
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnKey)
       ]),
       _: 1 /* STABLE */
-    }),
+    }, 8 /* PROPS */, ["title"]),
     ($options.self_pending)
       ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_2, _hoisted_4))
       : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
@@ -32323,7 +32341,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, {
       default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" div v-if=\"show_nfts\" class=\"selectors\">\n        <selector\n              v-on:selected=\"onAuthor\"\n              :options=\"artist_options\"\n              :selected=\"active_filter_by_artist\"\n              title=\"Author\"\n              v-if=\"artist_options.length\"\n        />\n        <selector v-model:selected=\"nfts_sort_by\"\n                  :options=\"selector_options\"\n                  title=\"Sort by\"\n        />\n      </div "),
-        ($options.can_admin)
+        (!$data.compact && $options.can_admin)
           ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
               key: 0,
               text: $options.admin_btn_text,
@@ -32333,8 +32351,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               onClick: $options.onAdmin
             }, null, 8 /* PROPS */, ["text", "onClick"]))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnWallet),
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnKey),
+        (!$data.compact)
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btnWallet, { key: 1 }))
+          : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
+        (!$data.compact)
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btnKey, { key: 2 }))
+          : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnProfile)
       ]),
       _: 1 /* STABLE */
@@ -38538,7 +38560,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const versions = {
-  DATABASE_VERSION:   123,
+  DATABASE_VERSION:   125,
   ARTIST_VERSION:     200,
   COLLECTION_VERSION: 200,
   NFT_VERSION:        200,

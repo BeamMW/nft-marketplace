@@ -1,6 +1,6 @@
 <template>
   <div class="my-page">
-    <pageTitle title="my page">
+    <pageTitle :title="page_title">
       <btnEditArtist/>
       <btnWallet/>
       <btnKey/>
@@ -120,6 +120,7 @@ import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists'
+import utils from 'utils/utils'
 import {my_tabs} from 'utils/consts'
 
 export default {
@@ -164,6 +165,9 @@ export default {
     },
     show_liked() {
       return this.active_tab == my_tabs.LIKED_NFTS
+    },
+    page_title() {
+      return utils.isCompact() ? '' : 'my page'
     },
     tabs() {
       let res = []

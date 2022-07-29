@@ -16,7 +16,6 @@
 
 <style scoped lang="stylus">
   .tabs-container {
-    min-height: 45px 
     display: flex
     flex-direction: row
     align-items: center

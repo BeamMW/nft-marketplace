@@ -13,7 +13,7 @@
 
 <style scoped lang="stylus">
   .page-title-container {
-    min-height: 45px 
+    min-height: 43px 
     user-select: none
     display: flex
     justify-content: center

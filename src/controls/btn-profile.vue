@@ -11,6 +11,7 @@
 
 <script>
 import artistsStore from 'stores/artists'
+import utils from 'utils/utils'
 import btn from 'controls/button'
 
 export default {
@@ -35,7 +36,7 @@ export default {
       return require('assets/user-blue.svg')
     },
     my_name () {
-      return this.self.label
+      return utils.isCompact() ? '' : this.self.label
     },
   }
 }
