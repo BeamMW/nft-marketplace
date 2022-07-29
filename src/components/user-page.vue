@@ -16,15 +16,14 @@
       </div -->
       <btn v-if="can_admin" 
            :text="admin_btn_text"
-           class="slotted-button"
            text_color="green"
            color="transparent"
            padding="11px 10px"
            @click="onAdmin"
       />
-      <btnWallet class="slotted-button"/>
-      <btnKey class="slotted-button"/>
-      <btnProfile class="slotted-button"/>
+      <btnWallet/>
+      <btnKey/>
+      <btnProfile/>
     </tabsctrl>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
     {{ search }} -->
@@ -64,15 +63,6 @@
   & > .selectors {
     padding-right: 12px
     margin-top: 4px
-  }
-
-  & .slotted-button {
-    margin-left: 12px
-    margin-top: 7px
-
-    &:last-child {
-      margin-right: 6px
-    }
   }
 }
 </style>

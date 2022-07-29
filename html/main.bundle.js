@@ -32327,16 +32327,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_btn, {
               key: 0,
               text: $options.admin_btn_text,
-              class: "slotted-button",
               text_color: "green",
               color: "transparent",
               padding: "11px 10px",
               onClick: $options.onAdmin
             }, null, 8 /* PROPS */, ["text", "onClick"]))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnWallet, { class: "slotted-button" }),
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnKey, { class: "slotted-button" }),
-        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnProfile, { class: "slotted-button" })
+        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnWallet),
+        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnKey),
+        (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btnProfile)
       ]),
       _: 1 /* STABLE */
     }, 8 /* PROPS */, ["modelValue", "tabs"]),
@@ -33350,7 +33349,7 @@ const _withScopeId = n => ((0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("dat
 const _hoisted_1 = { class: "title" }
 const _hoisted_2 = { class: "overlay" }
 const _hoisted_3 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, null, -1 /* HOISTED */))
-const _hoisted_4 = { class: "title-slot" }
+const _hoisted_4 = { class: "slot" }
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_backBtn = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("backBtn")
@@ -33840,7 +33839,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ], 10 /* CLASS, PROPS */, _hoisted_2))
     }), 128 /* KEYED_FRAGMENT */)),
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default", {}, undefined, true)
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")
     ])
   ]))
 }

@@ -16,16 +16,26 @@
 
 <style scoped lang="stylus">
   .tabs-container {
+    min-height: 45px 
     display: flex
     flex-direction: row
     align-items: center
     width: 100%
     user-select: none
-
+    
     .slot {
       margin-left: auto
       display: flex
       align-items: center
+
+      & :slotted(*) {
+        margin-left: 12px
+        margin-top: 5px
+
+        &:last-child {
+          margin-right: 8px
+        }
+      }
     }
 
     .tab-item {

@@ -4,7 +4,7 @@
     <div class="overlay">
       <backBtn/>
       <div/>
-      <div class="title-slot">
+      <div class="slot">
         <slot></slot>
       </div>
     </div>
@@ -21,7 +21,7 @@
     position: relative
 
     &.compact {
-      padding: 0 5px
+      padding: 0 0 0 5px
     }
 
     .overlay {
@@ -40,7 +40,7 @@
         flex-basis: 0
       }
 
-      & > .title-slot {
+      & > .slot {
         display: flex
         justify-content: flex-end
         align-items: center

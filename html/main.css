@@ -266,7 +266,7 @@ html, body {
   position: relative;
 }
 .page-title-container.compact[data-v-d942126c] {
-  padding: 0 5px;
+  padding: 0 0 0 5px;
 }
 .page-title-container .overlay[data-v-d942126c] {
   width: 100%;
@@ -283,16 +283,16 @@ html, body {
   flex-grow: 1;
   flex-basis: 0;
 }
-.page-title-container .overlay > .title-slot[data-v-d942126c] {
+.page-title-container .overlay > .slot[data-v-d942126c] {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.page-title-container .overlay > .title-slot *[data-v-d942126c-s] {
+.page-title-container .overlay > .slot *[data-v-d942126c-s] {
   margin-left: 12px;
   margin-top: 5px;
 }
-.page-title-container .overlay > .title-slot *[data-v-d942126c-s]:last-child {
+.page-title-container .overlay > .slot *[data-v-d942126c-s]:last-child {
   margin-right: 8px;
 }
 .page-title-container > .title[data-v-d942126c] {
@@ -370,6 +370,7 @@ html, body {
   !*** css ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-1.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/stylus-loader/dist/cjs.js??clonedRuleSet-1.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[5].use[0]!./src/controls/tabs.vue?vue&type=style&index=0&id=ed220ea4&scoped=true&lang=stylus ***!
   \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 .tabs-container[data-v-ed220ea4] {
+  min-height: 45px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -380,6 +381,13 @@ html, body {
   margin-left: auto;
   display: flex;
   align-items: center;
+}
+.tabs-container .slot *[data-v-ed220ea4-s] {
+  margin-left: 12px;
+  margin-top: 5px;
+}
+.tabs-container .slot *[data-v-ed220ea4-s]:last-child {
+  margin-right: 8px;
 }
 .tabs-container .tab-item[data-v-ed220ea4] {
   color: rgba(255,255,255,0.3);
@@ -570,13 +578,6 @@ html, body {
 .tabs > .selectors {
   padding-right: 12px;
   margin-top: 4px;
-}
-.tabs .slotted-button {
-  margin-left: 12px;
-  margin-top: 7px;
-}
-.tabs .slotted-button:last-child {
-  margin-right: 6px;
 }
 
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
