@@ -34,7 +34,7 @@ export default class Utils {
   }
 
   static isCompact () {
-    return Utils.is_mobile()
+    return Utils.isMobile()
   }
 
   static isDesktop () {
