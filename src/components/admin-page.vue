@@ -20,8 +20,8 @@
           </tr>
         </tbody>
       </table>
-      <input type="button" value="Add Moderator" @click="onAddModerator"/>
     </div>
+    <input type="button" value="Add Moderator" @click="onAddModerator"/>
   </div>
 </template>
 

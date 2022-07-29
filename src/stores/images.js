@@ -167,7 +167,8 @@ class ImagesStore {
         utils.ensureField(res, 'data', 'array')  
         data = res.data
       }
-      else {
+      
+      if (!utils.isDesktop()) {
         let url = [utils.ipfsGateway, what.ipfs_hash].join('')
         data = await utils.downloadAsync(url)
       }

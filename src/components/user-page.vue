@@ -14,17 +14,16 @@
                   title="Sort by"
         />
       </div -->
-      <btn v-if="can_admin" 
+      <btn v-if="!compact && can_admin" 
            :text="admin_btn_text"
-           class="slotted-button"
            text_color="green"
            color="transparent"
            padding="11px 10px"
            @click="onAdmin"
       />
-      <btnWallet class="slotted-button"/>
-      <btnKey class="slotted-button"/>
-      <btnProfile class="slotted-button"/>
+      <btnWallet v-if="!compact"/>
+      <btnKey v-if="!compact"/>
+      <btnProfile/>
     </tabsctrl>
     <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
     {{ search }} -->
@@ -65,15 +64,6 @@
     padding-right: 12px
     margin-top: 4px
   }
-
-  & .slotted-button {
-    margin-left: 12px
-    margin-top: 7px
-
-    &:last-child {
-      margin-right: 6px
-    }
-  }
 }
 </style>
 
@@ -98,7 +88,6 @@
 </style>
 
 <script>
-// TODO: headless
 import tabsctrl from 'controls/tabs'
 import btn from 'controls/button'
 import btnKey from 'controls/btn-key'
@@ -107,6 +96,7 @@ import btnProfile from 'controls/btn-profile'
 import list from 'controls/lazy-list'
 import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
+import utils from 'utils/utils'
 import {user_tabs, sort} from 'utils/consts'
 
 export default {
@@ -121,6 +111,7 @@ export default {
 
   data () {
     return {
+      compact: utils.isCompact(),
       tabs: [
         {id: user_tabs.NFTS, name: 'NFTs'},
         {id: user_tabs.COLLECTIONS, name: 'Collections'},

@@ -162,7 +162,10 @@ const store = {
   },
 
   async checkCID () {
-    this.state.shader = await utils.downloadAsync('galleryManager.wasm')
+    let href = window.location.href
+    let ipos = href.indexOf('index.html')
+    let wasmPath = [href.substring(0, ipos), 'galleryManager.wasm'].join('')
+    this.state.shader = await utils.downloadAsync(wasmPath)
 
     /*
     utils.invokeContract('', 
@@ -298,8 +301,8 @@ const store = {
       )
     }
 
-    // In web mode we let cache server time to be updates
-    setTimeout(storesLoader, utils.isWeb() ? 5 : 0)
+    // In cacahe service mode we let cache server time to be updated
+    setTimeout(storesLoader, utils.isDesktop() ? 0 : 5)
 
     if (this.state.my_active_tab == my_tabs.COLLECTIONS && !artistsStore.is_artist) {
       this.state.my_active_tab = my_tabs.OWNED_NFTS

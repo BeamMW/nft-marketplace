@@ -4,7 +4,7 @@
     <btnEditArtist/>
     <btnKey/>
   </pageTitle>
-  <div class="balance-container">
+  <div :class="['balance-container', compact ? 'compact' : '']">
     <div class="balance">
       <div>
         <div class="description">Current balance</div>
@@ -40,11 +40,20 @@
 
 <style lang="stylus" scoped>
 .balance-container {
-  display: grid
-  grid-template-columns: 1fr 1fr
-  column-gap: 20px
   margin-bottom: 10px
   margin-top: 20px
+
+  &:not(.compact) {
+    display: grid
+    grid-template-columns: 1fr 1fr
+    column-gap: 20px
+  }
+
+  &.compact {
+    display: grid
+    grid-template-columns: 1fr
+    row-gap: 20px
+  }
 
   .balance {
     background-color: rgba(255, 255, 255, 0.1)
@@ -77,6 +86,7 @@ import btnEditArtist from 'controls/btn-edit-artist'
 import pageTitle from 'controls/page-title'
 import amount from 'controls/amount'
 import artistsStore from 'stores/artists'
+import utils from 'utils/utils'
 
 export default {
   components: {
@@ -91,7 +101,13 @@ export default {
   props: {
     nft_sold: {
       type: Number,
-      default: 14 // for example
+      default: 0
+    }
+  },
+
+  data () {
+    return {
+      compact: utils.isCompact()
     }
   },
 

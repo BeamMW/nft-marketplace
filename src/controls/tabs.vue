@@ -5,7 +5,7 @@
          :class="[ modelValue === tab.id ? 'tab-active' : '','tab-item']" 
          @click="$emit('update:modelValue', tab.id)"
     >
-      <div class="title">{{ tab.name }}</div>
+      <div :class="['title', compact ? 'compact': '']">{{ tab.name }}</div>
       <div v-if="modelValue === tab.id" class="bottom-line"></div>
     </div>
     <div class="slot">
@@ -21,11 +21,20 @@
     align-items: center
     width: 100%
     user-select: none
-
+    
     .slot {
       margin-left: auto
       display: flex
       align-items: center
+
+      & :slotted(*) {
+        margin-left: 12px
+        margin-top: 5px
+
+        &:last-child {
+          margin-right: 8px
+        }
+      }
     }
 
     .tab-item {
@@ -33,10 +42,15 @@
       font-size: 12px
       font-weight: bold
       cursor: pointer
+      white-space: nowrap
 
       .title {
         padding: 4px 16px
         text-transform: uppercase
+
+        &.compact {
+          padding: 4px 8px
+        }
       }
     }
 
@@ -54,7 +68,8 @@
 </style>
 
 <script>
-// TODO: headless
+import utils from 'utils/utils'
+
 export default {
   props: {
     tabs: {
@@ -70,6 +85,12 @@ export default {
 
   emits: [
     'update:modelValue'
-  ]
+  ],
+
+  data () {
+    return {
+      compact: utils.isCompact()
+    }
+  }
 }
 </script>

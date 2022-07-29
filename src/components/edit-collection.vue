@@ -17,80 +17,87 @@
     </template>
     <loading v-if="edit_mode && collection === undefined" text="Loading Collection"/>
     <notFound v-else-if="edit_mode && collection == null" text="Collection Not Found" error/>
-    <div v-else class="fields">
-      <div class="col-first">
-        <formInput v-model="label"
-                   label="Collection Name*"
-                   :valid="label_valid"
-                   :max_length="40"
-                   style="margin-bottom:55px;margin-top:0"
-        />
-        <formInput v-model="website"
-                   label="Website"
-                   placeholder="https://website.name/"
-                   img="globe"
-                   :max_length="150"
-                   :valid="website_valid"
-        />
-        <formInput v-model="twitter"
-                   label="Twitter"
-                   placeholder="twitter"
-                   img="twitter"
-                   :max_length="15"
-                   :valid="twitter_valid"
-                   :counter="false"
-                   :allowed="twitter_allowed"
-        />
-        <formInput v-model="instagram"
-                   label="Instagram"
-                   placeholder="instagram"
-                   img="instagram"
-                   :max_length="30"
-                   :valid="instagram_valid"
-                   :counter="false"
-                   :allowed="instagram_allowed"
-        />
+    <div v-else class="scrollable">
+      <div class="fields">
+        <div class="col-first">
+          <formInput v-model="label"
+                     label="Collection Name*"
+                     :valid="label_valid"
+                     :max_length="40"
+                     style="margin-bottom:55px;margin-top:0"
+          />
+          <formInput v-model="website"
+                     label="Website"
+                     placeholder="https://website.name/"
+                     img="globe"
+                     :max_length="150"
+                     :valid="website_valid"
+          />
+          <formInput v-model="twitter"
+                     label="Twitter"
+                     placeholder="twitter"
+                     img="twitter"
+                     :max_length="15"
+                     :valid="twitter_valid"
+                     :counter="false"
+                     :allowed="twitter_allowed"
+          />
+          <formInput v-model="instagram"
+                     label="Instagram"
+                     placeholder="instagram"
+                     img="instagram"
+                     :max_length="30"
+                     :valid="instagram_valid"
+                     :counter="false"
+                     :allowed="instagram_allowed"
+          />
+        </div>
+        <div class="col-second">
+          <textArea v-model="description"
+                    label="Description"
+                    height="198px"
+                    :valid="description_valid"
+                    :max_length="1000"
+          />
+          <addImage v-model="cover"
+                    v-model:error="cover_error"
+                    title="Add collection image<br>(*.jpg, *.png, *.svg)"
+                    accept="image/jpeg,image/png,image/svg+xml"
+                    height="135px"
+                    :min_width="1400"
+                    :min_height="260"
+                    cover
+          />
+        </div>
       </div>
-      <div class="col-second">
-        <textArea v-model="description"
-                  label="Description"
-                  height="198px"
-                  :valid="description_valid"
-                  :max_length="1000"
-        />
-        <addImage v-model="cover"
-                  v-model:error="cover_error"
-                  title="Add collection image<br>(*.jpg, *.png, *.svg)"
-                  accept="image/jpeg,image/png,image/svg+xml"
-                  height="135px"
-                  :min_width="1400"
-                  :min_height="260"
-                  cover
-        />
+      <div class="actions">
+        <btn text="cancel" @click="$router.go(-1)">
+          <img src="~assets/cancel.svg"/>
+        </btn>
+        <btn :text="edit_mode ? 'update collection' : 'create collection'" 
+             color="green" 
+             :disabled="!can_submit" 
+             @click="onSetCollection"
+        >
+          <img src="~assets/create.svg"/>
+        </btn>
       </div>
     </div>
-  </div>
-  <div class="actions">
-    <btn text="cancel" @click="$router.go(-1)">
-      <img src="~assets/cancel.svg"/>
-    </btn>
-    <btn :text="edit_mode ? 'update collection' : 'create collection'" 
-         color="green" 
-         :disabled="!can_submit" 
-         @click="onSetCollection"
-    >
-      <img src="~assets/create.svg"/>
-    </btn>
   </div>
 </template>
 
 <style scoped lang="stylus">
   .collection-container {
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
+
     .description {
       font-size: 14px
       text-align: center
       color: #fff
-      margin: 10px 0px 30px 0px
+      margin: 10px 0px 20px 0px
       font-family: 'SFProDisplay', sans-serif
 
       & > i {
@@ -99,47 +106,54 @@
       }
     }
 
-    .fields {
-      padding: 0 30px
-      display: flex
+    .scrollable {
+      overflow-y: overlay
+      overflow-x: hidden
+      flex: 1
 
-      .col-first {
-        flex-basis: 50%
+      .fields {
+        padding: 0 30px
+        display: flex
 
-        & > *:not(:last-child) {
-          margin-bottom: 20px
+        .col-first {
+          flex-basis: 50%
+
+          & > *:not(:last-child) {
+            margin-bottom: 20px
+          }
+        }
+
+        .col-second {
+          flex-basis: 50%
+          margin-left: 30px
+
+          & > *:not(:last-child) {
+            margin-bottom: 20px
+          }
         }
       }
 
-      .col-second {
-        flex-basis: 50%
-        margin-left: 30px
-
-        & > *:not(:last-child) {
-          margin-bottom: 20px
-        }
+      .text {
+        width: 100%
+        height: 100%
+        display: flex
+        justify-content: center
+        align-items: center
+        font-size: 14px
+        color: #1af6d6
+        cursor: pointer
       }
     }
 
-    .text {
-      width: 100%
-      height: 100%
+    .actions {
       display: flex
       justify-content: center
-      align-items: center
-      font-size: 14px
-      color: #1af6d6
-      cursor: pointer
-    }
-  }
+      margin-top: 35px
+      margin-bottom: 10px
 
-  .actions {
-    display: flex
-    justify-content: center
-    margin-top: 50px
-
-    & > *:not(:first-child) {
-      margin-left: 30px
+      & > *:not(:first-child) {
+        margin-left: 30px
+      }
     }
   }
 </style>

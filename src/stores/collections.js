@@ -152,7 +152,7 @@ class CollectionsStore extends LazyItems {
   }
 
   async detectOwned(item) {
-    if (!utils.isWeb()) {
+    if (utils.isDesktop()) {
       return item.owned
     }
     

@@ -6,7 +6,7 @@
     <notFound v-else-if="collection === null" text="Collection Not Found"/>
     <template v-else>
       <keyModal ref="keyModal" :name="author_error ? '' : author_name" :artist_key="author_key"/>
-      <preview :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
+      <preview v-if="!compact" :class="{'error': collection.error}" :image="cover" width="100%" height="170px" :default="def_banner" cover>
         <div class="info-container">
           <div class="left">
             <preview :class="{'error': collection.author_error}" 
@@ -63,7 +63,7 @@
       </preview>  
 
       <!-- TODO: same layout as in approve containers -->
-      <div :class="{'block': true, 'block-long': long_text}">
+      <div v-if="!compact" :class="{'block': true, 'block-long': long_text}">
         <span ref="desc" :class="{'desc-short': !full_text}">{{ description }}</span>
         <btn v-if="long_text && !full_text"
              class="btn-right"
@@ -330,6 +330,7 @@ export default {
 
   data() {
     return {
+      compact: utils.isCompact(),
       observer: undefined,
       full_text: false,
       long_text: false,
@@ -457,10 +458,12 @@ export default {
   updated() {
     if (!this.observer) {
       let desc = this.$refs.desc
-      this.observer = new ResizeObserver(() => {
-        this.calcLongText()
-      })
-      this.observer.observe(desc)
+      if (desc) {
+        this.observer = new ResizeObserver(() => {
+          this.calcLongText()
+        })
+        this.observer.observe(desc)
+      }
     }
   },
 

@@ -112,12 +112,12 @@ export default class LazyLoader {
   async _req_AC_LOAD(id0, count) {
     let res = undefined 
 
-    if (utils.isWeb()) {
+    if (!utils.isDesktop()) {
       let request = `${utils.webGateway}view_${this._objname}s?id0=${id0}&count=${count}`
       res = await utils.downloadAsync(request, 'json')
     }
 
-    if (!utils.isWeb()) {
+    if (utils.isDesktop()) {
       ({res} = await utils.invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,
@@ -135,12 +135,12 @@ export default class LazyLoader {
   async _req_AC_UPDATE(h0, count) {
     let res = undefined 
     
-    if (utils.isWeb()) {
+    if (!utils.isDesktop()) {
       let request = `${utils.webGateway}view_${this._objname}s?h0=${h0}&count=${count}`
       res = await utils.downloadAsync(request, 'json')
     }
 
-    if (!utils.isWeb()) {
+    if (utils.isDesktop()) {
       ({res} = await utils.invokeContractAsync({
         role: 'manager',
         action: `view_${this._objname}s`,

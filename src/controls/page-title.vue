@@ -1,10 +1,10 @@
 <template>
-  <div class="page-title-container">
+  <div :class="['page-title-container', compact ? 'compact' : '']">
     <div class="title">{{ title }}</div>
     <div class="overlay">
       <backBtn/>
       <div/>
-      <div class="title-slot">
+      <div class="slot">
         <slot></slot>
       </div>
     </div>
@@ -13,12 +13,16 @@
 
 <style scoped lang="stylus">
   .page-title-container {
-    min-height: 45px 
+    min-height: 43px 
     user-select: none
     display: flex
     justify-content: center
     align-items: center
     position: relative
+
+    &.compact {
+      padding: 0 0 0 5px
+    }
 
     .overlay {
       width: 100%
@@ -36,14 +40,15 @@
         flex-basis: 0
       }
 
-      & > .title-slot {
+      & > .slot {
         display: flex
         justify-content: flex-end
         align-items: center
 
-        & > :slotted(*) {
+        & :slotted(*) {
           margin-left: 12px
           margin-top: 5px
+
           &:last-child {
             margin-right: 8px
           }
@@ -69,6 +74,7 @@
 
 <script>
 import backBtn from 'controls/btn-back'
+import utils from 'utils/utils'
 
 export default {
   components: {
@@ -80,6 +86,12 @@ export default {
       type: String,
       required: false,
       default: ''
+    }
+  },
+
+  data () {
+    return {
+      compact: utils.isCompact()
     }
   }
 }

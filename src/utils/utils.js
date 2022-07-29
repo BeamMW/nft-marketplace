@@ -5,9 +5,9 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
-let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
-let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
+let ipfsGateway  = 'https://gallery20.apps.beam.mw/ipfs/'
+let webGateway   = 'https://gallery20.apps.beam.mw/cache/'
+let headlessNode = 'eu-node01.mainnet.beam.mw:8200'
 let InitParams   = undefined
 
 export default class Utils {
@@ -33,8 +33,12 @@ export default class Utils {
     return Utils.is_mobile
   }
 
+  static isCompact () {
+    return Utils.isMobile()
+  }
+
   static isDesktop () {
-    if (Utils.is_mobile === undefined) {
+    if (Utils.is_desktop === undefined) {
       const ua = navigator.userAgent
       Utils.is_desktop = (/QtWebEngine/i.test(ua))
     }
@@ -43,7 +47,7 @@ export default class Utils {
 
   static isWeb () {
     if (Utils.is_web === undefined) {
-      Utils.is_web = (!Utils.is_desktop && ! Utils.is_mobile)
+      Utils.is_web = (!Utils.isDesktop() && !Utils.isMobile())
     }
     return Utils.is_web
   }
@@ -73,9 +77,15 @@ export default class Utils {
       if (!window.BEAM) {
         return reject()
       }
-      if (Utils.isAndroid()) document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
-      else window.BEAM.callWalletApiResult(apirescback)
-      resolve(window.BEAM)
+      if (Utils.isAndroid()) { 
+        document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
+      }
+      else {
+        window.BEAM.callWalletApiResult(apirescback)
+      }
+      resolve({
+        api: window.BEAM
+      })
     })
   }
 
@@ -445,6 +455,10 @@ export default class Utils {
 
     if (Utils.isWeb()) {
       document.body.classList.add('web')
+    }
+
+    if (Utils.isCompact()) {
+      document.body.classList.add('compact')
     }
   }
     
@@ -818,6 +832,7 @@ export default class Utils {
   }
 
   static formatAmountFixed(amount, fixed) {
+    if (amount == 0) return '0'
     let str = (amount / 100000000).toFixed(fixed)
     if (parseFloat(str) == 0) {
       let res = '< 0.'
