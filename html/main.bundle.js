@@ -37928,7 +37928,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const router = (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHistory)(window.location.pathname),
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHashHistory)(),
   routes: [
     {path: '/', component: components_user_page__WEBPACK_IMPORTED_MODULE_1__["default"], name: 'gallery'},
     {path: '/my', component: components_my_page__WEBPACK_IMPORTED_MODULE_0__["default"], name: 'my'},
@@ -38777,7 +38777,7 @@ const store = {
   //
   // App entry point
   //
-  async start () {
+  async start (useCurrentURL) {
     //
     // Download shader & start working with contract
     // nextTick to not to block UI while downloading
@@ -38786,7 +38786,7 @@ const store = {
       Object.assign(this.state, defaultState())
       this.state.is_headless = utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isHeadless()
       this.state.is_desktop = utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isDesktop()
-      router__WEBPACK_IMPORTED_MODULE_0__["default"].push({name: 'gallery'})
+      if(!useCurrentURL) router__WEBPACK_IMPORTED_MODULE_0__["default"].push({name: 'gallery'})
       
       await this.checkCID()
       await this.initStuff()      
@@ -40746,7 +40746,7 @@ const sort = {
 }
 
 const contract = {
-  cid: '4390f75c95f60e6c069fb25a4c210d9b3b8a79804b1e5ddba431965ea8eb4cd9'
+  cid: '4f35ecda4e84eb8acb6d3991b8b7443e26e01353a6987c07c8d90b00edd8fc80'
 }
 
 const def_images = {
@@ -40807,9 +40807,9 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let ipfsGateway  = 'https://gallery20.apps.beam.mw/ipfs/'
-let webGateway   = 'https://gallery20.apps.beam.mw/cache/'
-let headlessNode = 'eu-node01.mainnet.beam.mw:8200'
+let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
+let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
+let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
 let InitParams   = undefined
 
 class Utils {
@@ -48820,7 +48820,7 @@ utils_utils__WEBPACK_IMPORTED_MODULE_4__["default"].initialize(
       return stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].setError(new utils_errorex__WEBPACK_IMPORTED_MODULE_14__["default"]('Failed to initialize application', err), true)
     }
 
-    stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].start()
+    stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].start(true)
   }
 )
 

@@ -5,9 +5,9 @@ let BEAM         = null
 let CallID       = 0
 let Calls        = {}
 let APIResCB     = undefined
-let ipfsGateway  = 'https://gallery20.apps.beam.mw/ipfs/'
-let webGateway   = 'https://gallery20.apps.beam.mw/cache/'
-let headlessNode = 'eu-node01.mainnet.beam.mw:8200'
+let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
+let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
+let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
 let InitParams   = undefined
 
 export default class Utils {

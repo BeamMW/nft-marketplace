@@ -75,7 +75,7 @@ const store = {
   //
   // App entry point
   //
-  async start () {
+  async start (useCurrentURL) {
     //
     // Download shader & start working with contract
     // nextTick to not to block UI while downloading
@@ -84,7 +84,7 @@ const store = {
       Object.assign(this.state, defaultState())
       this.state.is_headless = utils.isHeadless()
       this.state.is_desktop = utils.isDesktop()
-      router.push({name: 'gallery'})
+      if(!useCurrentURL) router.push({name: 'gallery'})
       
       await this.checkCID()
       await this.initStuff()      

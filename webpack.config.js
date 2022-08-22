@@ -121,7 +121,7 @@ const config = (DEV_MODE) => {return {
           context: './src'
         },
         {
-          from: path.join(__dirname, './node_modules/beam-wasm-client/'),
+          from: path.join(__dirname, './node_modules/beam-wasm-client-dappnet/'),
           globOptions: {
             ignore: ['**/package.json', '**/README.md'],
           },
