@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="actions">
-          <btn text="cancel" @click="$router.go(-1)">
+          <btn text="cancel" @click="$store.toBack()">
             <img src="~assets/cancel.svg"/>
           </btn>
           <btn text="upload NFT" color="green" :disabled="!can_submit" @click="onUploadNFT">
@@ -128,7 +128,6 @@ import formSelect from 'controls/form-select'
 import loading from 'controls/loading'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
-import router from 'router'
 import {common} from 'utils/consts'
 import {computed} from 'vue'
 
@@ -241,7 +240,7 @@ export default {
         // user cancelled
         return
       }
-      router.go(-1)
+      this.$store.toBack()
     }
   }
 }

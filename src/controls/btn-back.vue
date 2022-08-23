@@ -1,5 +1,5 @@
 <template>
-  <div class="back-btn" @click="$router.go(-1)">
+  <div class="back-btn" @click="onBack()">
     <img src="~assets/back.svg"/>
     {{ text }}
   </div>
@@ -33,6 +33,11 @@ export default {
       required: false,
       default: utils.isCompact() ? '' : 'back'
     },
+  },
+  methods: {
+    onBack() {
+      this.$store.toBack()
+    }
   }
 }
 </script>

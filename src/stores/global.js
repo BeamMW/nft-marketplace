@@ -446,6 +446,10 @@ const store = {
   },
 
   toBack () {
+    if(!router.options.history.state.back) {
+      router.replace({name: 'gallery'})
+      return
+    } 
     router.go(-1)
   },
 

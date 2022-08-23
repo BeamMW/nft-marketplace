@@ -100,7 +100,7 @@
         Artist info cannot be changed while artist transaction is in progress
       </p>
       <div class="actions">
-        <btn text="cancel" @click="$router.go(-1)">
+        <btn text="cancel" @click="$store.toBack()">
           <img src="~assets/cancel.svg"/>
         </btn>
         <btn :text="edit_self ? 'update artist' : 'create account'" 
@@ -274,7 +274,6 @@ import btn from 'controls/button'
 import addImage from 'controls/add-image'
 import artistsStore from 'stores/artists'
 import validators from 'utils/validators'
-import router from 'router'
 import utils from 'utils/utils'
 import {common} from 'utils/consts'
 
@@ -470,7 +469,7 @@ export default {
         }
         throw err
       }
-      router.go(-1)
+      this.$store.toBack()
     }
   }
 }
