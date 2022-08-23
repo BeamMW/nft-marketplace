@@ -591,10 +591,10 @@ batch@0.6.1:
   resolved "https://registry.npmjs.org/batch/-/batch-0.6.1.tgz"
   integrity sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY=
 
-beam-wasm-client@^7.0.13064:
-  version "7.0.13064"
-  resolved "https://registry.yarnpkg.com/beam-wasm-client/-/beam-wasm-client-7.0.13064.tgz#b407e7839207d25016f878e7d1538aaa2ba9ffc5"
-  integrity sha512-8xhd8QpwgSP+g4rutNSxl3WgSCcZZ4wXRQGai7Zgik9OoePtqubpxNHtOPTJLjEXeNi7evdH8DTOAwPsfCXssQ==
+beam-wasm-client@^7.1.13105:
+  version "7.1.13105"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client/-/beam-wasm-client-7.1.13105.tgz#ba58032164985a99e62229be7221a1ef81a5f466"
+  integrity sha512-RPK3hA1z2mm6d3zS8MGjFKczm/AEduFnEWA4OFJk+pyp4OfeAWceMNCEZbNN8cgC8zLH/rTLdZGLGc7fqrGlsA==
 
 big.js@^5.2.2:
   version "5.2.2"

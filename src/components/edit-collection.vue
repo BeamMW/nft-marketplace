@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="actions">
-        <btn text="cancel" @click="$router.go(-1)">
+        <btn text="cancel" @click="$store.toBack()">
           <img src="~assets/cancel.svg"/>
         </btn>
         <btn :text="edit_mode ? 'update collection' : 'create collection'" 
@@ -167,7 +167,6 @@ import addImage from 'controls/add-image'
 import loading from 'controls/loading'
 import notFound from 'controls/not-found'
 import collsStore from 'stores/collections'
-import router from 'router'
 import validators from 'utils/validators'
 import messageModal from 'components/message-modal'
 
@@ -336,7 +335,7 @@ export default {
         }
         throw err
       }
-      router.go(-1)
+      this.$store.toBack()
     }
   }
 }

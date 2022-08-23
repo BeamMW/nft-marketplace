@@ -22318,10 +22318,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var controls_add_image__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! controls/add-image */ "./src/controls/add-image.vue");
 /* harmony import */ var stores_artists__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! stores/artists */ "./src/stores/artists.js");
 /* harmony import */ var utils_validators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! utils/validators */ "./src/utils/validators.js");
-/* harmony import */ var router__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! router */ "./src/router.js");
-/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
-/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
-
+/* harmony import */ var utils_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! utils/utils */ "./src/utils/utils.js");
+/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
 
 
 
@@ -22380,7 +22378,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     ellipse_style() {
       return {
-        'background-color': utils_utils__WEBPACK_IMPORTED_MODULE_9__["default"].getStyles().background_main
+        'background-color': utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].getStyles().background_main
       }
     },
     label_valid() {
@@ -22491,7 +22489,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     max_image_size() {
-      return utils_utils__WEBPACK_IMPORTED_MODULE_9__["default"].formatBytes(utils_consts__WEBPACK_IMPORTED_MODULE_10__.common.MAX_IMAGE_SIZE)
+      return utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].formatBytes(utils_consts__WEBPACK_IMPORTED_MODULE_9__.common.MAX_IMAGE_SIZE)
     },
   },
 
@@ -22526,7 +22524,7 @@ __webpack_require__.r(__webpack_exports__);
         }
         throw err
       }
-      router__WEBPACK_IMPORTED_MODULE_8__["default"].go(-1)
+      this.$store.toBack()
     }
   }
 });
@@ -22584,10 +22582,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var controls_loading__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! controls/loading */ "./src/controls/loading.vue");
 /* harmony import */ var controls_not_found__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! controls/not-found */ "./src/controls/not-found.vue");
 /* harmony import */ var stores_collections__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! stores/collections */ "./src/stores/collections.js");
-/* harmony import */ var router__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! router */ "./src/router.js");
-/* harmony import */ var utils_validators__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! utils/validators */ "./src/utils/validators.js");
-/* harmony import */ var components_message_modal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! components/message-modal */ "./src/components/message-modal.vue");
-
+/* harmony import */ var utils_validators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! utils/validators */ "./src/utils/validators.js");
+/* harmony import */ var components_message_modal__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! components/message-modal */ "./src/components/message-modal.vue");
 
 
 
@@ -22602,7 +22598,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    messageModal: components_message_modal__WEBPACK_IMPORTED_MODULE_10__["default"],
+    messageModal: components_message_modal__WEBPACK_IMPORTED_MODULE_9__["default"],
     formInput: controls_form_input__WEBPACK_IMPORTED_MODULE_0__["default"], 
     textArea: controls_textarea__WEBPACK_IMPORTED_MODULE_1__["default"], 
     pageTitle: controls_page_title__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -22666,7 +22662,7 @@ __webpack_require__.r(__webpack_exports__);
     website_valid() {
       let value = this.website
       if (!value) return true
-      return value.length <= 150 && utils_validators__WEBPACK_IMPORTED_MODULE_9__["default"].url(value)
+      return value.length <= 150 && utils_validators__WEBPACK_IMPORTED_MODULE_8__["default"].url(value)
     },
     twitter: {
       get () {
@@ -22678,10 +22674,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     twitter_valid() {
       let value = this.twitter
-      return !value || utils_validators__WEBPACK_IMPORTED_MODULE_9__["default"].twitter(value)
+      return !value || utils_validators__WEBPACK_IMPORTED_MODULE_8__["default"].twitter(value)
     },
     twitter_allowed() {
-      return utils_validators__WEBPACK_IMPORTED_MODULE_9__["default"].twitter_allowed()
+      return utils_validators__WEBPACK_IMPORTED_MODULE_8__["default"].twitter_allowed()
     },
     instagram: {
       get () {
@@ -22693,10 +22689,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     instagram_valid() {
       let value = this.instagram
-      return !value || utils_validators__WEBPACK_IMPORTED_MODULE_9__["default"].instagram(value)
+      return !value || utils_validators__WEBPACK_IMPORTED_MODULE_8__["default"].instagram(value)
     },
     instagram_allowed() {
-      return utils_validators__WEBPACK_IMPORTED_MODULE_9__["default"].instagram_allowed()
+      return utils_validators__WEBPACK_IMPORTED_MODULE_8__["default"].instagram_allowed()
     },
     description: {
       get () {
@@ -22765,7 +22761,7 @@ __webpack_require__.r(__webpack_exports__);
         }
         throw err
       }
-      router__WEBPACK_IMPORTED_MODULE_8__["default"].go(-1)
+      this.$store.toBack()
     }
   }
 });
@@ -22827,10 +22823,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var controls_loading__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! controls/loading */ "./src/controls/loading.vue");
 /* harmony import */ var stores_collections__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! stores/collections */ "./src/stores/collections.js");
 /* harmony import */ var stores_nfts__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! stores/nfts */ "./src/stores/nfts.js");
-/* harmony import */ var router__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! router */ "./src/router.js");
-/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm-bundler.js");
-
+/* harmony import */ var utils_consts__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! utils/consts */ "./src/utils/consts.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.runtime.esm-bundler.js");
 
 
 
@@ -22871,7 +22865,7 @@ __webpack_require__.r(__webpack_exports__);
 
   setup (props) {
     const lazyColls = stores_collections__WEBPACK_IMPORTED_MODULE_10__["default"].getLazyAllItems('artist')
-    const collections = (0,vue__WEBPACK_IMPORTED_MODULE_14__.computed)(() => {
+    const collections = (0,vue__WEBPACK_IMPORTED_MODULE_13__.computed)(() => {
       let colls = lazyColls.value
       if (!colls) {
         return undefined
@@ -22950,13 +22944,13 @@ __webpack_require__.r(__webpack_exports__);
         image: this.image
       }
       let collID = this.collections[this.collection].id
-      let price  = parseFloat(this.price) * utils_consts__WEBPACK_IMPORTED_MODULE_13__.common.GROTHS_IN_BEAM
+      let price  = parseFloat(this.price) * utils_consts__WEBPACK_IMPORTED_MODULE_12__.common.GROTHS_IN_BEAM
       let txid = await stores_nfts__WEBPACK_IMPORTED_MODULE_11__["default"].createNFT(collID, this.name, data, price)
       if (!txid) {
         // user cancelled
         return
       }
-      router__WEBPACK_IMPORTED_MODULE_12__["default"].go(-1)
+      this.$store.toBack()
     }
   }
 });
@@ -30943,7 +30937,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
             text: "cancel",
-            onClick: _cache[9] || (_cache[9] = $event => (_ctx.$router.go(-1)))
+            onClick: _cache[9] || (_cache[9] = $event => (_ctx.$store.toBack()))
           }, {
             default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
               _hoisted_13
@@ -31124,7 +31118,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [
                 (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
                   text: "cancel",
-                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
+                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$store.toBack()))
                 }, {
                   default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
                     _hoisted_13
@@ -31269,7 +31263,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [
                 (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_btn, {
                   text: "cancel",
-                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$router.go(-1)))
+                  onClick: _cache[7] || (_cache[7] = $event => (_ctx.$store.toBack()))
                 }, {
                   default: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(() => [
                     _hoisted_8
@@ -32576,7 +32570,7 @@ const _hoisted_1 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/(0,vue__WEBPACK
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     class: "back-btn",
-    onClick: _cache[0] || (_cache[0] = $event => (_ctx.$router.go(-1)))
+    onClick: _cache[0] || (_cache[0] = $event => (_ctx.$store.toBack()))
   }, [
     _hoisted_1,
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.text), 1 /* TEXT */)
@@ -37928,7 +37922,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const router = (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHistory)(window.location.pathname),
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_9__.createWebHashHistory)(),
   routes: [
     {path: '/', component: components_user_page__WEBPACK_IMPORTED_MODULE_1__["default"], name: 'gallery'},
     {path: '/my', component: components_my_page__WEBPACK_IMPORTED_MODULE_0__["default"], name: 'my'},
@@ -38777,7 +38771,7 @@ const store = {
   //
   // App entry point
   //
-  async start () {
+  async start (useCurrentURL) {
     //
     // Download shader & start working with contract
     // nextTick to not to block UI while downloading
@@ -38786,7 +38780,7 @@ const store = {
       Object.assign(this.state, defaultState())
       this.state.is_headless = utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isHeadless()
       this.state.is_desktop = utils_utils__WEBPACK_IMPORTED_MODULE_8__["default"].isDesktop()
-      router__WEBPACK_IMPORTED_MODULE_0__["default"].push({name: 'gallery'})
+      if(!useCurrentURL) router__WEBPACK_IMPORTED_MODULE_0__["default"].push({name: 'gallery'})
       
       await this.checkCID()
       await this.initStuff()      
@@ -39148,6 +39142,10 @@ const store = {
   },
 
   toBack () {
+    if(!router__WEBPACK_IMPORTED_MODULE_0__["default"].options.history.state.back) {
+      router__WEBPACK_IMPORTED_MODULE_0__["default"].replace({name: 'gallery'})
+      return
+    } 
     router__WEBPACK_IMPORTED_MODULE_0__["default"].go(-1)
   },
 
@@ -48820,7 +48818,7 @@ utils_utils__WEBPACK_IMPORTED_MODULE_4__["default"].initialize(
       return stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].setError(new utils_errorex__WEBPACK_IMPORTED_MODULE_14__["default"]('Failed to initialize application', err), true)
     }
 
-    stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].start()
+    stores_global__WEBPACK_IMPORTED_MODULE_6__["default"].start(true)
   }
 )
 

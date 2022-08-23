@@ -14,7 +14,7 @@
   "devDependencies": {
     "@popperjs/core": "^2.11.5",
     "@vueuse/rxjs": "^8.4.2",
-    "beam-wasm-client": "^7.0.13064",
+    "beam-wasm-client": "^7.1.13105",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.0",
     "dexie": "^3.2.2",

@@ -75,6 +75,6 @@ utils.initialize(
       return store.setError(new ErrorEx('Failed to initialize application', err), true)
     }
 
-    store.start()
+    store.start(true)
   }
 )
