@@ -38554,7 +38554,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const versions = {
-  DATABASE_VERSION:   126,
+  DATABASE_VERSION:   127,
   ARTIST_VERSION:     200,
   COLLECTION_VERSION: 200,
   NFT_VERSION:        200,
@@ -39948,7 +39948,7 @@ class LazyLoader {
   defaultStatus () {
     return {
       'iprocessed': 0,
-      'inext': 0,
+      'inext': this.getFirstIDX(),
       'hprocessed': 0 
     }
   }
@@ -40065,17 +40065,16 @@ class LazyLoader {
     let status = await this._loadStatus()
 
     if (action == AC_LOAD) {
-      if (status.iprocessed && status.inext == this.getZeroIDX()) {
+      if (status.inext == this.getZeroIDX()) {
         // initial loading already completed
         // nothig left to do
-        await this.onEnd(status)
         console.log(`_loadAsyncInternal for ${this._objname}s completed`)
         return false
       }
 
       if (status.hprocessed == 0) {
-        // first AC_LOAD, tell to start sync from the current height
-        status.hprocessed = this._global.state.height
+        // first AC_LOAD, tell to start next sync from the current height
+        status.hprocessed = this._global.state.height - 1
         console.log(`${this._objname} - AC_LOAD set processed block for update to ${this._global.state.height}`)
         await this._saveStatus(status)
       }
@@ -40086,7 +40085,6 @@ class LazyLoader {
         // not yet properly initialized. This can happen if initial AC_LOAD happens
         // a few msecs before new block. Usually should not happen
         console.log(`_loadAsyncInternal for ${this._objname}s ignored/not initialized`)
-        await this.onEnd(status)
         return false
       }
     }
@@ -40103,57 +40101,44 @@ class LazyLoader {
       let hnext = status.hprocessed + 1
       res = await this._req_AC_UPDATE(hnext, 20)
       items = res.items
-      if (items === undefined) {
-        // eslint-disable-next-line no-debugger
-        debugger
-      }
       console.log(`loading ${this._objname}s, depth ${depth}, h0 is ${hnext}, got ${items.length} items`)
     }
 
-    if (action == AC_LOAD) {
-      let inext = status.iprocessed ? status.inext : this.getFirstIDX()
-      res = await this._req_AC_LOAD(inext, 20)
+    if (action == AC_LOAD) { 
+      res = await this._req_AC_LOAD(status.inext, 20)
       items = res.items
-      if (items === undefined) {
-        // eslint-disable-next-line no-debugger
-        debugger
-      }
-      console.log(`loading ${this._objname}s, depth ${depth}, id0 is ${inext}, got ${items.length} items`)
+      console.log(`loading ${this._objname}s, depth ${depth}, id0 is ${status.inext}, got ${items.length} items`)
     }
 
     // TODO: do not load unmoderated items for an average user. Drop db after user becomes a modeator
     // TODO: delete unapproved items for an average user
     // TODO: import headless db when switching to headed
-    {
-      await this.onStart(status, items)
+    await this.onStart(status, items)
     
-      for(let item of items) {
-        await this.onItem(status, item)
-        if (action === AC_UPDATE) {
-          console.log(`${this._objname} ${item.id} processed`)
-          status.hprocessed = Math.max(status.hprocessed, item.updated)
-        }
+    for(let item of items) {
+      await this.onItem(status, item)
+      if (action === AC_UPDATE) {
+        console.log(`${this._objname} ${item.id} processed`)
+        status.hprocessed = Math.max(status.hprocessed, item.updated)
       }
-     
-      await this.onEnd(status, items)
     }
 
     if (action === AC_LOAD) {
       status.iprocessed += items.length
       status.inext = res.next_id
     }
-
+    
     await db.transaction('rw!', db[this._store_name], db[this._metastore_name], async () => {
-      await db[this._store_name].bulkPut(items)
+      if(items.length) await db[this._store_name].bulkPut(items)
       await this._saveStatus(status)
     })
 
-    await this.onEnd(status)
+    await this.onEnd(status, items)
 
     if (items.length > 0 || (action == AC_UPDATE && height < this._global.state.height)) {
       let further = async () => {return await this._loadAsyncInternal(action, ++depth, autoContinue)}
       if (autoContinue) {
-        setTimeout(further, 10)
+        setTimeout(further, 2)
       }
       return further
     }
