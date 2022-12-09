@@ -14,6 +14,8 @@
 
 #define Gallery_manager_view(macro)
 
+#define Gallery_manager_view_all_assets(macro)
+
 #define Gallery_manager_view_params(macro) macro(ContractID, cid)
 
 #define Gallery_manager_view_moderators(macro) macro(ContractID, cid)
@@ -99,6 +101,7 @@
     macro(manager, create_contract) macro(manager, replace_admin) macro(       \
         manager, set_min_approvers) macro(manager, view)                       \
         macro(manager, view_params) macro(manager, view_artists_stats) macro(  \
+        macro(manager, view_all_assets)                                     (  \
             manager, view_moderators_stats) macro(manager, view_artists)       \
             macro(manager, view_likes) macro(manager, view_collections) macro( \
                 manager, view_nfts) macro(manager, view_nft_sales)             \
@@ -1018,6 +1021,38 @@ ON_METHOD(manager, set_min_approvers) {
 
 ON_METHOD(manager, view) {
     EnumAndDumpContracts(gallery::kSid0);
+}
+
+ON_METHOD(manager, view_all_assets)
+{
+    Env::DocArray gr("res");
+
+    auto iSlot = Env::Assets_Enum(0, static_cast<Height>(-1));
+    while (true)
+    {
+        char szMetadata[1024 * 16 + 1]; // max metadata size is 16K
+        AssetInfo ai;
+        uint32_t nMetadata = sizeof(szMetadata) - 1;
+        auto aid = Env::Assets_MoveNext(iSlot, ai, szMetadata, nMetadata, 0);
+        if (!aid)
+            break;
+
+        Env::DocGroup gr1("");
+
+        Env::DocAddNum("aid", aid);
+
+        Env::DocAddNum("mintedLo", ai.m_ValueLo);
+        Env::DocAddNum("mintedHi", ai.m_ValueHi);
+
+        if (_POD_(ai.m_Cid).IsZero())
+            Env::DocAddBlob_T("owner_pk", ai.m_Owner);
+        else
+            Env::DocAddBlob_T("owner_cid", ai.m_Cid);
+
+        szMetadata[std::min<uint32_t>(nMetadata, sizeof(szMetadata) - 1)] = 0;
+        Env::DocAddText("metadata", szMetadata);
+    }
+    Env::Assets_Close(iSlot);
 }
 
 ON_METHOD(manager, set_moderator) {
