@@ -220,10 +220,6 @@ static const ContractID kOldGalleryCid = {
     0xed, 0xd8, 0xad, 0xd4, 0xcc, 0xfd, 0x40, 0x81, 0xae, 0x9e};
 static const ContractID kEmptyCid = {};
 
-const ShaderID kSids[] = {
-    gallery::kSid0,
-};
-
 const Upgradable3::Manager::VerInfo kVerInfo = {kSids, _countof(kSids)};
 
 /*
