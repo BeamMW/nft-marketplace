@@ -531,6 +531,13 @@ struct MigrateSales {
     uint32_t sales_len;
     Amount prices[];
 };
+
+struct Deposit {
+    static const uint32_t kMethod = 25;
+    Payout::Key key;
+    Amount value;
+};
+
 }  // namespace method
 #pragma pack(pop)
 }  // namespace gallery

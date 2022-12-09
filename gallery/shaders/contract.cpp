@@ -822,3 +822,9 @@ BEAM_EXPORT void Method_24(const method::MigrateSales& r) {
     ContractState s;
     s.AddSigAdmin();
 }
+
+BEAM_EXPORT void Method_25(const method::Deposit& r)
+{
+    PayoutMove(r.key, r.value, true);
+    Env::FundsLock(r.key.aid, r.value);
+}
