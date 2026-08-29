@@ -20,21 +20,49 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          # notes are built from the log since the previous tag
+          fetch-depth: 0
+
       - name: Download .dapp
         uses: actions/download-artifact@v7
         with:
           name: ${{ needs.build.outputs.dapp_name }}
+
+      # --generate-notes only lists merged PRs, and this repo releases straight
+      # off master, so it produced an empty changelog.
+      - name: Write release notes
+        env:
+          TAG: ${{ github.ref_name }}
+          DAPP: ${{ needs.build.outputs.dapp_name }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          PREV=$(git tag --list 'v*' --sort=-version:refname | grep -v "^${TAG}$" | head -1)
+          {
+            echo "Manifest version \`${VERSION}\`. Install \`${DAPP}\` from the wallet's Applications tab."
+            echo
+            echo "## Changes"
+            echo
+            if [ -n "$PREV" ]; then
+              git log --no-merges --format='- %s' "${PREV}..${TAG}"
+              echo
+              echo "**Full changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/${PREV}...${TAG}"
+            else
+              git log --no-merges --format='- %s' -20 "${TAG}"
+            fi
+          } > notes.md
+          cat notes.md
 
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
           DAPP: ${{ needs.build.outputs.dapp_name }}
-          VERSION: ${{ needs.build.outputs.version }}
           REPO: ${{ github.repository }}
         run: |
           gh release create "$TAG" "$DAPP" \
             --repo "$REPO" \
             --title "$TAG" \
-            --generate-notes \
-            --notes "Manifest version \`$VERSION\`. Install \`$DAPP\` from the Beam wallet."
+            --notes-file notes.md
