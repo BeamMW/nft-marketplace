@@ -1,13 +1,13 @@
+import wallet, {WalletEnvironment} from 'core/wallet'
+import network from 'core/network'
+
 const MIN_AMOUNT = 0.00000001
 const MAX_AMOUNT = 254000000
 
 let BEAM         = null
-let CallID       = 0
-let Calls        = {}
 let APIResCB     = undefined
-let headlessNode = 'eu-node02.dappnet.beam.mw:8200'
-let ipfsGateway  = 'https://apps-dappnet.beam.mw/ipfs/'
-let webGateway   = 'https://apps-dappnet.beam.mw/cache/'
+let ipfsGateway  = network.ipfsGateway
+let webGateway   = network.webGateway
 let InitParams   = undefined
 
 export default class Utils {
@@ -69,103 +69,15 @@ export default class Utils {
   }
 
   static isHeadless () {
-    return BEAM && BEAM.headless
+    return wallet.getEnvironment() === WalletEnvironment.HEADLESS
   }
 
-  static async createMobileAPI(apirescback) {
-    return new Promise((resolve, reject) => {
-      if (!window.BEAM) {
-        return reject()
-      }
-      if (Utils.isAndroid()) { 
-        document.addEventListener('onCallWalletApiResult', res => apirescback(res.detail))
-      }
-      else {
-        window.BEAM.callWalletApiResult(apirescback)
-      }
-      resolve({
-        api: window.BEAM
-      })
-    })
-  }
-
-  static async createDesktopAPI(apirescback) {
-    await Utils.injectScript('qrc:///qtwebchannel/qwebchannel.js')
-    return new Promise((resolve) => {
-      new QWebChannel(qt.webChannelTransport, (channel) => { // eslint-disable-line no-undef
-        channel.objects.BEAM.api.callWalletApiResult.connect(apirescback)
-        resolve({
-          api: channel.objects.BEAM.api,
-          styles: channel.objects.BEAM.style
-        })
-      })
-    })  
-  }
-
-  static async createWebAPI(apiver, apivermin, appname, apirescback) {
-    return new Promise((resolve) => {
-      window.addEventListener('message', async (ev) => {
-        if (ev.data === 'apiInjected') {
-          await window.BeamApi.callWalletApiResult(apirescback)
-          resolve({
-            api: window.BeamApi
-          })
-        }
-      }, false)
-      window.postMessage({type: 'create_beam_api', apiver, apivermin, appname}, window.origin)
-    })
-  }
-
-  static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
-    await Utils.injectScript('wasm-client.js')
-        
-    let WasmModule = await BeamModule()  // eslint-disable-line no-undef
-    let WasmWalletClient = WasmModule.WasmWalletClient
-    let client = new WasmWalletClient(headlessNode)
-    client.startWallet()
-
-    client.subscribe((response) => {
-      throw new Error(`Unexpected wasm wallet client response call: ${response}`)
-    })
-
-    client.setApproveContractInfoHandler((info) => {
-      throw new Error(`Unexpected wasm wallet client transaction in headless wallet ${info}`)
-    })
-        
-    return new Promise((resolve, reject) => {
-      let appid = WasmWalletClient.GenerateAppID(appname, window.location.href)
-      client.createAppAPI(apiver, apivermin, appid, appname, (err, api) => {
-        if (err) {
-          reject(err)
-        }
-                
-        api.setHandler(apirescback)
-        resolve({
-          headless: true,
-          module: WasmModule,
-          factory: WasmWalletClient,
-          client,
-          appid,
-          api
-        })
-      })
-    })
+  static get wallet () {
+    return wallet
   }
 
   static async stopHeadlessWallet() {
-    return new Promise((resolve, reject) => {
-      BEAM.client.stopWallet((data) => {
-        const running = BEAM.client.isRunning()
-        console.log(`is running: ${BEAM.client.isRunning()}`)
-        console.log('wallet stopped:', data)
-
-        if (running) {
-          reject(false)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return wallet.stopHeadlessWallet()
   }
 
   static async switchToWebAPI () {
@@ -176,12 +88,10 @@ export default class Utils {
     let apiver    = InitParams['api_version'] || 'current'
     let apivermin = InitParams['min_api_version'] || ''
     let appname   = InitParams['appname']
-    let apirescb  = (...args) => Utils.handleApiResult(...args)
 
     const newAPI = await new Promise((resolve) => {
       const listener = async (ev) => {
         if (ev.data === 'apiInjected') {
-          await window.BeamApi.callWalletApiResult(apirescb)
           Utils.hideLoading()
           resolve(window.BeamApi)
         }
@@ -192,7 +102,7 @@ export default class Utils {
       }
 
       // TODO: add some delay before showing connecting message
-      //       if extension is installed and app is allowed it would filck
+      //       if extension is installed and app is allowed it would flick
       window.addEventListener('message', listener, false)
       Utils.showLoading({
         headless: true,
@@ -212,70 +122,32 @@ export default class Utils {
     })
 
     if (newAPI) {
-      BEAM.api.delete()
-      await Utils.stopHeadlessWallet()
-      BEAM = {
-        api: newAPI
-      }
+      await wallet.adoptWebApi(newAPI)
+      BEAM = wallet.wallet
     }
 
     return newAPI
   }
 
   static async callApiAsync(method, params) {    
-    return new Promise((resolve, reject) => {
-      Utils.callApi(method, params, (err, res, full) => {
-        if (err) return reject(err)
-        return resolve({res, full})
-      })
-    })
+    let res = await wallet.callApi(method, params)
+    return {res, full: res}
   }
 
   static callApi(method, params, cback) {
-    let callid = ['call', CallID++, method].join('-')
-    let request = {
-      'jsonrpc': '2.0',
-      'id':      callid,
-      'method':  method,
-      'params':  params
-    }
-    Calls[callid] = {cback, request}
-
-    if (Utils.isHeadless()) {
-      return BEAM.api.callWalletApi(JSON.stringify(request))
-    }
-
-    if (Utils.isWeb()) {
-      return BEAM.api.callWalletApi(callid, method, params)
-    } 
-
-    if (Utils.isMobile()) {
-      return BEAM.api.callWalletApi(JSON.stringify(request))
-    }
-        
-    if (Utils.isDesktop()) {
-      return BEAM.api.callWalletApi(JSON.stringify(request))
-    }
+    wallet.callApi(method, params).then(
+      (res) => cback(null, res, res),
+      (err) => cback(err)
+    )
   }
 
   static async invokeContractAsync(args, bytes) {
-    return new Promise((resolve, reject) => {
-      Utils.invokeContract(args, (err, res, full, request) => {
-        if (err) return reject(err)
-        return resolve({res, full, request})
-      },
-      bytes)
-    })
+    return wallet.invokeContract(args, bytes)
   }
 
   static async invokeContractAsyncAndMakeTx (args) {
-    let {full} = await Utils.invokeContractAsync(args)
-    Utils.ensureField(full.result, 'raw_data', 'array')
-
     try {
-      let {res} = await Utils.callApiAsync('process_invoke_data', {data: full.result.raw_data})
-      Utils.ensureField(res, 'txid', 'string')
-      return res.txid
+      return await wallet.invokeContractAndMakeTx(args)
     }
     catch(err) {
       if (Utils.isUserCancelled(err)) {
@@ -286,139 +158,54 @@ export default class Utils {
   }
 
   static invokeContract(args, cback, bytes) {
-    let params = {
-      'create_tx': false
-    }
-
-    if (args) {
-      let assign = args
-
-      if (typeof args === 'object') {
-        assign = ''
-        for (let key in args) {
-          assign += (assign ? ',' : '') + key + '=' + args[key] 
-        }
-      }
-
-      params = Object.assign({
-        'args': assign
-      }, params)
-    }
-
-    if (bytes) {
-      params = Object.assign({
-        'contract': bytes
-      }, params)
-    }
-
-    // console.log('invoke contract', params)
-    return Utils.callApi('invoke_contract', params, cback)
-  }
-
-  static handleApiResult (json) {
-    let answer = undefined
-    
-    try
-    {
-      answer = JSON.parse(json)
-      const id = answer.id
-      const call = Calls[id] || {}
-      const cback = call.cback || APIResCB
-      const request = call.request
-      delete Calls[id]
-            
-      if (answer.error) {
-        return cback(answer)
-      }
-
-      if (typeof answer.result == 'undefined') {
-        return cback({
-          error: 'no valid api call result', 
-          answer
-        })
-      }
-
-      if (typeof answer.result.output == 'string') {
-        // this is shader result
-        let shaderAnswer = JSON.parse(answer.result.output)
-        if (shaderAnswer.error) {
-          return cback({
-            error: shaderAnswer.error,
-            answer,
-            request
-          })
-        }
-        return cback(null, shaderAnswer, answer, request)
-      }
-      else
-      {
-        return cback(null, answer.result, answer, request)
-      }
-    }
-    catch (err)
-    {
-      APIResCB({
-        error: err.toString(),
-        answer: answer || json
-      })
-    }
+    wallet.invokeContract(args, bytes).then(
+      ({res, full, request}) => cback(null, res, full, request),
+      (err) => cback(err)
+    )
   }
 
   static async initialize(params, initcback) {
     InitParams = params
     APIResCB = params['apiResultHandler']
-    let headless = params['headless']
-        
+
+    // wallet-pushed events (new block, tx changes) drive per-block refreshes
+    wallet.on('apiEvent', (response) => {
+      // A response whose call already timed out lands here too. Dropping it
+      // avoids a spurious "Unexpected API result".
+      let id = String((response || {}).id || '')
+      if (!id.startsWith('ev_')) {
+        console.log('dropping late/unmatched api response', id)
+        return
+      }
+
+      if (APIResCB) APIResCB(null, response.result, response)
+    })
+
+    wallet.on('error', (err) => {
+      if (APIResCB) APIResCB(err)
+    })
+
     try 
     {
-      if (Utils.isDesktop()) {
-        BEAM = await Utils.createDesktopAPI((...args) => Utils.handleApiResult(...args))
-      } 
-            
+      if (Utils.isWeb() && !Utils.isChrome()) {
+        Utils.showChromeDownload()
+        return false
+      }
+
       if (Utils.isWeb()) {
-        let apiver    = params['api_version'] || 'current'
-        let apivermin = params['min_api_version'] || ''
-        let appname   = params['appname']
-
-        if (!Utils.isChrome()) {
-          Utils.showChromeDownload()
-          return false
-        }
-                
-        if (headless) {
-          Utils.showLoading({
-            headless: true,
-            connecting: false
-          })
-          BEAM = await Utils.createHeadlessAPI(
-            apiver, apivermin, appname, 
-            (...args) => Utils.handleApiResult(...args)
-          )        
-        } else {
-          Utils.showLoading({
-            headless: false,
-            connecting: true
-          })
-          BEAM = await Utils.createWebAPI(
-            apiver, apivermin, appname, 
-            (...args) => Utils.handleApiResult(...args)
-          )
-        }
+        Utils.showLoading({
+          headless: !!params['headless'],
+          connecting: !params['headless']
+        })
       }
 
-      if (Utils.isMobile()) {
-        try {
-          BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args))
-        } catch (e) {
-          Utils.showMobileStoresLinks()
-          return false
-        }
-      }
+      await wallet.connect({headless: !!params['headless']})
+      BEAM = wallet.wallet
 
       let styles = Utils.getStyles()
       Utils.applyStyles(styles)
       Utils.hideLoading()
-            
+
       if (!BEAM) {
         return initcback('Failed to create BEAM API')
       }
@@ -427,11 +214,20 @@ export default class Utils {
     }
     catch (err)
     {
+      if (Utils.isMobile()) {
+        Utils.showMobileStoresLinks()
+        return false
+      }
       return initcback(err)
     }
   }
 
   static getStyles () {
+    if (wallet.styles) {
+      // TODO: проборосить стили из мобайла и экстеншена
+      return wallet.styles
+    }
+
     if (BEAM && BEAM.styles) {
       // TODO: проборосить стили из мобайла и экстеншена
       return BEAM.styles
@@ -538,7 +334,8 @@ export default class Utils {
 
   static handleString(next) {
     let result = true
-    const regex = new RegExp(/^-?\d+(\.\d*)?$/g)
+    // no leading '-' - a negative price reaches the contract as a huge uint
+    const regex = new RegExp(/^\d+(\.\d*)?$/g)
     const floatValue = parseFloat(next)
     const afterDot = next.indexOf('.') > 0 ? next.substring(next.indexOf('.') + 1) : '0'
     if ((next && !String(next).match(regex)) ||
@@ -823,12 +620,28 @@ export default class Utils {
   }
 
   static isUserCancelled (err) {
-    return err.error && err.error.code == -32021
+    if (!err) return false
+    if (err.error && err.error.code == -32021) return true
+    return err.code == -32021
   }
 
   static formatJSON(obj) {
     let res = JSON.stringify(obj, null, 2)
     return res == '{}' ? obj.toString() : res
+  }
+
+  // 306998 -> 306,998; decimals are left alone
+  static groupThousands(str) {
+    let [int, frac] = String(str).split('.')
+    let sign = ''
+
+    if (int.startsWith('-')) {
+      sign = '-'
+      int = int.substring(1)
+    }
+
+    int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    return frac === undefined ? sign + int : `${sign}${int}.${frac}`
   }
 
   static formatAmountFixed(amount, fixed) {
@@ -842,7 +655,12 @@ export default class Utils {
       res += '1'
       return res
     }
-    return str.replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1')
+    // strip trailing zeros
+    if (str.indexOf('.') !== -1) {
+      str = str.replace(/0+$/, '').replace(/\.$/, '')
+    }
+
+    return Utils.groupThousands(str)
   }
 
   static formatAmount3(amount) {
@@ -913,6 +731,20 @@ export default class Utils {
         oldobj[key] = newobj[key]
       }
     }
+  }
+
+  // execCommand('paste') is blocked everywhere, so the async API is the only
+  // option and there is no fallback when it is unavailable
+  static async pasteText() {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        return await navigator.clipboard.readText()
+      }
+    }
+    catch (err) {
+      console.log('clipboard read failed', err)
+    }
+    return ''
   }
 
   static copyText(text) {
