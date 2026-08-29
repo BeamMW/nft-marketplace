@@ -110,7 +110,7 @@ import list from 'controls/lazy-list'
 import collsStore from 'stores/collections'
 import nftsStore from 'stores/nfts'
 import artistsStore from 'stores/artists-lazy'
-import {admin_tabs} from 'utils/consts'
+import {admin_tabs, force_admin_ui} from 'utils/consts'
 
 export default {
   components: {
@@ -134,18 +134,18 @@ export default {
 
   computed: {
     page_title() {
-      return this.$state.is_admin ? 'admin panel' : 'moderator panel'
+      return (this.$state.is_admin || force_admin_ui) ? 'admin panel' : 'moderator panel'
     },
     tabs () {
       let tabs = []
 
-      if (this.$state.is_moderator) {
+      if (this.$state.is_moderator || force_admin_ui) {
         tabs.push({id: admin_tabs.NFTS, name: 'NFTs'})
         tabs.push({id: admin_tabs.COLLECTIONS, name: 'Collections'})
         tabs.push({id: admin_tabs.ARTISTS, name: 'Artists'})
       }
 
-      if (this.$state.is_admin) {
+      if (this.$state.is_admin || force_admin_ui) {
         tabs.push({id: admin_tabs.ADMIN, name: 'Admin'})
       }
 
