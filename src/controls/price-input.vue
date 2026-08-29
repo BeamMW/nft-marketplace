@@ -6,7 +6,10 @@
                @keydown="onKey"
                @paste="onPaste"
     >
-      <span class="beam" :class="{'readonly': readonly}">BEAM</span>
+      <span class="asset" :class="{'readonly': readonly}">
+        <assetIcon :aid="aid" :size="20" class="asset-icon"/>
+        {{ unit_name }}
+      </span>
     </formInput>
   </div>
 </template>
@@ -19,9 +22,16 @@
       padding-bottom: 10px !important
     }
 
-    .beam {
+    .asset {
+      display: flex
+      align-items: center
       font-size: 20px
       padding-right: 12px
+      white-space: nowrap
+
+      & > .asset-icon {
+        margin-right: 6px
+      }
 
       &.readonly {
         color: rgba(255, 255, 255, 0.3)
@@ -33,10 +43,13 @@
 <script>
 import formInput from 'controls/form-input'
 import utils from 'utils/utils'
+import assetsStore from 'stores/assets'
+import assetIcon from 'controls/asset-icon'
 
 export default {
   components: {
-    formInput
+    formInput,
+    assetIcon
   },
   props: {
     label: {
@@ -54,6 +67,10 @@ export default {
       default: false,
       required: false
     },
+    aid: {
+      type: Number,
+      default: 0
+    },
     // eslint-disable-next-line vue/prop-name-casing
     modelValue: {
       type: String,
@@ -67,6 +84,9 @@ export default {
   ],
 
   computed: {
+    unit_name () {
+      return assetsStore.get(this.aid).unit_name
+    },
     computedValue: {
       get() {
         return this.modelValue

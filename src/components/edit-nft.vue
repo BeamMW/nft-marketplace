@@ -26,8 +26,10 @@
                         :options="collections"
             />
             <priceInput v-model="price"
+                        :aid="price_aid"
                         label="Price"
             />
+            <assetSelect v-model="price_aid" label="Asset" :readonly="dontsell"/>
             <switchInput v-model="dontsell" label="Not for sale"/>
           </div>
           <div class="col-second">
@@ -123,6 +125,7 @@ import notFound from 'controls/not-found'
 import btn from 'controls/button'
 import addImage from 'controls/add-image'
 import priceInput from 'controls/price-input'
+import assetSelect from 'controls/asset-select'
 import switchInput from 'controls/switch-input'
 import formSelect from 'controls/form-select'
 import loading from 'controls/loading'
@@ -139,6 +142,7 @@ export default {
     btn,
     addImage,
     priceInput,
+    assetSelect,
     switchInput,
     formSelect,
     loading,
@@ -181,6 +185,7 @@ export default {
       image: undefined,
       image_error: undefined,
       price: '',
+      price_aid: 0,
       dontsell: true,
       collection: 0
     }
@@ -195,9 +200,18 @@ export default {
       let value = this.description
       return !value || value.length <= 300
     },
+    price_valid () {
+      if (this.dontsell || !this.price) {
+        return true
+      }
+      let value = parseFloat(this.price)
+      return !Number.isNaN(value) && value > 0
+    },
+
     can_submit () {
       return this.name && this.name_valid &&
              this.description_valid &&
+             this.price_valid &&
              this.image && !this.image_error
     }
   },
@@ -235,7 +249,7 @@ export default {
       }
       let collID = this.collections[this.collection].id
       let price  = parseFloat(this.price) * common.GROTHS_IN_BEAM
-      let txid = await nftsStore.createNFT(collID, this.name, data, price)
+      let txid = await nftsStore.createNFT(collID, this.name, data, price, this.price_aid)
       if (!txid) {
         // user cancelled
         return

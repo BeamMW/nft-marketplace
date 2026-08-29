@@ -4,7 +4,8 @@
       <div class="title">
         Set the price
       </div>
-      <priceInput v-model="price" color="#0bccf7" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
+      <priceInput v-model="price" :aid="aid" color="#0bccf7" placeholder="0" @trigger-key="onKey" @trigger-paste="onPaste"/>
+      <assetSelect v-model="aid" class="asset-select" label="Asset"/>
       <!-- div class="fee">
         <span class="title">Fee</span>
         <span class="value">0.011 BEAM</span>
@@ -62,6 +63,11 @@
       }
     }
 
+    .asset-select {
+      align-self: stretch
+      margin-top: 20px
+    }
+
     .info {
       margin-top: 20px
       opacity: 0.7
@@ -91,12 +97,13 @@
 import modal from 'controls/modal'
 import btn from 'controls/button'
 import priceInput from 'controls/price-input'
+import assetSelect from 'controls/asset-select'
 import utils from 'utils/utils'
 import {common} from 'utils/consts'
 
 export default {
   components: { 
-    modal, btn, priceInput
+    modal, btn, priceInput, assetSelect
   }, 
   
   emits:[
@@ -106,6 +113,7 @@ export default {
   data() {  
     return {
       price: '',
+      aid: 0,
     } 
   },
 
@@ -151,12 +159,13 @@ export default {
         return
       }
       let price = parseFloat(this.price) * common.GROTHS_IN_BEAM
-      this.$emit('sell-nft',price)
+      this.$emit('sell-nft', price, this.aid)
       this.close()
     },
 
-    open () {
+    open (aid) {
       this.price = ''
+      this.aid = Number(aid || 0)
       this.$refs.modal.open()
     },
 

@@ -1,8 +1,8 @@
 <template>
   <div class="amount-container" :style="text_style">
-    <img src="~assets/beam.svg" :style="icon_style"/>
+    <assetIcon :aid="aid" :size="icon_size"/>
     <div>
-      <div>{{ value }} BEAM</div>
+      <div>{{ value }} {{ unit_name }}</div>
       <div v-if="info">{{ info }}</div>
     </div>
   </div>
@@ -22,12 +22,22 @@
 
 <script>
 import utils from 'utils/utils'
+import assetsStore from 'stores/assets'
+import assetIcon from 'controls/asset-icon'
 
 export default {
+  components: {
+    assetIcon
+  },
+
   props: {
     amount: {
       type: Number,
       required: true,
+      default: 0
+    },
+    aid: {
+      type: Number,
       default: 0
     },
     size: {
@@ -48,6 +58,12 @@ export default {
     value () {
       return utils.formatAmountFixed(this.amount, 3)
     },
+    unit_name () {
+      return assetsStore.get(this.aid).unit_name
+    },
+    icon_size () {
+      return parseInt(this.size.substring(0, this.size.length - 2)) + 6
+    },
     text_style () {
       return {
         'font-size': this.size
@@ -55,7 +71,7 @@ export default {
     },
     icon_style () {
       return {
-        'width': `${parseInt(this.size.substring(0, this.size.length-2)) + 6}px`
+        'width': `${this.icon_size}px`
       }
     }
   }
