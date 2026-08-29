@@ -15,8 +15,7 @@
     "vue"
   ],
   "globals": {
-    "require": "readonly",
-    "module": "readonly"
+    "require": "readonly"
   },
   "rules": {
     "indent": [
@@ -106,5 +105,15 @@
       "error",
       "kebab-case"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/networks.js"
+      ],
+      "env": {
+        "node": true
+      }
+    }
+  ]
 }
