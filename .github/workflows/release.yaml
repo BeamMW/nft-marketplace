@@ -1,30 +1,16 @@
 name: Release
 
-# Tag a commit on master to cut a release:
-#   git tag v1.1.0 && git push origin v1.1.0
+# The manifest version is <prefix>.<commit count>, same as dex-app. Tag the
+# commit with that version to cut a release:
+#   git tag "v1.1.$(git rev-list --count HEAD)" && git push origin --tags
 on:
   push:
     tags:
       - 'v*'
 
 jobs:
-  # the tag is the release version, so the manifest should say the same thing
-  # rather than the commit count used for dev builds
-  version:
-    runs-on: ubuntu-latest
-    outputs:
-      manifest_version: ${{ steps.strip.outputs.manifest_version }}
-    steps:
-      - id: strip
-        env:
-          TAG: ${{ github.ref_name }}
-        run: echo "manifest_version=${TAG#v}" >> "$GITHUB_OUTPUT"
-
   build:
-    needs: version
     uses: ./.github/workflows/make-dapp.yaml
-    with:
-      manifest_version: ${{ needs.version.outputs.manifest_version }}
 
   release:
     needs: build
