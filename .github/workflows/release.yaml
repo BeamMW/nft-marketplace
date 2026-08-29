@@ -8,8 +8,23 @@ on:
       - 'v*'
 
 jobs:
+  # the tag is the release version, so the manifest should say the same thing
+  # rather than the commit count used for dev builds
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      manifest_version: ${{ steps.strip.outputs.manifest_version }}
+    steps:
+      - id: strip
+        env:
+          TAG: ${{ github.ref_name }}
+        run: echo "manifest_version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: version
     uses: ./.github/workflows/make-dapp.yaml
+    with:
+      manifest_version: ${{ needs.version.outputs.manifest_version }}
 
   release:
     needs: build
