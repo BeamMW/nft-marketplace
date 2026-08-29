@@ -1,5 +1,5 @@
 <template>
-  <div v-if="is_approved" class="likes-container" :disabled="!can_vote" v-on="{click: liked ? onUnlike : onLike}">
+  <div v-if="is_approved" class="likes-container" :disabled="!can_act" v-on="{click: liked ? onUnlike : onLike}">
     <div>{{ likes }}</div>
     <img :src="like_icon"/>
   </div>
@@ -44,8 +44,17 @@ export default {
       return this.item.approved
     },
 
+    // Only a first vote is paid from the pool, so un-liking needs no funds.
     can_vote () {
       return !this.item.error && this.$state.balance_reward > 0
+    },
+
+    can_unvote () {
+      return !this.item.error
+    },
+
+    can_act () {
+      return this.liked ? this.can_unvote : this.can_vote
     },
 
     liked () {
@@ -89,7 +98,7 @@ export default {
         return this.$store.switchToHeaded()  
       } 
 
-      if (this.can_vote) {
+      if (this.can_unvote) {
         return nftsStore.unlikeNFT(this.id)
       }
 

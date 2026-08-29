@@ -97,7 +97,8 @@ class ImagesStore {
       while(this._state.track.length > this._cache_size) {
         let hash = this._state.track.shift()
         let clear = this._state.images[hash]
-        if (clear.object) URL.revokeObjectURL(image.object)
+        // revoke the evicted url, not the one just added
+        if (clear && clear.object) URL.revokeObjectURL(clear.object)
         delete this._state.images[hash]
       }
     }

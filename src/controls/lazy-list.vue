@@ -110,7 +110,7 @@
 import paginator from 'controls/paginator'
 import selectItem from 'controls/select-item'
 import utils from 'utils/utils'
-import {computed, ref} from 'vue'
+import {computed, ref, onUnmounted} from 'vue'
 
 export default {
   components: {
@@ -172,6 +172,15 @@ export default {
 
   setup (props) {
     let subscription = undefined
+
+    // unmounted lists would otherwise keep their liveQuery subscription
+    onUnmounted(() => {
+      if (subscription) {
+        subscription.unsubscribe()
+        subscription = undefined
+      }
+    })
+
     const itemsObservable = computed(() => {
       if (subscription) {
         subscription.unsubscribe()
@@ -217,6 +226,13 @@ export default {
     this.clearDelay()
   },
 
+  unmounted() {
+    if (this._scroll_timer) {
+      clearTimeout(this._scroll_timer)
+      this._scroll_timer = undefined
+    }
+  },
+
   methods: {
     clearDelay() {
       this.delay_passed = false
@@ -225,8 +241,17 @@ export default {
       }, 100)
     },
     onScroll(ev) {
+      // debounced - scroll fires per frame
       let pos = ev.target.scrollTop
-      this.$router.replace({name: this.$route.name, hash: `#${pos}`})
+
+      if (this._scroll_timer) {
+        clearTimeout(this._scroll_timer)
+      }
+
+      this._scroll_timer = setTimeout(() => {
+        this._scroll_timer = undefined
+        this.$router.replace({name: this.$route.name, hash: `#${pos}`})
+      }, 150)
     },
     onPage(page) {
       this.$refs.itemslist.scrollTop = 0

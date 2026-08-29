@@ -88,7 +88,15 @@ export default class LazyLoader {
     }
 
     this._state.loading = true
-    return await this._loadAsyncInternal(AC_LOAD, 0, autoContinue)
+
+    try {
+      return await this._loadAsyncInternal(AC_LOAD, 0, autoContinue)
+    }
+    catch (err) {
+      // otherwise the flag stays set and every later load is a no-op
+      this._state.loading = false
+      throw err
+    }
   }
 
   async updateAsync (autoContinue) {
@@ -97,7 +105,14 @@ export default class LazyLoader {
     }
 
     this._state.updating = true
-    return await this._loadAsyncInternal(AC_UPDATE, 0, autoContinue)
+
+    try {
+      return await this._loadAsyncInternal(AC_UPDATE, 0, autoContinue)
+    }
+    catch (err) {
+      this._state.updating = false
+      throw err
+    }
   }
 
   async onStart(status, items) {
@@ -189,7 +204,8 @@ export default class LazyLoader {
     let items = []
     let res = undefined
     let db = this._db
-    let height = this._global.height
+    // state.height - _global.height does not exist
+    let height = this._global.state.height
 
     if (action == AC_UPDATE) {
       let hnext = status.hprocessed + 1

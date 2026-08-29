@@ -1,5 +1,6 @@
 
 import ArtistsCommon from 'stores/artists-common'
+import lazyArtistsStore from 'stores/artists-lazy'
 import formats from 'stores/formats'
 import utils from 'utils/utils'
 import router from 'router'
@@ -115,6 +116,18 @@ class ArtistsStore {
   // TODO: check if we need fail flag
   async _loadArtistAsync (id) {
     try {
+      // The lazy store already holds every artist locally, so look there
+      // before spending a roundtrip per author.
+      let local = await lazyArtistsStore.getItemFromDB(id)
+      if (local) {
+        let cached = this.fromDB(Object.assign({}, local))
+        cached.approved = (cached.status === 'approved') ? 1 : 0
+        cached.pending  = (cached.status === 'pending') ? 1 : 0
+        cached.rejected = (!cached.approved && !cached.pending) ? 1 : 0
+        this._setArtist(id, cached)
+        return this._state.artists[id]
+      }
+
       let {res} = await utils.invokeContractAsync({
         role: 'manager',
         action: 'view_artists',

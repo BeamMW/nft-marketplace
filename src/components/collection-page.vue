@@ -423,11 +423,11 @@ export default {
       return this.collection.nfts_count >= 500
     },
     max_sale() {
-      let value = this.collection.max_price.value 
+      let value = ((this.collection || {}).max_price || {}).value || 0
       return utils.formatAmount3(value)
     },
     trade_volume() {
-      let value = this.collection.total_sold.volume
+      let value = ((this.collection || {}).total_sold || {}).volume || 0
       return utils.formatAmount3(value)
     },
     active_tab: {
