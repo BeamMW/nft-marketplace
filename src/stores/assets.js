@@ -23,18 +23,47 @@ class AssetsStore {
       assets: {0: BEAM_ASSET}
     })
     this._pending = {}
+    this._list_loaded = false
   }
 
   get assets () {
     return this._state.assets
   }
 
-  // Assets to offer in the picker: BEAM, anything resolved, and anything seen
-  // on a price in this gallery.
+  // Assets to offer in the picker: whatever the wallet holds, plus BEAM and
+  // anything seen on a price in this gallery.
   get known () {
     let list = Object.values(this._state.assets)
     list.sort((a, b) => a.aid - b.aid)
     return list
+  }
+
+  //
+  // assets_list (api 7.3) returns every asset the wallet knows about, which is
+  // a much better picker than the handful the gallery happens to price things
+  // in. Best effort: a wallet that refuses it just falls back to those.
+  //
+  async loadListAsync () {
+    if (this._list_loaded) {
+      return
+    }
+
+    this._list_loaded = true
+
+    try {
+      let {res} = await utils.callApiAsync('assets_list', {refresh: false})
+      utils.ensureField(res, 'assets', 'array')
+
+      for (let entry of res.assets) {
+        let aid = Number((entry || {}).asset_id || 0)
+        if (!aid || this._state.assets[aid]) continue
+        this._state.assets[aid] = AssetsStore.fromApi(aid, entry)
+      }
+    }
+    catch (err) {
+      console.log('assets_list unavailable, falling back to gallery assets', err)
+      this._list_loaded = false
+    }
   }
 
   noteAid (aid) {

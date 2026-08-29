@@ -300,6 +300,9 @@ export default {
         return
       }
 
+      // pull the wallet's asset list the first time the picker is opened
+      assetsStore.loadListAsync()
+
       this.search = ''
       this.$refs.modal.open()
       nextTick(() => {
