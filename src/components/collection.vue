@@ -1,5 +1,4 @@
 <template>
-  <!--selectItem-->
   <div :class="{'collection': true, 'error': item.error}" @click="onDetails" @contextmenu="onMenu">
     <moderationMenu ref="moderationMenu" :item="item"/>
     <preview :image="item.cover"
@@ -36,7 +35,6 @@
       </div>
     </div>
   </div>
-  <!-- /selectitem -->
 </template>
     
 <style scoped lang="stylus">
