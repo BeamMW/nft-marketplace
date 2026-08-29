@@ -1,6 +1,14 @@
 <template>
   <div :style="ctrlStyle">
-    <div class="add-image-container" :style="borderStyle" :readonly="readonly" :class="{'error': error || (modelValue || {}).error}">
+    <div class="add-image-container"
+         :style="borderStyle"
+         :readonly="readonly"
+         :class="{'error': error || (modelValue || {}).error, 'dragover': dragover}"
+         @dragenter.prevent.stop="onDragEnter"
+         @dragover.prevent.stop="onDragEnter"
+         @dragleave.prevent.stop="onDragLeave"
+         @drop.prevent.stop="onDrop"
+    >
       <div v-if="modelValue && !readonly" class="remove" :style="remove_style">
         <img src="~/assets/remove.svg" @click="onRemove"/>
       </div>
@@ -34,6 +42,12 @@
 
     &[readonly] {
       opacity: 0.6
+    }
+
+    &.dragover {
+      background-color: rgba(26, 246, 214, 0.25)
+      outline: 1px dashed rgba(26, 246, 214, 0.8)
+      outline-offset: -4px
     }
 
     .remove {
@@ -171,7 +185,8 @@ export default {
 
   data() {
     return {
-      input_id: genUniqueID()
+      input_id: genUniqueID(),
+      dragover: false
     }
   },
 
@@ -230,7 +245,14 @@ export default {
       this.$emit('update:error', null)
     },
     onUpload (e) {
-      let file = e.target.files[0]
+      this.readFile(e.target.files[0])
+    },
+
+    readFile (file) {
+      if (!file) {
+        return
+      }
+
       let reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = (e) => {
@@ -239,6 +261,59 @@ export default {
           file
         })
       }
+    },
+
+    // Drag & drop. Without this a dropped image navigates the page away.
+    accepts (file) {
+      if (!this.accept || !file) {
+        return true
+      }
+
+      let types = this.accept.split(',').map(t => t.trim()).filter(Boolean)
+      if (!types.length) {
+        return true
+      }
+
+      return types.some(type => {
+        if (type.endsWith('/*')) {
+          return file.type.startsWith(type.slice(0, -1))
+        }
+        return file.type === type
+      })
+    },
+
+    onDragEnter () {
+      if (this.readonly) {
+        return
+      }
+      this.dragover = true
+    },
+
+    onDragLeave () {
+      this.dragover = false
+    },
+
+    onDrop (ev) {
+      this.dragover = false
+
+      if (this.readonly) {
+        return
+      }
+
+      let file = ((ev.dataTransfer || {}).files || [])[0]
+      if (!file) {
+        return
+      }
+
+      if (!this.accepts(file)) {
+        this.$emit('update:error', 'Unsupported image type')
+        return
+      }
+
+      // keep the hidden file input in sync so removing works the same way
+      this.$refs.input.value = ''
+      this.$emit('update:error', undefined)
+      this.readFile(file)
     },
     onLoad() {
       console.log('!!!!Image', this.modelValue)

@@ -5,7 +5,8 @@
     </label>
     <div class="input" :class="{'err': !valid, 'readonly': readonly}">
       <img v-if="img" :src="icon_src" :class="{'error': !valid}" alt="icon"/>
-      <input :value="modelValue"
+      <input ref="input"
+             :value="modelValue"
              :placeholder="placeholder"
              :style="style"
              :maxlength="max_length"
@@ -13,8 +14,23 @@
              :readonly="readonly"
              @input="$emit('update:modelValue', $event.target.value)"
              @keydown="onKeyDown"
+             @contextmenu="onContextMenu"
       />
       <slot></slot>
+      <popupMenu ref="ctxMenu">
+        <div class="item" @click="onCut">
+          <img src="~assets/remove.svg"/>
+          cut
+        </div>
+        <div class="item" @click="onCopy">
+          <img src="~assets/copy.svg"/>
+          copy
+        </div>
+        <div class="item" @click="onPaste">
+          <img src="~assets/change.svg"/>
+          paste
+        </div>
+      </popupMenu>
     </div>
     <charslen v-if="max_length && counter" 
               :readonly="readonly" 
@@ -109,12 +125,16 @@
 </style>
 
 <script>
+import {nextTick} from 'vue'
+import utils from 'utils/utils'
 import charslen from 'controls/charslen'
+import popupMenu from 'controls/popup-menu'
 import validators from 'utils/validators'
 
 export default {
   components: {
-    charslen
+    charslen,
+    popupMenu
   },
 
   props: {
@@ -192,6 +212,82 @@ export default {
       if (this.allowed && !this.allowed.test(ev.key)) {
         ev.preventDefault()
       }
+    },
+
+    // the desktop wallet webview has no native context menu
+    onContextMenu(ev) {
+      ev.preventDefault()
+      this.$refs.input.focus()
+      this.$refs.ctxMenu.open(ev)
+    },
+
+    selection() {
+      let input = this.$refs.input
+      let from = input.selectionStart
+      let to = input.selectionEnd
+      return {from, to, text: String(this.modelValue).substring(from, to)}
+    },
+
+    replaceSelection(text) {
+      let input = this.$refs.input
+      let value = String(this.modelValue)
+      let from = input.selectionStart
+      let to = input.selectionEnd
+      let next = value.substring(0, from) + text + value.substring(to)
+
+      if (this.max_length && next.length > this.max_length) {
+        next = next.substring(0, this.max_length)
+      }
+
+      this.$emit('update:modelValue', next)
+
+      nextTick(() => {
+        let pos = Math.min(from + text.length, next.length)
+        input.setSelectionRange(pos, pos)
+      })
+    },
+
+    async onCopy() {
+      this.$refs.ctxMenu.close()
+      let {text} = this.selection()
+      if (text) {
+        await utils.copyText(text)
+      }
+    },
+
+    async onCut() {
+      this.$refs.ctxMenu.close()
+
+      if (this.readonly) {
+        return
+      }
+
+      let {text} = this.selection()
+      if (!text) {
+        return
+      }
+
+      await utils.copyText(text)
+      this.replaceSelection('')
+    },
+
+    async onPaste() {
+      this.$refs.ctxMenu.close()
+
+      if (this.readonly) {
+        return
+      }
+
+      let text = await utils.pasteText()
+      if (!text) {
+        return
+      }
+
+      if (this.allowed && Array.from(text).some(ch => !this.allowed.test(ch))) {
+        return
+      }
+
+      this.replaceSelection(text)
     }
   }
 }
