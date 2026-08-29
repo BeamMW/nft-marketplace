@@ -105,5 +105,15 @@
       "error",
       "kebab-case"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/networks.js"
+      ],
+      "env": {
+        "node": true
+      }
+    }
+  ]
 }

@@ -30,6 +30,9 @@ function defaultState() {
     user_active_tab: 0,
     balance_beam: 0,
     balance_reward: 0,
+    // per-vote payout and its asset, both fixed by the contract config
+    reward_amount: 0,
+    reward_aid: 0,
     is_headless: false,
     is_desktop: true,
     debug: false
@@ -180,8 +183,17 @@ const store = {
       this.state.shader
     )
     
+    utils.ensureField(res, 'contracts', 'array')
+
     if(!res.contracts.some(el => el.cid == this.state.cid)) {
-      throw new Error(`CID ${this.state.cid} not found `)
+      // report what the node has, so a stale cid is distinguishable from the
+      // shader not being deployed here at all
+      let found = res.contracts.map(el => el.cid)
+      let detail = found.length
+        ? `deployed instances of this shader: ${found.join(', ')}`
+        : 'this shader has no deployed instances on the connected network'
+
+      throw new Error(`CID ${this.state.cid} not found - ${detail}`)
     }
   },
 
@@ -212,6 +224,15 @@ const store = {
     this.state.is_admin = !!res.is_admin
     this.state.is_moderator = !!res.is_moderator
     this.state.balance_reward = res.vote_reward.balance
+
+    // The shader exposes these as vote_reward_amount / vote_reward_aid; accept
+    // them nested under vote_reward too so this survives either shape.
+    this.state.reward_amount = Number(
+      res.vote_reward.amount !== undefined ? res.vote_reward.amount : (res.vote_reward_amount || 0)
+    )
+    this.state.reward_aid = Number(
+      res.vote_reward.aid !== undefined ? res.vote_reward.aid : (res.vote_reward_aid || 0)
+    )
     if (this.state.is_admin) this.loadModerators()
 
     if (this.state.is_admin && !this.state.is_moderator) {
@@ -387,12 +408,11 @@ const store = {
 
   //
   // Admin stuff
-  //
+  // add_rewards(cid, amount) - no aid, the pool's asset is fixed on chain.
   async addRewards (amount) {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'user',
       action: 'add_rewards',
-      aid: 0,
       amount,
       cid: this.state.cid
     })

@@ -3,7 +3,7 @@
   <span class="price-container">
     <!--- has price, so display it --->
     <template v-if="price">
-      <amount :amount="price.amount" :size="mode == 'normal' ? '18px' : '14px'"/>
+      <amount :amount="price.amount" :aid="price_aid" :size="mode == 'normal' ? '18px' : '14px'"/>
         
       <!--- has price and owned, display change price / remove from sale options --->
       <template v-if="owned">
@@ -146,11 +146,16 @@ export default {
     },
 
     author () {
-      return artistsStore.my_id === artistsStore.author
+      // the nft carries its author key
+      return !!artistsStore.my_key && this.nft.author === artistsStore.my_key
     },
 
     price () {
       return this.nft.price
+    },
+
+    price_aid () {
+      return Number((this.nft.price || {}).aid || 0)
     },
 
     compact() {
@@ -166,7 +171,7 @@ export default {
 
     onChangePrice(ev) {
       ev.stopPropagation()
-      this.$refs.priceModal.open()
+      this.$refs.priceModal.open(this.price_aid)
     },
 
     onSell (ev) {
@@ -182,13 +187,13 @@ export default {
       nftsStore.buyNFT(this.id)
     },
 
-    onSellNFT (price) {
-      nftsStore.setPrice(this.id, price)
+    onSellNFT (price, aid) {
+      nftsStore.setPrice(this.id, price, aid)
     },
 
     onRemoveFromSale (ev) {
       ev.stopPropagation()
-      nftsStore.setPrice(this.id, 0)
+      nftsStore.setPrice(this.id, 0, this.price_aid)
     },
   }
 }

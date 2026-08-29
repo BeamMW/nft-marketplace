@@ -81,10 +81,12 @@
     font-family: 'SFProDisplay', sans-serif
     font-size: 14px
     opacity: 0.85
+    transition: visibility 0s linear 100ms
   }
 
   &:hover .tooltip {
     visibility: visible
+    transition: visibility 0s linear 200ms
   }
 }
 </style>

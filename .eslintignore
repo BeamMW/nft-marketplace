@@ -1,2 +1,4 @@
 node_modules/
 html/
+nft-gallery/
+src/core/BeamDappConnector.js

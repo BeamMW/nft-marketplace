@@ -25,10 +25,26 @@
               <div class="title">
                 {{ title }}
               </div>
-              <btn v-if="approved" color="transparent" height="24px" padding="0px" @click="onShare">
+              <btn v-if="approved" color="transparent" height="24px" padding="0px" tooltip="copy link to this NFT" @click="onShare">
                 <img src="~assets/share.svg" width="24">
               </btn>
-              <btn v-if="approved & owned" color="transparent" height="20px" padding="0px 0px 2px 0px" @click="onTransfer">
+              <btn v-if="approved && ipfs_link"
+                   color="transparent"
+                   height="24px"
+                   padding="0px"
+                   tooltip="copy direct IPFS image link"
+                   @click="onCopyIpfs"
+              >
+                <img src="~assets/copy.svg" width="24">
+              </btn>
+              <btn v-if="approved && owned"
+                   color="transparent"
+                   height="20px"
+                   padding="0px 0px 2px 0px"
+                   :disabled="transfer_pending"
+                   :tooltip="transfer_pending ? 'transfer already in progress' : 'transfer this NFT'"
+                   @click="onTransfer"
+              >
                 <img src="~assets/transfer.svg" width="20">
               </btn>
             </div>
@@ -62,8 +78,8 @@
              :class="['row', compact ? 'compact' : '']"
         >
           <div>
-            <img src="~assets/beam.svg"/>
-            <span class="curr">BEAM</span>
+            <assetIcon :aid="Number(sale.aid || 0)" :size="20"/>
+            <span class="curr">{{ assetName(sale.aid) }}</span>
           </div>
           <div class="text">{{ formatAmountFixed(sale.amount) }}</div>
           <div class="text">{{ formatHeight(sale.height) }}</div>
@@ -310,6 +326,8 @@
               color: white
               margin-top: 20px
               font-size: 16px
+              white-space: pre-wrap
+              overflow-wrap: break-word
             }
 
             & .bottom {
@@ -366,6 +384,8 @@ import notFound from 'controls/not-found'
 import likes from 'controls/likes'
 import artistsStore from 'stores/artists'
 import nftsStore from 'stores/nfts'
+import assetsStore from 'stores/assets'
+import assetIcon from 'controls/asset-icon'
 import collsStore from 'stores/collections'
 import utils from 'utils/utils'
 import {def_images} from 'utils/consts'
@@ -387,7 +407,8 @@ export default {
     likes,
     moderationStatus,
     messageModal,
-    transferModal
+    transferModal,
+    assetIcon
   },
 
   props: {
@@ -465,6 +486,18 @@ export default {
       return this.show_safe? this.nft.safe_image : this.nft.image
     },
 
+    ipfs_link () {
+      let image = this.image
+      if (!image || image.error || !image.ipfs_hash) {
+        return ''
+      }
+      return [utils.ipfsGateway, image.ipfs_hash].join('')
+    },
+
+    transfer_pending () {
+      return nftsStore.isTransferPending(this.id)
+    },
+
     artists () {
       return artistsStore.artists
     }
@@ -473,18 +506,42 @@ export default {
   watch: {
     'nft': function (val) {
       this.collection = collsStore.getLazyItem(val.collection)
+    },
+
+    // refetch per block - the global store bumps height
+    '$state.height': function () {
+      this.refreshSales()
     }
   },
 
   created() {
-    (async () => {
-      this.sales = await nftsStore.getSales(this.id)
-    })()
+    this.refreshSales()
   },
 
   methods: {  
+    async refreshSales() {
+      try {
+        this.sales = await nftsStore.getSales(this.id)
+      }
+      catch (err) {
+        console.log(`failed to refresh sales for nft ${this.id}`, err)
+      }
+    },
+
     formatAmountFixed(amount) {
       return utils.formatAmountFixed(amount, 8)
+    },
+
+    assetName(aid) {
+      return assetsStore.get(aid).unit_name
+    },
+
+    onCopyIpfs() {
+      utils.copyText(this.ipfs_link)
+      this.$refs.messageModal.open(
+        'Direct image link',
+        'The direct IPFS link to this image has been copied to clipboard.'
+      )
     },
     formatHeight(height) {
       return utils.formatHeight(height)

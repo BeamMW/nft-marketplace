@@ -177,7 +177,8 @@ export default {
       return this.item.error || this.item.author_error
     },
     trade_volume() {
-      return this.item.total_sold.volume
+      // a partially loaded collection has no stats block
+      return ((this.item || {}).total_sold || {}).volume || 0
     }
   },
 

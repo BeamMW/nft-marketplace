@@ -1,10 +1,29 @@
 const path = require('path')
+const fs = require('fs')
 const html = require('html-webpack-plugin')
 const copy = require('copy-webpack-plugin')
 const extractCSS = require('mini-css-extract-plugin')
 const {VueLoaderPlugin} = require('vue-loader')
+const {ACTIVE, NETWORKS} = require('./src/networks')
 const ESLint = require('eslint-webpack-plugin')
 const SLint = require('stylelint-webpack-plugin')
+
+// Node address, gateways, contract id and wasm client come from
+// src/networks.js - see src/core/network.js.
+const network = NETWORKS[ACTIVE]
+
+if (!network) {
+  throw new Error(`Unknown network '${ACTIVE}' in src/networks.js`)
+}
+
+const wasmClientPath = path.join(__dirname, 'node_modules', network.wasmClient)
+
+if (!fs.existsSync(wasmClientPath)) {
+  throw new Error(
+    `Network '${ACTIVE}' needs the '${network.wasmClient}' package, which is not installed. ` +
+    `Run: yarn add -D ${network.wasmClient}`
+  )
+}
 
 const config = (DEV_MODE) => {return {
   entry: {
@@ -12,6 +31,7 @@ const config = (DEV_MODE) => {return {
   },
   devServer: {
     hot: true,
+    port: 13666,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp'
@@ -25,6 +45,7 @@ const config = (DEV_MODE) => {return {
   resolve: {
     alias: {
       'assets': path.resolve(__dirname, 'src/assets/'), 
+      'core': path.resolve(__dirname, 'src/core/'),
       'stores': path.resolve(__dirname, 'src/stores/'),
       'utils': path.resolve(__dirname, 'src/utils/'),
       'router': path.resolve(__dirname, 'src/router.js'),
@@ -121,7 +142,7 @@ const config = (DEV_MODE) => {return {
           context: './src'
         },
         {
-          from: path.join(__dirname, './node_modules/beam-wasm-client-dappnet/'),
+          from: wasmClientPath,
           globOptions: {
             ignore: ['**/package.json', '**/README.md'],
           },

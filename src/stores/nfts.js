@@ -1,9 +1,10 @@
 import LazyItems from 'stores/lazy-items'
 import imagesStore from 'stores/images'
+import assetsStore from 'stores/assets'
 import artistsStore from 'stores/artists'
 import formats from 'stores/formats'
 import {versions, cid} from 'stores/consts'
-import {computed} from 'vue'
+import {computed, reactive} from 'vue'
 import utils from 'utils/utils'
 import router from 'router'
 import likesStore from './likes'
@@ -114,6 +115,9 @@ class NFTSStore extends LazyItems {
   reset (global, db) {
     super.reset(global, db)
 
+    // nft id -> true while a transfer transaction is in flight
+    this._transfers = reactive({})
+
     this._allocMode({
       mode: 'user:liked', 
       loader: (store) => {
@@ -172,6 +176,17 @@ class NFTSStore extends LazyItems {
   fromContract(awork) {
     awork.description = awork.data.description 
     awork.image = awork.data.image
+
+    // let the picker know about every asset used for a price here
+    if (awork.price && awork.price.aid) {
+      assetsStore.noteAid(awork.price.aid)
+    }
+
+    // landed on chain - no longer ours, so nothing is in flight
+    if (this._transfers && this._transfers[awork.id] && !awork.owned) {
+      delete this._transfers[awork.id]
+    }
+
     return awork
   }
 
@@ -330,7 +345,7 @@ class NFTSStore extends LazyItems {
     return res.key
   }
 
-  async createNFT(collid, label, data, price) {
+  async createNFT(collid, label, data, price, aid) {
     ({label, data} = await this.toContract(label, data))
     
     let args = {
@@ -341,18 +356,18 @@ class NFTSStore extends LazyItems {
     }
 
     if (price) {
-      args['aid'] = 0
+      args['aid'] = Number(aid || 0)
       args['amount'] = price
     }
 
     return await utils.invokeContractAsyncAndMakeTx(args)
   }
 
-  async setPrice (id, amount) {
+  async setPrice (id, amount, aid) {
     return await utils.invokeContractAsyncAndMakeTx({
       role: 'user',
       action: 'set_price',
-      aid: 0,
+      aid: Number(aid || 0),
       amount, id, cid
     })
   }
@@ -392,13 +407,38 @@ class NFTSStore extends LazyItems {
     })
   }
 
+  // Transfers are not instant. Track what is in flight so the button can be
+  // disabled instead of firing a second, conflicting transaction.
+  isTransferPending(id) {
+    return !!(this._transfers && this._transfers[id])
+  }
+
   async transferNFT(id, to) {
-    return await utils.invokeContractAsyncAndMakeTx({
-      role: 'user',
-      action: 'transfer',
-      new_owner: to,
-      id, cid
-    })
+    if (this.isTransferPending(id)) {
+      return undefined
+    }
+
+    this._transfers[id] = true
+
+    try {
+      let txid = await utils.invokeContractAsyncAndMakeTx({
+        role: 'user',
+        action: 'transfer',
+        new_owner: to,
+        id, cid
+      })
+
+      if (!txid) {
+        // user cancelled in the wallet, nothing is in flight
+        delete this._transfers[id]
+      }
+
+      return txid
+    }
+    catch (err) {
+      delete this._transfers[id]
+      throw err
+    }
   }
 
   toNewItem(collid) {

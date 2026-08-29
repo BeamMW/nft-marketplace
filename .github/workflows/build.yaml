@@ -1,0 +1,14 @@
+name: Build and Package .dapp
+
+on:
+  push:
+    branches:
+      - master
+      - v1.1
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    uses: ./.github/workflows/make-dapp.yaml

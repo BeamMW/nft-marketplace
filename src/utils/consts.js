@@ -1,3 +1,5 @@
+import network from 'core/network'
+
 export const common = { 
   GROTHS_IN_BEAM: 100000000,
   ITEMS_PER_PAGE: 40,
@@ -41,8 +43,25 @@ export const sort = {
   LIKES_DESC: 5
 }
 
+// TESTING OVERRIDE - makes the admin panel reachable with any wallet.
+// Keep false outside local testing.
+export const force_admin_ui = false
+
 export const contract = {
-  cid: '4f35ecda4e84eb8acb6d3991b8b7443e26e01353a6987c07c8d90b00edd8fc80'
+  cid: network.cid
+}
+
+// Mirrors the DEX palette so an asset gets the same colour in both apps.
+export const pallete_assets = [
+  '#72fdff', '#2acf1d', '#ffbb54', '#d885ff', '#008eff',
+  '#ff746b', '#91e300', '#ffe75a', '#9643ff', '#395bff',
+  '#ff3b3b', '#73ff7c', '#ffa86c', '#ff3abe', '#0aaee1',
+  '#ff5200', '#6464ff', '#ff7a21', '#63afff', '#c81f68'
+]
+
+export function assetColor (aid) {
+  aid = Number(aid || 0)
+  return pallete_assets[aid] || pallete_assets[aid % pallete_assets.length]
 }
 
 export const def_images = {

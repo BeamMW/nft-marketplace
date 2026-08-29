@@ -18,7 +18,7 @@ import ErrorEx from 'utils/errorex'
 utils.initialize(
   {
     'appname': 'BEAM Gallery',
-    'min_api_version': '6.2',
+    'min_api_version': '7.3',
     'headless': true,
     'apiResultHandler': (...args) => store.onApiResult(...args)
   },
@@ -30,6 +30,10 @@ utils.initialize(
     //
     vueApp.config.errorHandler = (err, instance, info) => {store.setError(err)}
     window.addEventListener('unhandledrejection', ev => store.setError(ev.reason))
+
+    // a file dropped outside a dropzone would navigate the page away
+    window.addEventListener('dragover', ev => ev.preventDefault())
+    window.addEventListener('drop', ev => ev.preventDefault())
 
     vueApp.config.globalProperties.$store = store
     vueApp.config.globalProperties.$state = store.state
@@ -52,7 +56,7 @@ utils.initialize(
     } = utils.getStyles()
 
     if (utils.isWeb()) {
-      document.body.style.padding = '30px 10px 20px 30px'
+      document.body.style.padding = '30px 30px 20px 30px'
     }
 
     const topColor = [appsGradientOffset, 'px,'].join('')

@@ -1,3 +1,4 @@
+import homePage from 'components/home-page'
 import myPage from 'components/my-page'
 import userPage from 'components/user-page'
 import balancePage from 'components/balance-page'
@@ -12,7 +13,8 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    {path: '/', component: userPage, name: 'gallery'},
+    {path: '/', component: homePage, name: 'home'},
+    {path: '/gallery', component: userPage, name: 'gallery'},
     {path: '/my', component: myPage, name: 'my'},
     {path: '/balance', component: balancePage, name: 'balance'},
     {path: '/edit-artist/:id', component: editArtist, name: 'edit-artist', props: true},

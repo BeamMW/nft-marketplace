@@ -1,0 +1,65 @@
+name: Reusable Build and Package .dapp
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'Node.js version to use'
+        default: '20'
+        type: string
+      manifest_version:
+        description: 'Override the version instead of <prefix>.<commit count>'
+        default: ''
+        type: string
+    outputs:
+      dapp_name:
+        description: 'Name of the packaged .dapp file'
+        value: ${{ jobs.build.outputs.dapp_name }}
+      version:
+        description: 'Version written into the manifest'
+        value: ${{ jobs.build.outputs.version }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      dapp_name: ${{ steps.package.outputs.dapp_name }}
+      version: ${{ steps.package.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          # the version is derived from the commit count
+          fetch-depth: 0
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # Packaging lives in scripts/build-dapp.sh so CI and a local
+      # `yarn build:dapp` cannot drift apart. Lint runs as part of the build.
+      - name: Build and package
+        id: package
+        env:
+          SKIP_INSTALL: '1'
+          MANIFEST_VERSION: ${{ inputs.manifest_version }}
+        run: |
+          yarn build:dapp
+          DAPP=$(ls *.dapp | head -1)
+          echo "dapp_name=${DAPP}" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./${DAPP%.dapp}/manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload .dapp file
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.package.outputs.dapp_name }}
+          path: ${{ steps.package.outputs.dapp_name }}
