@@ -1,7 +1,10 @@
 {
-  "name": "NFT Marketplace",
-  "description": "Buy and sell NFTs",
+  "name": "BEAM NFT Gallery",
+  "description": "Buy and sell confidential NFTs",
+  "icon": "localapp/html/appicon.svg",
   "url": "localapp/html/index.html",
-  "guid": "nft-marketplace",
-  "min_api_version": "7.0"
+  "version": "1.1.0",
+  "api_version": "7.3",
+  "min_api_version": "7.3",
+  "guid": "ffbec734a0bb4f88a7104357a2680d20"
 }
