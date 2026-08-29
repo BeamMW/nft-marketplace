@@ -52,37 +52,42 @@ yarn build:dapp
 Zips the build plus a manifest into `nft-gallery.dapp`, which the wallet can install. The
 patch version is the commit count; override with `MANIFEST_VERSION=1.1.0 yarn build:dapp`.
 
-## Layout
+## Architecture
+
+The app never speaks to a node directly. Everything goes through a wallet:
 
 ```
-src/
-  components/   pages and modals
-  controls/     reusable widgets
-  stores/       contract-backed data layer
-  core/         wallet connection
-  utils/        formatting, validation, helpers
-  networks.js   network presets
-  galleryManager.wasm
+components / controls    Vue views and widgets
+        |
+      stores             one per entity: nfts, collections, artists, assets
+        |
+  utils/utils.js         facade
+        |
+   core/wallet.js        shader arg encoding, output unwrapping
+        |
+core/BeamDappConnector   connection, timeouts, reconnect, events
+        |
+      wallet             desktop, extension or headless WASM
 ```
 
-Import through the webpack aliases (`stores/nfts`, not `../stores/nfts`): `assets`,
-`stores`, `utils`, `controls`, `components`, `core`, `router`.
+**Calling the contract.** `utils.invokeContractAsync(args)` for reads,
+`invokeContractAsyncAndMakeTx(args)` for anything that costs a transaction. `args` is
+`{role, action, cid, ...}` naming a shader method — `view_*` reads use `role: 'manager'`,
+writes use `'user'`, `'artist'` or `'moderator'`.
 
-## How it fits together
+**Reading in bulk.** `stores/lazy-loader.js` pages through `view_*` and caches results in
+IndexedDB (Dexie), so a reload is instant and the UI reads from the local copy. Outside
+the desktop wallet it fetches from the HTTP cache gateway instead of the websocket API,
+which is much faster. Stores are plain classes over Vue's `reactive` — no Vuex, no Pinia.
 
-Stores are plain classes over Vue's `reactive` — no Vuex or Pinia. Contract calls go
-through `utils.invokeContractAsync(args)` or `invokeContractAsyncAndMakeTx(args)`, where
-`args` is `{role, action, cid, ...}` naming a shader method. `view_*` reads use
-`role: 'manager'`; writes use `'user'`, `'artist'` or `'moderator'`.
+**Staying current.** The wallet pushes an event on every new block. That bumps
+`state.height`, which stores watch to refresh, so the UI follows the chain without
+polling.
 
-Bulk reads are batched in `stores/lazy-loader.js` and cached in IndexedDB via Dexie.
-Outside the desktop wallet they go over the HTTP cache gateway rather than the websocket
-API, which is much faster.
-
-`src/core/BeamDappConnector.js` is vendored from
+**The connector.** `core/BeamDappConnector.js` is vendored from
 [dex-app](https://github.com/BeamMW/dex-app) and skipped by ESLint so it stays diffable
-against upstream; local edits are marked `LOCAL MODIFICATION`. `src/core/wallet.js`
-subclasses it and exports a configured singleton. `src/utils/utils.js` wraps that.
+against upstream; local changes are marked `LOCAL MODIFICATION`. Don't edit it to add
+gallery behaviour — that belongs in `core/wallet.js`, which subclasses it.
 
 ## Notes for contributors
 
