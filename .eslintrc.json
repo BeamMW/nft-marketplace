@@ -15,7 +15,8 @@
     "vue"
   ],
   "globals": {
-    "require": "readonly"
+    "require": "readonly",
+    "module": "readonly"
   },
   "rules": {
     "indent": [
