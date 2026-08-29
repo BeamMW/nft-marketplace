@@ -69,30 +69,34 @@
     top:50%
   }
 
+  /* matches the DEX dropdown: --color-dark-blue panel, no grey */
   .items {
-    background-color: rgb(50, 50, 50)
+    background-color: #042548
     color: #fff
     position: absolute
-    border:none
-    border-radius: 4px
+    border: 1px solid rgba(255, 255, 255, 0.08)
+    border-radius: 10px
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5)
     font-size: 14px
     right: 0
     z-index: 1
     margin-top: 47px
+    padding: 6px 0
     width: 100%
     max-height: 250px
-    overflow-y: scroll
+    overflow-y: auto
+    box-sizing: border-box
 
     div {
       color: #fff
-      padding: 15px 0px 15px 15px
+      padding: 12px 15px
       white-space: nowrap
       line-height: 1
       cursor: pointer
       user-select: none
-      
+
       &:hover {
-        color: #00f6d2
+        background-color: rgba(255, 255, 255, 0.07)
       }
     }
 

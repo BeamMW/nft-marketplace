@@ -1,32 +1,52 @@
 <template>
   <div class="gallery-container">
     <tabsctrl v-model="active_tab" class="tabs" :tabs="tabs">
-      <!-- div v-if="show_nfts" class="selectors">
-        <selector
-              v-on:selected="onAuthor"
-              :options="artist_options"
-              :selected="active_filter_by_artist"
-              title="Author"
-              v-if="artist_options.length"
-        />
-        <selector v-model:selected="nfts_sort_by"
-                  :options="selector_options"
-                  title="Sort by"
-        />
-      </div -->
+      <btn v-if="!compact"
+           height="36px"
+           width="36px"
+           padding="0px"
+           radius="10px"
+           tooltip="home"
+           @click="toHome"
+      >
+        <img src="~assets/home.svg"/>
+      </btn>
       <btn v-if="!compact && can_admin" 
-           :text="admin_btn_text"
-           text_color="green"
-           color="transparent"
-           padding="11px 10px"
+           height="36px"
+           width="36px"
+           padding="0px"
+           radius="10px"
+           :tooltip="admin_btn_text"
            @click="onAdmin"
-      />
+      >
+        <img src="~assets/admin.svg"/>
+      </btn>
       <btnWallet v-if="!compact"/>
       <btnKey v-if="!compact"/>
       <btnProfile/>
     </tabsctrl>
-    <!-- searchInput v-model:search="search" class="search_container" :max_length="20" placeholder="Search by artist, NFT or collection name..."/>
-    {{ search }} -->
+    <div class="toolbar">
+      <searchInput v-model="search"
+                   class="search_container"
+                   :max_length="40"
+                   placeholder="Search by NFT, collection or artist..."
+                   :suggestions="suggestions"
+                   @select="onSuggestion"
+      />
+      <div v-if="!compact" class="selectors">
+        <formSelect v-if="show_nfts && artist_options.length > 1"
+                    v-model="author_idx"
+                    class="selector"
+                    title="Author"
+                    :options="artist_options"
+        />
+        <formSelect v-model="sort_idx"
+                    class="selector"
+                    title="Sort by"
+                    :options="selector_options"
+        />
+      </div>
+    </div>
     <list v-if="show_nfts"
           class="list"
           items_name="NFTs"
@@ -65,6 +85,12 @@
     margin-top: 4px
   }
 }
+
+.toolbar {
+  & .selector {
+    min-width: 190px
+  }
+}
 </style>
 
 <style scoped lang="stylus">
@@ -74,10 +100,29 @@
     width: 100%
     height: 100%
 
-    & > .search_container {
+    & > .toolbar {
       display: flex
-      justify-content: flex-end
+      flex-direction: row
+      align-items: flex-end
+      justify-content: flex-start
+      flex-wrap: wrap
       margin-top: 10px
+
+      & > .search_container {
+        display: flex
+        width: 320px
+        align-self: flex-end
+      }
+
+      & > .selectors {
+        display: flex
+        flex-direction: row
+        margin-left: 20px
+
+        & > *:not(:first-child) {
+          margin-left: 20px
+        }
+      }
     }
 
     & > .list {
@@ -94,10 +139,13 @@ import btnKey from 'controls/btn-key'
 import btnWallet from 'controls/btn-wallet'
 import btnProfile from 'controls/btn-profile'
 import list from 'controls/lazy-list'
+import searchInput from 'controls/search-input'
+import formSelect from 'controls/form-select'
 import nftsStore from 'stores/nfts'
 import collsStore from 'stores/collections'
+import artistsStore from 'stores/artists-lazy'
 import utils from 'utils/utils'
-import {user_tabs, sort} from 'utils/consts'
+import {user_tabs, sort, force_admin_ui, def_images} from 'utils/consts'
 
 export default {
   components: {
@@ -106,7 +154,17 @@ export default {
     btnKey,
     btnWallet,
     btnProfile,
-    list
+    list,
+    searchInput,
+    formSelect
+  },
+
+  setup () {
+    // lazy store - the direct one issues a request per artist
+    return {
+      all_artists: artistsStore.getLazyAllItems('user'),
+      all_colls: collsStore.getLazyAllItems('user')
+    }
   },
 
   data () {
@@ -120,8 +178,8 @@ export default {
       ],
       search: '',
       selector_options: [
-        {name: 'Added: Oldest to Newest', id: sort.OLDEST_TO_NEWEST},
         {name: 'Added: Newest to Oldest', id: sort.NEWEST_TO_OLDEST},
+        {name: 'Added: Oldest to Newest', id: sort.OLDEST_TO_NEWEST},
         {name: 'Price: Low to High', id: sort.PRICE_ASC},
         {name: 'Price: High to Low', id: sort.PRICE_DESC},
         {name: 'Likes: Low to High', id: sort.LIKES_ASC},
@@ -140,10 +198,10 @@ export default {
       }
     },
     can_admin () {
-      return this.$state.is_moderator || this.$state.is_admin
+      return force_admin_ui || this.$state.is_moderator || this.$state.is_admin
     },
     admin_btn_text () {
-      let role = ''
+      let role = 'admin'
 
       if (this.$state.is_moderator) {
         role = 'moderator'
@@ -172,9 +230,124 @@ export default {
     },
     collsStore () {
       return collsStore
+    },
+
+    // Artists and collections are cached locally, NFTs are not.
+    suggestions () {
+      let needle = String(this.search || '').trim().toLowerCase()
+      if (needle.length < 2) {
+        return []
+      }
+
+      let matches = (list, type) => {
+        return (list || [])
+          .filter(item => item && item.id &&
+            String(item.label || '').toLowerCase().indexOf(needle) !== -1)
+          .map(item => {
+            return {
+              id: item.id,
+              type,
+              label: item.label,
+              sub: type === 'artist' ? 'Artist' : 'Collection',
+              // image objects, resolved to blob urls by the images store
+              image: type === 'artist' ? item.avatar : (item.safe_cover || item.cover),
+              default_image: type === 'artist'
+                ? def_images.artist_avatar
+                : def_images.artist_banner
+            }
+          })
+      }
+
+      return matches(this.all_artists, 'artist')
+        .concat(matches(this.all_colls, 'collection'))
+        .slice(0, 8)
+    },
+
+    // Read from the store query so the selectors cannot drift out of sync
+    // with the filter that is actually applied.
+    author_idx: {
+      get () {
+        let id = nftsStore.query.author
+        if (!id) return 0
+        let idx = this.artist_options.findIndex(option => option.id === id)
+        return idx === -1 ? 0 : idx
+      },
+      set (idx) {
+        let option = this.artist_options[idx]
+        this.applyQuery({author: option ? option.id : ''})
+      }
+    },
+
+    sort_idx: {
+      get () {
+        let idx = this.selector_options.findIndex(option => option.id === nftsStore.query.sort)
+        return idx === -1 ? 0 : idx
+      },
+      set (idx) {
+        let option = this.selector_options[idx]
+        if (option) this.applyQuery({sort: option.id})
+      }
+    },
+
+    artist_options () {
+      let artists = (this.all_artists || []).filter(artist => artist && artist.id)
+
+      let named = artists.map(artist => {
+        return {name: artist.label || artist.id, id: artist.id}
+      })
+
+      named.sort((a, b) => {
+        return String(a.name).localeCompare(String(b.name), undefined, {sensitivity: 'base'})
+      })
+
+      return [{name: 'All authors', id: ''}].concat(named)
     }
   },
+
+  watch: {
+    search (value) {
+      this.applyQuery({search: value})
+    }
+  },
+
   methods: {
+    // Picking an artist is an author filter, not a text search.
+    onSuggestion (item) {
+      if (item.type === 'artist') {
+        this.search = ''
+        this.applyQuery({search: '', search_authors: '', author: item.id})
+        return
+      }
+
+      collsStore.toDetails(item.id, 'user')
+    },
+
+    matchingAuthors (search) {
+      let needle = String(search || '').trim().toLowerCase()
+      if (!needle) {
+        return ''
+      }
+
+      return (this.all_artists || [])
+        .filter(artist => artist && artist.id &&
+          String(artist.label || '').toLowerCase().indexOf(needle) !== -1)
+        .map(artist => artist.id)
+        .join(',')
+    },
+
+    applyQuery (patch) {
+      if (patch.search !== undefined) {
+        patch = Object.assign({}, patch, {search_authors: this.matchingAuthors(patch.search)})
+      }
+
+      nftsStore.setQuery(patch)
+      collsStore.setQuery(patch)
+    },
+
+    toHome() {
+      this.$router.push({name: 'home'})
+    },
+
     onAdmin() {
       this.$store.toAdmin()
     }
