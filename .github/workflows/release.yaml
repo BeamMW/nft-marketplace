@@ -1,0 +1,39 @@
+name: Release
+
+# Tag a commit on master to cut a release:
+#   git tag v1.1.0 && git push origin v1.1.0
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/make-dapp.yaml
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download .dapp
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{ needs.build.outputs.dapp_name }}
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          DAPP: ${{ needs.build.outputs.dapp_name }}
+          VERSION: ${{ needs.build.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release create "$TAG" "$DAPP" \
+            --repo "$REPO" \
+            --title "$TAG" \
+            --generate-notes \
+            --notes "Manifest version \`$VERSION\`. Install \`$DAPP\` from the Beam wallet."

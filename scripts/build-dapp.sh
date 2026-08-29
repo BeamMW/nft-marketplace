@@ -30,7 +30,11 @@ ACTIVE_NETWORK="$(node -e "process.stdout.write(require('./src/networks').ACTIVE
 
 echo "Building ${MANIFEST_NAME} ${VERSION} for network '${ACTIVE_NETWORK}'"
 
-yarn install
+# CI installs with --immutable before calling this
+if [ -z "${SKIP_INSTALL:-}" ]; then
+  yarn install
+fi
+
 yarn build
 
 test -f html/index.html
