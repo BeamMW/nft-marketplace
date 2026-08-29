@@ -278,10 +278,15 @@ export default {
         .slice(0, 8)
     },
 
-    // Most traded first, newest as a tie-break.
+    // Most traded first, newest as a tie-break. BEAM only - volumes in other
+    // assets are not comparable without a rate.
     featured () {
-      const volume = (coll) => Number(((coll || {}).total_sold || {}).volume || 0)
-      const count  = (coll) => Number(((coll || {}).total_sold || {}).count || 0)
+      const sold = (coll) => {
+        let stats = (coll || {}).total_sold || {}
+        return Number(stats.aid || 0) === 0 ? stats : {}
+      }
+      const volume = (coll) => Number(sold(coll).volume || 0)
+      const count  = (coll) => Number(sold(coll).count || 0)
 
       let colls = (this.all_colls || []).slice()
       colls.sort((a, b) => (volume(b) - volume(a)) || (count(b) - count(a)) || (b.id - a.id))
