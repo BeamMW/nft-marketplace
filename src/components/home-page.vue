@@ -40,7 +40,7 @@
       </div>
       <div class="stat">
         <div class="stat-value">
-          <amount :amount="total_volume.amount" :aid="total_volume.aid" size="28px"/>
+          <amount :amount="total_volume" :aid="0" size="28px"/>
         </div>
         <div class="stat-title">Trade volume</div>
       </div>
@@ -224,28 +224,18 @@ export default {
       return (this.all_artists || []).length
     },
 
-    // Volumes are per asset and cannot be summed together - total each
-    // separately and show the largest.
+    // BEAM only - volumes in other assets are not comparable without a rate,
+    // so they are left out rather than summed in.
     total_volume () {
-      let totals = {}
+      let total = 0
 
       for (let coll of (this.all_colls || [])) {
         let sold = (coll || {}).total_sold || {}
-        let volume = Number(sold.volume || 0)
-        if (!volume) continue
-
-        let aid = Number(sold.aid || 0)
-        totals[aid] = (totals[aid] || 0) + volume
+        if (Number(sold.aid || 0) !== 0) continue
+        total += Number(sold.volume || 0)
       }
 
-      let best = {amount: 0, aid: 0}
-      for (let aid in totals) {
-        if (totals[aid] > best.amount) {
-          best = {amount: totals[aid], aid: Number(aid)}
-        }
-      }
-
-      return best
+      return total
     },
 
     suggestions () {
